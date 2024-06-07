@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace ei8.Cortex.Coding.d23.Filters
+namespace ei8.Cortex.Coding.d23.Selectors
 {
-    public interface IFilter
+    public interface ISelector
     {
         IEnumerable<Neuron> Evaluate(Ensemble ensemble, IEnumerable<Neuron> neurons);
     }

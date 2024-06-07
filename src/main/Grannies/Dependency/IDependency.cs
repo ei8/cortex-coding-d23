@@ -2,5 +2,7 @@
 {
     public interface IDependency : IGranny<IDependency, IDependencyParameterSet>
     {
+        Neuron Value { get; }
+        Neuron Type { get; }
     }
 }

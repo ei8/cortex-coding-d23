@@ -1,23 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
-namespace ei8.Cortex.Coding.d23.Filters
+namespace ei8.Cortex.Coding.d23.Selectors
 {
-    public class PresynapticBySibling : IFilter
+    public class PresynapticBySibling : ISelector
     {
         private readonly bool exhaustive;
-        private readonly IEnumerable<Guid> siblingNeuronIds;
+        private readonly IEnumerable<Neuron> siblingNeurons;
 
-        public PresynapticBySibling(params Guid[] siblingNeuronIds) : this(true, siblingNeuronIds)
+        public PresynapticBySibling(params Neuron[] siblingNeurons) : this(true, siblingNeurons)
         {
         }
 
-        public PresynapticBySibling(bool exhaustive, params Guid[] siblingNeuronIds)
+        public PresynapticBySibling(bool exhaustive, params Neuron[] siblingNeurons)
         {
             this.exhaustive = exhaustive;
-            this.siblingNeuronIds = siblingNeuronIds;
+            this.siblingNeurons = siblingNeurons;
         }
 
         public IEnumerable<Neuron> Evaluate(Ensemble ensemble, IEnumerable<Neuron> neurons)
@@ -35,10 +34,10 @@ namespace ei8.Cortex.Coding.d23.Filters
                     {
                         var preTerminals = pre.GetTerminals(ensemble);
                         // if presynaptic has only current neuron + siblings as postsynaptic 
-                        if (preTerminals.Count() == siblingNeuronIds.Count() + 1 &&
+                        if (preTerminals.Count() == siblingNeurons.Count() + 1 &&
                             // and postsynaptics of presynaptic match the current neuron and the siblings
                             preTerminals.Select(t => t.PostsynapticNeuronId).HasSameElementsAs(
-                                siblingNeuronIds.Concat(new[] { neuron.Id }))
+                                siblingNeurons.Select(sn => sn.Id).Concat(new[] { neuron.Id }))
                             )
                         {
                             // return presynaptic

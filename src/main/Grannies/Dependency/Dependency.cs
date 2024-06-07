@@ -1,4 +1,4 @@
-﻿using ei8.Cortex.Coding.d23.Filters;
+﻿using ei8.Cortex.Coding.d23.Selectors;
 using ei8.Cortex.Library.Common;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,16 +11,17 @@ namespace ei8.Cortex.Coding.d23.Grannies
         public Dependency()
         {
         }
-        
-        public async Task<Neuron> BuildAsync(Ensemble ensemble, ICoreSet coreSet, IDependencyParameterSet parameterSet)
+
+        public async Task<IDependency> BuildAsync(Ensemble ensemble, ICoreSet coreSet, IDependencyParameterSet parameterSet)
         {
-            Neuron value = ensemble.Obtain(parameterSet.Value);
-            Neuron dependencyType = ensemble.Obtain(parameterSet.Type);
-            Neuron dependency = ensemble.Obtain(Neuron.CreateTransient(null, null, null));
+            var result = new Dependency();
+            result.Value = ensemble.Obtain(parameterSet.Value);
+            result.Type = ensemble.Obtain(parameterSet.Type);
+            result.Neuron = ensemble.Obtain(Neuron.CreateTransient(null, null, null));
             // add dependency to ensemble
-            ensemble.AddReplace(Terminal.CreateTransient(dependency.Id, value.Id));
-            ensemble.AddReplace(Terminal.CreateTransient(dependency.Id, dependencyType.Id));
-            return dependency;
+            ensemble.AddReplace(Terminal.CreateTransient(result.Neuron.Id, result.Value.Id));
+            ensemble.AddReplace(Terminal.CreateTransient(result.Neuron.Id, result.Type.Id));
+            return result;
         }
 
         public IEnumerable<Library.Common.NeuronQuery> GetQueries(ICoreSet coreSet, IDependencyParameterSet parameterSet) =>
@@ -36,24 +37,31 @@ namespace ei8.Cortex.Coding.d23.Grannies
                 }
             };
 
-        public bool TryParse(Ensemble ensemble, ICoreSet coreSet, IDependencyParameterSet parameterSet, out Neuron result)
+        public bool TryParse(Ensemble ensemble, ICoreSet coreSet, IDependencyParameterSet parameterSet, out IDependency result)
         {
             result = null;
-            IEnumerable<Neuron> neurons = new[] { parameterSet.Value };
 
-            var levelParsers = new LevelParser[]
-            {
-                new LevelParser(new PresynapticBySibling(parameterSet.Type.Id)),
-            };
-
-            foreach (var levelParser in levelParsers)
-                neurons = levelParser.Evaluate(ensemble, neurons);
-
-            if (neurons.Count() == 1)
-                result = neurons.Single();
+            var tempResult = new Dependency();
+            tempResult.Value = parameterSet.Value;
+            tempResult.Type = parameterSet.Type;
+            
+            this.TryParseCore(
+                parameterSet,
+                ensemble,
+                tempResult,
+                new[] { tempResult.Value },
+                new[] { new LevelParser(new PresynapticBySibling(tempResult.Type)) },
+                (n) => tempResult.Neuron = n,
+                ref result
+                );
 
             return result != null;
-
         }
+
+        public Neuron Value { get; private set; }
+
+        public Neuron Type { get; private set; }
+
+        public Neuron Neuron { get; private set; }
     }
 }

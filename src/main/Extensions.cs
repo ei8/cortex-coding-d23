@@ -1,4 +1,5 @@
-﻿using neurUL.Common.Domain.Model;
+﻿using ei8.Cortex.Coding.d23.Selectors;
+using neurUL.Common.Domain.Model;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -19,7 +20,7 @@ namespace ei8.Cortex.Coding.d23
         /// <param name="neuronRepository"></param>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public async static Task<Neuron> ObtainAsync<TGranny, TParameterSet>(
+        public async static Task<TGranny> ObtainAsync<TGranny, TParameterSet>(
                 this IGranny<TGranny, TParameterSet> granny, 
                 Ensemble ensemble,
                 ICoreSet coreSet,
@@ -33,15 +34,15 @@ namespace ei8.Cortex.Coding.d23
             AssertionConcern.AssertArgumentNotNull(ensemble, nameof(ensemble));
             AssertionConcern.AssertArgumentNotNull(parameterSet, nameof(parameterSet));
 
-            Neuron result = null;
+            TGranny result = default;
             // if target is not in specified ensemble
-            if (!granny.TryParse(ensemble, coreSet, parameterSet, out Neuron ensembleParseResult))
+            if (!granny.TryParse(ensemble, coreSet, parameterSet, out TGranny ensembleParseResult))
             {
                 // retrieve target from DB
                 var queries = granny.GetQueries(coreSet, parameterSet);
                 ensemble.AddReplaceItems(await neuronRepository.GetByQueriesAsync(userId, queries.ToArray()));
                 // if target is in DB
-                if (granny.TryParse(ensemble, coreSet, parameterSet, out Neuron dbParseResult))
+                if (granny.TryParse(ensemble, coreSet, parameterSet, out TGranny dbParseResult))
                 {
                     result = dbParseResult;
                 }
@@ -58,8 +59,22 @@ namespace ei8.Cortex.Coding.d23
 
             return result;
         }
+
+        internal static void TryParseCore<TGranny, TParameterSet>(this TGranny granny, TParameterSet parameterSet, Ensemble ensemble, TGranny tempResult, IEnumerable<Neuron> neurons, LevelParser[] levelParsers, System.Action<Neuron> grannySetter, ref TGranny result)
+            where TGranny : IGranny<TGranny, TParameterSet>
+            where TParameterSet : IParameterSet
+        {
+            foreach (var levelParser in levelParsers)
+                neurons = levelParser.Evaluate(ensemble, neurons);
+
+            if (neurons.Count() == 1)
+            {
+                grannySetter(neurons.Single());
+                result = tempResult;
+            }
+        }
         #endregion
-        
+
         public static bool HasSameElementsAs<T>(
                 this IEnumerable<T> first,
                 IEnumerable<T> second

@@ -1,9 +1,9 @@
 ﻿using ei8.Cortex.Library.Common;
 using System.Collections.Generic;
 
-namespace ei8.Cortex.Coding.d23.Filters
+namespace ei8.Cortex.Coding.d23.Selectors
 {
-    public class Relation : IFilter
+    public class Relation : ISelector
     {
         private readonly RelativeType type;
 
