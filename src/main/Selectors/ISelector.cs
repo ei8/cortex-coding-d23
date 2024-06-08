@@ -6,6 +6,6 @@ namespace ei8.Cortex.Coding.d23.Selectors
 {
     public interface ISelector
     {
-        IEnumerable<Neuron> Evaluate(Ensemble ensemble, IEnumerable<Neuron> neurons);
+        IEnumerable<Neuron> Evaluate(Ensemble ensemble, IEnumerable<Neuron> selection);
     }
 }

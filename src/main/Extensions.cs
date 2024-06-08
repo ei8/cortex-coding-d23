@@ -60,16 +60,16 @@ namespace ei8.Cortex.Coding.d23
             return result;
         }
 
-        internal static void TryParseCore<TGranny, TParameterSet>(this TGranny granny, TParameterSet parameterSet, Ensemble ensemble, TGranny tempResult, IEnumerable<Neuron> neurons, LevelParser[] levelParsers, System.Action<Neuron> grannySetter, ref TGranny result)
+        internal static void TryParseCore<TGranny, TParameterSet>(this TGranny granny, TParameterSet parameterSet, Ensemble ensemble, TGranny tempResult, IEnumerable<Neuron> selection, LevelParser[] levelParsers, System.Action<Neuron> grannySetter, ref TGranny result)
             where TGranny : IGranny<TGranny, TParameterSet>
             where TParameterSet : IParameterSet
         {
             foreach (var levelParser in levelParsers)
-                neurons = levelParser.Evaluate(ensemble, neurons);
+                selection = levelParser.Evaluate(ensemble, selection);
 
-            if (neurons.Count() == 1)
+            if (selection.Count() == 1)
             {
-                grannySetter(neurons.Single());
+                grannySetter(selection.Single());
                 result = tempResult;
             }
         }

@@ -19,12 +19,12 @@ namespace ei8.Cortex.Coding.d23.Selectors
             this.siblingNeurons = siblingNeurons;
         }
 
-        public IEnumerable<Neuron> Evaluate(Ensemble ensemble, IEnumerable<Neuron> neurons)
+        public IEnumerable<Neuron> Evaluate(Ensemble ensemble, IEnumerable<Neuron> selection)
         {
             var result = new List<Neuron>();
 
             // loop through each specified neuron
-            foreach (var neuron in neurons)
+            foreach (var neuron in selection)
             {
                 // loop through each presynaptic
                 foreach (var pre in neuron.GetPresynapticNeurons(ensemble))

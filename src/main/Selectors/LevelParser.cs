@@ -11,12 +11,12 @@ namespace ei8.Cortex.Coding.d23.Selectors
 
         public IEnumerable<ISelector> Selectors { get; private set; }
 
-        public IEnumerable<Neuron> Evaluate(Ensemble ensemble, IEnumerable<Neuron> neurons)
+        public IEnumerable<Neuron> Evaluate(Ensemble ensemble, IEnumerable<Neuron> selection)
         {
-            foreach (var selector in Selectors)
-                neurons = selector.Evaluate(ensemble, neurons);
+            foreach (var selector in this.Selectors)
+                selection = selector.Evaluate(ensemble, selection);
 
-            return neurons;
+            return selection;
         }
     }
 }
