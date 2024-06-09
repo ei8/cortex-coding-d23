@@ -3,9 +3,9 @@ using System;
 
 namespace ei8.Cortex.Coding.d23.Grannies
 {
-    public class DependencyParameterSet : IDependencyParameterSet
+    public class DependentParameterSet : IDependentParameterSet
     {
-        public DependencyParameterSet(
+        public DependentParameterSet(
             Neuron value,
             Neuron type
             )

@@ -8,8 +8,10 @@ namespace ei8.Cortex.Coding.d23
     {
         Neuron DirectObject { get; }
 
+        Neuron InstantiatesUnit { get; }
+
         Neuron Subordination { get; }
 
-        Neuron InstantiatesUnit { get; }
+        Neuron Unit { get; }
     }
 }

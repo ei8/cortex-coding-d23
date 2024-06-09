@@ -1,20 +1,20 @@
 ﻿using ei8.Cortex.Coding.d23.Selectors;
 using ei8.Cortex.Library.Common;
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace ei8.Cortex.Coding.d23.Grannies
 {
-    public class Dependency : IDependency
+    public class Dependent : IDependent
     {
-        public Dependency()
+        public Dependent()
         {
         }
 
-        public async Task<IDependency> BuildAsync(Ensemble ensemble, ICoreSet coreSet, IDependencyParameterSet parameterSet)
+        public async Task<IDependent> BuildAsync(Ensemble ensemble, ICoreSet coreSet, IDependentParameterSet parameterSet)
         {
-            var result = new Dependency();
+            var result = new Dependent();
             result.Value = ensemble.Obtain(parameterSet.Value);
             result.Type = ensemble.Obtain(parameterSet.Type);
             result.Neuron = ensemble.Obtain(Neuron.CreateTransient(null, null, null));
@@ -24,24 +24,24 @@ namespace ei8.Cortex.Coding.d23.Grannies
             return result;
         }
 
-        public IEnumerable<Library.Common.NeuronQuery> GetQueries(ICoreSet coreSet, IDependencyParameterSet parameterSet) =>
+        public IEnumerable<Library.Common.NeuronQuery> GetQueries(ICoreSet coreSet, IDependentParameterSet parameterSet) =>
             new[] {
                 new NeuronQuery()
                 {
                     Postsynaptic = new[] { 
                         parameterSet.Value.Id.ToString(),
-                        parameterSet.Type.ToString()
+                        parameterSet.Type.Id.ToString()
                     },
                     DirectionValues = DirectionValues.Outbound,
                     Depth = 1
                 }
             };
 
-        public bool TryParse(Ensemble ensemble, ICoreSet coreSet, IDependencyParameterSet parameterSet, out IDependency result)
+        public bool TryParse(Ensemble ensemble, ICoreSet coreSet, IDependentParameterSet parameterSet, out IDependent result)
         {
             result = null;
 
-            var tempResult = new Dependency();
+            var tempResult = new Dependent();
             tempResult.Value = parameterSet.Value;
             tempResult.Type = parameterSet.Type;
             

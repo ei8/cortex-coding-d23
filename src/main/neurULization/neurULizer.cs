@@ -37,7 +37,7 @@ namespace ei8.Cortex.Coding.d23.neurULization
                 options.CoreSet,
                 new InstantiatesParameterSet(
                     rootTypeNeuron,
-                    new Dependency(),
+                    new Dependent(),
                     options.EnsembleRepository,
                     options.UserId
                     ),

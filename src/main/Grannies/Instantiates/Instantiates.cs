@@ -1,5 +1,6 @@
 ﻿using ei8.Cortex.Coding.d23.Selectors;
 using ei8.Cortex.Library.Common;
+using neurUL.Common.Domain.Model;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,19 +9,15 @@ namespace ei8.Cortex.Coding.d23.Grannies
 {
     public class Instantiates : IInstantiates
     {
-        public Instantiates()
-        {
-        }
-
         public async Task<IInstantiates> BuildAsync(Ensemble ensemble, ICoreSet coreSet, IInstantiatesParameterSet parameterSet)
         {
             var result = new Instantiates();
-            result.Subordination = ensemble.Obtain(coreSet.Subordination);
-            result.InstantiatesUnit = ensemble.Obtain(coreSet.InstantiatesUnit);
-            result.ClassDirectObject = await parameterSet.Dependency.ObtainAsync(
+            var subordination = ensemble.Obtain(coreSet.Subordination);
+            var instantiatesUnit = ensemble.Obtain(coreSet.InstantiatesUnit);
+            result.ClassDirectObject = await new Dependent().ObtainAsync(
                 ensemble,
                 coreSet,
-                new DependencyParameterSet(
+                new DependentParameterSet(
                     parameterSet.Class,
                     coreSet.DirectObject
                 ),
@@ -28,8 +25,8 @@ namespace ei8.Cortex.Coding.d23.Grannies
                 parameterSet.UserId
                 );
             result.Neuron = ensemble.Obtain(Neuron.CreateTransient(null, null, null));
-            ensemble.AddReplace(Terminal.CreateTransient(result.Neuron.Id, result.Subordination.Id));
-            ensemble.AddReplace(Terminal.CreateTransient(result.Neuron.Id, result.InstantiatesUnit.Id));
+            ensemble.AddReplace(Terminal.CreateTransient(result.Neuron.Id, subordination.Id));
+            ensemble.AddReplace(Terminal.CreateTransient(result.Neuron.Id, instantiatesUnit.Id));
             ensemble.AddReplace(Terminal.CreateTransient(result.Neuron.Id, result.ClassDirectObject.Neuron.Id));
 
             return result;
@@ -42,6 +39,8 @@ namespace ei8.Cortex.Coding.d23.Grannies
                     Id = new[] { parameterSet.Class.Id.ToString() },
                     DirectionValues = DirectionValues.Any,
                     Depth = 3,
+                    // less than 3 edges away otherwise should have postsynaptic of subordination or instantiates unit 
+                    // TODO: or should this be renamed to TraversalMaximumDepthPostsynaptic
                     TraversalMinimumDepthPostsynaptic = new[] {
                         new DepthIdsPair {
                             Depth = 3,
@@ -59,16 +58,14 @@ namespace ei8.Cortex.Coding.d23.Grannies
             result = null;
 
             var tempResult = new Instantiates();
-            tempResult.Subordination = coreSet.Subordination;
-            tempResult.InstantiatesUnit = coreSet.InstantiatesUnit;
-            if ((new Dependency()).TryParse(
+            if (new Dependent().TryParse(
                 ensemble,
                 coreSet,
-                new DependencyParameterSet(
+                new DependentParameterSet(
                     parameterSet.Class,
                     coreSet.DirectObject
                     ),
-                out IDependency classDirectObject
+                out IDependent classDirectObject
                 ))
             {
                 tempResult.ClassDirectObject = classDirectObject;
@@ -81,8 +78,8 @@ namespace ei8.Cortex.Coding.d23.Grannies
                     new []
                     {
                         new LevelParser(new PresynapticBySibling(
-                            tempResult.Subordination,
-                            tempResult.InstantiatesUnit
+                            coreSet.Subordination,
+                            coreSet.InstantiatesUnit
                             ))
                     }, 
                     (n) => tempResult.Neuron = n,
@@ -93,11 +90,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
             return result != null;
         }
 
-        public Neuron Subordination { get; private set; }
-
-        public Neuron InstantiatesUnit { get; private set; }
-
-        public IDependency ClassDirectObject { get; private set; }
+        public IDependent ClassDirectObject { get; private set; }
 
         public Neuron Neuron { get; private set; }
     }

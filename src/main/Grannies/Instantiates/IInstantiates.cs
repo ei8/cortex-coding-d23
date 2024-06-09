@@ -2,8 +2,6 @@
 {
     public interface IInstantiates : IGranny<IInstantiates, IInstantiatesParameterSet>
     {
-        Neuron Subordination { get; }
-        Neuron InstantiatesUnit { get; }
-        IDependency ClassDirectObject { get; }
+        IDependent ClassDirectObject { get; }
     }
 }
