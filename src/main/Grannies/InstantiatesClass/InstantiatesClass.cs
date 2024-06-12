@@ -6,31 +6,31 @@ using System.Threading.Tasks;
 
 namespace ei8.Cortex.Coding.d23.Grannies
 {
-    public class Instantiates : IInstantiates
+    public class InstantiatesClass : IInstantiatesClass
     {
-        public async Task<IInstantiates> BuildAsync(Ensemble ensemble, IPrimitiveSet primitives, IInstantiatesParameterSet parameters)
+        public async Task<IInstantiatesClass> BuildAsync(Ensemble ensemble, IPrimitiveSet primitives, IInstantiatesClassParameterSet parameters)
         {
-            var result = new Instantiates();
+            var result = new InstantiatesClass();
 
             var subordination = await new Subordination().BuildAsync(
                 ensemble,
                 primitives,
-                Instantiates.CreateSubordinationParameterSet(primitives, parameters)
+                InstantiatesClass.CreateSubordinationParameterSet(primitives, parameters)
                 );
 
-            result.ClassDirectObject = subordination.Dependents.Single();
+            result.Class = subordination.Dependents.Single();
             result.Neuron = subordination.Neuron;
 
             return result;
         }
 
-        public IEnumerable<NeuronQuery> GetQueries(IPrimitiveSet primitives, IInstantiatesParameterSet parameters) =>
+        public IEnumerable<NeuronQuery> GetQueries(IPrimitiveSet primitives, IInstantiatesClassParameterSet parameters) =>
             new Subordination().GetQueries(
                 primitives,
-                Instantiates.CreateSubordinationParameterSet(primitives, parameters)
+                InstantiatesClass.CreateSubordinationParameterSet(primitives, parameters)
                 );
 
-        private static SubordinationParameterSet CreateSubordinationParameterSet(IPrimitiveSet primitives, IInstantiatesParameterSet parameters)
+        private static SubordinationParameterSet CreateSubordinationParameterSet(IPrimitiveSet primitives, IInstantiatesClassParameterSet parameters)
         {
             return new SubordinationParameterSet(
                 new HeadParameterSet(primitives.Instantiates),
@@ -46,21 +46,21 @@ namespace ei8.Cortex.Coding.d23.Grannies
             );
         }
 
-        public bool TryParse(Ensemble ensemble, IPrimitiveSet primitives, IInstantiatesParameterSet parameters, out IInstantiates result)
+        public bool TryParse(Ensemble ensemble, IPrimitiveSet primitives, IInstantiatesClassParameterSet parameters, out IInstantiatesClass result)
         {
             result = null;
 
-            var tempResult = new Instantiates();
+            var tempResult = new InstantiatesClass();
 
             if (new Subordination().TryParse(
                 ensemble,
                 primitives,
-                Instantiates.CreateSubordinationParameterSet(primitives, parameters),
+                InstantiatesClass.CreateSubordinationParameterSet(primitives, parameters),
                 out ISubordination subordination
                 )
                 )
             {
-                tempResult.ClassDirectObject = subordination.Dependents.Single();
+                tempResult.Class = subordination.Dependents.Single();
                 tempResult.Neuron = subordination.Neuron;
                 result = tempResult;
             }
@@ -68,7 +68,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
             return result != null;
         }
 
-        public IDependent ClassDirectObject { get; private set; }
+        public IDependent Class { get; private set; }
 
         public Neuron Neuron { get; private set; }
     }

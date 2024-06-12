@@ -31,11 +31,11 @@ namespace ei8.Cortex.Coding.d23.neurULization
             var rootTypeNeuron = erDict[key];
 
             // instantiates
-            var instantiatesGranny = new Instantiates();
+            var instantiatesGranny = new InstantiatesClass();
             var instantiatesType = await instantiatesGranny.ObtainAsync(
                 result,
                 options.Primitives,
-                new InstantiatesParameterSet(
+                new InstantiatesClassParameterSet(
                     rootTypeNeuron,
                     new Dependent(),
                     options.EnsembleRepository,

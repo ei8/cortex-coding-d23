@@ -3,9 +3,9 @@ using System;
 
 namespace ei8.Cortex.Coding.d23.Grannies
 {
-    public class InstantiatesParameterSet : IInstantiatesParameterSet
+    public class InstantiatesClassParameterSet : IInstantiatesClassParameterSet
     {
-        public InstantiatesParameterSet(
+        public InstantiatesClassParameterSet(
             Neuron @class,
             IDependent dependent,
             IEnsembleRepository neuronRepository,
