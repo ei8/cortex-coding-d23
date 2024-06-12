@@ -12,11 +12,11 @@ namespace ei8.Cortex.Coding.d23.Grannies
         {
         }
 
-        public async Task<IDependent> BuildAsync(Ensemble ensemble, ICoreSet coreSet, IDependentParameterSet parameterSet)
+        public async Task<IDependent> BuildAsync(Ensemble ensemble, IPrimitiveSet primitives, IDependentParameterSet parameters)
         {
             var result = new Dependent();
-            result.Value = ensemble.Obtain(parameterSet.Value);
-            result.Type = ensemble.Obtain(parameterSet.Type);
+            result.Value = ensemble.Obtain(parameters.Value);
+            result.Type = ensemble.Obtain(parameters.Type);
             result.Neuron = ensemble.Obtain(Neuron.CreateTransient(null, null, null));
             // add dependency to ensemble
             ensemble.AddReplace(Terminal.CreateTransient(result.Neuron.Id, result.Value.Id));
@@ -24,29 +24,29 @@ namespace ei8.Cortex.Coding.d23.Grannies
             return result;
         }
 
-        public IEnumerable<Library.Common.NeuronQuery> GetQueries(ICoreSet coreSet, IDependentParameterSet parameterSet) =>
+        public IEnumerable<Library.Common.NeuronQuery> GetQueries(IPrimitiveSet primitives, IDependentParameterSet parameters) =>
             new[] {
                 new NeuronQuery()
                 {
                     Postsynaptic = new[] { 
-                        parameterSet.Value.Id.ToString(),
-                        parameterSet.Type.Id.ToString()
+                        parameters.Value.Id.ToString(),
+                        parameters.Type.Id.ToString()
                     },
                     DirectionValues = DirectionValues.Outbound,
                     Depth = 1
                 }
             };
 
-        public bool TryParse(Ensemble ensemble, ICoreSet coreSet, IDependentParameterSet parameterSet, out IDependent result)
+        public bool TryParse(Ensemble ensemble, IPrimitiveSet primitives, IDependentParameterSet parameters, out IDependent result)
         {
             result = null;
 
             var tempResult = new Dependent();
-            tempResult.Value = parameterSet.Value;
-            tempResult.Type = parameterSet.Type;
+            tempResult.Value = parameters.Value;
+            tempResult.Type = parameters.Type;
             
             this.TryParseCore(
-                parameterSet,
+                parameters,
                 ensemble,
                 tempResult,
                 new[] { tempResult.Value },

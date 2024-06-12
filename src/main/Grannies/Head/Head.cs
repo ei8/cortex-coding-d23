@@ -7,42 +7,42 @@ namespace ei8.Cortex.Coding.d23.Grannies
 {
     public class Head : IHead
     {
-        public async Task<IHead> BuildAsync(Ensemble ensemble, ICoreSet coreSet, IHeadParameterSet parameterSet)
+        public async Task<IHead> BuildAsync(Ensemble ensemble, IPrimitiveSet primitives, IHeadParameterSet parameters)
         {
             var result = new Head();
-            result.Value = ensemble.Obtain(parameterSet.Value);
+            result.Value = ensemble.Obtain(parameters.Value);
             result.Neuron = ensemble.Obtain(Neuron.CreateTransient(null, null, null));
             ensemble.AddReplace(Terminal.CreateTransient(result.Neuron.Id, result.Value.Id));
-            ensemble.AddReplace(Terminal.CreateTransient(result.Neuron.Id, coreSet.Unit.Id));
+            ensemble.AddReplace(Terminal.CreateTransient(result.Neuron.Id, primitives.Unit.Id));
             return result;
         }
 
-        public IEnumerable<NeuronQuery> GetQueries(ICoreSet coreSet, IHeadParameterSet parameterSet) =>
+        public IEnumerable<NeuronQuery> GetQueries(IPrimitiveSet primitives, IHeadParameterSet parameters) =>
             new[] {
                 new NeuronQuery()
                 {
                     Postsynaptic = new[] {
-                        parameterSet.Value.Id.ToString(),
-                        coreSet.Unit.Id.ToString()
+                        parameters.Value.Id.ToString(),
+                        primitives.Unit.Id.ToString()
                     },
                     DirectionValues = DirectionValues.Outbound,
                     Depth = 1
                 }
             };
 
-        public bool TryParse(Ensemble ensemble, ICoreSet coreSet, IHeadParameterSet parameterSet, out IHead result)
+        public bool TryParse(Ensemble ensemble, IPrimitiveSet primitives, IHeadParameterSet parameters, out IHead result)
         {
             result = null;
 
             var tempResult = new Head();
-            tempResult.Value = parameterSet.Value;
+            tempResult.Value = parameters.Value;
 
             this.TryParseCore(
-                parameterSet,
+                parameters,
                 ensemble,
                 tempResult,
                 new[] { tempResult.Value },
-                new[] { new LevelParser(new PresynapticBySibling(coreSet.Unit)) },
+                new[] { new LevelParser(new PresynapticBySibling(primitives.Unit)) },
                 (n) => tempResult.Neuron = n,
                 ref result
                 );

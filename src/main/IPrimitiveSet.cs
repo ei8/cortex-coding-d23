@@ -4,11 +4,11 @@ using System.Text;
 
 namespace ei8.Cortex.Coding.d23
 {
-    public interface ICoreSet
+    public interface IPrimitiveSet
     {
         Neuron DirectObject { get; }
 
-        Neuron InstantiatesUnit { get; }
+        Neuron Instantiates { get; }
 
         Neuron Subordination { get; }
 

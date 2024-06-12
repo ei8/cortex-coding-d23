@@ -1,14 +1,14 @@
 ﻿namespace ei8.Cortex.Coding.d23
 {
-    public class CoreSet : ICoreSet
+    public class PrimitiveSet : IPrimitiveSet
     {
-        public CoreSet()
+        public PrimitiveSet()
         {            
         }
 
         public Neuron DirectObject { get; set; }
 
-        public Neuron InstantiatesUnit { get; set; }
+        public Neuron Instantiates { get; set; }
 
         public Neuron Subordination { get; set; }
 

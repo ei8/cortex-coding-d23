@@ -14,11 +14,11 @@ namespace ei8.Cortex.Coding.d23.Grannies
         where TSelf : IGranny<TSelf, TParameterSet>
         where TParameterSet : IParameterSet
     {
-        bool TryParse(Ensemble ensemble, ICoreSet coreSet, TParameterSet parameterSet, out TSelf result);
+        bool TryParse(Ensemble ensemble, IPrimitiveSet primitives, TParameterSet parameters, out TSelf result);
 
-        IEnumerable<NeuronQuery> GetQueries(ICoreSet coreSet, TParameterSet parameterSet);
+        IEnumerable<NeuronQuery> GetQueries(IPrimitiveSet primitives, TParameterSet parameters);
 
-        Task<TSelf> BuildAsync(Ensemble ensemble, ICoreSet coreSet, TParameterSet parameterSet);
+        Task<TSelf> BuildAsync(Ensemble ensemble, IPrimitiveSet primitives, TParameterSet parameters);
 
         Neuron Neuron { get; }
     }

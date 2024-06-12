@@ -2,14 +2,14 @@
 {
     public class neurULizationOptions
     {
-        public neurULizationOptions(ICoreSet coreSet, IEnsembleRepository ensembleRepository, string userId)
+        public neurULizationOptions(IPrimitiveSet primitives, IEnsembleRepository ensembleRepository, string userId)
         {
-            this.CoreSet = coreSet;
+            this.Primitives = primitives;
             this.EnsembleRepository = ensembleRepository;
             this.UserId = userId;
         }
 
-        public ICoreSet CoreSet { get; }
+        public IPrimitiveSet Primitives { get; }
 
         public IEnsembleRepository EnsembleRepository { get; }
 

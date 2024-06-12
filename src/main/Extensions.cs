@@ -17,15 +17,15 @@ namespace ei8.Cortex.Coding.d23
         /// <typeparam name="TParameterSet"></typeparam>
         /// <param name="granny"></param>
         /// <param name="ensemble"></param>
-        /// <param name="parameterSet"></param>
+        /// <param name="parameters"></param>
         /// <param name="neuronRepository"></param>
         /// <param name="userId"></param>
         /// <returns></returns>
         public async static Task<TGranny> ObtainAsync<TGranny, TParameterSet>(
                 this IGranny<TGranny, TParameterSet> granny, 
                 Ensemble ensemble,
-                ICoreSet coreSet,
-                TParameterSet parameterSet,
+                IPrimitiveSet primitives,
+                TParameterSet parameters,
                 IEnsembleRepository neuronRepository,
                 string userId
             ) 
@@ -33,17 +33,17 @@ namespace ei8.Cortex.Coding.d23
             where TParameterSet : IParameterSet
         {
             AssertionConcern.AssertArgumentNotNull(ensemble, nameof(ensemble));
-            AssertionConcern.AssertArgumentNotNull(parameterSet, nameof(parameterSet));
+            AssertionConcern.AssertArgumentNotNull(parameters, nameof(parameters));
 
             TGranny result = default;
             // if target is not in specified ensemble
-            if (!granny.TryParse(ensemble, coreSet, parameterSet, out TGranny ensembleParseResult))
+            if (!granny.TryParse(ensemble, primitives, parameters, out TGranny ensembleParseResult))
             {
                 // retrieve target from DB
-                var queries = granny.GetQueries(coreSet, parameterSet);
+                var queries = granny.GetQueries(primitives, parameters);
                 ensemble.AddReplaceItems(await neuronRepository.GetByQueriesAsync(userId, queries.ToArray()));
                 // if target is in DB
-                if (granny.TryParse(ensemble, coreSet, parameterSet, out TGranny dbParseResult))
+                if (granny.TryParse(ensemble, primitives, parameters, out TGranny dbParseResult))
                 {
                     result = dbParseResult;
                 }
@@ -51,7 +51,7 @@ namespace ei8.Cortex.Coding.d23
                 else
                 {
                     // build in ensemble
-                    result = await granny.BuildAsync(ensemble, coreSet, parameterSet);
+                    result = await granny.BuildAsync(ensemble, primitives, parameters);
                 }
             }
             // if target was found in ensemble
@@ -61,7 +61,16 @@ namespace ei8.Cortex.Coding.d23
             return result;
         }
 
-        internal static void TryParseCore<TGranny, TParameterSet>(this TGranny granny, TParameterSet parameterSet, Ensemble ensemble, TGranny tempResult, IEnumerable<Neuron> selection, LevelParser[] levelParsers, System.Action<Neuron> grannySetter, ref TGranny result)
+        internal static void TryParseCore<TGranny, TParameterSet>(
+            this TGranny granny, 
+            TParameterSet parameters, 
+            Ensemble ensemble, 
+            TGranny tempResult, 
+            IEnumerable<Neuron> selection, 
+            LevelParser[] levelParsers, 
+            System.Action<Neuron> grannySetter, 
+            ref TGranny result
+            )
             where TGranny : IGranny<TGranny, TParameterSet>
             where TParameterSet : IParameterSet
         {

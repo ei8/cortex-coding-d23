@@ -1,6 +1,5 @@
 ﻿using ei8.Cortex.Coding.d23.Selectors;
 using ei8.Cortex.Library.Common;
-using neurUL.Common.Domain.Model;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,82 +8,61 @@ namespace ei8.Cortex.Coding.d23.Grannies
 {
     public class Instantiates : IInstantiates
     {
-        public async Task<IInstantiates> BuildAsync(Ensemble ensemble, ICoreSet coreSet, IInstantiatesParameterSet parameterSet)
+        public async Task<IInstantiates> BuildAsync(Ensemble ensemble, IPrimitiveSet primitives, IInstantiatesParameterSet parameters)
         {
             var result = new Instantiates();
-            var subordination = ensemble.Obtain(coreSet.Subordination);
-            var instantiatesUnit = ensemble.Obtain(coreSet.InstantiatesUnit);
-            result.ClassDirectObject = await new Dependent().ObtainAsync(
+
+            var subordination = await new Subordination().BuildAsync(
                 ensemble,
-                coreSet,
-                new DependentParameterSet(
-                    parameterSet.Class,
-                    coreSet.DirectObject
-                ),
-                parameterSet.NeuronRepository,
-                parameterSet.UserId
+                primitives,
+                Instantiates.CreateSubordinationParameterSet(primitives, parameters)
                 );
-            result.Neuron = ensemble.Obtain(Neuron.CreateTransient(null, null, null));
-            ensemble.AddReplace(Terminal.CreateTransient(result.Neuron.Id, subordination.Id));
-            ensemble.AddReplace(Terminal.CreateTransient(result.Neuron.Id, instantiatesUnit.Id));
-            ensemble.AddReplace(Terminal.CreateTransient(result.Neuron.Id, result.ClassDirectObject.Neuron.Id));
+
+            result.ClassDirectObject = subordination.Dependents.Single();
+            result.Neuron = subordination.Neuron;
 
             return result;
         }
 
-        public IEnumerable<Library.Common.NeuronQuery> GetQueries(ICoreSet coreSet, IInstantiatesParameterSet parameterSet) =>
-            new[] {
-                new NeuronQuery()
-                {
-                    Id = new[] { parameterSet.Class.Id.ToString() },
-                    DirectionValues = DirectionValues.Any,
-                    Depth = 3,
-                    // less than 3 edges away otherwise should have postsynaptic of subordination or instantiates unit 
-                    // TODO: or should this be renamed to TraversalMaximumDepthPostsynaptic
-                    TraversalMinimumDepthPostsynaptic = new[] {
-                        new DepthIdsPair {
-                            Depth = 3,
-                            Ids = new[] {
-                                coreSet.Subordination.Id,
-                                coreSet.InstantiatesUnit.Id
-                            }
-                        }
-                    }
-                }
-            };
+        public IEnumerable<NeuronQuery> GetQueries(IPrimitiveSet primitives, IInstantiatesParameterSet parameters) =>
+            new Subordination().GetQueries(
+                primitives,
+                Instantiates.CreateSubordinationParameterSet(primitives, parameters)
+                );
 
-        public bool TryParse(Ensemble ensemble, ICoreSet coreSet, IInstantiatesParameterSet parameterSet, out IInstantiates result)
+        private static SubordinationParameterSet CreateSubordinationParameterSet(IPrimitiveSet primitives, IInstantiatesParameterSet parameters)
+        {
+            return new SubordinationParameterSet(
+                new HeadParameterSet(primitives.Instantiates),
+                new IDependentParameterSet[]
+                {
+                    new DependentParameterSet(
+                        parameters.Class,
+                        primitives.DirectObject
+                        )
+                },
+                parameters.NeuronRepository,
+                parameters.UserId
+            );
+        }
+
+        public bool TryParse(Ensemble ensemble, IPrimitiveSet primitives, IInstantiatesParameterSet parameters, out IInstantiates result)
         {
             result = null;
 
             var tempResult = new Instantiates();
-            if (new Dependent().TryParse(
-                ensemble,
-                coreSet,
-                new DependentParameterSet(
-                    parameterSet.Class,
-                    coreSet.DirectObject
-                    ),
-                out IDependent classDirectObject
-                ))
-            {
-                tempResult.ClassDirectObject = classDirectObject;
 
-                this.TryParseCore(
-                    parameterSet,
-                    ensemble, 
-                    tempResult,
-                    new[] { tempResult.ClassDirectObject.Neuron },
-                    new []
-                    {
-                        new LevelParser(new PresynapticBySibling(
-                            coreSet.Subordination,
-                            coreSet.InstantiatesUnit
-                            ))
-                    }, 
-                    (n) => tempResult.Neuron = n,
-                    ref result
-                    );
+            if (new Subordination().TryParse(
+                ensemble,
+                primitives,
+                Instantiates.CreateSubordinationParameterSet(primitives, parameters),
+                out ISubordination subordination
+                )
+                )
+            {
+                tempResult.ClassDirectObject = subordination.Dependents.Single();
+                tempResult.Neuron = subordination.Neuron;
+                result = tempResult;
             }
 
             return result != null;

@@ -9,32 +9,32 @@ namespace ei8.Cortex.Coding.d23.Grannies
 {
     public class Subordination : ISubordination
     {
-        public async Task<ISubordination> BuildAsync(Ensemble ensemble, ICoreSet coreSet, ISubordinationParameterSet parameterSet)
+        public async Task<ISubordination> BuildAsync(Ensemble ensemble, IPrimitiveSet primitives, ISubordinationParameterSet parameters)
         {
             var result = new Subordination();
-            var subordination = ensemble.Obtain(coreSet.Subordination);
+            var subordination = ensemble.Obtain(primitives.Subordination);
             result.Head = await new Head().ObtainAsync(
                 ensemble,
-                coreSet,
+                primitives,
                 new HeadParameterSet(
-                    parameterSet.HeadParameters.Value
+                    parameters.HeadParameters.Value
                 ),
-                parameterSet.NeuronRepository,
-                parameterSet.UserId
+                parameters.NeuronRepository,
+                parameters.UserId
                 );
 
             var ides = new List<IDependent>();
-            foreach (var dp in parameterSet.DependentsParameters)
+            foreach (var dp in parameters.DependentsParameters)
             {
                 var ide = await new Dependent().ObtainAsync(
                     ensemble,
-                    coreSet,
+                    primitives,
                     new DependentParameterSet(
                         dp.Value,
                         dp.Type
                         ),
-                    parameterSet.NeuronRepository,
-                    parameterSet.UserId
+                    parameters.NeuronRepository,
+                    parameters.UserId
                     );
                 ides.Add(ide);
             }
@@ -47,55 +47,71 @@ namespace ei8.Cortex.Coding.d23.Grannies
             return result;
         }
 
-        public IEnumerable<NeuronQuery> GetQueries(ICoreSet coreSet, ISubordinationParameterSet parameterSet) =>
+        public IEnumerable<NeuronQuery> GetQueries(IPrimitiveSet primitives, ISubordinationParameterSet parameters) =>
             new[] {
                 new NeuronQuery()
                 {
-                    Id = parameterSet.DependentsParameters.Select(dp => dp.Value.Id.ToString()),
+                    Id = parameters.DependentsParameters.Select(dp => dp.Value.Id.ToString()),
                     DirectionValues = DirectionValues.Any,
-                    Depth = 3,
-                    TraversalMinimumDepthPostsynaptic = new[] {
+                    Depth = 4,
+                    TraversalDepthPostsynaptic = new[] {
+                        // 4 edges away and should have postsynaptic of unit or instantiates
+                        new DepthIdsPair {
+                            Depth = 4,
+                            Ids = new[] {
+                                parameters.HeadParameters.Value.Id,
+                                primitives.Unit.Id
+                            }
+                        },
+                        // 3 edges away and should have postsynaptic of subordination
                         new DepthIdsPair {
                             Depth = 3,
                             Ids = new[] {
-                                coreSet.Subordination.Id,
-                                parameterSet.HeadParameters.Value.Id
+                                primitives.Subordination.Id
+                            }
+                        },
+                        // 2 edges away and should have postsynaptic of direct object
+                        new DepthIdsPair {
+                            Depth = 2,
+                            Ids = new[] {
+                                primitives.DirectObject.Id
                             }
                         }
                     }
                 }
             };
 
-        public bool TryParse(Ensemble ensemble, ICoreSet coreSet, ISubordinationParameterSet parameterSet, out ISubordination result)
+        public bool TryParse(Ensemble ensemble, IPrimitiveSet primitives, ISubordinationParameterSet parameters, out ISubordination result)
         {
             result = null;
 
             var tempResult = new Subordination();
 
             var ides = new List<IDependent>();
-            foreach (var dp in parameterSet.DependentsParameters)
+            foreach (var dp in parameters.DependentsParameters)
             {
-                if (new Dependent().TryParse(ensemble, coreSet, dp, out IDependent ide))
+                if (new Dependent().TryParse(ensemble, primitives, dp, out IDependent ide))
                     ides.Add(ide);
             }
 
-            if (ides.Count == parameterSet.DependentsParameters.Count())
+            if (ides.Count == parameters.DependentsParameters.Count())
             {
                 tempResult.Dependents = ides;
-                if (new Head().TryParse(ensemble, coreSet, parameterSet.HeadParameters, out IHead head))
+                if (new Head().TryParse(ensemble, primitives, parameters.HeadParameters, out IHead head))
                 {
                     tempResult.Head = head;
 
                     this.TryParseCore(
-                        parameterSet,
+                        parameters,
                         ensemble,
                         tempResult,
-                        tempResult.Dependents.Select(d => d.Neuron),
+                        // start from the head neuron
+                        new[] { tempResult.Head.Neuron },
                         new[]
                         {
+                            // get the presynaptic via the siblings of the head and subordination
                             new LevelParser(new PresynapticBySibling(
-                                coreSet.Subordination,
-                                parameterSet.HeadParameters.Value
+                                ides.Select(i => i.Neuron).Concat(new[] { primitives.Subordination }).ToArray()
                                 ))
                         },
                         (n) => tempResult.Neuron = n,

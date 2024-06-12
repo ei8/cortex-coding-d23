@@ -34,7 +34,7 @@ namespace ei8.Cortex.Coding.d23.neurULization
             var instantiatesGranny = new Instantiates();
             var instantiatesType = await instantiatesGranny.ObtainAsync(
                 result,
-                options.CoreSet,
+                options.Primitives,
                 new InstantiatesParameterSet(
                     rootTypeNeuron,
                     new Dependent(),
@@ -45,8 +45,8 @@ namespace ei8.Cortex.Coding.d23.neurULization
                 options.UserId
                 );
 
-            // create Root Neuron
-            // link root neuron to InstantiatesType neuron
+            // link granny neuron to InstantiatesType neuron
+            result.AddReplace(Terminal.CreateTransient(granny.Id, instantiatesType.Neuron.Id));
 
             return result;
         }
