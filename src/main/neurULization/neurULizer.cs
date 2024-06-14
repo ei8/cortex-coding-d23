@@ -31,13 +31,12 @@ namespace ei8.Cortex.Coding.d23.neurULization
             var rootTypeNeuron = erDict[key];
 
             // instantiates
-            var instantiatesGranny = new InstantiatesClass();
-            var instantiatesType = await instantiatesGranny.ObtainAsync(
+            var instantiatesClass = new InstantiatesClass();
+            instantiatesClass = (InstantiatesClass) await instantiatesClass.ObtainAsync(
                 result,
                 options.Primitives,
                 new InstantiatesClassParameterSet(
                     rootTypeNeuron,
-                    new Dependent(),
                     options.EnsembleRepository,
                     options.UserId
                     ),
@@ -46,7 +45,25 @@ namespace ei8.Cortex.Coding.d23.neurULization
                 );
 
             // link granny neuron to InstantiatesType neuron
-            result.AddReplace(Terminal.CreateTransient(granny.Id, instantiatesType.Neuron.Id));
+            result.AddReplace(Terminal.CreateTransient(granny.Id, instantiatesClass.Neuron.Id));
+
+            // DEL: test code
+            var idea = Neuron.CreateTransient("Test Idea", null, null);
+            var instantiation = new Instantiation();
+            instantiation = (Instantiation)await instantiation.ObtainAsync(
+                result,
+                options.Primitives,
+                new InstantiationParameterSet(
+                    idea,
+                    options.Primitives.Idea,
+                    InstantiationMatchingNeuronProperty.Tag,
+                    options.EnsembleRepository,
+                    options.UserId
+                    ),
+                options.EnsembleRepository,
+                options.UserId
+                );
+
 
             return result;
         }

@@ -19,7 +19,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
                 new HeadParameterSet(
                     parameters.HeadParameters.Value
                 ),
-                parameters.NeuronRepository,
+                parameters.EnsembleRepository,
                 parameters.UserId
                 );
 
@@ -33,7 +33,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
                         dp.Value,
                         dp.Type
                         ),
-                    parameters.NeuronRepository,
+                    parameters.EnsembleRepository,
                     parameters.UserId
                     );
                 ides.Add(ide);
@@ -47,38 +47,40 @@ namespace ei8.Cortex.Coding.d23.Grannies
             return result;
         }
 
-        public IEnumerable<NeuronQuery> GetQueries(IPrimitiveSet primitives, ISubordinationParameterSet parameters) =>
+        public IEnumerable<GrannyQuery> GetQueries(IPrimitiveSet primitives, ISubordinationParameterSet parameters) =>
             new[] {
-                new NeuronQuery()
-                {
-                    Id = parameters.DependentsParameters.Select(dp => dp.Value.Id.ToString()),
-                    DirectionValues = DirectionValues.Any,
-                    Depth = 4,
-                    TraversalDepthPostsynaptic = new[] {
-                        // 4 edges away and should have postsynaptic of unit or instantiates
-                        new DepthIdsPair {
-                            Depth = 4,
-                            Ids = new[] {
-                                parameters.HeadParameters.Value.Id,
-                                primitives.Unit.Id
-                            }
-                        },
-                        // 3 edges away and should have postsynaptic of subordination
-                        new DepthIdsPair {
-                            Depth = 3,
-                            Ids = new[] {
-                                primitives.Subordination.Id
-                            }
-                        },
-                        // 2 edges away and should have postsynaptic of direct object
-                        new DepthIdsPair {
-                            Depth = 2,
-                            Ids = new[] {
-                                primitives.DirectObject.Id
+                new GrannyQuery(
+                    new NeuronQuery()
+                    {
+                        Id = parameters.DependentsParameters.Select(dp => dp.Value.Id.ToString()),
+                        DirectionValues = DirectionValues.Any,
+                        Depth = 4,
+                        TraversalDepthPostsynaptic = new[] {
+                            // 4 edges away and should have postsynaptic of unit or instantiates
+                            new DepthIdsPair {
+                                Depth = 4,
+                                Ids = new[] {
+                                    parameters.HeadParameters.Value.Id,
+                                    primitives.Unit.Id
+                                }
+                            },
+                            // 3 edges away and should have postsynaptic of subordination
+                            new DepthIdsPair {
+                                Depth = 3,
+                                Ids = new[] {
+                                    primitives.Subordination.Id
+                                }
+                            },
+                            // 2 edges away and should have postsynaptic of direct object
+                            new DepthIdsPair {
+                                Depth = 2,
+                                Ids = new[] {
+                                    primitives.DirectObject.Id
+                                }
                             }
                         }
                     }
-                }
+                )
             };
 
         public bool TryParse(Ensemble ensemble, IPrimitiveSet primitives, ISubordinationParameterSet parameters, out ISubordination result)

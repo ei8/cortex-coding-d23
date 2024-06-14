@@ -8,18 +8,18 @@ namespace ei8.Cortex.Coding.d23.Grannies
         public SubordinationParameterSet(
             IHeadParameterSet headParameters,
             IEnumerable<IDependentParameterSet> dependentsParameters,
-            IEnsembleRepository neuronRepository,
+            IEnsembleRepository ensembleRepository,
         string userId
             )
         {
             AssertionConcern.AssertArgumentNotNull(headParameters, nameof(headParameters));
             AssertionConcern.AssertArgumentNotNull(dependentsParameters, nameof(dependentsParameters));
-            AssertionConcern.AssertArgumentNotNull(neuronRepository, nameof(neuronRepository));
+            AssertionConcern.AssertArgumentNotNull(ensembleRepository, nameof(ensembleRepository));
             AssertionConcern.AssertArgumentNotEmpty(userId, "Specified value cannot be null or empty.", nameof(userId));
 
             this.HeadParameters = headParameters;
             this.DependentsParameters = dependentsParameters;
-            this.NeuronRepository = neuronRepository;
+            this.EnsembleRepository = ensembleRepository;
             this.UserId = userId;
         }
 
@@ -27,7 +27,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
 
         public IEnumerable<IDependentParameterSet> DependentsParameters { get; }
 
-        public IEnsembleRepository NeuronRepository { get; }
+        public IEnsembleRepository EnsembleRepository { get; }
 
         public string UserId { get; }
     }

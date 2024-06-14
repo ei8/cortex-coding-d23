@@ -1,5 +1,7 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
 using ei8.Cortex.Coding.d23.Selectors;
+using ei8.Cortex.Library.Common;
+using neurUL.Common;
 using neurUL.Common.Domain.Model;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +20,7 @@ namespace ei8.Cortex.Coding.d23
         /// <param name="granny"></param>
         /// <param name="ensemble"></param>
         /// <param name="parameters"></param>
-        /// <param name="neuronRepository"></param>
+        /// <param name="ensembleRepository"></param>
         /// <param name="userId"></param>
         /// <returns></returns>
         public async static Task<TGranny> ObtainAsync<TGranny, TParameterSet>(
@@ -26,7 +28,7 @@ namespace ei8.Cortex.Coding.d23
                 Ensemble ensemble,
                 IPrimitiveSet primitives,
                 TParameterSet parameters,
-                IEnsembleRepository neuronRepository,
+                IEnsembleRepository ensembleRepository,
                 string userId
             ) 
             where TGranny : IGranny<TGranny, TParameterSet>
@@ -40,8 +42,25 @@ namespace ei8.Cortex.Coding.d23
             if (!granny.TryParse(ensemble, primitives, parameters, out TGranny ensembleParseResult))
             {
                 // retrieve target from DB
-                var queries = granny.GetQueries(primitives, parameters);
-                ensemble.AddReplaceItems(await neuronRepository.GetByQueriesAsync(userId, queries.ToArray()));
+                var grannyQueries = granny.GetQueries(primitives, parameters);
+                Neuron previousGrannyNeuron = null;
+                // loop through each grannyQuery
+                foreach (var grannyQuery in grannyQueries)
+                {
+                    // get ensemble based on parameters and previous granny neuron if it's assigned
+                    var queryResult = await ensembleRepository.GetByQueryAsync(userId, grannyQuery.GetQuery(previousGrannyNeuron));
+                    // enrich ensemble
+                    ensemble.AddReplaceItems(queryResult);
+                    // if granny query has tryparser
+                    if (grannyQuery.HasTryParserAndParameters)
+                        // if current query is already able to parse ensemble
+                        if (grannyQuery.TryParse(ensemble, primitives, out IGranny grannyResult))
+                            // retrieve granny of result so it can be used by subsequent query
+                            previousGrannyNeuron = grannyResult.Neuron;
+                        else
+                            break;
+                }
+
                 // if target is in DB
                 if (granny.TryParse(ensemble, primitives, parameters, out TGranny dbParseResult))
                 {
@@ -82,6 +101,23 @@ namespace ei8.Cortex.Coding.d23
                 grannySetter(selection.Single());
                 result = tempResult;
             }
+        }
+
+        public static bool TryParseGranny<TParameters, TValue>(
+            this TValue granny, 
+            Ensemble ensemble,
+            IPrimitiveSet primitives, 
+            TParameters parameters,
+            out IGranny result)
+            where TValue : IGranny<TValue, TParameters>
+            where TParameters : IParameterSet
+        {
+            result = null;
+
+            if (granny.TryParse(ensemble, primitives, parameters, out TValue parseResult))
+                result = parseResult;
+
+            return result != null;
         }
         #endregion
 

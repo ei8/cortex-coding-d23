@@ -24,17 +24,19 @@ namespace ei8.Cortex.Coding.d23.Grannies
             return result;
         }
 
-        public IEnumerable<Library.Common.NeuronQuery> GetQueries(IPrimitiveSet primitives, IDependentParameterSet parameters) =>
+        public IEnumerable<GrannyQuery> GetQueries(IPrimitiveSet primitives, IDependentParameterSet parameters) =>
             new[] {
-                new NeuronQuery()
-                {
-                    Postsynaptic = new[] { 
-                        parameters.Value.Id.ToString(),
-                        parameters.Type.Id.ToString()
-                    },
-                    DirectionValues = DirectionValues.Outbound,
-                    Depth = 1
-                }
+                new GrannyQuery(
+                    new NeuronQuery()
+                    {
+                        Postsynaptic = new[] {
+                            parameters.Value.Id.ToString(),
+                            parameters.Type.Id.ToString()
+                        },
+                        DirectionValues = DirectionValues.Outbound,
+                        Depth = 1
+                    }
+                )
             };
 
         public bool TryParse(Ensemble ensemble, IPrimitiveSet primitives, IDependentParameterSet parameters, out IDependent result)

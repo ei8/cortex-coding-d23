@@ -1,5 +1,6 @@
 ﻿using ei8.Cortex.Coding.d23.Selectors;
 using ei8.Cortex.Library.Common;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -17,17 +18,19 @@ namespace ei8.Cortex.Coding.d23.Grannies
             return result;
         }
 
-        public IEnumerable<NeuronQuery> GetQueries(IPrimitiveSet primitives, IHeadParameterSet parameters) =>
+        public IEnumerable<GrannyQuery> GetQueries(IPrimitiveSet primitives, IHeadParameterSet parameters) =>
             new[] {
-                new NeuronQuery()
-                {
-                    Postsynaptic = new[] {
-                        parameters.Value.Id.ToString(),
-                        primitives.Unit.Id.ToString()
-                    },
-                    DirectionValues = DirectionValues.Outbound,
-                    Depth = 1
-                }
+                new GrannyQuery(
+                    new NeuronQuery()
+                    {
+                        Postsynaptic = new[] {
+                            parameters.Value.Id.ToString(),
+                            primitives.Unit.Id.ToString()
+                        },
+                        DirectionValues = DirectionValues.Outbound,
+                        Depth = 1
+                    }
+                )
             };
 
         public bool TryParse(Ensemble ensemble, IPrimitiveSet primitives, IHeadParameterSet parameters, out IHead result)

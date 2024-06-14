@@ -5,7 +5,7 @@
     /// </summary>
     public interface IAggregateParameterSet : IParameterSet
     {
-        IEnsembleRepository NeuronRepository { get; }
+        IEnsembleRepository EnsembleRepository { get; }
 
         string UserId { get; }
     }
