@@ -51,7 +51,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
                 parameters,
                 ensemble,
                 tempResult,
-                new[] { tempResult.Value },
+                new[] { tempResult.Value.Id },
                 new[] { new LevelParser(new PresynapticBySibling(tempResult.Type)) },
                 (n) => tempResult.Neuron = n,
                 ref result

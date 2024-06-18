@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace ei8.Cortex.Coding.d23.Selectors
 {
@@ -11,7 +12,7 @@ namespace ei8.Cortex.Coding.d23.Selectors
 
         public IEnumerable<ISelector> Selectors { get; private set; }
 
-        public IEnumerable<Neuron> Evaluate(Ensemble ensemble, IEnumerable<Neuron> selection)
+        public IEnumerable<Guid> Evaluate(Ensemble ensemble, IEnumerable<Guid> selection)
         {
             foreach (var selector in this.Selectors)
                 selection = selector.Evaluate(ensemble, selection);

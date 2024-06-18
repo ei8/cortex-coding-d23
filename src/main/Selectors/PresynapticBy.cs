@@ -12,21 +12,21 @@ namespace ei8.Cortex.Coding.d23.Selectors
             this.comparer = comparer;
         }
 
-        public IEnumerable<Neuron> Evaluate(Ensemble ensemble, IEnumerable<Neuron> selection)
+        public IEnumerable<Guid> Evaluate(Ensemble ensemble, IEnumerable<Guid> selection)
         {
-            var result = new List<Neuron>();
+            var result = new List<Guid>();
 
             // loop through each specified neuron
-            foreach (var neuron in selection)
+            foreach (var neuronId in selection)
             {
                 // loop through each presynaptic
-                foreach (var pre in neuron.GetPresynapticNeurons(ensemble))
+                foreach (var pre in ensemble.GetPresynapticNeurons(neuronId))
                 {
                     // if exhaustive
                     if (comparer(pre))
                     {
                         // return presynaptic
-                        result.Add(pre);
+                        result.Add(pre.Id);
                         break;
                     }
                 }

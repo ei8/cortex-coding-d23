@@ -3,6 +3,7 @@ using ei8.Cortex.Coding.d23.Selectors;
 using ei8.Cortex.Library.Common;
 using neurUL.Common;
 using neurUL.Common.Domain.Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -85,7 +86,7 @@ namespace ei8.Cortex.Coding.d23
             TParameterSet parameters, 
             Ensemble ensemble, 
             TGranny tempResult, 
-            IEnumerable<Neuron> selection, 
+            IEnumerable<Guid> selection, 
             LevelParser[] levelParsers, 
             System.Action<Neuron> grannySetter, 
             ref TGranny result
@@ -96,9 +97,9 @@ namespace ei8.Cortex.Coding.d23
             foreach (var levelParser in levelParsers)
                 selection = levelParser.Evaluate(ensemble, selection);
 
-            if (selection.Count() == 1)
+            if (selection.Count() == 1 && ensemble.TryGetById(selection.Single(), out Neuron ensembleResult))
             {
-                grannySetter(selection.Single());
+                grannySetter(ensembleResult);
                 result = tempResult;
             }
         }

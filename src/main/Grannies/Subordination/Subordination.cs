@@ -56,7 +56,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
                         DirectionValues = DirectionValues.Any,
                         Depth = 4,
                         TraversalDepthPostsynaptic = new[] {
-                            // 4 edges away and should have postsynaptic of unit or instantiates
+                            // 4 edges away and should have postsynaptic of unit or head
                             new DepthIdsPair {
                                 Depth = 4,
                                 Ids = new[] {
@@ -108,7 +108,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
                         ensemble,
                         tempResult,
                         // start from the head neuron
-                        new[] { tempResult.Head.Neuron },
+                        new[] { tempResult.Head.Neuron.Id },
                         new[]
                         {
                             // get the presynaptic via the siblings of the head and subordination

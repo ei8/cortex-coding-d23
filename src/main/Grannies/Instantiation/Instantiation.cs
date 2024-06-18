@@ -69,10 +69,10 @@ namespace ei8.Cortex.Coding.d23.Grannies
         private static InstantiatesClassParameterSet CreateInstantiatesParameterSet(IInstantiationParameterSet parameters)
         {
             return new InstantiatesClassParameterSet(
-                    parameters.Class,
-                    parameters.EnsembleRepository,
-                    parameters.UserId
-                );
+                parameters.Class,
+                parameters.EnsembleRepository,
+                parameters.UserId
+            );
         }
 
         public bool TryParse(Ensemble ensemble, IPrimitiveSet primitives, IInstantiationParameterSet parameters, out IInstantiation result)
@@ -95,12 +95,14 @@ namespace ei8.Cortex.Coding.d23.Grannies
                     ensemble,
                     tempResult,
                     // start from InstantiatesClass neuron
-                    new[] { tempResult.InstantiatesClass.Neuron },
+                    new[] { tempResult.InstantiatesClass.Neuron.Id },
                     new[] { new LevelParser(
-                        parameters.MatchingNeuronProperty == InstantiationMatchingNeuronProperty.Id ?
-                            new PresynapticBy(n => n.Id == parameters.Value.Id) :
-                            new PresynapticBy(n => n.Tag == parameters.Value.Tag)
+                            new PresynapticBy(n => 
+                                parameters.MatchingNeuronProperty == InstantiationMatchingNeuronProperty.Id ? 
+                                n.Id == parameters.Value.Id :
+                                n.Tag == parameters.Value.Tag
                             )
+                        )
                     },
                     (n) => tempResult.Neuron = n,
                     ref result

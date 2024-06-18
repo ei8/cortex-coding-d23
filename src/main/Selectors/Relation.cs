@@ -1,4 +1,5 @@
 ﻿using ei8.Cortex.Library.Common;
+using System;
 using System.Collections.Generic;
 
 namespace ei8.Cortex.Coding.d23.Selectors
@@ -12,7 +13,7 @@ namespace ei8.Cortex.Coding.d23.Selectors
             this.type = type;
         }
 
-        public IEnumerable<Neuron> Evaluate(Ensemble ensemble, IEnumerable<Neuron> selection)
+        public IEnumerable<Guid> Evaluate(Ensemble ensemble, IEnumerable<Guid> selection)
         {
             throw new System.NotImplementedException();
         }

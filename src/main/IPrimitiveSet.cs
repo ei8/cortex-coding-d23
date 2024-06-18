@@ -15,5 +15,9 @@ namespace ei8.Cortex.Coding.d23
         Neuron Subordination { get; }
 
         Neuron Unit { get; }
+
+        Neuron Of { get; }
+
+        Neuron Case { get; }
     }
 }

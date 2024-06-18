@@ -1,7 +1,4 @@
-﻿using ei8.Cortex.Coding.d23.Selectors;
-using ei8.Cortex.Library.Common;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 

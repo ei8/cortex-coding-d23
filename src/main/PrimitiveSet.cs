@@ -15,5 +15,9 @@
         public Neuron Subordination { get; set; }
 
         public Neuron Unit { get; set; }
+
+        public Neuron Of { get; set; }
+
+        public Neuron Case { get; set; }
     }
 }
