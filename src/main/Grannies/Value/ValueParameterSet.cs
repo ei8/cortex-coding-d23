@@ -5,9 +5,9 @@ using System.Text;
 
 namespace ei8.Cortex.Coding.d23.Grannies
 {
-    public class InstantiationParameterSet : IInstantiationParameterSet
+    public class ValueParameterSet : IValueParameterSet
     {
-        public InstantiationParameterSet(
+        public ValueParameterSet(
             Neuron value,
             Neuron @class,
             InstantiationMatchingNeuronProperty matchingNeuronProperty,

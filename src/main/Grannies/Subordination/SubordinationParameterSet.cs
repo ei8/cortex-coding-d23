@@ -6,8 +6,8 @@ namespace ei8.Cortex.Coding.d23.Grannies
     public class SubordinationParameterSet : ISubordinationParameterSet
     {
         public SubordinationParameterSet(
-            IHeadParameterSet headParameters,
-            IEnumerable<IDependentParameterSet> dependentsParameters,
+            IUnitParameterSet headParameters,
+            IEnumerable<IUnitParameterSet> dependentsParameters,
             IEnsembleRepository ensembleRepository,
         string userId
             )
@@ -23,9 +23,9 @@ namespace ei8.Cortex.Coding.d23.Grannies
             this.UserId = userId;
         }
 
-        public IHeadParameterSet HeadParameters { get; }
+        public IUnitParameterSet HeadParameters { get; }
 
-        public IEnumerable<IDependentParameterSet> DependentsParameters { get; }
+        public IEnumerable<IUnitParameterSet> DependentsParameters { get; }
 
         public IEnsembleRepository EnsembleRepository { get; }
 

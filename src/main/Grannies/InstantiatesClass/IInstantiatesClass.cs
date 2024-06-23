@@ -2,6 +2,6 @@
 {
     public interface IInstantiatesClass : IGranny<IInstantiatesClass, IInstantiatesClassParameterSet>
     {
-        IDependent Class { get; }
+        IUnit Class { get; }
     }
 }

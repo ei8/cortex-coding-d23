@@ -31,10 +31,13 @@ namespace ei8.Cortex.Coding.d23.Grannies
         private static SubordinationParameterSet CreateSubordinationParameterSet(IPrimitiveSet primitives, IInstantiatesClassParameterSet parameters)
         {
             return new SubordinationParameterSet(
-                new HeadParameterSet(primitives.Instantiates),
-                new IDependentParameterSet[]
+                new UnitParameterSet(
+                    primitives.Instantiates, 
+                    primitives.Unit
+                ),
+                new IUnitParameterSet[]
                 {
-                    new DependentParameterSet(
+                    new UnitParameterSet(
                         parameters.Class,
                         primitives.DirectObject
                         )
@@ -66,7 +69,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
             return result != null;
         }
 
-        public IDependent Class { get; private set; }
+        public IUnit Class { get; private set; }
 
         public Neuron Neuron { get; private set; }
     }

@@ -1,11 +1,13 @@
 ﻿using neurUL.Common.Domain.Model;
 using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace ei8.Cortex.Coding.d23.Grannies
 {
-    public class DependentParameterSet : IDependentParameterSet
+    public class UnitParameterSet : IUnitParameterSet
     {
-        public DependentParameterSet(
+        public UnitParameterSet(
             Neuron value,
             Neuron type
             )

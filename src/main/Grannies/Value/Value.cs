@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace ei8.Cortex.Coding.d23.Grannies
 {
-    public class Instantiation : IInstantiation
+    public class Value : IValue
     {
-        public async Task<IInstantiation> BuildAsync(Ensemble ensemble, IPrimitiveSet primitives, IInstantiationParameterSet parameters)
+        public async Task<IValue> BuildAsync(Ensemble ensemble, IPrimitiveSet primitives, IValueParameterSet parameters)
         {
-            var result = new Instantiation();
+            var result = new Value();
             result.Neuron = ensemble.Obtain(parameters.Value);
             result.InstantiatesClass = await new InstantiatesClass().ObtainAsync(
                 ensemble,
@@ -28,14 +28,14 @@ namespace ei8.Cortex.Coding.d23.Grannies
             return result;
         }
 
-        public IEnumerable<GrannyQuery> GetQueries(IPrimitiveSet primitives, IInstantiationParameterSet parameters) =>
+        public IEnumerable<GrannyQuery> GetQueries(IPrimitiveSet primitives, IValueParameterSet parameters) =>
             new[] {
                 new GrannyQuery(
                     (ps) => new InstantiatesClass().GetQueries(
                             primitives,
                             (IInstantiatesClassParameterSet) ps
                         ).Single().GetQuery(),
-                    Instantiation.CreateInstantiatesParameterSet(parameters),
+                    Value.CreateInstantiatesParameterSet(parameters),
                     (Ensemble e, IPrimitiveSet prs, IParameterSet ps, out IGranny r) => 
                         ((IInstantiatesClass) new InstantiatesClass()).TryParseGranny(
                             e, 
@@ -66,7 +66,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
                 )
             };
 
-        private static InstantiatesClassParameterSet CreateInstantiatesParameterSet(IInstantiationParameterSet parameters)
+        private static InstantiatesClassParameterSet CreateInstantiatesParameterSet(IValueParameterSet parameters)
         {
             return new InstantiatesClassParameterSet(
                 parameters.Class,
@@ -75,16 +75,16 @@ namespace ei8.Cortex.Coding.d23.Grannies
             );
         }
 
-        public bool TryParse(Ensemble ensemble, IPrimitiveSet primitives, IInstantiationParameterSet parameters, out IInstantiation result)
+        public bool TryParse(Ensemble ensemble, IPrimitiveSet primitives, IValueParameterSet parameters, out IValue result)
         {
             result = null;
 
-            var tempResult = new Instantiation();
+            var tempResult = new Value();
 
             if (new InstantiatesClass().TryParse(
                 ensemble, 
                 primitives, 
-                Instantiation.CreateInstantiatesParameterSet(parameters), 
+                Value.CreateInstantiatesParameterSet(parameters), 
                 out IInstantiatesClass ic
                 ))
             {

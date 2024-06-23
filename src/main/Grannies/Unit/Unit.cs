@@ -1,20 +1,15 @@
 ﻿using ei8.Cortex.Coding.d23.Selectors;
 using ei8.Cortex.Library.Common;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace ei8.Cortex.Coding.d23.Grannies
 {
-    public class Dependent : IDependent
+    public class Unit : IUnit
     {
-        public Dependent()
+        public async Task<IUnit> BuildAsync(Ensemble ensemble, IPrimitiveSet primitives, IUnitParameterSet parameters)
         {
-        }
-
-        public async Task<IDependent> BuildAsync(Ensemble ensemble, IPrimitiveSet primitives, IDependentParameterSet parameters)
-        {
-            var result = new Dependent();
+            var result = new Unit();
             result.Value = ensemble.Obtain(parameters.Value);
             result.Type = ensemble.Obtain(parameters.Type);
             result.Neuron = ensemble.Obtain(Neuron.CreateTransient(null, null, null));
@@ -24,7 +19,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
             return result;
         }
 
-        public IEnumerable<GrannyQuery> GetQueries(IPrimitiveSet primitives, IDependentParameterSet parameters) =>
+        public IEnumerable<GrannyQuery> GetQueries(IPrimitiveSet primitives, IUnitParameterSet parameters) =>
             new[] {
                 new GrannyQuery(
                     new NeuronQuery()
@@ -39,14 +34,14 @@ namespace ei8.Cortex.Coding.d23.Grannies
                 )
             };
 
-        public bool TryParse(Ensemble ensemble, IPrimitiveSet primitives, IDependentParameterSet parameters, out IDependent result)
+        public bool TryParse(Ensemble ensemble, IPrimitiveSet primitives, IUnitParameterSet parameters, out IUnit result)
         {
             result = null;
 
-            var tempResult = new Dependent();
+            var tempResult = new Unit();
             tempResult.Value = parameters.Value;
             tempResult.Type = parameters.Type;
-            
+
             this.TryParseCore(
                 parameters,
                 ensemble,

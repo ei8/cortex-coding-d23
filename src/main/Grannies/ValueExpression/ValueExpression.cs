@@ -10,10 +10,10 @@ namespace ei8.Cortex.Coding.d23.Grannies
         public async Task<IValueExpression> BuildAsync(Ensemble ensemble, IPrimitiveSet primitives, IValueExpressionParameterSet parameters)
         {
             var result = new ValueExpression();
-            result.ValueInstantiation = await new Instantiation().ObtainAsync(
+            result.ValueInstantiation = await new Value().ObtainAsync(
                 ensemble,
                 primitives,
-                new InstantiationParameterSet(
+                new ValueParameterSet(
                     parameters.Value,
                     parameters.Class,
                     parameters.MatchingNeuronProperty,
@@ -38,11 +38,11 @@ namespace ei8.Cortex.Coding.d23.Grannies
             throw new NotImplementedException();
         }
 
-        public IInstantiation ValueInstantiation { get; private set; }
+        public IValue ValueInstantiation { get; private set; }
 
-        public IHead Value { get; private set; }
+        public IUnit Value { get; private set; }
 
-        public IDependent Of { get; private set; }
+        public IUnit Of { get; private set; }
 
         public Neuron Neuron { get; private set; }
     }

@@ -13,23 +13,24 @@ namespace ei8.Cortex.Coding.d23.Grannies
         {
             var result = new Subordination();
             var subordination = ensemble.Obtain(primitives.Subordination);
-            result.Head = await new Head().ObtainAsync(
+            result.Head = await new Unit().ObtainAsync(
                 ensemble,
                 primitives,
-                new HeadParameterSet(
-                    parameters.HeadParameters.Value
+                new UnitParameterSet(
+                    parameters.HeadParameters.Value,
+                    primitives.Unit
                 ),
                 parameters.EnsembleRepository,
                 parameters.UserId
                 );
 
-            var ides = new List<IDependent>();
+            var ides = new List<IUnit>();
             foreach (var dp in parameters.DependentsParameters)
             {
-                var ide = await new Dependent().ObtainAsync(
+                var ide = await new Unit().ObtainAsync(
                     ensemble,
                     primitives,
-                    new DependentParameterSet(
+                    new UnitParameterSet(
                         dp.Value,
                         dp.Type
                         ),
@@ -89,17 +90,17 @@ namespace ei8.Cortex.Coding.d23.Grannies
 
             var tempResult = new Subordination();
 
-            var ides = new List<IDependent>();
+            var ides = new List<IUnit>();
             foreach (var dp in parameters.DependentsParameters)
             {
-                if (new Dependent().TryParse(ensemble, primitives, dp, out IDependent ide))
+                if (new Unit().TryParse(ensemble, primitives, dp, out IUnit ide))
                     ides.Add(ide);
             }
 
             if (ides.Count == parameters.DependentsParameters.Count())
             {
                 tempResult.Dependents = ides;
-                if (new Head().TryParse(ensemble, primitives, parameters.HeadParameters, out IHead head))
+                if (new Unit().TryParse(ensemble, primitives, parameters.HeadParameters, out IUnit head))
                 {
                     tempResult.Head = head;
 
@@ -125,9 +126,9 @@ namespace ei8.Cortex.Coding.d23.Grannies
             return result != null;
         }
 
-        public IHead Head { get; private set; }
+        public IUnit Head { get; private set; }
 
-        public IEnumerable<IDependent> Dependents { get; private set; }
+        public IEnumerable<IUnit> Dependents { get; private set; }
 
         public Neuron Neuron { get; private set; }
     }

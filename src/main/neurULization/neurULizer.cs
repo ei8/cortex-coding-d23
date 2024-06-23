@@ -49,11 +49,11 @@ namespace ei8.Cortex.Coding.d23.neurULization
 
             // DEL: test code
             var idea = Neuron.CreateTransient("Test Idea", null, null);
-            var instantiation = new Instantiation();
-            instantiation = (Instantiation)await instantiation.ObtainAsync(
+            var instantiation = new Value();
+            instantiation = (Value)await instantiation.ObtainAsync(
                 result,
                 options.Primitives,
-                new InstantiationParameterSet(
+                new ValueParameterSet(
                     idea,
                     options.Primitives.Idea,
                     InstantiationMatchingNeuronProperty.Tag,

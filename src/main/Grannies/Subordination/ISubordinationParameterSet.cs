@@ -6,8 +6,8 @@ namespace ei8.Cortex.Coding.d23.Grannies
 {
     public interface ISubordinationParameterSet : IAggregateParameterSet
     {
-        IHeadParameterSet HeadParameters { get; }
+        IUnitParameterSet HeadParameters { get; }
         
-        IEnumerable<IDependentParameterSet> DependentsParameters { get; }
+        IEnumerable<IUnitParameterSet> DependentsParameters { get; }
     }
 }

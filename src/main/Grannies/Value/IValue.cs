@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ei8.Cortex.Coding.d23.Grannies
 {
-    public interface IInstantiation : IGranny<IInstantiation, IInstantiationParameterSet>
+    public interface IValue : IGranny<IValue, IValueParameterSet>
     {
         IInstantiatesClass InstantiatesClass { get; }
     }

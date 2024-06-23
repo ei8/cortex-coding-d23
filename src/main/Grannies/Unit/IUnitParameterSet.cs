@@ -4,7 +4,7 @@ using System.Text;
 
 namespace ei8.Cortex.Coding.d23.Grannies
 {
-    public interface IDependent : IGranny<IDependent, IDependentParameterSet>
+    public interface IUnitParameterSet : IParameterSet
     {
         Neuron Value { get; }
 

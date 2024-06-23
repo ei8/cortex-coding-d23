@@ -6,8 +6,8 @@ namespace ei8.Cortex.Coding.d23.Grannies
 {
     public interface ISubordination : IGranny<ISubordination, ISubordinationParameterSet>
     {
-        IHead Head { get; }
+        IUnit Head { get; }
 
-        IEnumerable<IDependent> Dependents { get; }
+        IEnumerable<IUnit> Dependents { get; }
     }
 }
