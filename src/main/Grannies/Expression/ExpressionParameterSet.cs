@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace ei8.Cortex.Coding.d23.Grannies
 {
-    public class SubordinationParameterSet : ISubordinationParameterSet
+    public class ExpressionParameterSet : IExpressionParameterSet
     {
-        public SubordinationParameterSet(
+        public ExpressionParameterSet(
             IUnitParameterSet headParameters,
             IEnumerable<IUnitParameterSet> dependentsParameters,
             IEnsembleRepository ensembleRepository,

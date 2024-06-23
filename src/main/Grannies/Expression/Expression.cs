@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace ei8.Cortex.Coding.d23.Grannies
 {
-    public class Subordination : ISubordination
+    public class Expression : IExpression
     {
-        public async Task<ISubordination> BuildAsync(Ensemble ensemble, IPrimitiveSet primitives, ISubordinationParameterSet parameters)
+        public async Task<IExpression> BuildAsync(Ensemble ensemble, IPrimitiveSet primitives, IExpressionParameterSet parameters)
         {
-            var result = new Subordination();
+            var result = new Expression();
             var subordination = ensemble.Obtain(primitives.Subordination);
             result.Head = await new Unit().ObtainAsync(
                 ensemble,
@@ -48,7 +48,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
             return result;
         }
 
-        public IEnumerable<GrannyQuery> GetQueries(IPrimitiveSet primitives, ISubordinationParameterSet parameters) =>
+        public IEnumerable<GrannyQuery> GetQueries(IPrimitiveSet primitives, IExpressionParameterSet parameters) =>
             new[] {
                 new GrannyQuery(
                     new NeuronQuery()
@@ -84,11 +84,11 @@ namespace ei8.Cortex.Coding.d23.Grannies
                 )
             };
 
-        public bool TryParse(Ensemble ensemble, IPrimitiveSet primitives, ISubordinationParameterSet parameters, out ISubordination result)
+        public bool TryParse(Ensemble ensemble, IPrimitiveSet primitives, IExpressionParameterSet parameters, out IExpression result)
         {
             result = null;
 
-            var tempResult = new Subordination();
+            var tempResult = new Expression();
 
             var ides = new List<IUnit>();
             foreach (var dp in parameters.DependentsParameters)

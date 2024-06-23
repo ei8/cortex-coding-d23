@@ -10,7 +10,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
         {
             var result = new InstantiatesClass();
 
-            var subordination = await new Subordination().BuildAsync(
+            var subordination = await new Expression().BuildAsync(
                 ensemble,
                 primitives,
                 InstantiatesClass.CreateSubordinationParameterSet(primitives, parameters)
@@ -23,14 +23,14 @@ namespace ei8.Cortex.Coding.d23.Grannies
         }
 
         public IEnumerable<GrannyQuery> GetQueries(IPrimitiveSet primitives, IInstantiatesClassParameterSet parameters) =>
-            new Subordination().GetQueries(
+            new Expression().GetQueries(
                 primitives,
                 InstantiatesClass.CreateSubordinationParameterSet(primitives, parameters)
                 );
 
-        private static SubordinationParameterSet CreateSubordinationParameterSet(IPrimitiveSet primitives, IInstantiatesClassParameterSet parameters)
+        private static ExpressionParameterSet CreateSubordinationParameterSet(IPrimitiveSet primitives, IInstantiatesClassParameterSet parameters)
         {
-            return new SubordinationParameterSet(
+            return new ExpressionParameterSet(
                 new UnitParameterSet(
                     primitives.Instantiates, 
                     primitives.Unit
@@ -53,11 +53,11 @@ namespace ei8.Cortex.Coding.d23.Grannies
 
             var tempResult = new InstantiatesClass();
 
-            if (new Subordination().TryParse(
+            if (new Expression().TryParse(
                 ensemble,
                 primitives,
                 InstantiatesClass.CreateSubordinationParameterSet(primitives, parameters),
-                out ISubordination subordination
+                out IExpression subordination
                 )
                 )
             {
