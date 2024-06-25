@@ -7,16 +7,16 @@ namespace ei8.Cortex.Coding.d23.Selectors
     public class PresynapticBySibling : ISelector
     {
         private readonly bool exhaustive;
-        private readonly IEnumerable<Neuron> siblingNeurons;
+        private readonly IEnumerable<Guid> siblingNeuronIds;
 
-        public PresynapticBySibling(params Neuron[] siblingNeurons) : this(true, siblingNeurons)
+        public PresynapticBySibling(params Guid[] siblingNeuronIds) : this(true, siblingNeuronIds)
         {
         }
 
-        public PresynapticBySibling(bool exhaustive, params Neuron[] siblingNeurons)
+        public PresynapticBySibling(bool exhaustive, params Guid[] siblingNeuronIds)
         {
             this.exhaustive = exhaustive;
-            this.siblingNeurons = siblingNeurons;
+            this.siblingNeuronIds = siblingNeuronIds;
         }
 
         public IEnumerable<Guid> Evaluate(Ensemble ensemble, IEnumerable<Guid> selection)
@@ -34,10 +34,10 @@ namespace ei8.Cortex.Coding.d23.Selectors
                     {
                         var preTerminals = ensemble.GetTerminals(pre.Id);
                         // if presynaptic has only current neuron + siblings as postsynaptic 
-                        if (preTerminals.Count() == siblingNeurons.Count() + 1 &&
+                        if (preTerminals.Count() == siblingNeuronIds.Count() + 1 &&
                             // and postsynaptics of presynaptic match the current neuron and the siblings
                             preTerminals.Select(t => t.PostsynapticNeuronId).HasSameElementsAs(
-                                siblingNeurons.Select(sn => sn.Id).Concat(new[] { neuronId }))
+                                siblingNeuronIds.Concat(new[] { neuronId }))
                             )
                         {
                             // return presynaptic

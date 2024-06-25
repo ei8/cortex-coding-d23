@@ -6,26 +6,21 @@ namespace ei8.Cortex.Coding.d23.Grannies
     public class ExpressionParameterSet : IExpressionParameterSet
     {
         public ExpressionParameterSet(
-            IUnitParameterSet headParameters,
             IEnumerable<IUnitParameterSet> dependentsParameters,
             IEnsembleRepository ensembleRepository,
         string userId
             )
         {
-            AssertionConcern.AssertArgumentNotNull(headParameters, nameof(headParameters));
             AssertionConcern.AssertArgumentNotNull(dependentsParameters, nameof(dependentsParameters));
             AssertionConcern.AssertArgumentNotNull(ensembleRepository, nameof(ensembleRepository));
             AssertionConcern.AssertArgumentNotEmpty(userId, "Specified value cannot be null or empty.", nameof(userId));
 
-            this.HeadParameters = headParameters;
-            this.DependentsParameters = dependentsParameters;
+            this.UnitsParameters = dependentsParameters;
             this.EnsembleRepository = ensembleRepository;
             this.UserId = userId;
         }
 
-        public IUnitParameterSet HeadParameters { get; }
-
-        public IEnumerable<IUnitParameterSet> DependentsParameters { get; }
+        public IEnumerable<IUnitParameterSet> UnitsParameters { get; }
 
         public IEnsembleRepository EnsembleRepository { get; }
 

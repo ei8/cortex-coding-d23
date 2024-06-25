@@ -16,7 +16,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
                 InstantiatesClass.CreateSubordinationParameterSet(primitives, parameters)
                 );
 
-            result.Class = subordination.Dependents.Single();
+            result.Class = subordination.Units.Single(u => u.Type.Id == primitives.DirectObject.Id);
             result.Neuron = subordination.Neuron;
 
             return result;
@@ -31,16 +31,16 @@ namespace ei8.Cortex.Coding.d23.Grannies
         private static ExpressionParameterSet CreateSubordinationParameterSet(IPrimitiveSet primitives, IInstantiatesClassParameterSet parameters)
         {
             return new ExpressionParameterSet(
-                new UnitParameterSet(
-                    primitives.Instantiates, 
-                    primitives.Unit
-                ),
                 new IUnitParameterSet[]
                 {
                     new UnitParameterSet(
+                        primitives.Instantiates,
+                        primitives.Unit
+                    ),
+                    new UnitParameterSet(
                         parameters.Class,
                         primitives.DirectObject
-                        )
+                    )
                 },
                 parameters.EnsembleRepository,
                 parameters.UserId
@@ -61,7 +61,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
                 )
                 )
             {
-                tempResult.Class = subordination.Dependents.Single();
+                tempResult.Class = subordination.Units.Single(u => u.Type.Id == primitives.DirectObject.Id);
                 tempResult.Neuron = subordination.Neuron;
                 result = tempResult;
             }

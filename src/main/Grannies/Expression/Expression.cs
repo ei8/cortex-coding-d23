@@ -13,21 +13,11 @@ namespace ei8.Cortex.Coding.d23.Grannies
         {
             var result = new Expression();
             var subordination = ensemble.Obtain(primitives.Subordination);
-            result.Head = await new Unit().ObtainAsync(
-                ensemble,
-                primitives,
-                new UnitParameterSet(
-                    parameters.HeadParameters.Value,
-                    primitives.Unit
-                ),
-                parameters.EnsembleRepository,
-                parameters.UserId
-                );
-
-            var ides = new List<IUnit>();
-            foreach (var dp in parameters.DependentsParameters)
+            
+            var units = new List<IUnit>();
+            foreach (var dp in parameters.UnitsParameters)
             {
-                var ide = await new Unit().ObtainAsync(
+                var unit = await new Unit().ObtainAsync(
                     ensemble,
                     primitives,
                     new UnitParameterSet(
@@ -37,13 +27,12 @@ namespace ei8.Cortex.Coding.d23.Grannies
                     parameters.EnsembleRepository,
                     parameters.UserId
                     );
-                ides.Add(ide);
+                units.Add(unit);
             }
-            result.Dependents = ides;
+            result.Units = units;
             result.Neuron = ensemble.Obtain(Neuron.CreateTransient(null, null, null));
             ensemble.AddReplace(Terminal.CreateTransient(result.Neuron.Id, subordination.Id));
-            ensemble.AddReplace(Terminal.CreateTransient(result.Neuron.Id, result.Head.Neuron.Id));
-            ides.ForEach(ide => ensemble.AddReplace(Terminal.CreateTransient(result.Neuron.Id, ide.Neuron.Id)));
+            units.ForEach(u => ensemble.AddReplace(Terminal.CreateTransient(result.Neuron.Id, u.Neuron.Id)));
 
             return result;
         }
@@ -53,23 +42,30 @@ namespace ei8.Cortex.Coding.d23.Grannies
                 new GrannyQuery(
                     new NeuronQuery()
                     {
-                        Id = parameters.DependentsParameters.Select(dp => dp.Value.Id.ToString()),
+                        // set Id to values of Dependents (non-Head units)
+                        Id = parameters.UnitsParameters
+                            .Where(up => up.Type.Id != primitives.Unit.Id)
+                            .Select(dp => dp.Value.Id.ToString()),
                         DirectionValues = DirectionValues.Any,
                         Depth = 4,
                         TraversalDepthPostsynaptic = new[] {
-                            // 4 edges away and should have postsynaptic of unit or head
+                            // 4 edges away and should have postsynaptic of unit or values of Head units
                             new DepthIdsPair {
                                 Depth = 4,
-                                Ids = new[] {
-                                    parameters.HeadParameters.Value.Id,
-                                    primitives.Unit.Id
-                                }
+                                Ids = parameters.UnitsParameters
+                                    .Where(up => up.Type.Id == primitives.Unit.Id)
+                                    .Select(up => up.Value.Id)
+                                    .Concat(
+                                        new[] {
+                                            primitives.Unit.Id
+                                        }
+                                    )
                             },
                             // 3 edges away and should have postsynaptic of subordination
                             new DepthIdsPair {
                                 Depth = 3,
                                 Ids = new[] {
-                                    primitives.Subordination.Id
+                                    Expression.GetExpressionTypeId(parameters, primitives)
                                 }
                             },
                             // 2 edges away and should have postsynaptic of direct object
@@ -84,51 +80,86 @@ namespace ei8.Cortex.Coding.d23.Grannies
                 )
             };
 
+        private static Guid GetExpressionTypeId(IExpressionParameterSet expressionParameters, IPrimitiveSet primitives)
+        {
+            Guid result = Guid.Empty;
+
+            var headCount = expressionParameters.UnitsParameters.Count(up => up.Type.Id == primitives.Unit.Id);
+            var dependentCount = expressionParameters.UnitsParameters.Count() - headCount;
+
+            // coordination
+            if (headCount > 1)
+            {
+                if (dependentCount > 0)
+                {
+                    //TODO: result = primitives.CoordinationSubordination.Id
+                    throw new NotImplementedException();
+                }
+                else
+                {
+                    // TODO: result = primitives.Coordination.Id
+                    throw new NotImplementedException();
+                }
+            }
+            // subordination
+            else if (headCount == 1)
+            {
+                if (dependentCount > 0)
+                    result = primitives.Subordination.Id;
+                else
+                    // TODO: result = primitives.Simple.Id
+                    throw new NotImplementedException();
+            }
+            else
+                throw new InvalidOperationException("Expression must have at least one 'Head' unit.");
+
+            return result;
+        }
+
         public bool TryParse(Ensemble ensemble, IPrimitiveSet primitives, IExpressionParameterSet parameters, out IExpression result)
         {
             result = null;
 
             var tempResult = new Expression();
 
-            var ides = new List<IUnit>();
-            foreach (var dp in parameters.DependentsParameters)
+            var units = new List<IUnit>();
+            foreach (var dp in parameters.UnitsParameters)
             {
                 if (new Unit().TryParse(ensemble, primitives, dp, out IUnit ide))
-                    ides.Add(ide);
+                    units.Add(ide);
             }
 
-            if (ides.Count == parameters.DependentsParameters.Count())
+            if (units.Count == parameters.UnitsParameters.Count())
             {
-                tempResult.Dependents = ides;
-                if (new Unit().TryParse(ensemble, primitives, parameters.HeadParameters, out IUnit head))
-                {
-                    tempResult.Head = head;
+                tempResult.Units = units;
 
-                    this.TryParseCore(
-                        parameters,
-                        ensemble,
-                        tempResult,
-                        // start from the head neuron
-                        new[] { tempResult.Head.Neuron.Id },
-                        new[]
-                        {
-                            // get the presynaptic via the siblings of the head and subordination
-                            new LevelParser(new PresynapticBySibling(
-                                ides.Select(i => i.Neuron).Concat(new[] { primitives.Subordination }).ToArray()
-                                ))
-                        },
-                        (n) => tempResult.Neuron = n,
-                        ref result
-                        );
-                }
+                this.TryParseCore(
+                    parameters,
+                    ensemble,
+                    tempResult,
+                    // start from the Head units
+                    tempResult.Units
+                        .Where(u => u.Type.Id == primitives.Unit.Id)
+                        .Select(u => u.Neuron.Id),
+                    new[]
+                    {
+                        // get the presynaptic via the siblings of the head and subordination
+                        new LevelParser(new PresynapticBySibling(
+                            units
+                                .Where(u => u.Type.Id != primitives.Unit.Id)
+                                .Select(i => i.Neuron.Id)
+                                .Concat(new[] { primitives.Subordination.Id }).ToArray()
+                            ))
+                    },
+                    (n) => tempResult.Neuron = n,
+                    ref result
+                    );
             }
 
             return result != null;
         }
 
-        public IUnit Head { get; private set; }
-
-        public IEnumerable<IUnit> Dependents { get; private set; }
+        public IEnumerable<IUnit> Units { get; private set; }
 
         public Neuron Neuron { get; private set; }
     }
