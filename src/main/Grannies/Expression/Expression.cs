@@ -13,8 +13,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
         public async Task<IExpression> BuildAsync(Ensemble ensemble, IPrimitiveSet primitives, IExpressionParameterSet parameters)
         {
             var result = new Expression();
-            var subordination = ensemble.Obtain(primitives.Subordination);
-
+            
             var units = new List<IUnit>();
             foreach (var dp in parameters.UnitsParameters)
             {
@@ -32,7 +31,9 @@ namespace ei8.Cortex.Coding.d23.Grannies
             }
             result.Units = units;
             result.Neuron = ensemble.Obtain(Neuron.CreateTransient(null, null, null));
-            ensemble.AddReplace(Terminal.CreateTransient(result.Neuron.Id, subordination.Id));
+
+            var types = Expression.GetExpressionTypes(parameters, primitives);
+            types.ToList().ForEach(t => ensemble.AddReplace(Terminal.CreateTransient(result.Neuron.Id, ensemble.Obtain(t).Id)));
             units.ForEach(u => ensemble.AddReplace(Terminal.CreateTransient(result.Neuron.Id, u.Neuron.Id)));
 
             return result;
@@ -41,15 +42,15 @@ namespace ei8.Cortex.Coding.d23.Grannies
         public IEnumerable<IGrannyQuery> GetQueries(IPrimitiveSet primitives, IExpressionParameterSet parameters) =>
             Expression.GetQueryByType(primitives, parameters);
 
-        private static IEnumerable<GrannyQuery> GetQueryByType(IPrimitiveSet primitives, IExpressionParameterSet parameters)
+        private static IEnumerable<IGrannyQuery> GetQueryByType(IPrimitiveSet primitives, IExpressionParameterSet parameters)
         {
-            IEnumerable<GrannyQuery> result = null;
+            IEnumerable<IGrannyQuery> result = null;
             
-            var typeIds = Expression.GetExpressionTypeIds(parameters, primitives);
+            var types = Expression.GetExpressionTypes(parameters, primitives);
 
-            if (typeIds.Count() == 1)
+            if (types.Count() == 1)
             {
-                if (typeIds.Single() == primitives.Subordination.Id)
+                if (types.Single().Id == primitives.Subordination.Id)
                 {
                     result = new[] {
                         new GrannyQuery( 
@@ -77,7 +78,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
                                     // 3 edges away and should have postsynaptic of subordination
                                     new DepthIdsPair {
                                         Depth = 3,
-                                        Ids = new[] { typeIds.Single() }
+                                        Ids = new[] { primitives.Subordination.Id }
                                     },
                                     // 2 edges away and should have postsynaptic of direct object
                                     new DepthIdsPair {
@@ -91,41 +92,35 @@ namespace ei8.Cortex.Coding.d23.Grannies
                         )
                     };
                 }
-                else if (typeIds.Single() == primitives.Simple.Id)
+                else if (types.Single().Id == primitives.Simple.Id)
                 {
-                    result = null;
-                    //new NeuronQuery()
-                    //{
-                    //    // set Id to Head value
-                    //    Id = parameters.UnitsParameters
-                    //                .Where(up => up.Type.Id == primitives.Unit.Id)
-                    //                .Select(dp => dp.Value.Id.ToString()),
-                    //    DirectionValues = DirectionValues.Any,
-                    //    Depth = 3,
-                    //    TraversalDepthPostsynaptic = new[] {
-                    //            // 3 edges away and should have postsynaptic of simple
-                    //            new DepthIdsPair {
-                    //                Depth = 3,
-                    //                Ids = new[] {
-                    //                        primitives.Simple.Id
-                    //                    }
-                    //            },
-                    //            // 3 edges away and should have postsynaptic of subordination
-                    //            new DepthIdsPair {
-                    //                Depth = 3,
-                    //                Ids = new[] { typeIds.Single() }
-                    //            },
-                    //            // 2 edges away and should have postsynaptic of direct object
-                    //            new DepthIdsPair {
-                    //                Depth = 2,
-                    //                Ids = new[] {
-                    //                    primitives.DirectObject.Id
-                    //                }
-                    //            }
-                    //        }
-                    //};
+                    result = new IGrannyQuery[] {
+                        new GrannyQueryParser<IUnitParameterSet>(
+                            parameters.UnitsParameters.Single(u => u.Type.Id == primitives.Unit.Id),
+                            (ps) => new Unit().GetQueries(
+                                    primitives,
+                                    ps
+                                ).Single().GetQuery(),
+                            (Ensemble e, IPrimitiveSet prs, IUnitParameterSet ps, out IGranny r) =>
+                                ((IUnit) new Unit()).TryParseGranny(
+                                    e,
+                                    prs,
+                                    ps,
+                                    out r
+                                    )
+                        ),
+                        new GrannyQueryBuilder(
+                            (n) => new NeuronQuery()
+                            {
+                                Postsynaptic = new []{ 
+                                    n.Id.ToString(),
+                                    primitives.Simple.Id.ToString()
+                                }
+                            }
+                        )
+                    };
                 }
-                else if (typeIds.Single() == primitives.Coordination.Id)
+                else if (types.Single().Id == primitives.Coordination.Id)
                 {
                     throw new NotImplementedException();
                 }
@@ -137,9 +132,9 @@ namespace ei8.Cortex.Coding.d23.Grannies
             return result;
         }
 
-        private static IEnumerable<Guid> GetExpressionTypeIds(IExpressionParameterSet expressionParameters, IPrimitiveSet primitives)
+        private static IEnumerable<Neuron> GetExpressionTypes(IExpressionParameterSet expressionParameters, IPrimitiveSet primitives)
         {
-            var result = new List<Guid>();
+            var result = new List<Neuron>();
 
             var headCount = expressionParameters.UnitsParameters.Count(up => up.Type.Id == primitives.Unit.Id);
             var dependentCount = expressionParameters.UnitsParameters.Count() - headCount;
@@ -148,15 +143,15 @@ namespace ei8.Cortex.Coding.d23.Grannies
             {
                 if (headCount > 1)
                 {
-                    result.Add(primitives.Coordination.Id);
+                    result.Add(primitives.Coordination);
                 }
                 else if (headCount == 1 && dependentCount == 0)
                 {
-                    result.Add(primitives.Simple.Id);
+                    result.Add(primitives.Simple);
                 }
                 if (dependentCount > 0)
                 {
-                    result.Add(primitives.Subordination.Id);
+                    result.Add(primitives.Subordination);
                 }
             }
             else
@@ -197,7 +192,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
                             units
                                 .Where(u => u.Type.Id != primitives.Unit.Id)
                                 .Select(i => i.Neuron.Id)
-                                .Concat(new[] { primitives.Subordination.Id }).ToArray()
+                                .Concat(Expression.GetExpressionTypes(parameters, primitives).Select(t => t.Id)).ToArray()
                             ))
                     },
                     (n) => tempResult.Neuron = n,

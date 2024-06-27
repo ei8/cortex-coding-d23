@@ -16,13 +16,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
             result.InstantiatesClass = await new InstantiatesClass().ObtainAsync(
                 ensemble,
                 primitives,
-                new InstantiatesClassParameterSet(
-                    parameters.Class,
-                    parameters.EnsembleRepository,
-                    parameters.UserId
-                ),
-                parameters.EnsembleRepository,
-                parameters.UserId
+                Value.CreateInstantiatesClassParameterSet(parameters)
                 );
             ensemble.AddReplace(Terminal.CreateTransient(result.Neuron.Id, result.InstantiatesClass.Neuron.Id));
             return result;
@@ -66,14 +60,12 @@ namespace ei8.Cortex.Coding.d23.Grannies
                 )
             };
 
-        private static InstantiatesClassParameterSet CreateInstantiatesClassParameterSet(IValueParameterSet parameters)
-        {
-            return new InstantiatesClassParameterSet(
+        private static IInstantiatesClassParameterSet CreateInstantiatesClassParameterSet(IValueParameterSet parameters) =>
+            new InstantiatesClassParameterSet(
                 parameters.Class,
                 parameters.EnsembleRepository,
                 parameters.UserId
             );
-        }
 
         public bool TryParse(Ensemble ensemble, IPrimitiveSet primitives, IValueParameterSet parameters, out IValue result)
         {

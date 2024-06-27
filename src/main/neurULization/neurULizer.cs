@@ -39,9 +39,7 @@ namespace ei8.Cortex.Coding.d23.neurULization
                     rootTypeNeuron,
                     options.EnsembleRepository,
                     options.UserId
-                    ),
-                options.EnsembleRepository,
-                options.UserId
+                    )
                 );
 
             // link granny neuron to InstantiatesType neuron
@@ -59,9 +57,7 @@ namespace ei8.Cortex.Coding.d23.neurULization
                     InstantiationMatchingNeuronProperty.Tag,
                     options.EnsembleRepository,
                     options.UserId
-                    ),
-                options.EnsembleRepository,
-                options.UserId
+                    )
                 );
 
 

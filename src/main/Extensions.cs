@@ -13,18 +13,33 @@ namespace ei8.Cortex.Coding.d23
     public static class Extensions
     {
         #region IGranny
-        /// <summary>
-        /// Retrieves granny from ensemble if present; Otherwise, retrieves it from persistence or builds it, and adds it to the ensemble.
-        /// </summary>
-        /// <typeparam name="TGranny"></typeparam>
-        /// <typeparam name="TParameterSet"></typeparam>
-        /// <param name="granny"></param>
-        /// <param name="ensemble"></param>
-        /// <param name="parameters"></param>
-        /// <param name="ensembleRepository"></param>
-        /// <param name="userId"></param>
-        /// <returns></returns>
         public async static Task<TGranny> ObtainAsync<TGranny, TParameterSet>(
+                this IGranny<TGranny, TParameterSet> granny,
+                Ensemble ensemble,
+                IPrimitiveSet primitives,
+                TParameterSet parameters
+            )
+            where TGranny : IGranny<TGranny, TParameterSet>
+            where TParameterSet : IAggregateParameterSet
+            => await granny.ObtainAsync(
+                ensemble, 
+                primitives, 
+                parameters, 
+                parameters.EnsembleRepository, 
+                parameters.UserId
+                );
+            /// <summary>
+            /// Retrieves granny from ensemble if present; Otherwise, retrieves it from persistence or builds it, and adds it to the ensemble.
+            /// </summary>
+            /// <typeparam name="TGranny"></typeparam>
+            /// <typeparam name="TParameterSet"></typeparam>
+            /// <param name="granny"></param>
+            /// <param name="ensemble"></param>
+            /// <param name="parameters"></param>
+            /// <param name="ensembleRepository"></param>
+            /// <param name="userId"></param>
+            /// <returns></returns>
+            public async static Task<TGranny> ObtainAsync<TGranny, TParameterSet>(
                 this IGranny<TGranny, TParameterSet> granny, 
                 Ensemble ensemble,
                 IPrimitiveSet primitives,
