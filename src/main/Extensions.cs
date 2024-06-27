@@ -48,18 +48,21 @@ namespace ei8.Cortex.Coding.d23
                 // loop through each grannyQuery
                 foreach (var grannyQuery in grannyQueries)
                 {
+                    // if current grannyQuery requires retrievalResult
+                    if (grannyQuery is IReceiver gqrcv)
+                        gqrcv.SetRetrievalResult(previousGrannyNeuron);
+
                     // get ensemble based on parameters and previous granny neuron if it's assigned
-                    var queryResult = await ensembleRepository.GetByQueryAsync(userId, grannyQuery.GetQuery(previousGrannyNeuron));
+                    var queryResult = await ensembleRepository.GetByQueryAsync(userId, grannyQuery.GetQuery());
                     // enrich ensemble
                     ensemble.AddReplaceItems(queryResult);
-                    // if granny query has tryparser
-                    if (grannyQuery.HasTryParserAndParameters)
-                        // if current query is already able to parse ensemble
-                        if (grannyQuery.TryParse(ensemble, primitives, out IGranny grannyResult))
-                            // retrieve granny of result so it can be used by subsequent query
-                            previousGrannyNeuron = grannyResult.Neuron;
-                        else
+                    // if granny query is retriever
+                    if (grannyQuery is IRetriever gqr)
+                    {
+                        // retrieve neuron
+                        if ((previousGrannyNeuron = gqr.RetrieveNeuron(ensemble, primitives)) == null)
                             break;
+                    }
                 }
 
                 // if target is in DB

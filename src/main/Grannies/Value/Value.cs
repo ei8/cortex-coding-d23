@@ -28,23 +28,23 @@ namespace ei8.Cortex.Coding.d23.Grannies
             return result;
         }
 
-        public IEnumerable<GrannyQuery> GetQueries(IPrimitiveSet primitives, IValueParameterSet parameters) =>
-            new[] {
-                new GrannyQuery(
+        public IEnumerable<IGrannyQuery> GetQueries(IPrimitiveSet primitives, IValueParameterSet parameters) =>
+            new IGrannyQuery[] {
+                new GrannyQueryParser<IInstantiatesClassParameterSet>(
+                    Value.CreateInstantiatesClassParameterSet(parameters),
                     (ps) => new InstantiatesClass().GetQueries(
                             primitives,
-                            (IInstantiatesClassParameterSet) ps
+                            ps
                         ).Single().GetQuery(),
-                    Value.CreateInstantiatesParameterSet(parameters),
-                    (Ensemble e, IPrimitiveSet prs, IParameterSet ps, out IGranny r) => 
+                    (Ensemble e, IPrimitiveSet prs, IInstantiatesClassParameterSet ps, out IGranny r) => 
                         ((IInstantiatesClass) new InstantiatesClass()).TryParseGranny(
                             e, 
                             prs, 
-                            (IInstantiatesClassParameterSet) ps, 
+                            ps, 
                             out r
                             )
                 ),
-                new GrannyQuery(
+                new GrannyQueryBuilder(
                     (n) => new NeuronQuery()
                     {
                         Id = parameters.MatchingNeuronProperty == InstantiationMatchingNeuronProperty.Id ? 
@@ -66,7 +66,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
                 )
             };
 
-        private static InstantiatesClassParameterSet CreateInstantiatesParameterSet(IValueParameterSet parameters)
+        private static InstantiatesClassParameterSet CreateInstantiatesClassParameterSet(IValueParameterSet parameters)
         {
             return new InstantiatesClassParameterSet(
                 parameters.Class,
@@ -84,7 +84,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
             if (new InstantiatesClass().TryParse(
                 ensemble, 
                 primitives, 
-                Value.CreateInstantiatesParameterSet(parameters), 
+                Value.CreateInstantiatesClassParameterSet(parameters), 
                 out IInstantiatesClass ic
                 ))
             {

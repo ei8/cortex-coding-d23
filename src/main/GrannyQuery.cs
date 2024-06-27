@@ -5,60 +5,93 @@ using System;
 
 namespace ei8.Cortex.Coding.d23
 {
-    public class GrannyQuery
+    public class GrannyQuery : IGrannyQuery
     {
         private NeuronQuery neuronQuery;
-        private IParameterSet parameters;
-        private Func<IParameterSet, NeuronQuery> queryWithParametersBuilder;
-        private TryParseFunc tryParser;
-        private Func<Neuron, NeuronQuery> queryWithNeuronBuilder;
 
-        public GrannyQuery(NeuronQuery neuronQuery) : this(neuronQuery, null, null, null, null)
+        public GrannyQuery(NeuronQuery neuronQuery) 
         {
-        }
-
-        public GrannyQuery(Func<Neuron, NeuronQuery> queryWithNeuronBuilder) : this(null, queryWithNeuronBuilder, null, null, null)
-        {
-        }
-
-        public GrannyQuery(Func<IParameterSet, NeuronQuery> queryWithParametersBuilder, IParameterSet parameters, TryParseFunc tryParser) :
-            this(null, null, queryWithParametersBuilder, parameters, tryParser)
-        {
-        }
-
-        private GrannyQuery(NeuronQuery neuronQuery, Func<Neuron, NeuronQuery> queryWithNeuronBuilder, Func<IParameterSet, NeuronQuery> queryWithParametersBuilder, IParameterSet parameters, TryParseFunc tryParser)
-        {
+            AssertionConcern.AssertArgumentNotNull(neuronQuery, nameof(neuronQuery));
             this.neuronQuery = neuronQuery;
+        }
+
+        public NeuronQuery GetQuery()
+        {
+            return this.neuronQuery;
+        }
+    }
+
+    public class GrannyQueryBuilder : IReceiver
+    {
+        private Func<Neuron, NeuronQuery> queryWithNeuronBuilder;
+        private Neuron retrievalResult;
+
+        public GrannyQueryBuilder(Func<Neuron, NeuronQuery> queryWithNeuronBuilder) 
+        {
+            AssertionConcern.AssertArgumentNotNull(queryWithNeuronBuilder, nameof(queryWithNeuronBuilder));
             this.queryWithNeuronBuilder = queryWithNeuronBuilder;
-            this.queryWithParametersBuilder = queryWithParametersBuilder;
+            this.retrievalResult = null;
+        }
+
+        public NeuronQuery GetQuery()
+        {
+            AssertionConcern.AssertStateTrue(this.retrievalResult != null, "RetrievalResult is required to invoke GetQuery.");
+            return this.queryWithNeuronBuilder(this.retrievalResult);
+        }
+
+        public void SetRetrievalResult(Neuron value)
+        {
+            AssertionConcern.AssertArgumentNotNull(value, nameof(value));
+            this.retrievalResult = value;
+        }
+    }
+
+    public class GrannyQueryParser<T> : IRetriever
+        where T : IParameterSet
+    {
+        private T parameters;
+        private Func<T, NeuronQuery> queryWithParametersBuilder;
+        private TryParseFunc<T> tryParser;
+
+        public GrannyQueryParser(T parameters, Func<T, NeuronQuery> queryWithParametersBuilder, TryParseFunc<T> tryParser)
+        {
+            AssertionConcern.AssertArgumentNotNull(parameters, nameof(parameters));
+            AssertionConcern.AssertArgumentNotNull(queryWithParametersBuilder, nameof(queryWithParametersBuilder));
+            AssertionConcern.AssertArgumentNotNull(tryParser, nameof(tryParser));
+
             this.parameters = parameters;
+            this.queryWithParametersBuilder = queryWithParametersBuilder;
             this.tryParser = tryParser;
         }
 
-        public NeuronQuery GetQuery(Neuron previousGrannyNeuron = null)
+        public NeuronQuery GetQuery()
         {
-            NeuronQuery result = null;
+            return this.queryWithParametersBuilder(this.parameters);
+        }
 
-            if (this.neuronQuery != null)
-                result = this.neuronQuery;
-            else if (this.queryWithNeuronBuilder != null)
-            {
-                AssertionConcern.AssertArgumentNotNull(previousGrannyNeuron, nameof(previousGrannyNeuron));
-                result = this.queryWithNeuronBuilder(previousGrannyNeuron);
-            }
-            else if (this.queryWithParametersBuilder != null)
-            {
-                result = this.queryWithParametersBuilder(this.parameters);
-            }
-            else
-                throw new InvalidOperationException("Unable to retrieve query as none of the query-related properties have been specified.");
+        public Neuron RetrieveNeuron(Ensemble ensemble, IPrimitiveSet primitives)
+        {
+            Neuron result = null;
+
+            if (this.tryParser(ensemble, primitives, this.parameters, out IGranny granny))
+                result = granny.Neuron;
 
             return result;
         }
+    }
 
-        public bool TryParse(Ensemble ensemble, IPrimitiveSet primitives, out IGranny granny) =>
-            this.tryParser(ensemble, primitives, this.parameters, out granny);
-        
-        public bool HasTryParserAndParameters => this.tryParser != null && this.parameters != null;
+    public interface IGrannyQuery
+    {
+        NeuronQuery GetQuery();
+    }
+
+    public interface IReceiver : IGrannyQuery
+    {
+        void SetRetrievalResult(Neuron value);
+    }
+
+    public interface IRetriever : IGrannyQuery
+    {
+        Neuron RetrieveNeuron(Ensemble ensemble, IPrimitiveSet primitives);
     }
 }

@@ -12,7 +12,11 @@
 
         public Neuron Instantiates { get; set; }
 
+        public Neuron Simple { get; set; }
+
         public Neuron Subordination { get; set; }
+
+        public Neuron Coordination { get; set; }
 
         public Neuron Unit { get; set; }
 

@@ -22,7 +22,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
     {
         bool TryParse(Ensemble ensemble, IPrimitiveSet primitives, TParameterSet parameters, out TSelf result);
 
-        IEnumerable<GrannyQuery> GetQueries(IPrimitiveSet primitives, TParameterSet parameters);
+        IEnumerable<IGrannyQuery> GetQueries(IPrimitiveSet primitives, TParameterSet parameters);
 
         Task<TSelf> BuildAsync(Ensemble ensemble, IPrimitiveSet primitives, TParameterSet parameters);
     }

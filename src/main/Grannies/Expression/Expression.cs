@@ -3,6 +3,7 @@ using ei8.Cortex.Library.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ei8.Cortex.Coding.d23.Grannies
@@ -13,7 +14,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
         {
             var result = new Expression();
             var subordination = ensemble.Obtain(primitives.Subordination);
-            
+
             var units = new List<IUnit>();
             foreach (var dp in parameters.UnitsParameters)
             {
@@ -37,83 +38,131 @@ namespace ei8.Cortex.Coding.d23.Grannies
             return result;
         }
 
-        public IEnumerable<GrannyQuery> GetQueries(IPrimitiveSet primitives, IExpressionParameterSet parameters) =>
-            new[] {
-                new GrannyQuery(
-                    new NeuronQuery()
-                    {
-                        // set Id to values of Dependents (non-Head units)
-                        Id = parameters.UnitsParameters
-                            .Where(up => up.Type.Id != primitives.Unit.Id)
-                            .Select(dp => dp.Value.Id.ToString()),
-                        DirectionValues = DirectionValues.Any,
-                        Depth = 4,
-                        TraversalDepthPostsynaptic = new[] {
-                            // 4 edges away and should have postsynaptic of unit or values of Head units
-                            new DepthIdsPair {
+        public IEnumerable<IGrannyQuery> GetQueries(IPrimitiveSet primitives, IExpressionParameterSet parameters) =>
+            Expression.GetQueryByType(primitives, parameters);
+
+        private static IEnumerable<GrannyQuery> GetQueryByType(IPrimitiveSet primitives, IExpressionParameterSet parameters)
+        {
+            IEnumerable<GrannyQuery> result = null;
+            
+            var typeIds = Expression.GetExpressionTypeIds(parameters, primitives);
+
+            if (typeIds.Count() == 1)
+            {
+                if (typeIds.Single() == primitives.Subordination.Id)
+                {
+                    result = new[] {
+                        new GrannyQuery( 
+                            new NeuronQuery()
+                            {
+                                // set Id to values of Dependents (non-Head units)
+                                Id = parameters.UnitsParameters
+                                        .Where(up => up.Type.Id != primitives.Unit.Id)
+                                        .Select(dp => dp.Value.Id.ToString()),
+                                DirectionValues = DirectionValues.Any,
                                 Depth = 4,
-                                Ids = parameters.UnitsParameters
-                                    .Where(up => up.Type.Id == primitives.Unit.Id)
-                                    .Select(up => up.Value.Id)
-                                    .Concat(
-                                        new[] {
-                                            primitives.Unit.Id
+                                TraversalDepthPostsynaptic = new[] {
+                                    // 4 edges away and should have postsynaptic of unit or values of Head units
+                                    new DepthIdsPair {
+                                        Depth = 4,
+                                        Ids = parameters.UnitsParameters
+                                            .Where(up => up.Type.Id == primitives.Unit.Id)
+                                            .Select(up => up.Value.Id)
+                                            .Concat(
+                                                new[] {
+                                                    primitives.Unit.Id
+                                                }
+                                            )
+                                    },
+                                    // 3 edges away and should have postsynaptic of subordination
+                                    new DepthIdsPair {
+                                        Depth = 3,
+                                        Ids = new[] { typeIds.Single() }
+                                    },
+                                    // 2 edges away and should have postsynaptic of direct object
+                                    new DepthIdsPair {
+                                        Depth = 2,
+                                        Ids = new[] {
+                                            primitives.DirectObject.Id
                                         }
-                                    )
-                            },
-                            // 3 edges away and should have postsynaptic of subordination
-                            new DepthIdsPair {
-                                Depth = 3,
-                                Ids = new[] {
-                                    Expression.GetExpressionTypeId(parameters, primitives)
-                                }
-                            },
-                            // 2 edges away and should have postsynaptic of direct object
-                            new DepthIdsPair {
-                                Depth = 2,
-                                Ids = new[] {
-                                    primitives.DirectObject.Id
+                                    }
                                 }
                             }
-                        }
-                    }
-                )
-            };
+                        )
+                    };
+                }
+                else if (typeIds.Single() == primitives.Simple.Id)
+                {
+                    result = null;
+                    //new NeuronQuery()
+                    //{
+                    //    // set Id to Head value
+                    //    Id = parameters.UnitsParameters
+                    //                .Where(up => up.Type.Id == primitives.Unit.Id)
+                    //                .Select(dp => dp.Value.Id.ToString()),
+                    //    DirectionValues = DirectionValues.Any,
+                    //    Depth = 3,
+                    //    TraversalDepthPostsynaptic = new[] {
+                    //            // 3 edges away and should have postsynaptic of simple
+                    //            new DepthIdsPair {
+                    //                Depth = 3,
+                    //                Ids = new[] {
+                    //                        primitives.Simple.Id
+                    //                    }
+                    //            },
+                    //            // 3 edges away and should have postsynaptic of subordination
+                    //            new DepthIdsPair {
+                    //                Depth = 3,
+                    //                Ids = new[] { typeIds.Single() }
+                    //            },
+                    //            // 2 edges away and should have postsynaptic of direct object
+                    //            new DepthIdsPair {
+                    //                Depth = 2,
+                    //                Ids = new[] {
+                    //                    primitives.DirectObject.Id
+                    //                }
+                    //            }
+                    //        }
+                    //};
+                }
+                else if (typeIds.Single() == primitives.Coordination.Id)
+                {
+                    throw new NotImplementedException();
+                }
+            }
+            else
+                // TODO: Coordination-Subscription
+                throw new NotImplementedException();
 
-        private static Guid GetExpressionTypeId(IExpressionParameterSet expressionParameters, IPrimitiveSet primitives)
+            return result;
+        }
+
+        private static IEnumerable<Guid> GetExpressionTypeIds(IExpressionParameterSet expressionParameters, IPrimitiveSet primitives)
         {
-            Guid result = Guid.Empty;
+            var result = new List<Guid>();
 
             var headCount = expressionParameters.UnitsParameters.Count(up => up.Type.Id == primitives.Unit.Id);
             var dependentCount = expressionParameters.UnitsParameters.Count() - headCount;
 
-            // coordination
-            if (headCount > 1)
+            if (headCount > 0)
             {
+                if (headCount > 1)
+                {
+                    result.Add(primitives.Coordination.Id);
+                }
+                else if (headCount == 1 && dependentCount == 0)
+                {
+                    result.Add(primitives.Simple.Id);
+                }
                 if (dependentCount > 0)
                 {
-                    //TODO: result = primitives.CoordinationSubordination.Id
-                    throw new NotImplementedException();
+                    result.Add(primitives.Subordination.Id);
                 }
-                else
-                {
-                    // TODO: result = primitives.Coordination.Id
-                    throw new NotImplementedException();
-                }
-            }
-            // subordination
-            else if (headCount == 1)
-            {
-                if (dependentCount > 0)
-                    result = primitives.Subordination.Id;
-                else
-                    // TODO: result = primitives.Simple.Id
-                    throw new NotImplementedException();
             }
             else
                 throw new InvalidOperationException("Expression must have at least one 'Head' unit.");
 
-            return result;
+            return result.ToArray();
         }
 
         public bool TryParse(Ensemble ensemble, IPrimitiveSet primitives, IExpressionParameterSet parameters, out IExpression result)

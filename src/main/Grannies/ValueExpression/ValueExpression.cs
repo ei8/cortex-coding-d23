@@ -10,7 +10,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
         public async Task<IValueExpression> BuildAsync(Ensemble ensemble, IPrimitiveSet primitives, IValueExpressionParameterSet parameters)
         {
             var result = new ValueExpression();
-            result.ValueInstantiation = await new Value().ObtainAsync(
+            result.ValueInstance = await new Value().ObtainAsync(
                 ensemble,
                 primitives,
                 new ValueParameterSet(
@@ -23,12 +23,28 @@ namespace ei8.Cortex.Coding.d23.Grannies
                 parameters.EnsembleRepository,
                 parameters.UserId
                 );
-            //result.Value = await new Head().ObtainAsync()
-
+            result.Expression = await new Expression().ObtainAsync(
+                ensemble,
+                primitives,
+                new ExpressionParameterSet(
+                    new[]
+                    {
+                        new UnitParameterSet(
+                            result.ValueInstance.Neuron,
+                            primitives.Unit
+                        )
+                    },
+                    parameters.EnsembleRepository, 
+                    parameters.UserId
+                ),
+                parameters.EnsembleRepository,
+                parameters.UserId
+            );
+            result.Neuron = result.Expression.Neuron;
             return result;
         }
 
-        public IEnumerable<GrannyQuery> GetQueries(IPrimitiveSet primitives, IValueExpressionParameterSet parameters)
+        public IEnumerable<IGrannyQuery> GetQueries(IPrimitiveSet primitives, IValueExpressionParameterSet parameters)
         {
             throw new NotImplementedException();
         }
@@ -38,11 +54,9 @@ namespace ei8.Cortex.Coding.d23.Grannies
             throw new NotImplementedException();
         }
 
-        public IValue ValueInstantiation { get; private set; }
+        public IValue ValueInstance { get; private set; }
 
-        public IUnit Value { get; private set; }
-
-        public IUnit Of { get; private set; }
+        public IExpression Expression { get; private set; }
 
         public Neuron Neuron { get; private set; }
     }

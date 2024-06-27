@@ -22,7 +22,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
             return result;
         }
 
-        public IEnumerable<GrannyQuery> GetQueries(IPrimitiveSet primitives, IInstantiatesClassParameterSet parameters) =>
+        public IEnumerable<IGrannyQuery> GetQueries(IPrimitiveSet primitives, IInstantiatesClassParameterSet parameters) =>
             new Expression().GetQueries(
                 primitives,
                 InstantiatesClass.CreateSubordinationParameterSet(primitives, parameters)

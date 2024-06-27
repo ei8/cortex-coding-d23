@@ -12,7 +12,11 @@ namespace ei8.Cortex.Coding.d23
 
         Neuron Instantiates { get; }
 
+        Neuron Simple { get; }
+
         Neuron Subordination { get; }
+
+        Neuron Coordination { get; }
 
         Neuron Unit { get; }
 

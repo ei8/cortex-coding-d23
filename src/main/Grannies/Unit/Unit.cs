@@ -19,7 +19,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
             return result;
         }
 
-        public IEnumerable<GrannyQuery> GetQueries(IPrimitiveSet primitives, IUnitParameterSet parameters) =>
+        public IEnumerable<IGrannyQuery> GetQueries(IPrimitiveSet primitives, IUnitParameterSet parameters) =>
             new[] {
                 new GrannyQuery(
                     new NeuronQuery()
