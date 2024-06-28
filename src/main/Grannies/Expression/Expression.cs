@@ -1,4 +1,5 @@
-﻿using ei8.Cortex.Coding.d23.Selectors;
+﻿using ei8.Cortex.Coding.d23.Queries;
+using ei8.Cortex.Coding.d23.Selectors;
 using ei8.Cortex.Library.Common;
 using System;
 using System.Collections.Generic;
@@ -18,14 +19,16 @@ namespace ei8.Cortex.Coding.d23.Grannies
             foreach (var dp in parameters.UnitsParameters)
             {
                 var unit = await new Unit().ObtainAsync(
-                    ensemble,
-                    primitives,
+                    new ObtainParameters(
+                        ensemble,
+                        primitives,
+                        parameters.EnsembleRepository,
+                        parameters.UserId
+                    ),
                     new UnitParameterSet(
                         dp.Value,
                         dp.Type
-                        ),
-                    parameters.EnsembleRepository,
-                    parameters.UserId
+                        )
                     );
                 units.Add(unit);
             }
@@ -100,7 +103,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
                             (ps) => new Unit().GetQueries(
                                     primitives,
                                     ps
-                                ).Single().GetQuery(),
+                                ),
                             (Ensemble e, IPrimitiveSet prs, IUnitParameterSet ps, out IGranny r) =>
                                 ((IUnit) new Unit()).TryParseGranny(
                                     e,

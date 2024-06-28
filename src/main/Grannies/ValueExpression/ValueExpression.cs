@@ -1,4 +1,5 @@
-﻿using ei8.Cortex.Library.Common;
+﻿using ei8.Cortex.Coding.d23.Queries;
+using ei8.Cortex.Library.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -51,7 +52,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
                     (ps) => new Value().GetQueries(
                             primitives,
                             ps
-                        ).Single().GetQuery(),
+                        ),
                     (Ensemble e, IPrimitiveSet prs, IValueParameterSet ps, out IGranny r) =>
                         ((IValue) new Value()).TryParseGranny(
                             e,
@@ -60,7 +61,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
                             out r
                             )
                 ),
-                // TODO: use result of preceding granny query
+                // TODO: use result of preceding granny OR USE Expression.GetQueries similar to InstantiatesClass
                 //
                 // new GrannyQueryBuilder(
                 //    (n) => new NeuronQuery()

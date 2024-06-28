@@ -1,7 +1,6 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
+using ei8.Cortex.Coding.d23.Queries;
 using ei8.Cortex.Coding.d23.Selectors;
-using ei8.Cortex.Library.Common;
-using neurUL.Common;
 using neurUL.Common.Domain.Model;
 using System;
 using System.Collections.Generic;
@@ -14,74 +13,56 @@ namespace ei8.Cortex.Coding.d23
     {
         #region IGranny
         public async static Task<TGranny> ObtainAsync<TGranny, TParameterSet>(
-                this IGranny<TGranny, TParameterSet> granny,
-                Ensemble ensemble,
-                IPrimitiveSet primitives,
-                TParameterSet parameters
+            this IGranny<TGranny, TParameterSet> granny,
+            Ensemble ensemble,
+            IPrimitiveSet primitives,
+            TParameterSet parameters
             )
             where TGranny : IGranny<TGranny, TParameterSet>
             where TParameterSet : IAggregateParameterSet
-            => await granny.ObtainAsync(
+        => await granny.ObtainAsync(
+            new ObtainParameters(
                 ensemble, 
-                primitives, 
-                parameters, 
-                parameters.EnsembleRepository, 
+                primitives,
+                parameters.EnsembleRepository,
                 parameters.UserId
-                );
-            /// <summary>
-            /// Retrieves granny from ensemble if present; Otherwise, retrieves it from persistence or builds it, and adds it to the ensemble.
-            /// </summary>
-            /// <typeparam name="TGranny"></typeparam>
-            /// <typeparam name="TParameterSet"></typeparam>
-            /// <param name="granny"></param>
-            /// <param name="ensemble"></param>
-            /// <param name="parameters"></param>
-            /// <param name="ensembleRepository"></param>
-            /// <param name="userId"></param>
-            /// <returns></returns>
-            public async static Task<TGranny> ObtainAsync<TGranny, TParameterSet>(
-                this IGranny<TGranny, TParameterSet> granny, 
-                Ensemble ensemble,
-                IPrimitiveSet primitives,
-                TParameterSet parameters,
-                IEnsembleRepository ensembleRepository,
-                string userId
+                ),
+            parameters
+            );
+
+        /// <summary>
+        /// Retrieves granny from ensemble if present; Otherwise, retrieves it from persistence or builds it, and adds it to the ensemble.
+        /// </summary>
+        /// <typeparam name="TGranny"></typeparam>
+        /// <typeparam name="TParameterSet"></typeparam>
+        /// <param name="granny"></param>
+        /// <param name="ensemble"></param>
+        /// <param name="parameters"></param>
+        /// <param name="ensembleRepository"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public async static Task<TGranny> ObtainAsync<TGranny, TParameterSet>(
+            this IGranny<TGranny, TParameterSet> granny, 
+            ObtainParameters obtainParameters,
+            TParameterSet parameters
             ) 
             where TGranny : IGranny<TGranny, TParameterSet>
             where TParameterSet : IParameterSet
         {
-            AssertionConcern.AssertArgumentNotNull(ensemble, nameof(ensemble));
+            AssertionConcern.AssertArgumentNotNull(obtainParameters, nameof(obtainParameters));
             AssertionConcern.AssertArgumentNotNull(parameters, nameof(parameters));
 
             TGranny result = default;
             // if target is not in specified ensemble
-            if (!granny.TryParse(ensemble, primitives, parameters, out TGranny ensembleParseResult))
+            if (!granny.TryParse(obtainParameters.Ensemble, obtainParameters.Primitives, parameters, out TGranny ensembleParseResult))
             {
                 // retrieve target from DB
-                var grannyQueries = granny.GetQueries(primitives, parameters);
-                Neuron previousGrannyNeuron = null;
-                // loop through each grannyQuery
-                foreach (var grannyQuery in grannyQueries)
-                {
-                    // if current grannyQuery requires retrievalResult
-                    if (grannyQuery is IReceiver gqrcv)
-                        gqrcv.SetRetrievalResult(previousGrannyNeuron);
-
-                    // get ensemble based on parameters and previous granny neuron if it's assigned
-                    var queryResult = await ensembleRepository.GetByQueryAsync(userId, grannyQuery.GetQuery());
-                    // enrich ensemble
-                    ensemble.AddReplaceItems(queryResult);
-                    // if granny query is retriever
-                    if (grannyQuery is IRetriever gqr)
-                    {
-                        // retrieve neuron
-                        if ((previousGrannyNeuron = gqr.RetrieveNeuron(ensemble, primitives)) == null)
-                            break;
-                    }
-                }
+                var grannyQueries = granny.GetQueries(obtainParameters.Primitives, parameters);
+                
+                await grannyQueries.Process(obtainParameters);
 
                 // if target is in DB
-                if (granny.TryParse(ensemble, primitives, parameters, out TGranny dbParseResult))
+                if (granny.TryParse(obtainParameters.Ensemble, obtainParameters.Primitives, parameters, out TGranny dbParseResult))
                 {
                     result = dbParseResult;
                 }
@@ -89,7 +70,7 @@ namespace ei8.Cortex.Coding.d23
                 else
                 {
                     // build in ensemble
-                    result = await granny.BuildAsync(ensemble, primitives, parameters);
+                    result = await granny.BuildAsync(obtainParameters.Ensemble, obtainParameters.Primitives, parameters);
                 }
             }
             // if target was found in ensemble
@@ -97,6 +78,40 @@ namespace ei8.Cortex.Coding.d23
                 result = ensembleParseResult;
 
             return result;
+        }
+
+        internal static async Task Process(
+            this IEnumerable<IGrannyQuery> grannyQueries,
+            ObtainParameters obtainParameters,
+            bool breakBeforeLastGetQuery = false
+            )
+        {
+            Neuron previousGrannyNeuron = null;
+            // loop through each grannyQuery
+            foreach (var grannyQuery in grannyQueries)
+            {
+                // if current grannyQuery requires retrievalResult
+                if (grannyQuery is IReceiver gqrcv)
+                    gqrcv.SetRetrievalResult(previousGrannyNeuron);
+
+                if (breakBeforeLastGetQuery && grannyQueries.Last() == grannyQuery)
+                    break;
+
+                // get ensemble based on parameters and previous granny neuron if it's assigned
+                var queryResult = await obtainParameters.EnsembleRepository.GetByQueryAsync(
+                    obtainParameters.UserId,
+                    await grannyQuery.GetQuery(obtainParameters)
+                    );
+                // enrich ensemble
+                obtainParameters.Ensemble.AddReplaceItems(queryResult);
+                // if granny query is retriever
+                if (grannyQuery is IRetriever gqr)
+                {
+                    // retrieve neuron
+                    if ((previousGrannyNeuron = gqr.RetrieveNeuron(obtainParameters.Ensemble, obtainParameters.Primitives)) == null)
+                        break;
+                }
+            }
         }
 
         internal static void TryParseCore<TGranny, TParameterSet>(
@@ -127,7 +142,8 @@ namespace ei8.Cortex.Coding.d23
             Ensemble ensemble,
             IPrimitiveSet primitives, 
             TParameters parameters,
-            out IGranny result)
+            out IGranny result
+            )
             where TValue : IGranny<TValue, TParameters>
             where TParameters : IParameterSet
         {
@@ -141,8 +157,8 @@ namespace ei8.Cortex.Coding.d23
         #endregion
 
         public static bool HasSameElementsAs<T>(
-                this IEnumerable<T> first,
-                IEnumerable<T> second
+            this IEnumerable<T> first,
+            IEnumerable<T> second
             )
         {
             var firstMap = first

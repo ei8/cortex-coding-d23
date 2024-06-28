@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ei8.Cortex.Coding.d23.Queries;
 
 namespace ei8.Cortex.Coding.d23.Grannies
 {

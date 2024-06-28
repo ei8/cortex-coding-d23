@@ -1,4 +1,5 @@
-﻿using ei8.Cortex.Coding.d23.Selectors;
+﻿using ei8.Cortex.Coding.d23.Queries;
+using ei8.Cortex.Coding.d23.Selectors;
 using ei8.Cortex.Library.Common;
 using System;
 using System.Collections.Generic;
@@ -29,7 +30,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
                     (ps) => new InstantiatesClass().GetQueries(
                             primitives,
                             ps
-                        ).Single().GetQuery(),
+                        ),
                     (Ensemble e, IPrimitiveSet prs, IInstantiatesClassParameterSet ps, out IGranny r) => 
                         ((IInstantiatesClass) new InstantiatesClass()).TryParseGranny(
                             e, 
