@@ -44,33 +44,11 @@ namespace ei8.Cortex.Coding.d23.Grannies
 
         public IEnumerable<IGrannyQuery> GetQueries(IPrimitiveSet primitives, IValueExpressionParameterSet parameters) =>
             new IGrannyQuery[] {
-                new GrannyQueryParser<IValueParameterSet>(
-                    (n) => ValueExpression.CreateValueParameterSet(parameters),
-                    (ps) => new Value().GetQueries(
-                            primitives,
-                            ps
-                        ),
-                    (Ensemble e, IPrimitiveSet prs, IValueParameterSet ps, out IGranny r) =>
-                        ((IValue) new Value()).TryParseGranny(
-                            e,
-                            prs,
-                            ps,
-                            out r
-                            )
+                new GrannyQueryInner<Value, IValue, IValueParameterSet>(
+                    (n) => ValueExpression.CreateValueParameterSet(parameters)
                 ),
-                new GrannyQueryParser<IExpressionParameterSet>(
-                    (n) => ValueExpression.CreateExpressionParameterSet(primitives, parameters, n),
-                    (ps) => new Expression().GetQueries(
-                            primitives,
-                            ps
-                        ),
-                    (Ensemble e, IPrimitiveSet prs, IExpressionParameterSet ps, out IGranny r) =>
-                        ((IExpression) new Expression()).TryParseGranny(
-                            e,
-                            prs,
-                            ps,
-                            out r
-                        )
+                new GrannyQueryInner<Expression, IExpression, IExpressionParameterSet>(
+                    (n) => ValueExpression.CreateExpressionParameterSet(primitives, parameters, n)
                 )
             };
 

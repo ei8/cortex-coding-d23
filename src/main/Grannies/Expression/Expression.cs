@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace ei8.Cortex.Coding.d23.Grannies
 {
     public class Expression : IExpression
-    {
+    { 
         public async Task<IExpression> BuildAsync(Ensemble ensemble, IPrimitiveSet primitives, IExpressionParameterSet parameters)
         {
             var result = new Expression();
@@ -98,19 +98,8 @@ namespace ei8.Cortex.Coding.d23.Grannies
                 else if (types.Single().Id == primitives.Simple.Id)
                 {
                     result = new IGrannyQuery[] {
-                        new GrannyQueryParser<IUnitParameterSet>(
-                            (n) => parameters.UnitsParameters.Single(u => u.Type.Id == primitives.Unit.Id),
-                            (ps) => new Unit().GetQueries(
-                                    primitives,
-                                    ps
-                                ),
-                            (Ensemble e, IPrimitiveSet prs, IUnitParameterSet ps, out IGranny r) =>
-                                ((IUnit) new Unit()).TryParseGranny(
-                                    e,
-                                    prs,
-                                    ps,
-                                    out r
-                                    )
+                        new GrannyQueryInner<Unit, IUnit, IUnitParameterSet>(
+                            (n) => parameters.UnitsParameters.Single(u => u.Type.Id == primitives.Unit.Id)
                         ),
                         new GrannyQueryBuilder(
                             (n) => new NeuronQuery()

@@ -25,19 +25,8 @@ namespace ei8.Cortex.Coding.d23.Grannies
 
         public IEnumerable<IGrannyQuery> GetQueries(IPrimitiveSet primitives, IValueParameterSet parameters) =>
             new IGrannyQuery[] {
-                new GrannyQueryParser<IInstantiatesClassParameterSet>(
-                    (n) => Value.CreateInstantiatesClassParameterSet(parameters),
-                    (ps) => new InstantiatesClass().GetQueries(
-                            primitives,
-                            ps
-                        ),
-                    (Ensemble e, IPrimitiveSet prs, IInstantiatesClassParameterSet ps, out IGranny r) => 
-                        ((IInstantiatesClass) new InstantiatesClass()).TryParseGranny(
-                            e, 
-                            prs, 
-                            ps, 
-                            out r
-                            )
+                new GrannyQueryInner<InstantiatesClass, IInstantiatesClass, IInstantiatesClassParameterSet>(
+                    (n) => Value.CreateInstantiatesClassParameterSet(parameters)
                 ),
                 new GrannyQueryBuilder(
                     (n) => new NeuronQuery()

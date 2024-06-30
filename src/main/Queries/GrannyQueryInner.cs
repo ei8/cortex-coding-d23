@@ -2,35 +2,32 @@
 using ei8.Cortex.Library.Common;
 using neurUL.Common.Domain.Model;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace ei8.Cortex.Coding.d23.Queries
 {
-    public class GrannyQueryParser<T> : IRetriever, IReceiver
-        where T : IParameterSet
+    public class GrannyQueryInner<TGranny, TIGranny, TParameterSet> : IRetriever, IReceiver
+        where TGranny : TIGranny, new()
+        where TIGranny : IGranny<TIGranny, TParameterSet>
+        where TParameterSet : IParameterSet
     {
-        private Func<Neuron, T> parametersBuilder;
-        private Func<T, IEnumerable<IGrannyQuery>> queryWithParametersBuilder;
-        private TryParseFunc<T> tryParser;
+        private readonly TGranny granny;
+        private readonly Func<Neuron, TParameterSet> parametersBuilder;
         private Neuron retrievalResult;
 
-        public GrannyQueryParser(Func<Neuron, T> parametersBuilder, Func<T, IEnumerable<IGrannyQuery>> queryWithParametersBuilder, TryParseFunc<T> tryParser)
+        public GrannyQueryInner(Func<Neuron, TParameterSet> parametersBuilder)
         {
             AssertionConcern.AssertArgumentNotNull(parametersBuilder, nameof(parametersBuilder));
-            AssertionConcern.AssertArgumentNotNull(queryWithParametersBuilder, nameof(queryWithParametersBuilder));
-            AssertionConcern.AssertArgumentNotNull(tryParser, nameof(tryParser));
 
+            this.granny = new TGranny();
             this.parametersBuilder = parametersBuilder;
-            this.queryWithParametersBuilder = queryWithParametersBuilder;
-            this.tryParser = tryParser;
             this.retrievalResult = null;
         }
 
         public async Task<NeuronQuery> GetQuery(ObtainParameters obtainParameters)
         {
-            var gqs = queryWithParametersBuilder(this.parametersBuilder(this.retrievalResult));
+            var gqs = this.granny.GetQueries(obtainParameters.Primitives, this.parametersBuilder(this.retrievalResult));
             // process granny queries just like in Extensions.ObtainSync
             var completed = await gqs.Process(obtainParameters, true, this.retrievalResult);
             // then call GetQuery on last granny query if completed successfully
@@ -41,7 +38,7 @@ namespace ei8.Cortex.Coding.d23.Queries
         {
             Neuron result = null;
 
-            if (this.tryParser(ensemble, primitives, this.parametersBuilder(this.retrievalResult), out IGranny granny))
+            if (this.granny.TryParse(ensemble, primitives, this.parametersBuilder(this.retrievalResult), out TIGranny granny))
                 result = granny.Neuron;
 
             return result;
