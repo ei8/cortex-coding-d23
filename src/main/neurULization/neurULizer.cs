@@ -46,12 +46,24 @@ namespace ei8.Cortex.Coding.d23.neurULization
             result.AddReplace(Terminal.CreateTransient(granny.Id, instantiatesClass.Neuron.Id));
 
             // DEL: test code
-            var idea = Neuron.CreateTransient("Test Idea", null, null);
-            var instantiation = new Value();
-            instantiation = (Value)await instantiation.ObtainAsync(
+            var idea = Neuron.CreateTransient("Test Idea Expression", null, null);
+            //var instantiation = new Value();
+            //instantiation = (Value)await instantiation.ObtainAsync(
+            //    result,
+            //    options.Primitives,
+            //    new ValueParameterSet(
+            //        idea,
+            //        options.Primitives.Idea,
+            //        InstantiationMatchingNeuronProperty.Tag,
+            //        options.EnsembleRepository,
+            //        options.UserId
+            //        )
+            //    );
+            var expression = new ValueExpression();
+            expression = (ValueExpression)await expression.ObtainAsync(
                 result,
                 options.Primitives,
-                new ValueParameterSet(
+                new ValueExpressionParameterSet(
                     idea,
                     options.Primitives.Idea,
                     InstantiationMatchingNeuronProperty.Tag,
@@ -59,7 +71,6 @@ namespace ei8.Cortex.Coding.d23.neurULization
                     options.UserId
                     )
                 );
-
 
             return result;
         }

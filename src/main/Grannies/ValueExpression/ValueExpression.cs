@@ -1,8 +1,5 @@
 ﻿using ei8.Cortex.Coding.d23.Queries;
-using ei8.Cortex.Library.Common;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace ei8.Cortex.Coding.d23.Grannies
@@ -28,7 +25,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
                             primitives.Unit
                         )
                     },
-                    parameters.EnsembleRepository, 
+                    parameters.EnsembleRepository,
                     parameters.UserId
                 )
             );
@@ -48,7 +45,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
         public IEnumerable<IGrannyQuery> GetQueries(IPrimitiveSet primitives, IValueExpressionParameterSet parameters) =>
             new IGrannyQuery[] {
                 new GrannyQueryParser<IValueParameterSet>(
-                    ValueExpression.CreateValueParameterSet(parameters),
+                    (n) => ValueExpression.CreateValueParameterSet(parameters),
                     (ps) => new Value().GetQueries(
                             primitives,
                             ps
@@ -61,33 +58,65 @@ namespace ei8.Cortex.Coding.d23.Grannies
                             out r
                             )
                 ),
-                // TODO: use result of preceding granny OR USE Expression.GetQueries similar to InstantiatesClass
-                //
-                // new GrannyQueryBuilder(
-                //    (n) => new NeuronQuery()
-                //    {
-                //        Id = parameters.MatchingNeuronProperty == InstantiationMatchingNeuronProperty.Id ?
-                //            new[] { parameters.Value.Id.ToString() } :
-                //            Array.Empty<string>(),
-                //        TagContains = parameters.MatchingNeuronProperty == InstantiationMatchingNeuronProperty.Tag ?
-                //            new[] { parameters.Value.Tag } :
-                //            Array.Empty<string>(),
-                //        DirectionValues = DirectionValues.Outbound,
-                //        Depth = 1,
-                //        TraversalDepthPostsynaptic = new[] {
-                //            // 1 edge away and should have postsynaptic of previous granny
-                //            new DepthIdsPair {
-                //                Depth = 1,
-                //                Ids = new[] { n.Id }
-                //            },
-                //        }
-                //    }
-                //)
+                new GrannyQueryParser<IExpressionParameterSet>(
+                    (n) => ValueExpression.CreateExpressionParameterSet(primitives, parameters, n),
+                    (ps) => new Expression().GetQueries(
+                            primitives,
+                            ps
+                        ),
+                    (Ensemble e, IPrimitiveSet prs, IExpressionParameterSet ps, out IGranny r) =>
+                        ((IExpression) new Expression()).TryParseGranny(
+                            e,
+                            prs,
+                            ps,
+                            out r
+                        )
+                )
             };
+
+        private static ExpressionParameterSet CreateExpressionParameterSet(IPrimitiveSet primitives, IValueExpressionParameterSet parameters, Neuron n)
+        {
+            return new ExpressionParameterSet(new[]
+                    {
+                        new UnitParameterSet(
+                            n,
+                            primitives.Unit
+                        ),
+                    },
+                    parameters.EnsembleRepository,
+                    parameters.UserId
+                );
+        }
 
         public bool TryParse(Ensemble ensemble, IPrimitiveSet primitives, IValueExpressionParameterSet parameters, out IValueExpression result)
         {
-            throw new NotImplementedException();
+            result = null;
+
+            var tempResult = new ValueExpression();
+
+            if (new Value().TryParse(
+                ensemble,
+                primitives,
+                ValueExpression.CreateValueParameterSet(parameters),
+                out IValue v
+                ))
+            {
+                tempResult.Value = v;
+
+                if (new Expression().TryParse(
+                    ensemble,
+                    primitives,
+                    ValueExpression.CreateExpressionParameterSet(primitives, parameters, tempResult.Value.Neuron),
+                    out IExpression e
+                    ))
+                {
+                    tempResult.Expression = e;
+                    tempResult.Neuron = e.Neuron;
+                    result = tempResult;
+                }
+            }
+
+            return result != null;
         }
 
         public IValue Value { get; private set; }

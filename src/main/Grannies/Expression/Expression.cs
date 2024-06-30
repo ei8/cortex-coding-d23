@@ -99,7 +99,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
                 {
                     result = new IGrannyQuery[] {
                         new GrannyQueryParser<IUnitParameterSet>(
-                            parameters.UnitsParameters.Single(u => u.Type.Id == primitives.Unit.Id),
+                            (n) => parameters.UnitsParameters.Single(u => u.Type.Id == primitives.Unit.Id),
                             (ps) => new Unit().GetQueries(
                                     primitives,
                                     ps
@@ -118,7 +118,9 @@ namespace ei8.Cortex.Coding.d23.Grannies
                                 Postsynaptic = new []{ 
                                     n.Id.ToString(),
                                     primitives.Simple.Id.ToString()
-                                }
+                                },
+                                DirectionValues = DirectionValues.Outbound,
+                                Depth = 1
                             }
                         )
                     };

@@ -1,9 +1,11 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
 using ei8.Cortex.Coding.d23.Queries;
 using ei8.Cortex.Coding.d23.Selectors;
+using ei8.Cortex.Library.Common;
 using neurUL.Common.Domain.Model;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -80,38 +82,62 @@ namespace ei8.Cortex.Coding.d23
             return result;
         }
 
-        internal static async Task Process(
+        internal static async Task<bool> Process(
             this IEnumerable<IGrannyQuery> grannyQueries,
             ObtainParameters obtainParameters,
-            bool breakBeforeLastGetQuery = false
+            bool breakBeforeLastGetQuery = false,
+            Neuron previousGrannyNeuron = null
             )
         {
-            Neuron previousGrannyNeuron = null;
+            var result = false;
             // loop through each grannyQuery
             foreach (var grannyQuery in grannyQueries)
             {
                 // if current grannyQuery requires retrievalResult
-                if (grannyQuery is IReceiver gqrcv)
-                    gqrcv.SetRetrievalResult(previousGrannyNeuron);
+                if (grannyQuery is IReceiver gqrcv && previousGrannyNeuron != null)
+                    gqrcv.SetPrecedingRetrievalResult(previousGrannyNeuron);
 
+                // if last is supposed to be skipped
                 if (breakBeforeLastGetQuery && grannyQueries.Last() == grannyQuery)
+                {
+                    // indicate success then break
+                    result = true;
+                    break;
+                }
+
+                NeuronQuery query = null;
+                
+                // if query is obtained successfully
+                if ((query = await grannyQuery.GetQuery(obtainParameters)) != null)
+                {
+                    // get ensemble based on parameters and previous granny neuron if it's assigned
+                    var queryResult = await obtainParameters.EnsembleRepository.GetByQueryAsync(
+                        obtainParameters.UserId,
+                        query
+                        );
+                    // enrich ensemble
+                    obtainParameters.Ensemble.AddReplaceItems(queryResult);
+                    // if granny query is retriever
+                    if (grannyQuery is IRetriever gqr)
+                    {
+                        previousGrannyNeuron = gqr.RetrieveNeuron(obtainParameters.Ensemble, obtainParameters.Primitives);
+                        // if retrieval fails and this is not the last query
+                        if (previousGrannyNeuron == null && grannyQueries.Last() != grannyQuery)
+                            // break with a failure indication
+                            break;
+                    }
+                }
+                else
                     break;
 
-                // get ensemble based on parameters and previous granny neuron if it's assigned
-                var queryResult = await obtainParameters.EnsembleRepository.GetByQueryAsync(
-                    obtainParameters.UserId,
-                    await grannyQuery.GetQuery(obtainParameters)
-                    );
-                // enrich ensemble
-                obtainParameters.Ensemble.AddReplaceItems(queryResult);
-                // if granny query is retriever
-                if (grannyQuery is IRetriever gqr)
+                // if this is the last granny
+                if (grannyQueries.Last() == grannyQuery)
                 {
-                    // retrieve neuron
-                    if ((previousGrannyNeuron = gqr.RetrieveNeuron(obtainParameters.Ensemble, obtainParameters.Primitives)) == null)
-                        break;
+                    // indicate success
+                    result = true;
                 }
             }
+            return result;
         }
 
         internal static void TryParseCore<TGranny, TParameterSet>(
@@ -130,6 +156,7 @@ namespace ei8.Cortex.Coding.d23
             foreach (var levelParser in levelParsers)
                 selection = levelParser.Evaluate(ensemble, selection);
 
+            Trace.WriteLineIf(selection.Count() > 1, "Redundant data encountered.");
             if (selection.Count() == 1 && ensemble.TryGetById(selection.Single(), out Neuron ensembleResult))
             {
                 grannySetter(ensembleResult);

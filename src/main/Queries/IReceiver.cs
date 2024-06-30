@@ -6,6 +6,6 @@ namespace ei8.Cortex.Coding.d23.Queries
 {
     public interface IReceiver : IGrannyQuery
     {
-        void SetRetrievalResult(Neuron value);
+        void SetPrecedingRetrievalResult(Neuron value);
     }
 }

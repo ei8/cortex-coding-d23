@@ -14,19 +14,19 @@ namespace ei8.Cortex.Coding.d23.Queries
         {
             AssertionConcern.AssertArgumentNotNull(queryWithNeuronBuilder, nameof(queryWithNeuronBuilder));
             this.queryWithNeuronBuilder = queryWithNeuronBuilder;
-            retrievalResult = null;
+            this.retrievalResult = null;
         }
 
         public Task<NeuronQuery> GetQuery(ObtainParameters obtainParameters)
         {
-            AssertionConcern.AssertStateTrue(retrievalResult != null, "RetrievalResult is required to invoke GetQuery.");
-            return Task.FromResult(queryWithNeuronBuilder(retrievalResult));
+            AssertionConcern.AssertStateTrue(this.retrievalResult != null, "RetrievalResult is required to invoke GetQuery.");
+            return Task.FromResult(queryWithNeuronBuilder(this.retrievalResult));
         }
 
-        public void SetRetrievalResult(Neuron value)
+        public void SetPrecedingRetrievalResult(Neuron value)
         {
             AssertionConcern.AssertArgumentNotNull(value, nameof(value));
-            retrievalResult = value;
+            this.retrievalResult = value;
         }
     }
 }
