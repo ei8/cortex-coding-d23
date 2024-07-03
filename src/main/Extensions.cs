@@ -166,7 +166,7 @@ namespace ei8.Cortex.Coding.d23
 
         internal static TResult AggregateTryParse<TResult>(
                 this TResult tempResult,
-                IEnumerable<IProcessInner<TResult>> parsers,
+                IEnumerable<IInnerProcess<TResult>> parsers,
                 Ensemble ensemble,
                 IPrimitiveSet primitives,
                 Action<Neuron, TResult> grannyNeuronSetter
@@ -191,7 +191,7 @@ namespace ei8.Cortex.Coding.d23
 
         internal static async Task<TResult> AggregateBuildAsync<TResult>(
                 this TResult tempResult,
-                IEnumerable<IProcessInner<TResult>> parsers,
+                IEnumerable<IInnerProcess<TResult>> parsers,
                 Ensemble ensemble,
                 IPrimitiveSet primitives,
                 Action<Neuron, TResult> grannyNeuronSetter
@@ -205,6 +205,9 @@ namespace ei8.Cortex.Coding.d23
             return tempResult;
         }
         #endregion
+
+        internal static IUnit GetByTypeId(this IEnumerable<IUnit> units, Guid id) =>
+            units.Single(u => u.Type.Id == id);
 
         public static bool HasSameElementsAs<T>(
             this IEnumerable<T> first,

@@ -8,15 +8,17 @@ namespace ei8.Cortex.Coding.d23.Grannies
     {
         public async Task<IValueExpression> BuildAsync(Ensemble ensemble, IPrimitiveSet primitives, IValueExpressionParameterSet parameters) =>
             await new ValueExpression().AggregateBuildAsync(
-                new IProcessInner<ValueExpression>[]
+                new IInnerProcess<ValueExpression>[]
                 {
-                    new BuildAggregateParametersInner<Value, IValue, IValueParameterSet, ValueExpression>(
+                    new InnerProcess<Value, IValue, IValueParameterSet, ValueExpression>(
                         (g) => ValueExpression.CreateValueParameterSet(parameters),
-                        (g, r) => r.Value = g
+                        (g, r) => r.Value = g,
+                        ProcessHelper.ObtainWithAggregateParamsAsync
                         ),
-                    new BuildAggregateParametersInner<Expression, IExpression, IExpressionParameterSet, ValueExpression>(
+                    new InnerProcess<Expression, IExpression, IExpressionParameterSet, ValueExpression>(
                         (g) => ValueExpression.CreateExpressionParameterSet(primitives, parameters, g.Neuron),
-                        (g, r) => r.Expression = g
+                        (g, r) => r.Expression = g,
+                        ProcessHelper.ObtainWithAggregateParamsAsync
                         )
                 },
                 ensemble,
@@ -57,15 +59,17 @@ namespace ei8.Cortex.Coding.d23.Grannies
 
         public bool TryParse(Ensemble ensemble, IPrimitiveSet primitives, IValueExpressionParameterSet parameters, out IValueExpression result) =>
             (result = new ValueExpression().AggregateTryParse(
-                new IProcessInner<ValueExpression>[]
+                new IInnerProcess<ValueExpression>[]
                 {
-                    new TryParseInner<Value, IValue, IValueParameterSet, ValueExpression>(
+                    new InnerProcess<Value, IValue, IValueParameterSet, ValueExpression>(
                         (g) => ValueExpression.CreateValueParameterSet(parameters),
-                        (g, r) => r.Value = g
+                        (g, r) => r.Value = g,
+                        ProcessHelper.TryParse
                         ),
-                    new TryParseInner<Expression, IExpression, IExpressionParameterSet, ValueExpression>(
+                    new InnerProcess<Expression, IExpression, IExpressionParameterSet, ValueExpression>(
                         (g) => ValueExpression.CreateExpressionParameterSet(primitives, parameters, g.Neuron),
-                        (g, r) => r.Expression = g
+                        (g, r) => r.Expression = g,
+                        ProcessHelper.TryParse
                         )
                 },
                 ensemble,

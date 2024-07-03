@@ -1,6 +1,30 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
+using System;
+using System.Threading.Tasks;
 
 namespace ei8.Cortex.Coding.d23
 {
-    public delegate bool TryParseFunc<T>(Ensemble ensemble, IPrimitiveSet primitives, T parameters, out IGranny granny) where T : IParameterSet;
+    public delegate IGranny GrannyProcessCallback<T, TIGranny, TParameterSet, TResult>(
+        T granny, 
+        Ensemble ensemble, 
+        IPrimitiveSet primitives, 
+        TParameterSet parameters, 
+        Action<TIGranny, TResult> resultUpdater, 
+        TResult tempResult
+        )
+        where T : TIGranny, new()
+        where TIGranny : IGranny<TIGranny, TParameterSet>
+        where TParameterSet : IParameterSet;
+
+    public delegate Task<IGranny> AsyncGrannyProcessCallback<T, TIGranny, TParameterSet, TResult>(
+        T granny,
+        Ensemble ensemble,
+        IPrimitiveSet primitives,
+        TParameterSet parameters,
+        Action<TIGranny, TResult> resultUpdater,
+        TResult tempResult
+        )
+        where T : TIGranny, new()
+        where TIGranny : IGranny<TIGranny, TParameterSet>
+        where TParameterSet : IParameterSet;
 }
