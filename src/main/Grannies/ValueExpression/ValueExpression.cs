@@ -6,32 +6,23 @@ namespace ei8.Cortex.Coding.d23.Grannies
 {
     public class ValueExpression : IValueExpression
     {
-        public async Task<IValueExpression> BuildAsync(Ensemble ensemble, IPrimitiveSet primitives, IValueExpressionParameterSet parameters)
-        {
-            var result = new ValueExpression();
-            result.Value = await new Value().ObtainAsync(
-                ensemble,
-                primitives,
-                ValueExpression.CreateValueParameterSet(parameters)
-                );
-            result.Expression = await new Expression().ObtainAsync(
-                ensemble,
-                primitives,
-                new ExpressionParameterSet(
-                    new[]
-                    {
-                        new UnitParameterSet(
-                            result.Value.Neuron,
-                            primitives.Unit
+        public async Task<IValueExpression> BuildAsync(Ensemble ensemble, IPrimitiveSet primitives, IValueExpressionParameterSet parameters) =>
+            await new ValueExpression().AggregateBuildAsync(
+                new IProcessInner<ValueExpression>[]
+                {
+                    new BuildAggregateParametersInner<Value, IValue, IValueParameterSet, ValueExpression>(
+                        (g) => ValueExpression.CreateValueParameterSet(parameters),
+                        (g, r) => r.Value = g
+                        ),
+                    new BuildAggregateParametersInner<Expression, IExpression, IExpressionParameterSet, ValueExpression>(
+                        (g) => ValueExpression.CreateExpressionParameterSet(primitives, parameters, g.Neuron),
+                        (g, r) => r.Expression = g
                         )
-                    },
-                    parameters.EnsembleRepository,
-                    parameters.UserId
-                )
-            );
-            result.Neuron = result.Expression.Neuron;
-            return result;
-        }
+                },
+                ensemble,
+                primitives,
+                (n, r) => r.Neuron = n
+                );
 
         private static IValueParameterSet CreateValueParameterSet(IValueExpressionParameterSet parameters) =>
             new ValueParameterSet(
@@ -52,50 +43,35 @@ namespace ei8.Cortex.Coding.d23.Grannies
                 )
             };
 
-        private static ExpressionParameterSet CreateExpressionParameterSet(IPrimitiveSet primitives, IValueExpressionParameterSet parameters, Neuron n)
-        {
-            return new ExpressionParameterSet(new[]
-                    {
-                        new UnitParameterSet(
-                            n,
-                            primitives.Unit
+        private static ExpressionParameterSet CreateExpressionParameterSet(IPrimitiveSet primitives, IValueExpressionParameterSet parameters, Neuron n) =>
+            new ExpressionParameterSet(
+                new[] {
+                    new UnitParameterSet(
+                        n,
+                        primitives.Unit
+                    ),
+                },
+                parameters.EnsembleRepository,
+                parameters.UserId
+            );
+
+        public bool TryParse(Ensemble ensemble, IPrimitiveSet primitives, IValueExpressionParameterSet parameters, out IValueExpression result) =>
+            (result = new ValueExpression().AggregateTryParse(
+                new IProcessInner<ValueExpression>[]
+                {
+                    new TryParseInner<Value, IValue, IValueParameterSet, ValueExpression>(
+                        (g) => ValueExpression.CreateValueParameterSet(parameters),
+                        (g, r) => r.Value = g
                         ),
-                    },
-                    parameters.EnsembleRepository,
-                    parameters.UserId
-                );
-        }
-
-        public bool TryParse(Ensemble ensemble, IPrimitiveSet primitives, IValueExpressionParameterSet parameters, out IValueExpression result)
-        {
-            result = null;
-
-            var tempResult = new ValueExpression();
-
-            if (new Value().TryParse(
+                    new TryParseInner<Expression, IExpression, IExpressionParameterSet, ValueExpression>(
+                        (g) => ValueExpression.CreateExpressionParameterSet(primitives, parameters, g.Neuron),
+                        (g, r) => r.Expression = g
+                        )
+                },
                 ensemble,
                 primitives,
-                ValueExpression.CreateValueParameterSet(parameters),
-                out IValue v
-                ))
-            {
-                tempResult.Value = v;
-
-                if (new Expression().TryParse(
-                    ensemble,
-                    primitives,
-                    ValueExpression.CreateExpressionParameterSet(primitives, parameters, tempResult.Value.Neuron),
-                    out IExpression e
-                    ))
-                {
-                    tempResult.Expression = e;
-                    tempResult.Neuron = e.Neuron;
-                    result = tempResult;
-                }
-            }
-
-            return result != null;
-        }
+                (n, r) => r.Neuron = n
+            )) != null;
 
         public IValue Value { get; private set; }
 

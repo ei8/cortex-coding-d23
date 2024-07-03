@@ -14,7 +14,7 @@ namespace ei8.Cortex.Coding.d23
     public static class Extensions
     {
         #region IGranny
-        public async static Task<TGranny> ObtainAsync<TGranny, TParameterSet>(
+        internal async static Task<TGranny> ObtainAsync<TGranny, TParameterSet>(
             this IGranny<TGranny, TParameterSet> granny,
             Ensemble ensemble,
             IPrimitiveSet primitives,
@@ -24,7 +24,7 @@ namespace ei8.Cortex.Coding.d23
             where TParameterSet : IAggregateParameterSet
         => await granny.ObtainAsync(
             new ObtainParameters(
-                ensemble, 
+                ensemble,
                 primitives,
                 parameters.EnsembleRepository,
                 parameters.UserId
@@ -43,11 +43,11 @@ namespace ei8.Cortex.Coding.d23
         /// <param name="ensembleRepository"></param>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public async static Task<TGranny> ObtainAsync<TGranny, TParameterSet>(
-            this IGranny<TGranny, TParameterSet> granny, 
+        internal async static Task<TGranny> ObtainAsync<TGranny, TParameterSet>(
+            this IGranny<TGranny, TParameterSet> granny,
             ObtainParameters obtainParameters,
             TParameterSet parameters
-            ) 
+            )
             where TGranny : IGranny<TGranny, TParameterSet>
             where TParameterSet : IParameterSet
         {
@@ -60,7 +60,7 @@ namespace ei8.Cortex.Coding.d23
             {
                 // retrieve target from DB
                 var grannyQueries = granny.GetQueries(obtainParameters.Primitives, parameters);
-                
+
                 await grannyQueries.Process(obtainParameters);
 
                 // if target is in DB
@@ -106,7 +106,7 @@ namespace ei8.Cortex.Coding.d23
                 }
 
                 NeuronQuery query = null;
-                
+
                 // if query is obtained successfully
                 if ((query = await grannyQuery.GetQuery(obtainParameters)) != null)
                 {
@@ -141,13 +141,13 @@ namespace ei8.Cortex.Coding.d23
         }
 
         internal static void TryParseCore<TGranny, TParameterSet>(
-            this TGranny granny, 
-            TParameterSet parameters, 
-            Ensemble ensemble, 
-            TGranny tempResult, 
-            IEnumerable<Guid> selection, 
-            LevelParser[] levelParsers, 
-            System.Action<Neuron> grannySetter, 
+            this TGranny granny,
+            TParameterSet parameters,
+            Ensemble ensemble,
+            TGranny tempResult,
+            IEnumerable<Guid> selection,
+            LevelParser[] levelParsers,
+            System.Action<Neuron> grannySetter,
             ref TGranny result
             )
             where TGranny : IGranny<TGranny, TParameterSet>
@@ -164,22 +164,45 @@ namespace ei8.Cortex.Coding.d23
             }
         }
 
-        public static bool TryParseGranny<TParameters, TValue>(
-            this TValue granny, 
-            Ensemble ensemble,
-            IPrimitiveSet primitives, 
-            TParameters parameters,
-            out IGranny result
+        internal static TResult AggregateTryParse<TResult>(
+                this TResult tempResult,
+                IEnumerable<IProcessInner<TResult>> parsers,
+                Ensemble ensemble,
+                IPrimitiveSet primitives,
+                Action<Neuron, TResult> grannyNeuronSetter
             )
-            where TValue : IGranny<TValue, TParameters>
-            where TParameters : IParameterSet
         {
-            result = null;
+            TResult result = default;
 
-            if (granny.TryParse(ensemble, primitives, parameters, out TValue parseResult))
-                result = parseResult;
+            IGranny precedingGranny = null;
+            foreach(var p in parsers)
+            {
+                if ((precedingGranny = p.Execute(ensemble, primitives, precedingGranny, tempResult)) == null)
+                    break;
+                else if (parsers.Last() == p)
+                {
+                    grannyNeuronSetter(precedingGranny.Neuron, tempResult);
+                    result = tempResult;
+                }
+            }
 
-            return result != null;
+            return result;
+        }
+
+        internal static async Task<TResult> AggregateBuildAsync<TResult>(
+                this TResult tempResult,
+                IEnumerable<IProcessInner<TResult>> parsers,
+                Ensemble ensemble,
+                IPrimitiveSet primitives,
+                Action<Neuron, TResult> grannyNeuronSetter
+            )
+        {
+            IGranny precedingGranny = null;
+            foreach (var p in parsers)
+                precedingGranny = await p.ExecuteAsync(ensemble, primitives, precedingGranny, tempResult);
+
+            grannyNeuronSetter(precedingGranny.Neuron, tempResult);
+            return tempResult;
         }
         #endregion
 
