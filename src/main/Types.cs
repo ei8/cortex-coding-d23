@@ -10,8 +10,10 @@ namespace ei8.Cortex.Coding.d23
         IPrimitiveSet primitives, 
         TParameterSet parameters, 
         Action<TIGranny, TResult> resultUpdater, 
-        TResult tempResult
-        )
+        TResult tempResult,
+        IEnsembleRepository ensembleRepository,
+        string userId
+    )
         where T : TIGranny, new()
         where TIGranny : IGranny<TIGranny, TParameterSet>
         where TParameterSet : IParameterSet;
@@ -22,8 +24,10 @@ namespace ei8.Cortex.Coding.d23
         IPrimitiveSet primitives,
         TParameterSet parameters,
         Action<TIGranny, TResult> resultUpdater,
-        TResult tempResult
-        )
+        TResult tempResult,
+        IEnsembleRepository ensembleRepository,
+        string userId
+    )
         where T : TIGranny, new()
         where TIGranny : IGranny<TIGranny, TParameterSet>
         where TParameterSet : IParameterSet;

@@ -14,7 +14,9 @@ namespace ei8.Cortex.Coding.d23
             IPrimitiveSet primitives,
             TParameterSet parameters,
             Action<TIGranny, TResult> resultUpdater,
-            TResult tempResult
+            TResult tempResult,
+            IEnsembleRepository ensembleRepository,
+            string userId
         )
             where T : TIGranny, new()
             where TIGranny : IGranny<TIGranny, TParameterSet>
@@ -31,17 +33,48 @@ namespace ei8.Cortex.Coding.d23
             return result;
         }
 
+        public static async Task<IGranny> ObtainAsync<T, TIGranny, TParameterSet, TResult>(
+            T granny,
+            Ensemble ensemble,
+            IPrimitiveSet primitives,
+            TParameterSet parameters,
+            Action<TIGranny, TResult> resultUpdater,
+            TResult tempResult,
+            IEnsembleRepository ensembleRepository,
+            string userId
+        )
+            where T : TIGranny, new()
+            where TIGranny : IGranny<TIGranny, TParameterSet>
+            where TParameterSet : IParameterSet
+        {
+            TIGranny result = await granny.ObtainAsync(
+                new ObtainParameters(
+                    ensemble,
+                    primitives,
+                    ensembleRepository,
+                    userId
+                ),
+                parameters
+                );
+
+            resultUpdater(result, tempResult);
+
+            return result;
+        }
+
         public static IGranny TryParse<T, TIGranny, TParameterSet, TResult>(
             T granny,
             Ensemble ensemble,
             IPrimitiveSet primitives,
             TParameterSet parameters,
             Action<TIGranny, TResult> resultUpdater,
-            TResult tempResult
+            TResult tempResult,
+            IEnsembleRepository ensembleRepository,
+            string userId
         )
             where T : TIGranny, new()
             where TIGranny : IGranny<TIGranny, TParameterSet>
-            where TParameterSet : IAggregateParameterSet
+            where TParameterSet : IParameterSet
         {
             IGranny result = null;
 

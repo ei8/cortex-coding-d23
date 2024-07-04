@@ -166,22 +166,34 @@ namespace ei8.Cortex.Coding.d23
 
         internal static TResult AggregateTryParse<TResult>(
                 this TResult tempResult,
-                IEnumerable<IInnerProcess<TResult>> parsers,
+                IEnumerable<IInnerProcess<TResult>> processes,
                 Ensemble ensemble,
                 IPrimitiveSet primitives,
-                Action<Neuron, TResult> grannyNeuronSetter
+                IEnsembleRepository ensembleRepository,
+                string userId,
+                Action<Neuron, TResult> grannyNeuronSetter = null
             )
+            where TResult : IGranny
         {
             TResult result = default;
 
             IGranny precedingGranny = null;
-            foreach(var p in parsers)
+            var ps = processes.ToArray();
+            for(int i = 0; i < ps.Length; i++)
             {
-                if ((precedingGranny = p.Execute(ensemble, primitives, precedingGranny, tempResult)) == null)
+                if ((precedingGranny = ps[i].Execute(
+                    ensemble, 
+                    primitives, 
+                    precedingGranny, 
+                    tempResult,
+                    ensembleRepository,
+                    userId
+                    )) == null)
                     break;
-                else if (parsers.Last() == p)
+                else if (i == ps.Length - 1)
                 {
-                    grannyNeuronSetter(precedingGranny.Neuron, tempResult);
+                    if (grannyNeuronSetter != null)
+                        grannyNeuronSetter(precedingGranny.Neuron, tempResult);
                     result = tempResult;
                 }
             }
@@ -191,23 +203,49 @@ namespace ei8.Cortex.Coding.d23
 
         internal static async Task<TResult> AggregateBuildAsync<TResult>(
                 this TResult tempResult,
-                IEnumerable<IInnerProcess<TResult>> parsers,
+                IEnumerable<IInnerProcess<TResult>> processes,
                 Ensemble ensemble,
                 IPrimitiveSet primitives,
-                Action<Neuron, TResult> grannyNeuronSetter
+                IEnsembleRepository ensembleRepository,
+                string userId,
+                Action<Neuron, TResult> grannyNeuronSetter,
+                Func<TResult, IEnumerable<Neuron>> postsynapticsRetriever = null
             )
+            where TResult : IGranny
         {
             IGranny precedingGranny = null;
-            foreach (var p in parsers)
-                precedingGranny = await p.ExecuteAsync(ensemble, primitives, precedingGranny, tempResult);
+            foreach (var p in processes)
+                precedingGranny = await p.ExecuteAsync(
+                    ensemble,
+                    primitives,
+                    precedingGranny,
+                    tempResult,
+                    ensembleRepository,
+                    userId
+                    );
 
             grannyNeuronSetter(precedingGranny.Neuron, tempResult);
+
+            IEnumerable<Neuron> postsynaptics = null;
+            if (
+                postsynapticsRetriever != null &&
+                (postsynaptics = postsynapticsRetriever(tempResult)) != null &&
+                postsynaptics.Any()
+                )
+                postsynaptics.ToList().ForEach(n =>
+                    ensemble.AddReplace(
+                        Terminal.CreateTransient(
+                            tempResult.Neuron.Id, n.Id
+                        )
+                    )
+                );
+
             return tempResult;
         }
         #endregion
 
-        internal static IUnit GetByTypeId(this IEnumerable<IUnit> units, Guid id) =>
-            units.Single(u => u.Type.Id == id);
+        internal static IEnumerable<IUnit> GetByTypeId(this IEnumerable<IUnit> units, Guid id, bool isEqual = true) =>
+            units.Where(u => isEqual ? u.Type.Id == id : u.Type.Id != id);
 
         public static bool HasSameElementsAs<T>(
             this IEnumerable<T> first,

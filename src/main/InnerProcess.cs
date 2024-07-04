@@ -42,15 +42,46 @@ namespace ei8.Cortex.Coding.d23
             this.resultUpdater = resultUpdater;
         }
 
-        public IGranny Execute(Ensemble ensemble, IPrimitiveSet primitives, IGranny precedingGranny, TResult tempResult)
+        public IGranny Execute(
+            Ensemble ensemble, 
+            IPrimitiveSet primitives, 
+            IGranny precedingGranny, 
+            TResult tempResult, 
+            IEnsembleRepository ensembleRepository,
+            string userId)
         {
             AssertionConcern.AssertStateTrue(this.syncProcess != null, "Cannot invoke InnerProcess.Execute() when 'syncProcess' is null.");
-            return this.syncProcess(this.granny, ensemble, primitives, this.parametersBuilder(precedingGranny), this.resultUpdater, tempResult);
+            return this.syncProcess(
+                this.granny, 
+                ensemble, 
+                primitives, 
+                this.parametersBuilder(precedingGranny), 
+                this.resultUpdater, 
+                tempResult,
+                ensembleRepository,
+                userId
+                );
         }
-        public async Task<IGranny> ExecuteAsync(Ensemble ensemble, IPrimitiveSet primitives, IGranny precedingGranny, TResult tempResult)
+        public async Task<IGranny> ExecuteAsync(
+            Ensemble ensemble, 
+            IPrimitiveSet primitives, 
+            IGranny precedingGranny, 
+            TResult tempResult,
+            IEnsembleRepository ensembleRepository,
+            string userId
+            )
         {
             AssertionConcern.AssertStateTrue(this.asyncProcess != null, "Cannot invoke InnerProcess.ExecuteAsync() when 'asyncProcess' is null.");
-            return await this.asyncProcess(this.granny, ensemble, primitives, this.parametersBuilder(precedingGranny), this.resultUpdater, tempResult);
+            return await this.asyncProcess(
+                this.granny, 
+                ensemble, 
+                primitives, 
+                this.parametersBuilder(precedingGranny), 
+                this.resultUpdater, 
+                tempResult,
+                ensembleRepository,
+                userId
+                );
         }
     }
 }

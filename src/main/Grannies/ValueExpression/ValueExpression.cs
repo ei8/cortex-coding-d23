@@ -23,6 +23,8 @@ namespace ei8.Cortex.Coding.d23.Grannies
                 },
                 ensemble,
                 primitives,
+                parameters.EnsembleRepository,
+                parameters.UserId,
                 (n, r) => r.Neuron = n
                 );
 
@@ -74,6 +76,8 @@ namespace ei8.Cortex.Coding.d23.Grannies
                 },
                 ensemble,
                 primitives,
+                parameters.EnsembleRepository,
+                parameters.UserId,
                 (n, r) => r.Neuron = n
             )) != null;
 

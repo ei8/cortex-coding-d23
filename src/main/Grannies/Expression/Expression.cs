@@ -10,37 +10,30 @@ using System.Threading.Tasks;
 namespace ei8.Cortex.Coding.d23.Grannies
 {
     public class Expression : IExpression
-    { 
-        public async Task<IExpression> BuildAsync(Ensemble ensemble, IPrimitiveSet primitives, IExpressionParameterSet parameters)
-        {
-            var result = new Expression();
-            
-            var units = new List<IUnit>();
-            foreach (var dp in parameters.UnitsParameters)
-            {
-                var unit = await new Unit().ObtainAsync(
-                    new ObtainParameters(
-                        ensemble,
-                        primitives,
-                        parameters.EnsembleRepository,
-                        parameters.UserId
-                    ),
-                    new UnitParameterSet(
-                        dp.Value,
-                        dp.Type
+    {
+        private IList<IUnit> units = new List<IUnit>();
+
+        public async Task<IExpression> BuildAsync(Ensemble ensemble, IPrimitiveSet primitives, IExpressionParameterSet parameters) =>
+            await new Expression().AggregateBuildAsync(
+                parameters.UnitsParameters.Select(
+                    u => new InnerProcess<Unit, IUnit, IUnitParameterSet, Expression>(
+                        (g) => u,
+                        (g, r) => r.units.Add(g),
+                        ProcessHelper.ObtainAsync
                         )
-                    );
-                units.Add(unit);
-            }
-            result.Units = units;
-            result.Neuron = ensemble.Obtain(Neuron.CreateTransient(null, null, null));
-
-            var types = Expression.GetExpressionTypes(parameters, primitives);
-            types.ToList().ForEach(t => ensemble.AddReplace(Terminal.CreateTransient(result.Neuron.Id, ensemble.Obtain(t).Id)));
-            units.ForEach(u => ensemble.AddReplace(Terminal.CreateTransient(result.Neuron.Id, u.Neuron.Id)));
-
-            return result;
-        }
+                ),
+                ensemble,
+                primitives,
+                parameters.EnsembleRepository,
+                parameters.UserId,
+                (n, r) => r.Neuron = ensemble.Obtain(Neuron.CreateTransient(null, null, null)),
+                (r) => 
+                    // concat applicable expression types
+                    Expression.GetExpressionTypes(parameters, primitives).Select(et => ensemble.Obtain(et)).Concat(
+                        // with Units in result
+                        r.Units.Select(u => u.Neuron)
+                    )
+            );
 
         public IEnumerable<IGrannyQuery> GetQueries(IPrimitiveSet primitives, IExpressionParameterSet parameters) =>
             Expression.GetQueryByType(primitives, parameters);
@@ -158,33 +151,33 @@ namespace ei8.Cortex.Coding.d23.Grannies
         {
             result = null;
 
-            var tempResult = new Expression();
+            var tempResult = new Expression().AggregateTryParse(
+                parameters.UnitsParameters.Select(
+                    u => new InnerProcess<Unit, IUnit, IUnitParameterSet, Expression>(
+                        (g) => u,
+                        (g, r) => r.units.Add(g),
+                        ProcessHelper.TryParse
+                        )
+                ),
+                ensemble,
+                primitives,
+                parameters.EnsembleRepository,
+                parameters.UserId
+            );
 
-            var units = new List<IUnit>();
-            foreach (var dp in parameters.UnitsParameters)
+            if (tempResult != null && tempResult.Units.Count() == parameters.UnitsParameters.Count())
             {
-                if (new Unit().TryParse(ensemble, primitives, dp, out IUnit ide))
-                    units.Add(ide);
-            }
-
-            if (units.Count == parameters.UnitsParameters.Count())
-            {
-                tempResult.Units = units;
-
                 this.TryParseCore(
                     parameters,
                     ensemble,
                     tempResult,
                     // start from the Head units
-                    tempResult.Units
-                        .Where(u => u.Type.Id == primitives.Unit.Id)
-                        .Select(u => u.Neuron.Id),
+                    tempResult.Units.GetByTypeId(primitives.Unit.Id).Select(u => u.Neuron.Id),
                     new[]
                     {
                         // get the presynaptic via the siblings of the head and subordination
                         new LevelParser(new PresynapticBySibling(
-                            units
-                                .Where(u => u.Type.Id != primitives.Unit.Id)
+                            tempResult.Units.GetByTypeId(primitives.Unit.Id, false)
                                 .Select(i => i.Neuron.Id)
                                 .Concat(Expression.GetExpressionTypes(parameters, primitives).Select(t => t.Id)).ToArray()
                             ))
@@ -197,7 +190,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
             return result != null;
         }
 
-        public IEnumerable<IUnit> Units { get; private set; }
+        public IEnumerable<IUnit> Units => this.units.ToArray();
 
         public Neuron Neuron { get; private set; }
     }

@@ -13,12 +13,14 @@ namespace ei8.Cortex.Coding.d23.Grannies
                 {
                     new InnerProcess<Expression, IExpression, IExpressionParameterSet, InstantiatesClass>(
                         (g) => InstantiatesClass.CreateSubordinationParameterSet(primitives, parameters),
-                        (g, r) => r.Class = g.Units.GetByTypeId(primitives.DirectObject.Id),
+                        (g, r) => r.Class = g.Units.GetByTypeId(primitives.DirectObject.Id).Single(),
                         ProcessHelper.ObtainWithAggregateParamsAsync
                         )
                 },
                 ensemble,
                 primitives,
+                parameters.EnsembleRepository,
+                parameters.UserId,
                 (n, r) => r.Neuron = n
             );
 
@@ -53,12 +55,14 @@ namespace ei8.Cortex.Coding.d23.Grannies
                 {
                     new InnerProcess<Expression, IExpression, IExpressionParameterSet, InstantiatesClass>(
                         (g) => InstantiatesClass.CreateSubordinationParameterSet(primitives, parameters),
-                        (g, r) => r.Class = g.Units.GetByTypeId(primitives.DirectObject.Id),
+                        (g, r) => r.Class = g.Units.GetByTypeId(primitives.DirectObject.Id).Single(),
                         ProcessHelper.TryParse
                         )
                 },
                 ensemble,
-                primitives,
+                primitives, 
+                parameters.EnsembleRepository,
+                parameters.UserId,
                 (n, r) => r.Neuron = n
             )) != null;
 

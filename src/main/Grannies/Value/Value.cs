@@ -10,18 +10,23 @@ namespace ei8.Cortex.Coding.d23.Grannies
 {
     public class Value : IValue
     {
-        public async Task<IValue> BuildAsync(Ensemble ensemble, IPrimitiveSet primitives, IValueParameterSet parameters)
-        {
-            var result = new Value();
-            result.Neuron = ensemble.Obtain(parameters.Value);
-            result.InstantiatesClass = await new InstantiatesClass().ObtainAsync(
+        public async Task<IValue> BuildAsync(Ensemble ensemble, IPrimitiveSet primitives, IValueParameterSet parameters) =>
+            await new Value().AggregateBuildAsync(
+                new IInnerProcess<Value>[]
+                {
+                    new InnerProcess<InstantiatesClass, IInstantiatesClass, IInstantiatesClassParameterSet, Value>(
+                        (g) => Value.CreateInstantiatesClassParameterSet(parameters),
+                        (g, r) => r.InstantiatesClass = g,
+                        ProcessHelper.ObtainWithAggregateParamsAsync
+                        )
+                },
                 ensemble,
                 primitives,
-                Value.CreateInstantiatesClassParameterSet(parameters)
-                );
-            ensemble.AddReplace(Terminal.CreateTransient(result.Neuron.Id, result.InstantiatesClass.Neuron.Id));
-            return result;
-        }
+                parameters.EnsembleRepository,
+                parameters.UserId,
+                (n, r) => r.Neuron = ensemble.Obtain(parameters.Value),
+                (g) => new[] { g.InstantiatesClass.Neuron }
+            );
 
         public IEnumerable<IGrannyQuery> GetQueries(IPrimitiveSet primitives, IValueParameterSet parameters) =>
             new IGrannyQuery[] {
@@ -61,17 +66,22 @@ namespace ei8.Cortex.Coding.d23.Grannies
         {
             result = null;
 
-            var tempResult = new Value();
+            var tempResult = new Value().AggregateTryParse(
+                new IInnerProcess<Value>[]
+                {
+                    new InnerProcess<InstantiatesClass, IInstantiatesClass, IInstantiatesClassParameterSet, Value>(
+                        (g) => Value.CreateInstantiatesClassParameterSet(parameters),
+                        (g, r) => r.InstantiatesClass = g,
+                        ProcessHelper.TryParse
+                        )
+                },
+                ensemble,
+                primitives,
+                parameters.EnsembleRepository,
+                parameters.UserId
+            );
 
-            if (new InstantiatesClass().TryParse(
-                ensemble, 
-                primitives, 
-                Value.CreateInstantiatesClassParameterSet(parameters), 
-                out IInstantiatesClass ic
-                ))
-            {
-                tempResult.InstantiatesClass = ic;
-
+            if (tempResult != null) 
                 this.TryParseCore(
                     parameters,
                     ensemble,
@@ -89,7 +99,6 @@ namespace ei8.Cortex.Coding.d23.Grannies
                     (n) => tempResult.Neuron = n,
                     ref result
                 );
-            }
 
             return result != null;
         }
