@@ -26,7 +26,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
                 parameters.EnsembleRepository,
                 parameters.UserId,
                 (n, r) => r.Neuron = n
-                );
+            );
 
         private static IValueParameterSet CreateValueParameterSet(IValueExpressionParameterSet parameters) =>
             new ValueParameterSet(

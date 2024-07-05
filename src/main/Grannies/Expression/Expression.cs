@@ -53,8 +53,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
                             new NeuronQuery()
                             {
                                 // set Id to values of Dependents (non-Head units)
-                                Id = parameters.UnitsParameters
-                                        .Where(up => up.Type.Id != primitives.Unit.Id)
+                                Id = parameters.UnitsParameters.GetByTypeId(primitives.Unit.Id, false)
                                         .Select(dp => dp.Value.Id.ToString()),
                                 DirectionValues = DirectionValues.Any,
                                 Depth = 4,
@@ -62,8 +61,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
                                     // 4 edges away and should have postsynaptic of unit or values of Head units
                                     new DepthIdsPair {
                                         Depth = 4,
-                                        Ids = parameters.UnitsParameters
-                                            .Where(up => up.Type.Id == primitives.Unit.Id)
+                                        Ids = parameters.UnitsParameters.GetByTypeId(primitives.Unit.Id)
                                             .Select(up => up.Value.Id)
                                             .Concat(
                                                 new[] {
@@ -79,9 +77,8 @@ namespace ei8.Cortex.Coding.d23.Grannies
                                     // 2 edges away and should have postsynaptic of direct object
                                     new DepthIdsPair {
                                         Depth = 2,
-                                        Ids = new[] {
-                                            primitives.DirectObject.Id
-                                        }
+                                        Ids = parameters.UnitsParameters.GetByTypeId(primitives.Unit.Id, false)
+                                                .Select(up => up.Type.Id)
                                     }
                                 }
                             }
@@ -157,7 +154,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
                         (g) => u,
                         (g, r) => r.units.Add(g),
                         ProcessHelper.TryParse
-                        )
+                    )
                 ),
                 ensemble,
                 primitives,

@@ -59,11 +59,11 @@ namespace ei8.Cortex.Coding.d23.neurULization
             //        options.UserId
             //        )
             //    );
-            var expression = new ValueExpression();
-            expression = (ValueExpression)await expression.ObtainAsync(
+            var expression = new PropertyValueExpression();
+            expression = (PropertyValueExpression)await expression.ObtainAsync(
                 result,
                 options.Primitives,
-                new ValueExpressionParameterSet(
+                new PropertyValueExpressionParameterSet(
                     idea,
                     options.Primitives.Idea,
                     InstantiationMatchingNeuronProperty.Tag,

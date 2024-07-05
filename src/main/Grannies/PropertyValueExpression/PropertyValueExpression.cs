@@ -4,30 +4,31 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ei8.Cortex.Coding.d23.Grannies.PropertyValueExpression
+namespace ei8.Cortex.Coding.d23.Grannies
 {
     public class PropertyValueExpression : IPropertyValueExpression
     {
-        public async Task<IPropertyValueExpression> BuildAsync(Ensemble ensemble, IPrimitiveSet primitives, IPropertyValueExpressionParameterSet parameters)
-        {
-            var result = new PropertyValueExpression();
-            result.ValueExpression = await new ValueExpression().ObtainAsync(
-                ensemble,
-                primitives,
-                PropertyValueExpression.CreatePropertyValueParameterSet(parameters)
-                );
-            result.Expression = await new Expression().ObtainAsync(
-                ensemble,
-                primitives,
-                PropertyValueExpression.CreateExpressionParameterSet(
-                    primitives, 
-                    parameters, 
-                    result.ValueExpression.Neuron
+        public async Task<IPropertyValueExpression> BuildAsync(Ensemble ensemble, IPrimitiveSet primitives, IPropertyValueExpressionParameterSet parameters) =>
+            await new PropertyValueExpression().AggregateBuildAsync(
+                new IInnerProcess<PropertyValueExpression>[]
+                {
+                    new InnerProcess<ValueExpression, IValueExpression, IValueExpressionParameterSet, PropertyValueExpression>(
+                        (g) => PropertyValueExpression.CreatePropertyValueParameterSet(parameters),
+                        (g, r) => r.ValueExpression = g,
+                        ProcessHelper.ObtainWithAggregateParamsAsync
+                    ),
+                    new InnerProcess<Expression, IExpression, IExpressionParameterSet, PropertyValueExpression>(
+                        (g) => PropertyValueExpression.CreateExpressionParameterSet(primitives, parameters, g.Neuron),
+                        (g, r) => r.Expression = g,
+                        ProcessHelper.ObtainWithAggregateParamsAsync
                     )
+                },
+                ensemble,
+                primitives,
+                parameters.EnsembleRepository,
+                parameters.UserId,
+                (n, r) => r.Neuron = n
             );
-            result.Neuron = result.Expression.Neuron;
-            return result;
-        }
 
         private static ExpressionParameterSet CreateExpressionParameterSet(IPrimitiveSet primitives, IPropertyValueExpressionParameterSet parameters, Neuron neuron) =>
             new ExpressionParameterSet(
@@ -66,10 +67,27 @@ namespace ei8.Cortex.Coding.d23.Grannies.PropertyValueExpression
                 )
             };
 
-        public bool TryParse(Ensemble ensemble, IPrimitiveSet primitives, IPropertyValueExpressionParameterSet parameters, out IPropertyValueExpression result)
-        {
-            throw new NotImplementedException();
-        }
+        public bool TryParse(Ensemble ensemble, IPrimitiveSet primitives, IPropertyValueExpressionParameterSet parameters, out IPropertyValueExpression result) =>
+            (result = new PropertyValueExpression().AggregateTryParse(
+                new IInnerProcess<PropertyValueExpression>[]
+                {
+                    new InnerProcess<ValueExpression, IValueExpression, IValueExpressionParameterSet, PropertyValueExpression>(
+                        (g) => PropertyValueExpression.CreatePropertyValueParameterSet(parameters),
+                        (g, r) => r.ValueExpression = g,
+                        ProcessHelper.TryParse
+                        ),
+                    new InnerProcess<Expression, IExpression, IExpressionParameterSet, PropertyValueExpression>(
+                        (g) => PropertyValueExpression.CreateExpressionParameterSet(primitives, parameters, g.Neuron),
+                        (g, r) => r.Expression = g,
+                        ProcessHelper.TryParse
+                        )
+                },
+                ensemble,
+                primitives,
+                parameters.EnsembleRepository,
+                parameters.UserId,
+                (n, r) => r.Neuron = n
+            )) != null;
 
         public IValueExpression ValueExpression { get; private set; }
 
