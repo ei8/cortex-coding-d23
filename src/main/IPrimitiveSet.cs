@@ -25,5 +25,7 @@ namespace ei8.Cortex.Coding.d23
         Neuron Case { get; }
 
         Neuron NominalModifier { get; }
+
+        Neuron Has { get; }
     }
 }

@@ -19,13 +19,13 @@ namespace ei8.Cortex.Coding.d23.neurULization
             var granny = Neuron.CreateTransient(null, null, null);
             result.AddReplace(granny);
 
-            string key = GetExternalReferenceKey(value.GetType());
-            var contentPropertyKey = GetExternalReferenceKey(value.GetType().GetProperty("Content"));
+            string key = value.GetType().GetExternalReferenceKey();
+            var contentPropertyKey = value.GetType().GetProperty("Content").GetExternalReferenceKey();
             // use key to retrieve external reference url from library
             var erDict = await options.EnsembleRepository.GetExternalReferencesAsync(
-                options.UserId, 
-                new string[] { 
-                    key, 
+                options.UserId,
+                new string[] {
+                    key,
                     contentPropertyKey
                 });
             var rootTypeNeuron = erDict[key];
@@ -48,11 +48,10 @@ namespace ei8.Cortex.Coding.d23.neurULization
             // DEL: test code
             var idea = Neuron.CreateTransient("Test Idea Expression", null, null);
 
-            var propertyAssignment = new PropertyAssignment();
-            propertyAssignment = (PropertyAssignment)await propertyAssignment.ObtainAsync(
+            await new PropertyAssociation().ObtainAsync(
                 result,
                 options.Primitives,
-                new PropertyAssignmentParameterSet(
+                new PropertyAssociationParameterSet(
                     erDict[contentPropertyKey],
                     idea,
                     options.Primitives.Idea,
@@ -63,24 +62,6 @@ namespace ei8.Cortex.Coding.d23.neurULization
                 );
 
             return result;
-        }
-
-        private static string GetExternalReferenceKey(MemberInfo value)
-        {
-            // get ExternalReferenceKeyAttribute of root type
-            var erka = value.GetCustomAttributes(typeof(ExternalReferenceKeyAttribute), true).SingleOrDefault() as ExternalReferenceKeyAttribute;
-            var key = string.Empty;
-            // if attribute exists
-            if (erka != null)
-                key = erka.Key;
-            else if (value is PropertyInfo pi)
-                key = pi.ToExternalReferenceKeyString();
-            else if (value is Type t)
-                // assembly qualified name 
-                key = t.ToExternalReferenceKeyString();
-            else
-                throw new ArgumentOutOfRangeException(nameof(value));
-            return key;
         }
     }
 }

@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace ei8.Cortex.Coding.d23
@@ -244,11 +245,13 @@ namespace ei8.Cortex.Coding.d23
         }
         #endregion
 
+        #region Units
         internal static IEnumerable<IUnit> GetByTypeId(this IEnumerable<IUnit> units, Guid id, bool isEqual = true) =>
             units.Where(u => isEqual ? u.Type.Id == id : u.Type.Id != id);
 
         internal static IEnumerable<IUnitParameterSet> GetByTypeId(this IEnumerable<IUnitParameterSet> units, Guid id, bool isEqual = true) =>
             units.Where(u => isEqual ? u.Type.Id == id : u.Type.Id != id);
+        #endregion
 
         public static bool HasSameElementsAs<T>(
             this IEnumerable<T> first,
@@ -268,6 +271,24 @@ namespace ei8.Cortex.Coding.d23
                 secondMap.Keys.All(x =>
                     firstMap.Keys.Contains(x) && secondMap[x] == firstMap[x]
                 );
+        }
+
+        internal static string GetExternalReferenceKey(this MemberInfo value)
+        {
+            // get ExternalReferenceKeyAttribute of root type
+            var erka = value.GetCustomAttributes(typeof(ExternalReferenceKeyAttribute), true).SingleOrDefault() as ExternalReferenceKeyAttribute;
+            var key = string.Empty;
+            // if attribute exists
+            if (erka != null)
+                key = erka.Key;
+            else if (value is PropertyInfo pi)
+                key = pi.ToExternalReferenceKeyString();
+            else if (value is Type t)
+                // assembly qualified name 
+                key = t.ToExternalReferenceKeyString();
+            else
+                throw new ArgumentOutOfRangeException(nameof(value));
+            return key;
         }
     }
 }
