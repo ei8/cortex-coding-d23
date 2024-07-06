@@ -1,7 +1,5 @@
 ﻿using ei8.Cortex.Coding.d23.Queries;
-using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ei8.Cortex.Coding.d23.Grannies
@@ -13,7 +11,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
                 new IInnerProcess<PropertyValueExpression>[]
                 {
                     new InnerProcess<ValueExpression, IValueExpression, IValueExpressionParameterSet, PropertyValueExpression>(
-                        (g) => PropertyValueExpression.CreatePropertyValueParameterSet(parameters),
+                        (g) => PropertyValueExpression.CreateValueExpressionParameterSet(parameters),
                         (g, r) => r.ValueExpression = g,
                         ProcessHelper.ObtainWithAggregateParamsAsync
                     ),
@@ -47,11 +45,11 @@ namespace ei8.Cortex.Coding.d23.Grannies
                 parameters.UserId
             );
 
-        private static IValueExpressionParameterSet CreatePropertyValueParameterSet(IPropertyValueExpressionParameterSet parameters) =>
+        private static IValueExpressionParameterSet CreateValueExpressionParameterSet(IPropertyValueExpressionParameterSet parameters) =>
             new ValueExpressionParameterSet(
                 parameters.Value,
                 parameters.Class,
-                parameters.MatchingNeuronProperty,
+                parameters.ValueMatchBy,
                 parameters.EnsembleRepository,
                 parameters.UserId
             );
@@ -60,7 +58,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
         public IEnumerable<IGrannyQuery> GetQueries(IPrimitiveSet primitives, IPropertyValueExpressionParameterSet parameters) =>
             new IGrannyQuery[] {
                 new GrannyQueryInner<ValueExpression, IValueExpression, IValueExpressionParameterSet>(
-                    (n) => PropertyValueExpression.CreatePropertyValueParameterSet(parameters)
+                    (n) => PropertyValueExpression.CreateValueExpressionParameterSet(parameters)
                 ),
                 new GrannyQueryInner<Expression, IExpression, IExpressionParameterSet>(
                     (n) => PropertyValueExpression.CreateExpressionParameterSet(primitives, parameters, n)
@@ -72,7 +70,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
                 new IInnerProcess<PropertyValueExpression>[]
                 {
                     new InnerProcess<ValueExpression, IValueExpression, IValueExpressionParameterSet, PropertyValueExpression>(
-                        (g) => PropertyValueExpression.CreatePropertyValueParameterSet(parameters),
+                        (g) => PropertyValueExpression.CreateValueExpressionParameterSet(parameters),
                         (g, r) => r.ValueExpression = g,
                         ProcessHelper.TryParse
                         ),

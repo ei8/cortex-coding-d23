@@ -4,9 +4,10 @@ using System.Text;
 
 namespace ei8.Cortex.Coding.d23.Grannies
 {
-    public class ValueExpressionParameterSet : ValueParameterSet, IValueExpressionParameterSet
+    public class PropertyAssignmentParameterSet : PropertyValueExpressionParameterSet, IPropertyAssignmentParameterSet
     {
-        public ValueExpressionParameterSet(
+        public PropertyAssignmentParameterSet(
+            Neuron property,
             Neuron value,
             Neuron @class,
             ValueMatchByValue valueMatchBy,
@@ -14,6 +15,9 @@ namespace ei8.Cortex.Coding.d23.Grannies
             string userId
             ) : base(value, @class, valueMatchBy, ensembleRepository, userId)
         {
+            this.Property = property;
         }
+
+        public Neuron Property { get; }
     }
 }

@@ -36,10 +36,10 @@ namespace ei8.Cortex.Coding.d23.Grannies
                 new GrannyQueryBuilder(
                     (n) => new NeuronQuery()
                     {
-                        Id = parameters.MatchingNeuronProperty == InstantiationMatchingNeuronProperty.Id ? 
+                        Id = parameters.ValueMatchBy == ValueMatchByValue.Id ? 
                             new[] { parameters.Value.Id.ToString() } : 
                             Array.Empty<string>(),
-                        TagContains = parameters.MatchingNeuronProperty == InstantiationMatchingNeuronProperty.Tag ?
+                        TagContains = parameters.ValueMatchBy == ValueMatchByValue.Tag ?
                             new[] { parameters.Value.Tag } : 
                             Array.Empty<string>(),
                         DirectionValues = DirectionValues.Outbound,
@@ -90,7 +90,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
                     new[] { tempResult.InstantiatesClass.Neuron.Id },
                     new[] { new LevelParser(
                             new PresynapticBy(n => 
-                                parameters.MatchingNeuronProperty == InstantiationMatchingNeuronProperty.Id ? 
+                                parameters.ValueMatchBy == ValueMatchByValue.Id ? 
                                 n.Id == parameters.Value.Id :
                                 n.Tag == parameters.Value.Tag
                             )

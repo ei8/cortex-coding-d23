@@ -10,7 +10,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
         public ValueParameterSet(
             Neuron value,
             Neuron @class,
-            InstantiationMatchingNeuronProperty matchingNeuronProperty,
+            ValueMatchByValue valueMatchBy,
             IEnsembleRepository ensembleRepository,
             string userId
             )
@@ -22,7 +22,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
 
             this.Value = value;
             this.Class = @class;
-            this.MatchingNeuronProperty = matchingNeuronProperty;
+            this.ValueMatchBy = valueMatchBy;
             this.EnsembleRepository = ensembleRepository;
             this.UserId = userId;
         }
@@ -31,7 +31,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
 
         public Neuron Class { get; }
 
-        public InstantiationMatchingNeuronProperty MatchingNeuronProperty { get; }
+        public ValueMatchByValue ValueMatchBy { get; }
 
         public IEnsembleRepository EnsembleRepository { get; }
 

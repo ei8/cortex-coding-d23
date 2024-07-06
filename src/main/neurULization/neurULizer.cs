@@ -1,6 +1,8 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
 using neurUL.Common.Domain.Model;
+using System;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace ei8.Cortex.Coding.d23.neurULization
@@ -17,22 +19,20 @@ namespace ei8.Cortex.Coding.d23.neurULization
             var granny = Neuron.CreateTransient(null, null, null);
             result.AddReplace(granny);
 
-            // get ExternalReferenceKeyAttribute of root type
-            var erka = value.GetType().GetCustomAttributes(typeof(ExternalReferenceKeyAttribute), true).SingleOrDefault() as ExternalReferenceKeyAttribute;
-            var key = string.Empty;
-            // if attribute exists
-            if (erka != null)
-                key = erka.Key;
-            else
-                // assembly qualified name 
-                key = value.GetType().ToExternalReferenceKeyString();
+            string key = GetExternalReferenceKey(value.GetType());
+            var contentPropertyKey = GetExternalReferenceKey(value.GetType().GetProperty("Content"));
             // use key to retrieve external reference url from library
-            var erDict = await options.EnsembleRepository.GetExternalReferencesAsync(options.UserId, new string[] { key });
+            var erDict = await options.EnsembleRepository.GetExternalReferencesAsync(
+                options.UserId, 
+                new string[] { 
+                    key, 
+                    contentPropertyKey
+                });
             var rootTypeNeuron = erDict[key];
 
             // instantiates
             var instantiatesClass = new InstantiatesClass();
-            instantiatesClass = (InstantiatesClass) await instantiatesClass.ObtainAsync(
+            instantiatesClass = (InstantiatesClass)await instantiatesClass.ObtainAsync(
                 result,
                 options.Primitives,
                 new InstantiatesClassParameterSet(
@@ -47,32 +47,40 @@ namespace ei8.Cortex.Coding.d23.neurULization
 
             // DEL: test code
             var idea = Neuron.CreateTransient("Test Idea Expression", null, null);
-            //var instantiation = new Value();
-            //instantiation = (Value)await instantiation.ObtainAsync(
-            //    result,
-            //    options.Primitives,
-            //    new ValueParameterSet(
-            //        idea,
-            //        options.Primitives.Idea,
-            //        InstantiationMatchingNeuronProperty.Tag,
-            //        options.EnsembleRepository,
-            //        options.UserId
-            //        )
-            //    );
-            var expression = new PropertyValueExpression();
-            expression = (PropertyValueExpression)await expression.ObtainAsync(
+
+            var propertyAssignment = new PropertyAssignment();
+            propertyAssignment = (PropertyAssignment)await propertyAssignment.ObtainAsync(
                 result,
                 options.Primitives,
-                new PropertyValueExpressionParameterSet(
+                new PropertyAssignmentParameterSet(
+                    erDict[contentPropertyKey],
                     idea,
                     options.Primitives.Idea,
-                    InstantiationMatchingNeuronProperty.Tag,
+                    ValueMatchByValue.Tag,
                     options.EnsembleRepository,
                     options.UserId
                     )
                 );
 
             return result;
+        }
+
+        private static string GetExternalReferenceKey(MemberInfo value)
+        {
+            // get ExternalReferenceKeyAttribute of root type
+            var erka = value.GetCustomAttributes(typeof(ExternalReferenceKeyAttribute), true).SingleOrDefault() as ExternalReferenceKeyAttribute;
+            var key = string.Empty;
+            // if attribute exists
+            if (erka != null)
+                key = erka.Key;
+            else if (value is PropertyInfo pi)
+                key = pi.ToExternalReferenceKeyString();
+            else if (value is Type t)
+                // assembly qualified name 
+                key = t.ToExternalReferenceKeyString();
+            else
+                throw new ArgumentOutOfRangeException(nameof(value));
+            return key;
         }
     }
 }

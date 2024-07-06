@@ -32,7 +32,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
             new ValueParameterSet(
                 parameters.Value,
                 parameters.Class,
-                parameters.MatchingNeuronProperty,
+                parameters.ValueMatchBy,
                 parameters.EnsembleRepository,
                 parameters.UserId
             );

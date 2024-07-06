@@ -9,10 +9,10 @@ namespace ei8.Cortex.Coding.d23.Grannies
         public PropertyValueExpressionParameterSet(
             Neuron value,
             Neuron @class,
-            InstantiationMatchingNeuronProperty matchingNeuronProperty,
+            ValueMatchByValue valueMatchBy,
             IEnsembleRepository ensembleRepository,
             string userId
-            ) : base(value, @class, matchingNeuronProperty, ensembleRepository, userId)
+            ) : base(value, @class, valueMatchBy, ensembleRepository, userId)
         {
         }
     }
