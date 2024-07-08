@@ -1,7 +1,6 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
+using ei8.Cortex.Coding.d23.neurULization;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ei8.Cortex.Coding.d23
@@ -11,20 +10,18 @@ namespace ei8.Cortex.Coding.d23
         public static async Task<IGranny> ObtainWithAggregateParamsAsync<T, TIGranny, TParameterSet, TResult>(
             T granny,
             Ensemble ensemble,
-            IPrimitiveSet primitives,
+            neurULizationOptions options,
             TParameterSet parameters,
             Action<TIGranny, TResult> resultUpdater,
-            TResult tempResult,
-            IEnsembleRepository ensembleRepository,
-            string userId
+            TResult tempResult
         )
             where T : TIGranny, new()
             where TIGranny : IGranny<TIGranny, TParameterSet>
-            where TParameterSet : IAggregateParameterSet
+            where TParameterSet : IParameterSet
         {
             TIGranny result = await granny.ObtainAsync(
                 ensemble,
-                primitives,
+                options,
                 parameters
                 );
 
@@ -36,12 +33,10 @@ namespace ei8.Cortex.Coding.d23
         public static async Task<IGranny> ObtainAsync<T, TIGranny, TParameterSet, TResult>(
             T granny,
             Ensemble ensemble,
-            IPrimitiveSet primitives,
+            neurULizationOptions options,
             TParameterSet parameters,
             Action<TIGranny, TResult> resultUpdater,
-            TResult tempResult,
-            IEnsembleRepository ensembleRepository,
-            string userId
+            TResult tempResult
         )
             where T : TIGranny, new()
             where TIGranny : IGranny<TIGranny, TParameterSet>
@@ -50,9 +45,7 @@ namespace ei8.Cortex.Coding.d23
             TIGranny result = await granny.ObtainAsync(
                 new ObtainParameters(
                     ensemble,
-                    primitives,
-                    ensembleRepository,
-                    userId
+                    options
                 ),
                 parameters
                 );
@@ -65,12 +58,10 @@ namespace ei8.Cortex.Coding.d23
         public static IGranny TryParse<T, TIGranny, TParameterSet, TResult>(
             T granny,
             Ensemble ensemble,
-            IPrimitiveSet primitives,
+            neurULizationOptions options,
             TParameterSet parameters,
             Action<TIGranny, TResult> resultUpdater,
-            TResult tempResult,
-            IEnsembleRepository ensembleRepository,
-            string userId
+            TResult tempResult
         )
             where T : TIGranny, new()
             where TIGranny : IGranny<TIGranny, TParameterSet>
@@ -80,7 +71,7 @@ namespace ei8.Cortex.Coding.d23
 
             if (granny.TryParse(
                 ensemble,
-                primitives,
+                options,
                 parameters,
                 out TIGranny gr)
                 )

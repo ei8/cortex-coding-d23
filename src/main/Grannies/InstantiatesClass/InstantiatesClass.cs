@@ -7,30 +7,28 @@ namespace ei8.Cortex.Coding.d23.Grannies
 {
     public class InstantiatesClass : IInstantiatesClass
     {
-        public async Task<IInstantiatesClass> BuildAsync(Ensemble ensemble, IPrimitiveSet primitives, IInstantiatesClassParameterSet parameters) =>
+        public async Task<IInstantiatesClass> BuildAsync(Ensemble ensemble, IneurULizationOptions options, IInstantiatesClassParameterSet parameters) =>
             await new InstantiatesClass().AggregateBuildAsync(
                 new IInnerProcess<InstantiatesClass>[]
                 {
                     new InnerProcess<Expression, IExpression, IExpressionParameterSet, InstantiatesClass>(
-                        (g) => InstantiatesClass.CreateSubordinationParameterSet(primitives, parameters),
-                        (g, r) => r.Class = g.Units.GetByTypeId(primitives.DirectObject.Id).Single(),
+                        (g) => InstantiatesClass.CreateSubordinationParameterSet(options.ToInternal().Primitives, parameters),
+                        (g, r) => r.Class = g.Units.GetByTypeId(options.ToInternal().Primitives.DirectObject.Id).Single(),
                         ProcessHelper.ObtainWithAggregateParamsAsync
                         )
                 },
                 ensemble,
-                primitives,
-                parameters.EnsembleRepository,
-                parameters.UserId,
+                options.ToInternal(),
                 (n, r) => r.Neuron = n
             );
 
-        public IEnumerable<IGrannyQuery> GetQueries(IPrimitiveSet primitives, IInstantiatesClassParameterSet parameters) =>
+        public IEnumerable<IGrannyQuery> GetQueries(IneurULizationOptions options, IInstantiatesClassParameterSet parameters) =>
             new Expression().GetQueries(
-                primitives,
-                InstantiatesClass.CreateSubordinationParameterSet(primitives, parameters)
+                options,
+                InstantiatesClass.CreateSubordinationParameterSet(options.ToInternal().Primitives, parameters)
                 );
 
-        private static ExpressionParameterSet CreateSubordinationParameterSet(IPrimitiveSet primitives, IInstantiatesClassParameterSet parameters)
+        private static ExpressionParameterSet CreateSubordinationParameterSet(PrimitiveSet primitives, IInstantiatesClassParameterSet parameters)
         {
             return new ExpressionParameterSet(
                 new IUnitParameterSet[]
@@ -43,26 +41,22 @@ namespace ei8.Cortex.Coding.d23.Grannies
                         parameters.Class,
                         primitives.DirectObject
                     )
-                },
-                parameters.EnsembleRepository,
-                parameters.UserId
+                }
             );
         }
 
-        public bool TryParse(Ensemble ensemble, IPrimitiveSet primitives, IInstantiatesClassParameterSet parameters, out IInstantiatesClass result) =>
+        public bool TryParse(Ensemble ensemble, IneurULizationOptions options, IInstantiatesClassParameterSet parameters, out IInstantiatesClass result) =>
             (result = new InstantiatesClass().AggregateTryParse(
                 new IInnerProcess<InstantiatesClass>[]
                 {
                     new InnerProcess<Expression, IExpression, IExpressionParameterSet, InstantiatesClass>(
-                        (g) => InstantiatesClass.CreateSubordinationParameterSet(primitives, parameters),
-                        (g, r) => r.Class = g.Units.GetByTypeId(primitives.DirectObject.Id).Single(),
+                        (g) => InstantiatesClass.CreateSubordinationParameterSet(options.ToInternal().Primitives, parameters),
+                        (g, r) => r.Class = g.Units.GetByTypeId(options.ToInternal().Primitives.DirectObject.Id).Single(),
                         ProcessHelper.TryParse
                         )
                 },
                 ensemble,
-                primitives, 
-                parameters.EnsembleRepository,
-                parameters.UserId,
+                options.ToInternal(),
                 (n, r) => r.Neuron = n
             )) != null;
 

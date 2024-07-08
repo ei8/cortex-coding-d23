@@ -27,18 +27,18 @@ namespace ei8.Cortex.Coding.d23.Queries
 
         public async Task<NeuronQuery> GetQuery(ObtainParameters obtainParameters)
         {
-            var gqs = this.granny.GetQueries(obtainParameters.Primitives, this.parametersBuilder(this.retrievalResult));
+            var gqs = this.granny.GetQueries(obtainParameters.Options, this.parametersBuilder(this.retrievalResult));
             // process granny queries just like in Extensions.ObtainSync
             var completed = await gqs.Process(obtainParameters, true, this.retrievalResult);
             // then call GetQuery on last granny query if completed successfully
             return completed ? await gqs.Last().GetQuery(obtainParameters) : null;
         }
 
-        public Neuron RetrieveNeuron(Ensemble ensemble, IPrimitiveSet primitives)
+        public Neuron RetrieveNeuron(Ensemble ensemble, IneurULizationOptions options)
         {
             Neuron result = null;
 
-            if (this.granny.TryParse(ensemble, primitives, this.parametersBuilder(this.retrievalResult), out TIGranny granny))
+            if (this.granny.TryParse(ensemble, options, this.parametersBuilder(this.retrievalResult), out TIGranny granny))
                 result = granny.Neuron;
 
             return result;

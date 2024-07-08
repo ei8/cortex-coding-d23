@@ -8,7 +8,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
 {
     public class PropertyAssociation : IPropertyAssociation
     {
-        public async Task<IPropertyAssociation> BuildAsync(Ensemble ensemble, IPrimitiveSet primitives, IPropertyAssociationParameterSet parameters) =>
+        public async Task<IPropertyAssociation> BuildAsync(Ensemble ensemble, IneurULizationOptions options, IPropertyAssociationParameterSet parameters) =>
             await new PropertyAssociation().AggregateBuildAsync(
                 new IInnerProcess<PropertyAssociation>[]
                 {
@@ -18,15 +18,13 @@ namespace ei8.Cortex.Coding.d23.Grannies
                         ProcessHelper.ObtainWithAggregateParamsAsync
                     ),
                     new InnerProcess<Expression, IExpression, IExpressionParameterSet, PropertyAssociation>(
-                        (g) => PropertyAssociation.CreateExpressionParameterSet(primitives, parameters, g.Neuron),
+                        (g) => PropertyAssociation.CreateExpressionParameterSet(options.ToInternal().Primitives, parameters, g.Neuron),
                         (g, r) => r.Expression = g,
                         ProcessHelper.ObtainWithAggregateParamsAsync
                     )
                 },
                 ensemble,
-                primitives,
-                parameters.EnsembleRepository,
-                parameters.UserId,
+                options.ToInternal(),
                 (n, r) => r.Neuron = n
             );
 
@@ -35,12 +33,10 @@ namespace ei8.Cortex.Coding.d23.Grannies
                 parameters.Property,
                 parameters.Value,
                 parameters.Class,
-                parameters.ValueMatchBy,
-                parameters.EnsembleRepository,
-                parameters.UserId
+                parameters.ValueMatchBy
             );
 
-        private static ExpressionParameterSet CreateExpressionParameterSet(IPrimitiveSet primitives, IPropertyAssociationParameterSet parameters, Neuron neuron) =>
+        private static ExpressionParameterSet CreateExpressionParameterSet(PrimitiveSet primitives, IPropertyAssociationParameterSet parameters, Neuron neuron) =>
             new ExpressionParameterSet(
                 new[]
                 {
@@ -52,22 +48,20 @@ namespace ei8.Cortex.Coding.d23.Grannies
                         neuron,
                         primitives.DirectObject
                     )
-                },
-                parameters.EnsembleRepository,
-                parameters.UserId
+                }
             );
 
-        public IEnumerable<IGrannyQuery> GetQueries(IPrimitiveSet primitives, IPropertyAssociationParameterSet parameters) =>
+        public IEnumerable<IGrannyQuery> GetQueries(IneurULizationOptions options, IPropertyAssociationParameterSet parameters) =>
             new IGrannyQuery[] {
                 new GrannyQueryInner<PropertyAssignment, IPropertyAssignment, IPropertyAssignmentParameterSet>(
                     (n) => PropertyAssociation.CreatePropertyAssignmentParameterSet(parameters)
                 ),
                 new GrannyQueryInner<Expression, IExpression, IExpressionParameterSet>(
-                    (n) => PropertyAssociation.CreateExpressionParameterSet(primitives, parameters, n)
+                    (n) => PropertyAssociation.CreateExpressionParameterSet(options.ToInternal().Primitives, parameters, n)
                 )
             };
 
-        public bool TryParse(Ensemble ensemble, IPrimitiveSet primitives, IPropertyAssociationParameterSet parameters, out IPropertyAssociation result) =>
+        public bool TryParse(Ensemble ensemble, IneurULizationOptions options, IPropertyAssociationParameterSet parameters, out IPropertyAssociation result) =>
             (result = new PropertyAssociation().AggregateTryParse(
                 new IInnerProcess<PropertyAssociation>[]
                 {
@@ -77,15 +71,13 @@ namespace ei8.Cortex.Coding.d23.Grannies
                         ProcessHelper.TryParse
                         ),
                     new InnerProcess<Expression, IExpression, IExpressionParameterSet, PropertyAssociation>(
-                        (g) => PropertyAssociation.CreateExpressionParameterSet(primitives, parameters, g.Neuron),
+                        (g) => PropertyAssociation.CreateExpressionParameterSet(options.ToInternal().Primitives, parameters, g.Neuron),
                         (g, r) => r.Expression = g,
                         ProcessHelper.TryParse
                         )
                 },
                 ensemble,
-                primitives,
-                parameters.EnsembleRepository,
-                parameters.UserId,
+                options.ToInternal(),
                 (n, r) => r.Neuron = n
             )) != null;
 

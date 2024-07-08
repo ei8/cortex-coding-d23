@@ -1,6 +1,6 @@
 ﻿namespace ei8.Cortex.Coding.d23
 {
-    public class PrimitiveSet : IPrimitiveSet
+    public class PrimitiveSet
     {
         public PrimitiveSet()
         {            

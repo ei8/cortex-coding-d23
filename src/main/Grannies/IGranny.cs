@@ -1,6 +1,5 @@
-﻿using ei8.Cortex.Coding.d23.Queries;
-using ei8.Cortex.Library.Common;
-using System;
+﻿using ei8.Cortex.Coding.d23.neurULization;
+using ei8.Cortex.Coding.d23.Queries;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -21,10 +20,10 @@ namespace ei8.Cortex.Coding.d23.Grannies
         where TSelf : IGranny<TSelf, TParameterSet>
         where TParameterSet : IParameterSet
     {
-        bool TryParse(Ensemble ensemble, IPrimitiveSet primitives, TParameterSet parameters, out TSelf result);
+        bool TryParse(Ensemble ensemble, IneurULizationOptions options, TParameterSet parameters, out TSelf result);
 
-        IEnumerable<IGrannyQuery> GetQueries(IPrimitiveSet primitives, TParameterSet parameters);
+        IEnumerable<IGrannyQuery> GetQueries(IneurULizationOptions options, TParameterSet parameters);
 
-        Task<TSelf> BuildAsync(Ensemble ensemble, IPrimitiveSet primitives, TParameterSet parameters);
+        Task<TSelf> BuildAsync(Ensemble ensemble, IneurULizationOptions options, TParameterSet parameters);
     }
 }

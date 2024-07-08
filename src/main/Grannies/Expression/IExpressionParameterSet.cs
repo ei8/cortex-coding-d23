@@ -4,7 +4,7 @@ using System.Text;
 
 namespace ei8.Cortex.Coding.d23.Grannies
 {
-    public interface IExpressionParameterSet : IAggregateParameterSet
+    public interface IExpressionParameterSet : IParameterSet
     {
         IEnumerable<IUnitParameterSet> UnitsParameters { get; }
     }

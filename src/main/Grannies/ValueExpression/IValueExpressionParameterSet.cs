@@ -4,7 +4,7 @@ using System.Text;
 
 namespace ei8.Cortex.Coding.d23.Grannies
 {
-    public interface IValueExpressionParameterSet : IAggregateParameterSet
+    public interface IValueExpressionParameterSet : IParameterSet
     {
         Neuron Value { get; }
 

@@ -1,4 +1,5 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
+using ei8.Cortex.Coding.d23.neurULization;
 using System.Threading.Tasks;
 
 namespace ei8.Cortex.Coding.d23
@@ -7,20 +8,16 @@ namespace ei8.Cortex.Coding.d23
     {
         IGranny Execute(
             Ensemble ensemble, 
-            IPrimitiveSet primitives, 
+            neurULizationOptions options,
             IGranny precedingGranny, 
-            TResult tempResult, 
-            IEnsembleRepository ensembleRepository,
-            string userId
+            TResult tempResult
             );
 
         Task<IGranny> ExecuteAsync(
             Ensemble ensemble,
-            IPrimitiveSet primitives,
+            neurULizationOptions options,
             IGranny precedingGranny,
-            TResult tempResult,
-            IEnsembleRepository ensembleRepository,
-            string userId
+            TResult tempResult
             );
     }
 }

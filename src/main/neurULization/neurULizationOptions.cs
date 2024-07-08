@@ -1,15 +1,15 @@
 ﻿namespace ei8.Cortex.Coding.d23.neurULization
 {
-    public class neurULizationOptions
+    public class neurULizationOptions : IneurULizationOptions
     {
-        public neurULizationOptions(IPrimitiveSet primitives, IEnsembleRepository ensembleRepository, string userId)
+        public neurULizationOptions(PrimitiveSet primitives, IEnsembleRepository ensembleRepository, string userId)
         {
             this.Primitives = primitives;
             this.EnsembleRepository = ensembleRepository;
             this.UserId = userId;
         }
 
-        public IPrimitiveSet Primitives { get; }
+        public PrimitiveSet Primitives { get; }
 
         public IEnsembleRepository EnsembleRepository { get; }
 

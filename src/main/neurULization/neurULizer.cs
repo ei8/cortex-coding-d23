@@ -1,18 +1,21 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
 using neurUL.Common.Domain.Model;
-using System;
-using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 
 namespace ei8.Cortex.Coding.d23.neurULization
 {
-    public class neurULizer
+    public class neurULizer : IneurULizer
     {
-        public async Task<Ensemble> neurULizeAsync<TValue>(TValue value, neurULizationOptions options)
+        public async Task<Ensemble> neurULizeAsync<TValue>(TValue value, IneurULizationOptions options)
         {
             AssertionConcern.AssertArgumentNotNull(value, nameof(value));
             AssertionConcern.AssertArgumentNotNull(options, nameof(options));
+            AssertionConcern.AssertArgumentValid(
+                o => o is neurULizationOptions, 
+                options, 
+                $"Specified 'options' is not of the expected type '{typeof(neurULizationOptions).FullName}'.", 
+                nameof(options)
+                );
 
             var result = new Ensemble();
 
@@ -22,8 +25,8 @@ namespace ei8.Cortex.Coding.d23.neurULization
             string key = value.GetType().GetExternalReferenceKey();
             var contentPropertyKey = value.GetType().GetProperty("Content").GetExternalReferenceKey();
             // use key to retrieve external reference url from library
-            var erDict = await options.EnsembleRepository.GetExternalReferencesAsync(
-                options.UserId,
+            var erDict = await options.ToInternal().EnsembleRepository.GetExternalReferencesAsync(
+                options.ToInternal().UserId,
                 new string[] {
                     key,
                     contentPropertyKey
@@ -34,11 +37,9 @@ namespace ei8.Cortex.Coding.d23.neurULization
             var instantiatesClass = new InstantiatesClass();
             instantiatesClass = (InstantiatesClass)await instantiatesClass.ObtainAsync(
                 result,
-                options.Primitives,
+                options.ToInternal(),
                 new InstantiatesClassParameterSet(
-                    rootTypeNeuron,
-                    options.EnsembleRepository,
-                    options.UserId
+                    rootTypeNeuron
                     )
                 );
 
@@ -50,14 +51,12 @@ namespace ei8.Cortex.Coding.d23.neurULization
 
             await new PropertyAssociation().ObtainAsync(
                 result,
-                options.Primitives,
+                options.ToInternal(),
                 new PropertyAssociationParameterSet(
                     erDict[contentPropertyKey],
                     idea,
-                    options.Primitives.Idea,
-                    ValueMatchByValue.Tag,
-                    options.EnsembleRepository,
-                    options.UserId
+                    options.ToInternal().Primitives.Idea,
+                    ValueMatchByValue.Tag
                     )
                 );
 

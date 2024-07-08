@@ -1,4 +1,5 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
+using ei8.Cortex.Coding.d23.neurULization;
 using neurUL.Common.Domain.Model;
 using System;
 using System.Threading.Tasks;
@@ -44,43 +45,36 @@ namespace ei8.Cortex.Coding.d23
 
         public IGranny Execute(
             Ensemble ensemble, 
-            IPrimitiveSet primitives, 
+            neurULizationOptions options, 
             IGranny precedingGranny, 
-            TResult tempResult, 
-            IEnsembleRepository ensembleRepository,
-            string userId)
+            TResult tempResult
+            )
         {
             AssertionConcern.AssertStateTrue(this.syncProcess != null, "Cannot invoke InnerProcess.Execute() when 'syncProcess' is null.");
             return this.syncProcess(
                 this.granny, 
                 ensemble, 
-                primitives, 
+                options, 
                 this.parametersBuilder(precedingGranny), 
                 this.resultUpdater, 
-                tempResult,
-                ensembleRepository,
-                userId
+                tempResult
                 );
         }
         public async Task<IGranny> ExecuteAsync(
             Ensemble ensemble, 
-            IPrimitiveSet primitives, 
+            neurULizationOptions options, 
             IGranny precedingGranny, 
-            TResult tempResult,
-            IEnsembleRepository ensembleRepository,
-            string userId
+            TResult tempResult
             )
         {
             AssertionConcern.AssertStateTrue(this.asyncProcess != null, "Cannot invoke InnerProcess.ExecuteAsync() when 'asyncProcess' is null.");
             return await this.asyncProcess(
                 this.granny, 
                 ensemble, 
-                primitives, 
+                options, 
                 this.parametersBuilder(precedingGranny), 
                 this.resultUpdater, 
-                tempResult,
-                ensembleRepository,
-                userId
+                tempResult
                 );
         }
     }

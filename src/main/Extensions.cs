@@ -1,4 +1,5 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
+using ei8.Cortex.Coding.d23.neurULization;
 using ei8.Cortex.Coding.d23.Queries;
 using ei8.Cortex.Coding.d23.Selectors;
 using ei8.Cortex.Library.Common;
@@ -18,17 +19,15 @@ namespace ei8.Cortex.Coding.d23
         internal async static Task<TGranny> ObtainAsync<TGranny, TParameterSet>(
             this IGranny<TGranny, TParameterSet> granny,
             Ensemble ensemble,
-            IPrimitiveSet primitives,
+            neurULizationOptions options,
             TParameterSet parameters
             )
             where TGranny : IGranny<TGranny, TParameterSet>
-            where TParameterSet : IAggregateParameterSet
+            where TParameterSet : IParameterSet
         => await granny.ObtainAsync(
             new ObtainParameters(
                 ensemble,
-                primitives,
-                parameters.EnsembleRepository,
-                parameters.UserId
+                options
                 ),
             parameters
             );
@@ -57,15 +56,15 @@ namespace ei8.Cortex.Coding.d23
 
             TGranny result = default;
             // if target is not in specified ensemble
-            if (!granny.TryParse(obtainParameters.Ensemble, obtainParameters.Primitives, parameters, out TGranny ensembleParseResult))
+            if (!granny.TryParse(obtainParameters.Ensemble, obtainParameters.Options, parameters, out TGranny ensembleParseResult))
             {
                 // retrieve target from DB
-                var grannyQueries = granny.GetQueries(obtainParameters.Primitives, parameters);
+                var grannyQueries = granny.GetQueries(obtainParameters.Options, parameters);
 
                 await grannyQueries.Process(obtainParameters);
 
                 // if target is in DB
-                if (granny.TryParse(obtainParameters.Ensemble, obtainParameters.Primitives, parameters, out TGranny dbParseResult))
+                if (granny.TryParse(obtainParameters.Ensemble, obtainParameters.Options, parameters, out TGranny dbParseResult))
                 {
                     result = dbParseResult;
                 }
@@ -73,7 +72,7 @@ namespace ei8.Cortex.Coding.d23
                 else
                 {
                     // build in ensemble
-                    result = await granny.BuildAsync(obtainParameters.Ensemble, obtainParameters.Primitives, parameters);
+                    result = await granny.BuildAsync(obtainParameters.Ensemble, obtainParameters.Options, parameters);
                 }
             }
             // if target was found in ensemble
@@ -112,8 +111,8 @@ namespace ei8.Cortex.Coding.d23
                 if ((query = await grannyQuery.GetQuery(obtainParameters)) != null)
                 {
                     // get ensemble based on parameters and previous granny neuron if it's assigned
-                    var queryResult = await obtainParameters.EnsembleRepository.GetByQueryAsync(
-                        obtainParameters.UserId,
+                    var queryResult = await obtainParameters.Options.EnsembleRepository.GetByQueryAsync(
+                        obtainParameters.Options.UserId,
                         query
                         );
                     // enrich ensemble
@@ -121,7 +120,7 @@ namespace ei8.Cortex.Coding.d23
                     // if granny query is retriever
                     if (grannyQuery is IRetriever gqr)
                     {
-                        previousGrannyNeuron = gqr.RetrieveNeuron(obtainParameters.Ensemble, obtainParameters.Primitives);
+                        previousGrannyNeuron = gqr.RetrieveNeuron(obtainParameters.Ensemble, obtainParameters.Options);
                         // if retrieval fails and this is not the last query
                         if (previousGrannyNeuron == null && grannyQueries.Last() != grannyQuery)
                             // break with a failure indication
@@ -169,9 +168,7 @@ namespace ei8.Cortex.Coding.d23
                 this TResult tempResult,
                 IEnumerable<IInnerProcess<TResult>> processes,
                 Ensemble ensemble,
-                IPrimitiveSet primitives,
-                IEnsembleRepository ensembleRepository,
-                string userId,
+                neurULizationOptions options,
                 Action<Neuron, TResult> grannyNeuronSetter = null
             )
             where TResult : IGranny
@@ -184,11 +181,9 @@ namespace ei8.Cortex.Coding.d23
             {
                 if ((precedingGranny = ps[i].Execute(
                     ensemble, 
-                    primitives, 
+                    options, 
                     precedingGranny, 
-                    tempResult,
-                    ensembleRepository,
-                    userId
+                    tempResult
                     )) == null)
                     break;
                 else if (i == ps.Length - 1)
@@ -206,9 +201,7 @@ namespace ei8.Cortex.Coding.d23
                 this TResult tempResult,
                 IEnumerable<IInnerProcess<TResult>> processes,
                 Ensemble ensemble,
-                IPrimitiveSet primitives,
-                IEnsembleRepository ensembleRepository,
-                string userId,
+                neurULizationOptions options,
                 Action<Neuron, TResult> grannyNeuronSetter,
                 Func<TResult, IEnumerable<Neuron>> postsynapticsRetriever = null
             )
@@ -218,11 +211,9 @@ namespace ei8.Cortex.Coding.d23
             foreach (var p in processes)
                 precedingGranny = await p.ExecuteAsync(
                     ensemble,
-                    primitives,
+                    options,
                     precedingGranny,
-                    tempResult,
-                    ensembleRepository,
-                    userId
+                    tempResult
                     );
 
             grannyNeuronSetter(precedingGranny.Neuron, tempResult);
@@ -290,5 +281,8 @@ namespace ei8.Cortex.Coding.d23
                 throw new ArgumentOutOfRangeException(nameof(value));
             return key;
         }
+
+        internal static neurULizationOptions ToInternal(this IneurULizationOptions options) =>
+            ((neurULizationOptions)options);
     }
 }

@@ -2,6 +2,6 @@
 {
     public interface IRetriever : IGrannyQuery
     {
-        Neuron RetrieveNeuron(Ensemble ensemble, IPrimitiveSet primitives);
+        Neuron RetrieveNeuron(Ensemble ensemble, IneurULizationOptions options);
     }
 }

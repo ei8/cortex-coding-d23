@@ -10,10 +10,8 @@ namespace ei8.Cortex.Coding.d23.Grannies
             Neuron property,
             Neuron value,
             Neuron @class,
-            ValueMatchByValue valueMatchBy,
-            IEnsembleRepository ensembleRepository,
-            string userId
-            ) : base(property, value, @class, valueMatchBy, ensembleRepository, userId)
+            ValueMatchByValue valueMatchBy
+            ) : base(property, value, @class, valueMatchBy)
         {
         }
     }
