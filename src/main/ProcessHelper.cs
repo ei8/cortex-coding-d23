@@ -10,7 +10,7 @@ namespace ei8.Cortex.Coding.d23
         public static async Task<IGranny> ObtainWithAggregateParamsAsync<T, TIGranny, TParameterSet, TResult>(
             T granny,
             Ensemble ensemble,
-            neurULizationOptions options,
+            Id23neurULizationOptions options,
             TParameterSet parameters,
             Action<TIGranny, TResult> resultUpdater,
             TResult tempResult
@@ -33,7 +33,7 @@ namespace ei8.Cortex.Coding.d23
         public static async Task<IGranny> ObtainAsync<T, TIGranny, TParameterSet, TResult>(
             T granny,
             Ensemble ensemble,
-            neurULizationOptions options,
+            Id23neurULizationOptions options,
             TParameterSet parameters,
             Action<TIGranny, TResult> resultUpdater,
             TResult tempResult
@@ -58,7 +58,7 @@ namespace ei8.Cortex.Coding.d23
         public static IGranny TryParse<T, TIGranny, TParameterSet, TResult>(
             T granny,
             Ensemble ensemble,
-            neurULizationOptions options,
+            Id23neurULizationOptions options,
             TParameterSet parameters,
             Action<TIGranny, TResult> resultUpdater,
             TResult tempResult

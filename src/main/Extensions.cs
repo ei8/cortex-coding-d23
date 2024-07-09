@@ -19,7 +19,7 @@ namespace ei8.Cortex.Coding.d23
         internal async static Task<TGranny> ObtainAsync<TGranny, TParameterSet>(
             this IGranny<TGranny, TParameterSet> granny,
             Ensemble ensemble,
-            neurULizationOptions options,
+            Id23neurULizationOptions options,
             TParameterSet parameters
             )
             where TGranny : IGranny<TGranny, TParameterSet>
@@ -168,7 +168,7 @@ namespace ei8.Cortex.Coding.d23
                 this TResult tempResult,
                 IEnumerable<IInnerProcess<TResult>> processes,
                 Ensemble ensemble,
-                neurULizationOptions options,
+                Id23neurULizationOptions options,
                 Action<Neuron, TResult> grannyNeuronSetter = null
             )
             where TResult : IGranny
@@ -201,7 +201,7 @@ namespace ei8.Cortex.Coding.d23
                 this TResult tempResult,
                 IEnumerable<IInnerProcess<TResult>> processes,
                 Ensemble ensemble,
-                neurULizationOptions options,
+                Id23neurULizationOptions options,
                 Action<Neuron, TResult> grannyNeuronSetter,
                 Func<TResult, IEnumerable<Neuron>> postsynapticsRetriever = null
             )
@@ -281,8 +281,5 @@ namespace ei8.Cortex.Coding.d23
                 throw new ArgumentOutOfRangeException(nameof(value));
             return key;
         }
-
-        internal static neurULizationOptions ToInternal(this IneurULizationOptions options) =>
-            ((neurULizationOptions)options);
     }
 }

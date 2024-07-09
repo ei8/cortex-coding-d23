@@ -1,4 +1,5 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
+using ei8.Cortex.Coding.d23.neurULization;
 using ei8.Cortex.Library.Common;
 using neurUL.Common.Domain.Model;
 using System;
@@ -34,7 +35,7 @@ namespace ei8.Cortex.Coding.d23.Queries
             return completed ? await gqs.Last().GetQuery(obtainParameters) : null;
         }
 
-        public Neuron RetrieveNeuron(Ensemble ensemble, IneurULizationOptions options)
+        public Neuron RetrieveNeuron(Ensemble ensemble, Id23neurULizationOptions options)
         {
             Neuron result = null;
 

@@ -45,7 +45,7 @@ namespace ei8.Cortex.Coding.d23
 
         public IGranny Execute(
             Ensemble ensemble, 
-            neurULizationOptions options, 
+            Id23neurULizationOptions options, 
             IGranny precedingGranny, 
             TResult tempResult
             )
@@ -62,7 +62,7 @@ namespace ei8.Cortex.Coding.d23
         }
         public async Task<IGranny> ExecuteAsync(
             Ensemble ensemble, 
-            neurULizationOptions options, 
+            Id23neurULizationOptions options, 
             IGranny precedingGranny, 
             TResult tempResult
             )

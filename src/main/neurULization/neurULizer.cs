@@ -11,9 +11,9 @@ namespace ei8.Cortex.Coding.d23.neurULization
             AssertionConcern.AssertArgumentNotNull(value, nameof(value));
             AssertionConcern.AssertArgumentNotNull(options, nameof(options));
             AssertionConcern.AssertArgumentValid(
-                o => o is neurULizationOptions, 
+                o => o is Id23neurULizationOptions, 
                 options, 
-                $"Specified 'options' is not of the expected type '{typeof(neurULizationOptions).FullName}'.", 
+                $"Specified 'options' is not of the expected type '{typeof(Id23neurULizationOptions).FullName}'.", 
                 nameof(options)
                 );
 
@@ -22,11 +22,13 @@ namespace ei8.Cortex.Coding.d23.neurULization
             var granny = Neuron.CreateTransient(null, null, null);
             result.AddReplace(granny);
 
+            var d23Options = (Id23neurULizationOptions) options;
+
             string key = value.GetType().GetExternalReferenceKey();
             var contentPropertyKey = value.GetType().GetProperty("Content").GetExternalReferenceKey();
             // use key to retrieve external reference url from library
-            var erDict = await options.ToInternal().EnsembleRepository.GetExternalReferencesAsync(
-                options.ToInternal().UserId,
+            var erDict = await d23Options.EnsembleRepository.GetExternalReferencesAsync(
+                d23Options.UserId,
                 new string[] {
                     key,
                     contentPropertyKey
@@ -37,7 +39,7 @@ namespace ei8.Cortex.Coding.d23.neurULization
             var instantiatesClass = new InstantiatesClass();
             instantiatesClass = (InstantiatesClass)await instantiatesClass.ObtainAsync(
                 result,
-                options.ToInternal(),
+                d23Options,
                 new InstantiatesClassParameterSet(
                     rootTypeNeuron
                     )
@@ -51,11 +53,11 @@ namespace ei8.Cortex.Coding.d23.neurULization
 
             await new PropertyAssociation().ObtainAsync(
                 result,
-                options.ToInternal(),
+                d23Options,
                 new PropertyAssociationParameterSet(
                     erDict[contentPropertyKey],
                     idea,
-                    options.ToInternal().Primitives.Idea,
+                    d23Options.Primitives.Idea,
                     ValueMatchByValue.Tag
                     )
                 );

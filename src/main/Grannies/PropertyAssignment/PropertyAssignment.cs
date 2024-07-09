@@ -1,14 +1,13 @@
-﻿using ei8.Cortex.Coding.d23.Queries;
-using System;
+﻿using ei8.Cortex.Coding.d23.neurULization;
+using ei8.Cortex.Coding.d23.Queries;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ei8.Cortex.Coding.d23.Grannies
 {
     public class PropertyAssignment : IPropertyAssignment
     {
-        public async Task<IPropertyAssignment> BuildAsync(Ensemble ensemble, IneurULizationOptions options, IPropertyAssignmentParameterSet parameters) =>
+        public async Task<IPropertyAssignment> BuildAsync(Ensemble ensemble, Id23neurULizationOptions options, IPropertyAssignmentParameterSet parameters) =>
             await new PropertyAssignment().AggregateBuildAsync(
                 new IInnerProcess<PropertyAssignment>[]
                 {
@@ -18,13 +17,13 @@ namespace ei8.Cortex.Coding.d23.Grannies
                         ProcessHelper.ObtainWithAggregateParamsAsync
                     ),
                     new InnerProcess<Expression, IExpression, IExpressionParameterSet, PropertyAssignment>(
-                        (g) => PropertyAssignment.CreateExpressionParameterSet(options.ToInternal().Primitives, parameters, g.Neuron),
+                        (g) => PropertyAssignment.CreateExpressionParameterSet(options.Primitives, parameters, g.Neuron),
                         (g, r) => r.Expression = g,
                         ProcessHelper.ObtainWithAggregateParamsAsync
                     )
                 },
                 ensemble,
-                options.ToInternal(),
+                options,
                 (n, r) => r.Neuron = n
             );
 
@@ -50,17 +49,17 @@ namespace ei8.Cortex.Coding.d23.Grannies
                 }
             );
 
-        public IEnumerable<IGrannyQuery> GetQueries(IneurULizationOptions options, IPropertyAssignmentParameterSet parameters) =>
+        public IEnumerable<IGrannyQuery> GetQueries(Id23neurULizationOptions options, IPropertyAssignmentParameterSet parameters) =>
             new IGrannyQuery[] {
                 new GrannyQueryInner<PropertyValueExpression, IPropertyValueExpression, IPropertyValueExpressionParameterSet>(
                     (n) => PropertyAssignment.CreatePropertyValueExpressionParameterSet(parameters)
                 ),
                 new GrannyQueryInner<Expression, IExpression, IExpressionParameterSet>(
-                    (n) => PropertyAssignment.CreateExpressionParameterSet(options.ToInternal().Primitives, parameters, n)
+                    (n) => PropertyAssignment.CreateExpressionParameterSet(options.Primitives, parameters, n)
                 )
             };
 
-        public bool TryParse(Ensemble ensemble, IneurULizationOptions options, IPropertyAssignmentParameterSet parameters, out IPropertyAssignment result) =>
+        public bool TryParse(Ensemble ensemble, Id23neurULizationOptions options, IPropertyAssignmentParameterSet parameters, out IPropertyAssignment result) =>
             (result = new PropertyAssignment().AggregateTryParse(
                 new IInnerProcess<PropertyAssignment>[]
                 {
@@ -70,13 +69,13 @@ namespace ei8.Cortex.Coding.d23.Grannies
                         ProcessHelper.TryParse
                         ),
                     new InnerProcess<Expression, IExpression, IExpressionParameterSet, PropertyAssignment>(
-                        (g) => PropertyAssignment.CreateExpressionParameterSet(options.ToInternal().Primitives, parameters, g.Neuron),
+                        (g) => PropertyAssignment.CreateExpressionParameterSet(options.Primitives, parameters, g.Neuron),
                         (g, r) => r.Expression = g,
                         ProcessHelper.TryParse
                         )
                 },
                 ensemble,
-                options.ToInternal(),
+                options,
                 (n, r) => r.Neuron = n
             )) != null;
 

@@ -1,16 +1,16 @@
-﻿using ei8.Cortex.Coding.d23.Queries;
+﻿using ei8.Cortex.Coding.d23.neurULization;
+using ei8.Cortex.Coding.d23.Queries;
 using ei8.Cortex.Coding.d23.Selectors;
 using ei8.Cortex.Library.Common;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace ei8.Cortex.Coding.d23.Grannies
 {
     public class Value : IValue
     {
-        public async Task<IValue> BuildAsync(Ensemble ensemble, IneurULizationOptions options, IValueParameterSet parameters) =>
+        public async Task<IValue> BuildAsync(Ensemble ensemble, Id23neurULizationOptions options, IValueParameterSet parameters) =>
             await new Value().AggregateBuildAsync(
                 new IInnerProcess<Value>[]
                 {
@@ -21,12 +21,12 @@ namespace ei8.Cortex.Coding.d23.Grannies
                         )
                 },
                 ensemble,
-                options.ToInternal(),
+                options,
                 (n, r) => r.Neuron = ensemble.Obtain(parameters.Value),
                 (g) => new[] { g.InstantiatesClass.Neuron }
             );
 
-        public IEnumerable<IGrannyQuery> GetQueries(IneurULizationOptions options, IValueParameterSet parameters) =>
+        public IEnumerable<IGrannyQuery> GetQueries(Id23neurULizationOptions options, IValueParameterSet parameters) =>
             new IGrannyQuery[] {
                 new GrannyQueryInner<InstantiatesClass, IInstantiatesClass, IInstantiatesClassParameterSet>(
                     (n) => Value.CreateInstantiatesClassParameterSet(parameters)
@@ -58,7 +58,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
                 parameters.Class
             );
 
-        public bool TryParse(Ensemble ensemble, IneurULizationOptions options, IValueParameterSet parameters, out IValue result)
+        public bool TryParse(Ensemble ensemble, Id23neurULizationOptions options, IValueParameterSet parameters, out IValue result)
         {
             result = null;
 
@@ -72,7 +72,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
                         )
                 },
                 ensemble,
-                options.ToInternal()
+                options
             );
 
             if (tempResult != null) 

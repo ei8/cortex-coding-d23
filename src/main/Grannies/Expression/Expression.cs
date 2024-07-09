@@ -14,7 +14,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
     {
         private IList<IUnit> units = new List<IUnit>();
 
-        public async Task<IExpression> BuildAsync(Ensemble ensemble, IneurULizationOptions options, IExpressionParameterSet parameters) =>
+        public async Task<IExpression> BuildAsync(Ensemble ensemble, Id23neurULizationOptions options, IExpressionParameterSet parameters) =>
             await new Expression().AggregateBuildAsync(
                 parameters.UnitsParameters.Select(
                     u => new InnerProcess<Unit, IUnit, IUnitParameterSet, Expression>(
@@ -24,18 +24,18 @@ namespace ei8.Cortex.Coding.d23.Grannies
                         )
                 ),
                 ensemble,
-                options.ToInternal(),
+                options,
                 (n, r) => r.Neuron = ensemble.Obtain(Neuron.CreateTransient(null, null, null)),
                 (r) => 
                     // concat applicable expression types
-                    Expression.GetExpressionTypes(parameters, options.ToInternal().Primitives).Select(et => ensemble.Obtain(et)).Concat(
+                    Expression.GetExpressionTypes(parameters, options.Primitives).Select(et => ensemble.Obtain(et)).Concat(
                         // with Units in result
                         r.Units.Select(u => u.Neuron)
                     )
             );
 
-        public IEnumerable<IGrannyQuery> GetQueries(IneurULizationOptions options, IExpressionParameterSet parameters) =>
-            Expression.GetQueryByType(options.ToInternal().Primitives, parameters);
+        public IEnumerable<IGrannyQuery> GetQueries(Id23neurULizationOptions options, IExpressionParameterSet parameters) =>
+            Expression.GetQueryByType(options.Primitives, parameters);
 
         private static IEnumerable<IGrannyQuery> GetQueryByType(PrimitiveSet primitives, IExpressionParameterSet parameters)
         {
@@ -143,7 +143,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
             return result.ToArray();
         }
 
-        public bool TryParse(Ensemble ensemble, IneurULizationOptions options, IExpressionParameterSet parameters, out IExpression result)
+        public bool TryParse(Ensemble ensemble, Id23neurULizationOptions options, IExpressionParameterSet parameters, out IExpression result)
         {
             result = null;
 
@@ -156,7 +156,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
                     )
                 ),
                 ensemble,
-                options.ToInternal()
+                options
             );
 
             if (tempResult != null && tempResult.Units.Count() == parameters.UnitsParameters.Count())
@@ -166,17 +166,17 @@ namespace ei8.Cortex.Coding.d23.Grannies
                     ensemble,
                     tempResult,
                     // start from the Head units
-                    tempResult.Units.GetByTypeId(options.ToInternal().Primitives.Unit.Id).Select(u => u.Neuron.Id),
+                    tempResult.Units.GetByTypeId(options.Primitives.Unit.Id).Select(u => u.Neuron.Id),
                     new[]
                     {
                         // get the presynaptic via the siblings of the head and subordination
                         new LevelParser(new PresynapticBySibling(
-                            tempResult.Units.GetByTypeId(options.ToInternal().Primitives.Unit.Id, false)
+                            tempResult.Units.GetByTypeId(options.Primitives.Unit.Id, false)
                                 .Select(i => i.Neuron.Id)
                                 .Concat(
                                     Expression.GetExpressionTypes(
                                         parameters, 
-                                        options.ToInternal().Primitives
+                                        options.Primitives
                                     ).Select(t => t.Id)
                                 ).ToArray()
                             )

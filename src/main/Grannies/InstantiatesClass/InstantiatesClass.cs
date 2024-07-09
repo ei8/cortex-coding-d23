@@ -1,31 +1,32 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ei8.Cortex.Coding.d23.neurULization;
 using ei8.Cortex.Coding.d23.Queries;
 
 namespace ei8.Cortex.Coding.d23.Grannies
 {
     public class InstantiatesClass : IInstantiatesClass
     {
-        public async Task<IInstantiatesClass> BuildAsync(Ensemble ensemble, IneurULizationOptions options, IInstantiatesClassParameterSet parameters) =>
+        public async Task<IInstantiatesClass> BuildAsync(Ensemble ensemble, Id23neurULizationOptions options, IInstantiatesClassParameterSet parameters) =>
             await new InstantiatesClass().AggregateBuildAsync(
                 new IInnerProcess<InstantiatesClass>[]
                 {
                     new InnerProcess<Expression, IExpression, IExpressionParameterSet, InstantiatesClass>(
-                        (g) => InstantiatesClass.CreateSubordinationParameterSet(options.ToInternal().Primitives, parameters),
-                        (g, r) => r.Class = g.Units.GetByTypeId(options.ToInternal().Primitives.DirectObject.Id).Single(),
+                        (g) => InstantiatesClass.CreateSubordinationParameterSet(options.Primitives, parameters),
+                        (g, r) => r.Class = g.Units.GetByTypeId(options.Primitives.DirectObject.Id).Single(),
                         ProcessHelper.ObtainWithAggregateParamsAsync
                         )
                 },
                 ensemble,
-                options.ToInternal(),
+                options,
                 (n, r) => r.Neuron = n
             );
 
-        public IEnumerable<IGrannyQuery> GetQueries(IneurULizationOptions options, IInstantiatesClassParameterSet parameters) =>
+        public IEnumerable<IGrannyQuery> GetQueries(Id23neurULizationOptions options, IInstantiatesClassParameterSet parameters) =>
             new Expression().GetQueries(
                 options,
-                InstantiatesClass.CreateSubordinationParameterSet(options.ToInternal().Primitives, parameters)
+                InstantiatesClass.CreateSubordinationParameterSet(options.Primitives, parameters)
                 );
 
         private static ExpressionParameterSet CreateSubordinationParameterSet(PrimitiveSet primitives, IInstantiatesClassParameterSet parameters)
@@ -45,18 +46,18 @@ namespace ei8.Cortex.Coding.d23.Grannies
             );
         }
 
-        public bool TryParse(Ensemble ensemble, IneurULizationOptions options, IInstantiatesClassParameterSet parameters, out IInstantiatesClass result) =>
+        public bool TryParse(Ensemble ensemble, Id23neurULizationOptions options, IInstantiatesClassParameterSet parameters, out IInstantiatesClass result) =>
             (result = new InstantiatesClass().AggregateTryParse(
                 new IInnerProcess<InstantiatesClass>[]
                 {
                     new InnerProcess<Expression, IExpression, IExpressionParameterSet, InstantiatesClass>(
-                        (g) => InstantiatesClass.CreateSubordinationParameterSet(options.ToInternal().Primitives, parameters),
-                        (g, r) => r.Class = g.Units.GetByTypeId(options.ToInternal().Primitives.DirectObject.Id).Single(),
+                        (g) => InstantiatesClass.CreateSubordinationParameterSet(options.Primitives, parameters),
+                        (g, r) => r.Class = g.Units.GetByTypeId(options.Primitives.DirectObject.Id).Single(),
                         ProcessHelper.TryParse
                         )
                 },
                 ensemble,
-                options.ToInternal(),
+                options,
                 (n, r) => r.Neuron = n
             )) != null;
 

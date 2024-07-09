@@ -7,7 +7,7 @@ namespace ei8.Cortex.Coding.d23
     {
         public ObtainParameters(
             Ensemble ensemble,
-            neurULizationOptions options
+            Id23neurULizationOptions options
             )
         {
             AssertionConcern.AssertArgumentNotNull(ensemble, nameof(ensemble));
@@ -19,6 +19,6 @@ namespace ei8.Cortex.Coding.d23
 
         public Ensemble Ensemble { get; }
 
-        public neurULizationOptions Options { get; } 
+        public Id23neurULizationOptions Options { get; } 
     }
 }
