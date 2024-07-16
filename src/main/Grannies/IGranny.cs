@@ -20,10 +20,10 @@ namespace ei8.Cortex.Coding.d23.Grannies
         where TSelf : IGranny<TSelf, TParameterSet>
         where TParameterSet : IParameterSet
     {
-        bool TryParse(Ensemble ensemble, Id23neurULizationOptions options, TParameterSet parameters, out TSelf result);
+        bool TryParse(Ensemble ensemble, Id23neurULizerOptions options, TParameterSet parameters, out TSelf result);
 
-        IEnumerable<IGrannyQuery> GetQueries(Id23neurULizationOptions options, TParameterSet parameters);
+        IEnumerable<IGrannyQuery> GetQueries(Id23neurULizerOptions options, TParameterSet parameters);
 
-        Task<TSelf> BuildAsync(Ensemble ensemble, Id23neurULizationOptions options, TParameterSet parameters);
+        Task<TSelf> BuildAsync(Ensemble ensemble, Id23neurULizerOptions options, TParameterSet parameters);
     }
 }

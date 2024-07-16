@@ -19,7 +19,7 @@ namespace ei8.Cortex.Coding.d23
         internal async static Task<TGranny> ObtainAsync<TGranny, TParameterSet>(
             this IGranny<TGranny, TParameterSet> granny,
             Ensemble ensemble,
-            Id23neurULizationOptions options,
+            Id23neurULizerOptions options,
             TParameterSet parameters
             )
             where TGranny : IGranny<TGranny, TParameterSet>
@@ -168,7 +168,7 @@ namespace ei8.Cortex.Coding.d23
                 this TResult tempResult,
                 IEnumerable<IInnerProcess<TResult>> processes,
                 Ensemble ensemble,
-                Id23neurULizationOptions options,
+                Id23neurULizerOptions options,
                 Action<Neuron, TResult> grannyNeuronSetter = null
             )
             where TResult : IGranny
@@ -201,7 +201,7 @@ namespace ei8.Cortex.Coding.d23
                 this TResult tempResult,
                 IEnumerable<IInnerProcess<TResult>> processes,
                 Ensemble ensemble,
-                Id23neurULizationOptions options,
+                Id23neurULizerOptions options,
                 Action<Neuron, TResult> grannyNeuronSetter,
                 Func<TResult, IEnumerable<Neuron>> postsynapticsRetriever = null
             )
@@ -264,11 +264,85 @@ namespace ei8.Cortex.Coding.d23
                 );
         }
 
+        internal static PropertyData ToPropertyData(this PropertyInfo property, object obj)
+        {
+            PropertyData result = null;
+            var ignore = property.GetCustomAttributes<neurULIgnoreAttribute>().SingleOrDefault();
+            if (ignore == null)
+            {
+                var neuronPropertyAttribute = property.GetCustomAttributes<neurULNeuronPropertyAttribute>().SingleOrDefault();
+                if (neuronPropertyAttribute != null)
+                {
+                    result = Extensions.GetNeuronPropertyData(neuronPropertyAttribute, property.Name, property.GetValue(obj));
+                }
+                else
+                {
+                    var classAttribute = property.GetCustomAttributes<neurULClassAttribute>().SingleOrDefault();
+                    // if property type is Guid and property is decorated by classAttribute
+                    var matchBy = property.PropertyType == typeof(Guid) && classAttribute != null ?
+                            // match by id
+                            ValueMatchBy.Id :
+                            // otherwise, match by tag
+                            ValueMatchBy.Tag;
+                    var propertyValue = property.GetValue(obj)?.ToString();
+                    string propertyKey = property.ToExternalReferenceKeyString();
+
+                    result = new PropertyData(
+                        propertyKey,
+                        // if classAttribute was specified
+                        classAttribute?.Type != null ? 
+                            // use classAttribute type
+                            classAttribute.Type.ToExternalReferenceKeyString() :
+                            // otherwise, use property type
+                            property.PropertyType.ToExternalReferenceKeyString(),
+                        propertyValue,
+                        matchBy
+                        );
+                }
+            }
+
+            return result;
+        } 
+
+        private static PropertyData GetNeuronPropertyData(neurULNeuronPropertyAttribute neuronPropertyAttribute, string propertyName, object propertyValue)
+        {
+            PropertyData result = null;
+
+            if (!neuronPropertyAttribute.IsReadOnly)
+            {
+                var property = neuronPropertyAttribute.PropertyName ?? propertyName;
+                INeuronProperty neuronProperty;
+                switch (property)
+                {
+                    case nameof(Neuron.Id):
+                        neuronProperty = new IdProperty((Guid)propertyValue);
+                        break;
+                    case nameof(Neuron.Tag):
+                        neuronProperty = new TagProperty((string)
+                            propertyValue);
+                        break;
+                    case nameof(Neuron.ExternalReferenceUrl):
+                        neuronProperty = new ExternalReferenceUrlProperty((string)propertyValue);
+                        break;
+                    case nameof(Neuron.RegionId):
+                        neuronProperty = new RegionIdProperty((Guid?)propertyValue);
+                        break;
+                    default:
+                        throw new NotImplementedException($"Neuron Property '{property}' not yet implemented.");
+                }
+
+                if (neuronProperty != null)
+                    result = new PropertyData(neuronProperty);
+            }
+
+            return result;
+        }
+
         internal static string GetExternalReferenceKey(this MemberInfo value)
         {
             // get ExternalReferenceKeyAttribute of root type
-            var erka = value.GetCustomAttributes(typeof(ExternalReferenceKeyAttribute), true).SingleOrDefault() as ExternalReferenceKeyAttribute;
-            var key = string.Empty;
+            var erka = value.GetCustomAttributes<neurULKeyAttribute>().SingleOrDefault();
+            string key;
             // if attribute exists
             if (erka != null)
                 key = erka.Key;

@@ -10,7 +10,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
 {
     public class Value : IValue
     {
-        public async Task<IValue> BuildAsync(Ensemble ensemble, Id23neurULizationOptions options, IValueParameterSet parameters) =>
+        public async Task<IValue> BuildAsync(Ensemble ensemble, Id23neurULizerOptions options, IValueParameterSet parameters) =>
             await new Value().AggregateBuildAsync(
                 new IInnerProcess<Value>[]
                 {
@@ -26,7 +26,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
                 (g) => new[] { g.InstantiatesClass.Neuron }
             );
 
-        public IEnumerable<IGrannyQuery> GetQueries(Id23neurULizationOptions options, IValueParameterSet parameters) =>
+        public IEnumerable<IGrannyQuery> GetQueries(Id23neurULizerOptions options, IValueParameterSet parameters) =>
             new IGrannyQuery[] {
                 new GrannyQueryInner<InstantiatesClass, IInstantiatesClass, IInstantiatesClassParameterSet>(
                     (n) => Value.CreateInstantiatesClassParameterSet(parameters)
@@ -34,10 +34,10 @@ namespace ei8.Cortex.Coding.d23.Grannies
                 new GrannyQueryBuilder(
                     (n) => new NeuronQuery()
                     {
-                        Id = parameters.ValueMatchBy == ValueMatchByValue.Id ? 
+                        Id = parameters.ValueMatchBy == ValueMatchBy.Id ? 
                             new[] { parameters.Value.Id.ToString() } : 
                             Array.Empty<string>(),
-                        TagContains = parameters.ValueMatchBy == ValueMatchByValue.Tag ?
+                        TagContains = parameters.ValueMatchBy == ValueMatchBy.Tag ?
                             new[] { parameters.Value.Tag } : 
                             Array.Empty<string>(),
                         DirectionValues = DirectionValues.Outbound,
@@ -58,7 +58,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
                 parameters.Class
             );
 
-        public bool TryParse(Ensemble ensemble, Id23neurULizationOptions options, IValueParameterSet parameters, out IValue result)
+        public bool TryParse(Ensemble ensemble, Id23neurULizerOptions options, IValueParameterSet parameters, out IValue result)
         {
             result = null;
 
@@ -84,7 +84,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
                     new[] { tempResult.InstantiatesClass.Neuron.Id },
                     new[] { new LevelParser(
                             new PresynapticBy(n => 
-                                parameters.ValueMatchBy == ValueMatchByValue.Id ? 
+                                parameters.ValueMatchBy == ValueMatchBy.Id ? 
                                 n.Id == parameters.Value.Id :
                                 n.Tag == parameters.Value.Tag
                             )

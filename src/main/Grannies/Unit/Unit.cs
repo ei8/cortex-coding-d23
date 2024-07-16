@@ -9,7 +9,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
 {
     public class Unit : IUnit
     {
-        public async Task<IUnit> BuildAsync(Ensemble ensemble, Id23neurULizationOptions options, IUnitParameterSet parameters)
+        public async Task<IUnit> BuildAsync(Ensemble ensemble, Id23neurULizerOptions options, IUnitParameterSet parameters)
         {
             var result = new Unit();
             result.Value = ensemble.Obtain(parameters.Value);
@@ -21,7 +21,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
             return result;
         }
 
-        public IEnumerable<IGrannyQuery> GetQueries(Id23neurULizationOptions options, IUnitParameterSet parameters) =>
+        public IEnumerable<IGrannyQuery> GetQueries(Id23neurULizerOptions options, IUnitParameterSet parameters) =>
             new[] {
                 new GrannyQuery(
                     new NeuronQuery()
@@ -36,7 +36,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
                 )
             };
 
-        public bool TryParse(Ensemble ensemble, Id23neurULizationOptions options, IUnitParameterSet parameters, out IUnit result)
+        public bool TryParse(Ensemble ensemble, Id23neurULizerOptions options, IUnitParameterSet parameters, out IUnit result)
         {
             result = null;
 

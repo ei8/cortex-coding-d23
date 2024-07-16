@@ -10,6 +10,6 @@ namespace ei8.Cortex.Coding.d23.Grannies
 
         Neuron Class { get; }
 
-        ValueMatchByValue ValueMatchBy { get; }
+        ValueMatchBy ValueMatchBy { get; }
     }
 }

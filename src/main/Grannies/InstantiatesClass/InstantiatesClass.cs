@@ -8,7 +8,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
 {
     public class InstantiatesClass : IInstantiatesClass
     {
-        public async Task<IInstantiatesClass> BuildAsync(Ensemble ensemble, Id23neurULizationOptions options, IInstantiatesClassParameterSet parameters) =>
+        public async Task<IInstantiatesClass> BuildAsync(Ensemble ensemble, Id23neurULizerOptions options, IInstantiatesClassParameterSet parameters) =>
             await new InstantiatesClass().AggregateBuildAsync(
                 new IInnerProcess<InstantiatesClass>[]
                 {
@@ -23,7 +23,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
                 (n, r) => r.Neuron = n
             );
 
-        public IEnumerable<IGrannyQuery> GetQueries(Id23neurULizationOptions options, IInstantiatesClassParameterSet parameters) =>
+        public IEnumerable<IGrannyQuery> GetQueries(Id23neurULizerOptions options, IInstantiatesClassParameterSet parameters) =>
             new Expression().GetQueries(
                 options,
                 InstantiatesClass.CreateSubordinationParameterSet(options.Primitives, parameters)
@@ -46,7 +46,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
             );
         }
 
-        public bool TryParse(Ensemble ensemble, Id23neurULizationOptions options, IInstantiatesClassParameterSet parameters, out IInstantiatesClass result) =>
+        public bool TryParse(Ensemble ensemble, Id23neurULizerOptions options, IInstantiatesClassParameterSet parameters, out IInstantiatesClass result) =>
             (result = new InstantiatesClass().AggregateTryParse(
                 new IInnerProcess<InstantiatesClass>[]
                 {

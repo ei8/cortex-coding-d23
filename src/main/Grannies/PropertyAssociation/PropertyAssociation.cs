@@ -7,7 +7,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
 {
     public class PropertyAssociation : IPropertyAssociation
     {
-        public async Task<IPropertyAssociation> BuildAsync(Ensemble ensemble, Id23neurULizationOptions options, IPropertyAssociationParameterSet parameters) =>
+        public async Task<IPropertyAssociation> BuildAsync(Ensemble ensemble, Id23neurULizerOptions options, IPropertyAssociationParameterSet parameters) =>
             await new PropertyAssociation().AggregateBuildAsync(
                 new IInnerProcess<PropertyAssociation>[]
                 {
@@ -50,7 +50,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
                 }
             );
 
-        public IEnumerable<IGrannyQuery> GetQueries(Id23neurULizationOptions options, IPropertyAssociationParameterSet parameters) =>
+        public IEnumerable<IGrannyQuery> GetQueries(Id23neurULizerOptions options, IPropertyAssociationParameterSet parameters) =>
             new IGrannyQuery[] {
                 new GrannyQueryInner<PropertyAssignment, IPropertyAssignment, IPropertyAssignmentParameterSet>(
                     (n) => PropertyAssociation.CreatePropertyAssignmentParameterSet(parameters)
@@ -60,7 +60,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
                 )
             };
 
-        public bool TryParse(Ensemble ensemble, Id23neurULizationOptions options, IPropertyAssociationParameterSet parameters, out IPropertyAssociation result) =>
+        public bool TryParse(Ensemble ensemble, Id23neurULizerOptions options, IPropertyAssociationParameterSet parameters, out IPropertyAssociation result) =>
             (result = new PropertyAssociation().AggregateTryParse(
                 new IInnerProcess<PropertyAssociation>[]
                 {

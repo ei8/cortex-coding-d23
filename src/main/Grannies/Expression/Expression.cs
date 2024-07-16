@@ -14,7 +14,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
     {
         private IList<IUnit> units = new List<IUnit>();
 
-        public async Task<IExpression> BuildAsync(Ensemble ensemble, Id23neurULizationOptions options, IExpressionParameterSet parameters) =>
+        public async Task<IExpression> BuildAsync(Ensemble ensemble, Id23neurULizerOptions options, IExpressionParameterSet parameters) =>
             await new Expression().AggregateBuildAsync(
                 parameters.UnitsParameters.Select(
                     u => new InnerProcess<Unit, IUnit, IUnitParameterSet, Expression>(
@@ -34,7 +34,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
                     )
             );
 
-        public IEnumerable<IGrannyQuery> GetQueries(Id23neurULizationOptions options, IExpressionParameterSet parameters) =>
+        public IEnumerable<IGrannyQuery> GetQueries(Id23neurULizerOptions options, IExpressionParameterSet parameters) =>
             Expression.GetQueryByType(options.Primitives, parameters);
 
         private static IEnumerable<IGrannyQuery> GetQueryByType(PrimitiveSet primitives, IExpressionParameterSet parameters)
@@ -143,7 +143,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
             return result.ToArray();
         }
 
-        public bool TryParse(Ensemble ensemble, Id23neurULizationOptions options, IExpressionParameterSet parameters, out IExpression result)
+        public bool TryParse(Ensemble ensemble, Id23neurULizerOptions options, IExpressionParameterSet parameters, out IExpression result)
         {
             result = null;
 

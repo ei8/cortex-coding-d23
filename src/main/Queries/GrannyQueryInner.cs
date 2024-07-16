@@ -35,7 +35,7 @@ namespace ei8.Cortex.Coding.d23.Queries
             return completed ? await gqs.Last().GetQuery(obtainParameters) : null;
         }
 
-        public Neuron RetrieveNeuron(Ensemble ensemble, Id23neurULizationOptions options)
+        public Neuron RetrieveNeuron(Ensemble ensemble, Id23neurULizerOptions options)
         {
             Neuron result = null;
 

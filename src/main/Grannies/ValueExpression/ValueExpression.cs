@@ -7,7 +7,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
 {
     public class ValueExpression : IValueExpression
     {
-        public async Task<IValueExpression> BuildAsync(Ensemble ensemble, Id23neurULizationOptions options, IValueExpressionParameterSet parameters) =>
+        public async Task<IValueExpression> BuildAsync(Ensemble ensemble, Id23neurULizerOptions options, IValueExpressionParameterSet parameters) =>
             await new ValueExpression().AggregateBuildAsync(
                 new IInnerProcess<ValueExpression>[]
                 {
@@ -34,7 +34,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
                 parameters.ValueMatchBy
             );
 
-        public IEnumerable<IGrannyQuery> GetQueries(Id23neurULizationOptions options, IValueExpressionParameterSet parameters) =>
+        public IEnumerable<IGrannyQuery> GetQueries(Id23neurULizerOptions options, IValueExpressionParameterSet parameters) =>
             new IGrannyQuery[] {
                 new GrannyQueryInner<Value, IValue, IValueParameterSet>(
                     (n) => ValueExpression.CreateValueParameterSet(parameters)
@@ -54,7 +54,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
                 }
             );
 
-        public bool TryParse(Ensemble ensemble, Id23neurULizationOptions options, IValueExpressionParameterSet parameters, out IValueExpression result) =>
+        public bool TryParse(Ensemble ensemble, Id23neurULizerOptions options, IValueExpressionParameterSet parameters, out IValueExpression result) =>
             (result = new ValueExpression().AggregateTryParse(
                 new IInnerProcess<ValueExpression>[]
                 {

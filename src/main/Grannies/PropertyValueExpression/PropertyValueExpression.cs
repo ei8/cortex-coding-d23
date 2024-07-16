@@ -7,7 +7,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
 {
     public class PropertyValueExpression : IPropertyValueExpression
     {
-        public async Task<IPropertyValueExpression> BuildAsync(Ensemble ensemble, Id23neurULizationOptions options, IPropertyValueExpressionParameterSet parameters) =>
+        public async Task<IPropertyValueExpression> BuildAsync(Ensemble ensemble, Id23neurULizerOptions options, IPropertyValueExpressionParameterSet parameters) =>
             await new PropertyValueExpression().AggregateBuildAsync(
                 new IInnerProcess<PropertyValueExpression>[]
                 {
@@ -50,7 +50,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
             );
         
 
-        public IEnumerable<IGrannyQuery> GetQueries(Id23neurULizationOptions options, IPropertyValueExpressionParameterSet parameters) =>
+        public IEnumerable<IGrannyQuery> GetQueries(Id23neurULizerOptions options, IPropertyValueExpressionParameterSet parameters) =>
             new IGrannyQuery[] {
                 new GrannyQueryInner<ValueExpression, IValueExpression, IValueExpressionParameterSet>(
                     (n) => PropertyValueExpression.CreateValueExpressionParameterSet(parameters)
@@ -60,7 +60,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
                 )
             };
 
-        public bool TryParse(Ensemble ensemble, Id23neurULizationOptions options, IPropertyValueExpressionParameterSet parameters, out IPropertyValueExpression result) =>
+        public bool TryParse(Ensemble ensemble, Id23neurULizerOptions options, IPropertyValueExpressionParameterSet parameters, out IPropertyValueExpression result) =>
             (result = new PropertyValueExpression().AggregateTryParse(
                 new IInnerProcess<PropertyValueExpression>[]
                 {

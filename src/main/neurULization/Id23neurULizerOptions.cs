@@ -4,7 +4,7 @@ using System.Text;
 
 namespace ei8.Cortex.Coding.d23.neurULization
 {
-    public interface Id23neurULizationOptions : IneurULizationOptions
+    public interface Id23neurULizerOptions : IneurULizerOptions
     {
         PrimitiveSet Primitives { get; }
 

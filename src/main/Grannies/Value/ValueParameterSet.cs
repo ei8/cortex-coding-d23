@@ -10,7 +10,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
         public ValueParameterSet(
             Neuron value,
             Neuron @class,
-            ValueMatchByValue valueMatchBy
+            ValueMatchBy valueMatchBy
             )
         {
             AssertionConcern.AssertArgumentNotNull(value, nameof(value));
@@ -25,6 +25,6 @@ namespace ei8.Cortex.Coding.d23.Grannies
 
         public Neuron Class { get; }
 
-        public ValueMatchByValue ValueMatchBy { get; }
+        public ValueMatchBy ValueMatchBy { get; }
     }
 }
