@@ -7,18 +7,19 @@ namespace ei8.Cortex.Coding.d23
 {
     internal static class ProcessHelper
     {
-        public static async Task<IGranny> ObtainWithAggregateParamsAsync<TIGranny, TParameterSet, TResult>(
-            TIGranny granny,
+        public static async Task<IGranny> ObtainWithAggregateParamsAsync<TGranny, TGrannyProcessor, TParameterSet, TResult>(
+            TGrannyProcessor grannyProcessor,
             Ensemble ensemble,
             Id23neurULizerOptions options,
             TParameterSet parameters,
-            Action<TIGranny, TResult> resultUpdater,
+            Action<TGranny, TResult> resultUpdater,
             TResult tempResult
         )
-            where TIGranny : IGranny<TIGranny, TParameterSet>
+            where TGranny : IGranny
+            where TGrannyProcessor : IGrannyProcessor<TGranny, TParameterSet>
             where TParameterSet : IParameterSet
         {
-            TIGranny result = await granny.ObtainAsync(
+            TGranny result = await grannyProcessor.ObtainAsync<TGranny, TGrannyProcessor, TParameterSet>(
                 ensemble,
                 options,
                 parameters
@@ -29,18 +30,19 @@ namespace ei8.Cortex.Coding.d23
             return result;
         }
 
-        public static async Task<IGranny> ObtainAsync<TIGranny, TParameterSet, TResult>(
-            TIGranny granny,
+        public static async Task<IGranny> ObtainAsync<TGranny, TGrannyProcessor, TParameterSet, TResult>(
+            TGrannyProcessor grannyProcessor,
             Ensemble ensemble,
             Id23neurULizerOptions options,
             TParameterSet parameters,
-            Action<TIGranny, TResult> resultUpdater,
+            Action<TGranny, TResult> resultUpdater,
             TResult tempResult
         )
-            where TIGranny : IGranny<TIGranny, TParameterSet>
+            where TGranny : IGranny
+            where TGrannyProcessor : IGrannyProcessor<TGranny, TParameterSet>
             where TParameterSet : IParameterSet
         {
-            TIGranny result = await granny.ObtainAsync(
+            TGranny result = await grannyProcessor.ObtainAsync<TGranny, TGrannyProcessor, TParameterSet>(
                 new ObtainParameters(
                     ensemble,
                     options
@@ -53,24 +55,25 @@ namespace ei8.Cortex.Coding.d23
             return result;
         }
 
-        public static IGranny TryParse<TIGranny, TParameterSet, TResult>(
-            TIGranny granny,
+        public static IGranny TryParse<TGranny, TGrannyProcessor, TParameterSet, TResult>(
+            TGrannyProcessor grannyProcessor,
             Ensemble ensemble,
             Id23neurULizerOptions options,
             TParameterSet parameters,
-            Action<TIGranny, TResult> resultUpdater,
+            Action<TGranny, TResult> resultUpdater,
             TResult tempResult
         )
-            where TIGranny : IGranny<TIGranny, TParameterSet>
+            where TGranny : IGranny
+            where TGrannyProcessor : IGrannyProcessor<TGranny, TParameterSet>
             where TParameterSet : IParameterSet
         {
             IGranny result = null;
 
-            if (granny.TryParse(
+            if (grannyProcessor.TryParse(
                 ensemble,
                 options,
                 parameters,
-                out TIGranny gr)
+                out TGranny gr)
                 )
             {
                 resultUpdater(gr, tempResult);

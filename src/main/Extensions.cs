@@ -17,15 +17,16 @@ namespace ei8.Cortex.Coding.d23
     public static class Extensions
     {
         #region IGranny
-        internal async static Task<TGranny> ObtainAsync<TGranny, TParameterSet>(
-            this IGranny<TGranny, TParameterSet> granny,
+        internal async static Task<TGranny> ObtainAsync<TGranny, TGrannyProcessor, TParameterSet>(
+            this TGrannyProcessor grannyProcessor,
             Ensemble ensemble,
             Id23neurULizerOptions options,
             TParameterSet parameters
             )
-            where TGranny : IGranny<TGranny, TParameterSet>
+            where TGranny : IGranny
+            where TGrannyProcessor : IGrannyProcessor<TGranny, TParameterSet>
             where TParameterSet : IParameterSet
-        => await granny.ObtainAsync(
+        => await grannyProcessor.ObtainAsync<TGranny, TGrannyProcessor, TParameterSet>(
             new ObtainParameters(
                 ensemble,
                 options
@@ -38,18 +39,19 @@ namespace ei8.Cortex.Coding.d23
         /// </summary>
         /// <typeparam name="TGranny"></typeparam>
         /// <typeparam name="TParameterSet"></typeparam>
-        /// <param name="granny"></param>
+        /// <param name="grannyProcessor"></param>
         /// <param name="ensemble"></param>
         /// <param name="parameters"></param>
         /// <param name="ensembleRepository"></param>
         /// <param name="userId"></param>
         /// <returns></returns>
-        internal async static Task<TGranny> ObtainAsync<TGranny, TParameterSet>(
-            this IGranny<TGranny, TParameterSet> granny,
+        internal async static Task<TGranny> ObtainAsync<TGranny, TGrannyProcessor, TParameterSet>(
+            this TGrannyProcessor grannyProcessor,
             ObtainParameters obtainParameters,
             TParameterSet parameters
             )
-            where TGranny : IGranny<TGranny, TParameterSet>
+            where TGranny : IGranny
+            where TGrannyProcessor : IGrannyProcessor<TGranny, TParameterSet>
             where TParameterSet : IParameterSet
         {
             AssertionConcern.AssertArgumentNotNull(obtainParameters, nameof(obtainParameters));
@@ -57,15 +59,15 @@ namespace ei8.Cortex.Coding.d23
 
             TGranny result = default;
             // if target is not in specified ensemble
-            if (!granny.TryParse(obtainParameters.Ensemble, obtainParameters.Options, parameters, out TGranny ensembleParseResult))
+            if (!grannyProcessor.TryParse(obtainParameters.Ensemble, obtainParameters.Options, parameters, out TGranny ensembleParseResult))
             {
                 // retrieve target from DB
-                var grannyQueries = granny.GetQueries(obtainParameters.Options, parameters);
+                var grannyQueries = grannyProcessor.GetQueries(obtainParameters.Options, parameters);
 
                 await grannyQueries.Process(obtainParameters);
 
                 // if target is in DB
-                if (granny.TryParse(obtainParameters.Ensemble, obtainParameters.Options, parameters, out TGranny dbParseResult))
+                if (grannyProcessor.TryParse(obtainParameters.Ensemble, obtainParameters.Options, parameters, out TGranny dbParseResult))
                 {
                     result = dbParseResult;
                 }
@@ -73,7 +75,7 @@ namespace ei8.Cortex.Coding.d23
                 else
                 {
                     // build in ensemble
-                    result = await granny.BuildAsync(obtainParameters.Ensemble, obtainParameters.Options, parameters);
+                    result = await grannyProcessor.BuildAsync(obtainParameters.Ensemble, obtainParameters.Options, parameters);
                 }
             }
             // if target was found in ensemble
@@ -141,8 +143,8 @@ namespace ei8.Cortex.Coding.d23
             return result;
         }
 
-        internal static void TryParseCore<TGranny, TParameterSet>(
-            this TGranny granny,
+        internal static void TryParseCore<TGranny, TGrannyProcessor, TParameterSet>(
+            this TGrannyProcessor grannyProcessor,
             TParameterSet parameters,
             Ensemble ensemble,
             TGranny tempResult,
@@ -151,7 +153,8 @@ namespace ei8.Cortex.Coding.d23
             System.Action<Neuron> grannySetter,
             ref TGranny result
             )
-            where TGranny : IGranny<TGranny, TParameterSet>
+            where TGranny : IGranny
+            where TGrannyProcessor : IGrannyProcessor<TGranny, TParameterSet>
             where TParameterSet : IParameterSet
         {
             foreach (var levelParser in levelParsers)

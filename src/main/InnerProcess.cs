@@ -6,41 +6,42 @@ using System.Threading.Tasks;
 
 namespace ei8.Cortex.Coding.d23
 {
-    internal class InnerProcess<TIGranny, TParameterSet, TResult> : IInnerProcess<TResult>
-        where TIGranny : IGranny<TIGranny, TParameterSet>
+    internal class InnerProcess<TGranny, TGrannyProcessor, TParameterSet, TResult> : IInnerProcess<TResult>
+        where TGranny : IGranny
+        where TGrannyProcessor : IGrannyProcessor<TGranny, TParameterSet>
         where TParameterSet : IParameterSet
     {
-        private readonly TIGranny granny;
+        private readonly TGrannyProcessor grannyProcessor;
         private readonly Func<IGranny, TParameterSet> parametersBuilder;
-        private readonly Action<TIGranny, TResult> resultUpdater;
-        private readonly GrannyProcessCallback<TIGranny, TParameterSet, TResult> syncProcess;
-        private readonly AsyncGrannyProcessCallback<TIGranny, TParameterSet, TResult> asyncProcess;
+        private readonly Action<TGranny, TResult> resultUpdater;
+        private readonly GrannyProcessCallback<TGranny, TGrannyProcessor, TParameterSet, TResult> syncProcess;
+        private readonly AsyncGrannyProcessCallback<TGranny, TGrannyProcessor, TParameterSet, TResult> asyncProcess;
 
         public InnerProcess(
-            TIGranny granny,
+            TGrannyProcessor grannyProcessor,
             Func<IGranny, TParameterSet> parametersBuilder,
-            Action<TIGranny, TResult> resultUpdater,
-            GrannyProcessCallback<TIGranny, TParameterSet, TResult> syncProcess) : this(granny, parametersBuilder, resultUpdater)
+            Action<TGranny, TResult> resultUpdater,
+            GrannyProcessCallback<TGranny, TGrannyProcessor, TParameterSet, TResult> syncProcess) : this(grannyProcessor, parametersBuilder, resultUpdater)
         { 
             this.syncProcess = syncProcess;
         }
 
         public InnerProcess(
-            TIGranny granny,
+            TGrannyProcessor grannyProcessor,
             Func<IGranny, TParameterSet> parametersBuilder,
-            Action<TIGranny, TResult> resultUpdater,
-            AsyncGrannyProcessCallback<TIGranny, TParameterSet, TResult> asyncProcess) : this(granny, parametersBuilder, resultUpdater)
+            Action<TGranny, TResult> resultUpdater,
+            AsyncGrannyProcessCallback<TGranny, TGrannyProcessor, TParameterSet, TResult> asyncProcess) : this(grannyProcessor, parametersBuilder, resultUpdater)
         {
             this.asyncProcess = asyncProcess;
         }
 
         private InnerProcess(
-           TIGranny granny,
+           TGrannyProcessor grannyProcessor,
            Func<IGranny, TParameterSet> parametersBuilder,
-           Action<TIGranny, TResult> resultUpdater
+           Action<TGranny, TResult> resultUpdater
            )
         {
-            this.granny = granny;
+            this.grannyProcessor = grannyProcessor;
             this.parametersBuilder = parametersBuilder;
             this.resultUpdater = resultUpdater;
         }
@@ -54,7 +55,7 @@ namespace ei8.Cortex.Coding.d23
         {
             AssertionConcern.AssertStateTrue(this.syncProcess != null, "Cannot invoke InnerProcess.Execute() when 'syncProcess' is null.");
             return this.syncProcess(
-                this.granny, 
+                this.grannyProcessor, 
                 ensemble, 
                 options, 
                 this.parametersBuilder(precedingGranny), 
@@ -71,7 +72,7 @@ namespace ei8.Cortex.Coding.d23
         {
             AssertionConcern.AssertStateTrue(this.asyncProcess != null, "Cannot invoke InnerProcess.ExecuteAsync() when 'asyncProcess' is null.");
             return await this.asyncProcess(
-                this.granny, 
+                this.grannyProcessor, 
                 ensemble, 
                 options, 
                 this.parametersBuilder(precedingGranny), 

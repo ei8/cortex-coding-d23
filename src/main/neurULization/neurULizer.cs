@@ -59,10 +59,11 @@ namespace ei8.Cortex.Coding.d23.neurULization
                 );
 
             // instantiates
-            var instantiatesClass = await d23Options.ServiceProvider.GetRequiredService<IInstantiatesClass>().ObtainAsync(
-                result,
-                d23Options,
-                new InstantiatesClassParameterSet(externalReferences[valueClassKey])
+            var instantiatesClass = await d23Options.ServiceProvider.GetRequiredService<IInstantiatesClassProcessor>()
+                .ObtainAsync<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet>(
+                    result,
+                    d23Options,
+                    new InstantiatesClassParameterSet(externalReferences[valueClassKey])
                 );
 
             // link granny neuron to InstantiatesClass neuron
@@ -79,15 +80,16 @@ namespace ei8.Cortex.Coding.d23.neurULization
                     Neuron.CreateTransient(Guid.Parse(gp.Value), null, null, regionId) :
                     Neuron.CreateTransient(gp.Value, null, regionId);
 
-                var propertyAssociation = await d23Options.ServiceProvider.GetRequiredService<IPropertyAssociation>().ObtainAsync(
-                    result,
-                    d23Options,
-                    new PropertyAssociationParameterSet(
-                        externalReferences[gp.Key],
-                        propertyValue,
-                        externalReferences[gp.ClassKey],
-                        ValueMatchBy.Tag
-                        )
+                var propertyAssociation = await d23Options.ServiceProvider.GetRequiredService<IPropertyAssociationProcessor>()
+                    .ObtainAsync<IPropertyAssociation, IPropertyAssociationProcessor, IPropertyAssociationParameterSet>(
+                        result,
+                        d23Options,
+                        new PropertyAssociationParameterSet(
+                            externalReferences[gp.Key],
+                            propertyValue,
+                            externalReferences[gp.ClassKey],
+                            ValueMatchBy.Tag
+                            )
                     );
 
                 // link granny neuron to PropertyAssociation neuron

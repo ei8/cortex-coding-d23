@@ -4,8 +4,7 @@ using System.Text;
 
 namespace ei8.Cortex.Coding.d23.Grannies
 {
-    public interface IExpression : IGranny
+    public interface IUnitProcessor : IGrannyProcessor<IUnit, IUnitParameterSet>
     {
-        IList<IUnit> Units { get; }
     }
 }

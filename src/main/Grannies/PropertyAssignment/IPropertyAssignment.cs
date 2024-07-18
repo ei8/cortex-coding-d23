@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ei8.Cortex.Coding.d23.Grannies
+﻿namespace ei8.Cortex.Coding.d23.Grannies
 {
-    public interface IPropertyAssignment : IGranny<IPropertyAssignment, IPropertyAssignmentParameterSet>
+    public interface IPropertyAssignment : IGranny
     {
         IPropertyValueExpression PropertyValueExpression { get; set; }
 
