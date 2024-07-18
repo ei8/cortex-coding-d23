@@ -8,11 +8,19 @@ namespace ei8.Cortex.Coding.d23.Grannies
 {
     public class InstantiatesClass : IInstantiatesClass
     {
+        private readonly IExpression expressionProcessor;
+
+        public InstantiatesClass(IExpression expressionProcessor)
+        {
+            this.expressionProcessor = expressionProcessor;
+        }
+
         public async Task<IInstantiatesClass> BuildAsync(Ensemble ensemble, Id23neurULizerOptions options, IInstantiatesClassParameterSet parameters) =>
-            await new InstantiatesClass().AggregateBuildAsync(
-                new IInnerProcess<InstantiatesClass>[]
+            await new InstantiatesClass(this.expressionProcessor).AggregateBuildAsync(
+                new IInnerProcess<IInstantiatesClass>[]
                 {
-                    new InnerProcess<Expression, IExpression, IExpressionParameterSet, InstantiatesClass>(
+                    new InnerProcess<IExpression, IExpressionParameterSet, IInstantiatesClass>(
+                        this.expressionProcessor,
                         (g) => InstantiatesClass.CreateSubordinationParameterSet(options.Primitives, parameters),
                         (g, r) => r.Class = g.Units.GetByTypeId(options.Primitives.DirectObject.Id).Single(),
                         ProcessHelper.ObtainWithAggregateParamsAsync
@@ -24,7 +32,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
             );
 
         public IEnumerable<IGrannyQuery> GetQueries(Id23neurULizerOptions options, IInstantiatesClassParameterSet parameters) =>
-            new Expression().GetQueries(
+            this.expressionProcessor.GetQueries(
                 options,
                 InstantiatesClass.CreateSubordinationParameterSet(options.Primitives, parameters)
                 );
@@ -47,10 +55,11 @@ namespace ei8.Cortex.Coding.d23.Grannies
         }
 
         public bool TryParse(Ensemble ensemble, Id23neurULizerOptions options, IInstantiatesClassParameterSet parameters, out IInstantiatesClass result) =>
-            (result = new InstantiatesClass().AggregateTryParse(
-                new IInnerProcess<InstantiatesClass>[]
+            (result = new InstantiatesClass(this.expressionProcessor).AggregateTryParse(
+                new IInnerProcess<IInstantiatesClass>[]
                 {
-                    new InnerProcess<Expression, IExpression, IExpressionParameterSet, InstantiatesClass>(
+                    new InnerProcess<IExpression, IExpressionParameterSet, IInstantiatesClass>(
+                        this.expressionProcessor,
                         (g) => InstantiatesClass.CreateSubordinationParameterSet(options.Primitives, parameters),
                         (g, r) => r.Class = g.Units.GetByTypeId(options.Primitives.DirectObject.Id).Single(),
                         ProcessHelper.TryParse
@@ -61,8 +70,8 @@ namespace ei8.Cortex.Coding.d23.Grannies
                 (n, r) => r.Neuron = n
             )) != null;
 
-        public IUnit Class { get; private set; }
+        public IUnit Class { get; set; }
 
-        public Neuron Neuron { get; private set; }
+        public Neuron Neuron { get; set; }
     }
 }

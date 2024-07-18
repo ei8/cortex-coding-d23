@@ -6,39 +6,41 @@ using System.Threading.Tasks;
 
 namespace ei8.Cortex.Coding.d23
 {
-    internal class InnerProcess<T, TIGranny, TParameterSet, TResult> : IInnerProcess<TResult>
-        where T : TIGranny, new()
+    internal class InnerProcess<TIGranny, TParameterSet, TResult> : IInnerProcess<TResult>
         where TIGranny : IGranny<TIGranny, TParameterSet>
         where TParameterSet : IParameterSet
     {
-        private readonly T granny;
+        private readonly TIGranny granny;
         private readonly Func<IGranny, TParameterSet> parametersBuilder;
         private readonly Action<TIGranny, TResult> resultUpdater;
-        private readonly GrannyProcessCallback<T, TIGranny, TParameterSet, TResult> syncProcess;
-        private readonly AsyncGrannyProcessCallback<T, TIGranny, TParameterSet, TResult> asyncProcess;
+        private readonly GrannyProcessCallback<TIGranny, TParameterSet, TResult> syncProcess;
+        private readonly AsyncGrannyProcessCallback<TIGranny, TParameterSet, TResult> asyncProcess;
 
         public InnerProcess(
-           Func<IGranny, TParameterSet> parametersBuilder,
-           Action<TIGranny, TResult> resultUpdater,
-           GrannyProcessCallback<T, TIGranny, TParameterSet, TResult> syncProcess) : this(parametersBuilder, resultUpdater)
+            TIGranny granny,
+            Func<IGranny, TParameterSet> parametersBuilder,
+            Action<TIGranny, TResult> resultUpdater,
+            GrannyProcessCallback<TIGranny, TParameterSet, TResult> syncProcess) : this(granny, parametersBuilder, resultUpdater)
         { 
             this.syncProcess = syncProcess;
         }
 
         public InnerProcess(
-           Func<IGranny, TParameterSet> parametersBuilder,
-           Action<TIGranny, TResult> resultUpdater,
-           AsyncGrannyProcessCallback<T, TIGranny, TParameterSet, TResult> asyncProcess) : this(parametersBuilder, resultUpdater)
+            TIGranny granny,
+            Func<IGranny, TParameterSet> parametersBuilder,
+            Action<TIGranny, TResult> resultUpdater,
+            AsyncGrannyProcessCallback<TIGranny, TParameterSet, TResult> asyncProcess) : this(granny, parametersBuilder, resultUpdater)
         {
             this.asyncProcess = asyncProcess;
         }
 
         private InnerProcess(
+           TIGranny granny,
            Func<IGranny, TParameterSet> parametersBuilder,
            Action<TIGranny, TResult> resultUpdater
            )
         {
-            this.granny = new T();
+            this.granny = granny;
             this.parametersBuilder = parametersBuilder;
             this.resultUpdater = resultUpdater;
         }

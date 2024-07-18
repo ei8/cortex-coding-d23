@@ -6,9 +6,9 @@ namespace ei8.Cortex.Coding.d23.neurULization
 {
     public interface Id23neurULizerOptions : IneurULizerOptions
     {
-        PrimitiveSet Primitives { get; }
+        IServiceProvider ServiceProvider { get; }
 
-        IEnsembleRepository EnsembleRepository { get; }
+        PrimitiveSet Primitives { get; }
 
         string UserId { get; }
     }

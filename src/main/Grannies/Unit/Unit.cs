@@ -57,10 +57,10 @@ namespace ei8.Cortex.Coding.d23.Grannies
             return result != null;
         }
 
-        public Neuron Value { get; private set; }
+        public Neuron Value { get; set; }
 
-        public Neuron Type { get; private set; }
+        public Neuron Type { get; set; }
 
-        public Neuron Neuron { get; private set; }
+        public Neuron Neuron { get; set; }
     }
 }

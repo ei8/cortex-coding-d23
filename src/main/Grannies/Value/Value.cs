@@ -10,11 +10,19 @@ namespace ei8.Cortex.Coding.d23.Grannies
 {
     public class Value : IValue
     {
+        private readonly IInstantiatesClass instantiatesClassProcessor;
+
+        public Value(IInstantiatesClass instantiatesClassProcessor)
+        {
+            this.instantiatesClassProcessor = instantiatesClassProcessor;
+        }
+
         public async Task<IValue> BuildAsync(Ensemble ensemble, Id23neurULizerOptions options, IValueParameterSet parameters) =>
-            await new Value().AggregateBuildAsync(
-                new IInnerProcess<Value>[]
+            await new Value(this.instantiatesClassProcessor).AggregateBuildAsync(
+                new IInnerProcess<IValue>[]
                 {
-                    new InnerProcess<InstantiatesClass, IInstantiatesClass, IInstantiatesClassParameterSet, Value>(
+                    new InnerProcess<IInstantiatesClass, IInstantiatesClassParameterSet, IValue>(
+                        this.instantiatesClassProcessor,
                         (g) => Value.CreateInstantiatesClassParameterSet(parameters),
                         (g, r) => r.InstantiatesClass = g,
                         ProcessHelper.ObtainWithAggregateParamsAsync
@@ -28,7 +36,8 @@ namespace ei8.Cortex.Coding.d23.Grannies
 
         public IEnumerable<IGrannyQuery> GetQueries(Id23neurULizerOptions options, IValueParameterSet parameters) =>
             new IGrannyQuery[] {
-                new GrannyQueryInner<InstantiatesClass, IInstantiatesClass, IInstantiatesClassParameterSet>(
+                new GrannyQueryInner<IInstantiatesClass, IInstantiatesClassParameterSet>(
+                    this.instantiatesClassProcessor,
                     (n) => Value.CreateInstantiatesClassParameterSet(parameters)
                 ),
                 new GrannyQueryBuilder(
@@ -62,10 +71,11 @@ namespace ei8.Cortex.Coding.d23.Grannies
         {
             result = null;
 
-            var tempResult = new Value().AggregateTryParse(
-                new IInnerProcess<Value>[]
+            var tempResult = new Value(this.instantiatesClassProcessor).AggregateTryParse(
+                new IInnerProcess<IValue>[]
                 {
-                    new InnerProcess<InstantiatesClass, IInstantiatesClass, IInstantiatesClassParameterSet, Value>(
+                    new InnerProcess<IInstantiatesClass, IInstantiatesClassParameterSet, IValue>(
+                        this.instantiatesClassProcessor,
                         (g) => Value.CreateInstantiatesClassParameterSet(parameters),
                         (g, r) => r.InstantiatesClass = g,
                         ProcessHelper.TryParse
@@ -97,8 +107,8 @@ namespace ei8.Cortex.Coding.d23.Grannies
             return result != null;
         }
 
-        public IInstantiatesClass InstantiatesClass { get; private set; }
+        public IInstantiatesClass InstantiatesClass { get; set; }
 
-        public Neuron Neuron { get; private set; }
+        public Neuron Neuron { get; set; }
     }
 }

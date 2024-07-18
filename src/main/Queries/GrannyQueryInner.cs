@@ -8,20 +8,19 @@ using System.Threading.Tasks;
 
 namespace ei8.Cortex.Coding.d23.Queries
 {
-    public class GrannyQueryInner<TGranny, TIGranny, TParameterSet> : IRetriever, IReceiver
-        where TGranny : TIGranny, new()
+    public class GrannyQueryInner<TIGranny, TParameterSet> : IRetriever, IReceiver
         where TIGranny : IGranny<TIGranny, TParameterSet>
         where TParameterSet : IParameterSet
     {
-        private readonly TGranny granny;
+        private readonly TIGranny granny;
         private readonly Func<Neuron, TParameterSet> parametersBuilder;
         private Neuron retrievalResult;
 
-        public GrannyQueryInner(Func<Neuron, TParameterSet> parametersBuilder)
+        public GrannyQueryInner(TIGranny granny, Func<Neuron, TParameterSet> parametersBuilder)
         {
             AssertionConcern.AssertArgumentNotNull(parametersBuilder, nameof(parametersBuilder));
 
-            this.granny = new TGranny();
+            this.granny = granny;
             this.parametersBuilder = parametersBuilder;
             this.retrievalResult = null;
         }

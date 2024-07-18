@@ -7,7 +7,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
 {
     public interface IGranny
     {
-        Neuron Neuron { get; }
+        Neuron Neuron { get; set; }
     }
 
     /// <summary>

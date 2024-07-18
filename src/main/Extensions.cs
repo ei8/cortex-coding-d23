@@ -3,6 +3,7 @@ using ei8.Cortex.Coding.d23.neurULization;
 using ei8.Cortex.Coding.d23.Queries;
 using ei8.Cortex.Coding.d23.Selectors;
 using ei8.Cortex.Library.Common;
+using Microsoft.Extensions.DependencyInjection;
 using neurUL.Common.Domain.Model;
 using System;
 using System.Collections.Generic;
@@ -111,7 +112,7 @@ namespace ei8.Cortex.Coding.d23
                 if ((query = await grannyQuery.GetQuery(obtainParameters)) != null)
                 {
                     // get ensemble based on parameters and previous granny neuron if it's assigned
-                    var queryResult = await obtainParameters.Options.EnsembleRepository.GetByQueryAsync(
+                    var queryResult = await obtainParameters.Options.ServiceProvider.GetRequiredService<IEnsembleRepository>().GetByQueryAsync(
                         obtainParameters.Options.UserId,
                         query
                         );

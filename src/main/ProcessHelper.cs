@@ -7,15 +7,14 @@ namespace ei8.Cortex.Coding.d23
 {
     internal static class ProcessHelper
     {
-        public static async Task<IGranny> ObtainWithAggregateParamsAsync<T, TIGranny, TParameterSet, TResult>(
-            T granny,
+        public static async Task<IGranny> ObtainWithAggregateParamsAsync<TIGranny, TParameterSet, TResult>(
+            TIGranny granny,
             Ensemble ensemble,
             Id23neurULizerOptions options,
             TParameterSet parameters,
             Action<TIGranny, TResult> resultUpdater,
             TResult tempResult
         )
-            where T : TIGranny, new()
             where TIGranny : IGranny<TIGranny, TParameterSet>
             where TParameterSet : IParameterSet
         {
@@ -30,15 +29,14 @@ namespace ei8.Cortex.Coding.d23
             return result;
         }
 
-        public static async Task<IGranny> ObtainAsync<T, TIGranny, TParameterSet, TResult>(
-            T granny,
+        public static async Task<IGranny> ObtainAsync<TIGranny, TParameterSet, TResult>(
+            TIGranny granny,
             Ensemble ensemble,
             Id23neurULizerOptions options,
             TParameterSet parameters,
             Action<TIGranny, TResult> resultUpdater,
             TResult tempResult
         )
-            where T : TIGranny, new()
             where TIGranny : IGranny<TIGranny, TParameterSet>
             where TParameterSet : IParameterSet
         {
@@ -55,15 +53,14 @@ namespace ei8.Cortex.Coding.d23
             return result;
         }
 
-        public static IGranny TryParse<T, TIGranny, TParameterSet, TResult>(
-            T granny,
+        public static IGranny TryParse<TIGranny, TParameterSet, TResult>(
+            TIGranny granny,
             Ensemble ensemble,
             Id23neurULizerOptions options,
             TParameterSet parameters,
             Action<TIGranny, TResult> resultUpdater,
             TResult tempResult
         )
-            where T : TIGranny, new()
             where TIGranny : IGranny<TIGranny, TParameterSet>
             where TParameterSet : IParameterSet
         {

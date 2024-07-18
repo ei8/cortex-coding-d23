@@ -12,14 +12,20 @@ namespace ei8.Cortex.Coding.d23.Grannies
 {
     public class Expression : IExpression
     {
-        private IList<IUnit> units = new List<IUnit>();
+        private readonly IUnit unitProcessor;
+
+        public Expression(IUnit unitProcessor)
+        {
+            this.unitProcessor = unitProcessor;
+        }
 
         public async Task<IExpression> BuildAsync(Ensemble ensemble, Id23neurULizerOptions options, IExpressionParameterSet parameters) =>
-            await new Expression().AggregateBuildAsync(
+            await new Expression(this.unitProcessor).AggregateBuildAsync(
                 parameters.UnitsParameters.Select(
-                    u => new InnerProcess<Unit, IUnit, IUnitParameterSet, Expression>(
+                    u => new InnerProcess<IUnit, IUnitParameterSet, IExpression>(
+                        this.unitProcessor,
                         (g) => u,
-                        (g, r) => r.units.Add(g),
+                        (g, r) => r.Units.Add(g),
                         ProcessHelper.ObtainAsync
                         )
                 ),
@@ -35,9 +41,9 @@ namespace ei8.Cortex.Coding.d23.Grannies
             );
 
         public IEnumerable<IGrannyQuery> GetQueries(Id23neurULizerOptions options, IExpressionParameterSet parameters) =>
-            Expression.GetQueryByType(options.Primitives, parameters);
+            this.GetQueryByType(options.Primitives, parameters);
 
-        private static IEnumerable<IGrannyQuery> GetQueryByType(PrimitiveSet primitives, IExpressionParameterSet parameters)
+        private IEnumerable<IGrannyQuery> GetQueryByType(PrimitiveSet primitives, IExpressionParameterSet parameters)
         {
             IEnumerable<IGrannyQuery> result = null;
             
@@ -87,7 +93,8 @@ namespace ei8.Cortex.Coding.d23.Grannies
                 else if (types.Single().Id == primitives.Simple.Id)
                 {
                     result = new IGrannyQuery[] {
-                        new GrannyQueryInner<Unit, IUnit, IUnitParameterSet>(
+                        new GrannyQueryInner<IUnit, IUnitParameterSet>(
+                            this.unitProcessor,
                             (n) => parameters.UnitsParameters.Single(u => u.Type.Id == primitives.Unit.Id)
                         ),
                         new GrannyQueryBuilder(
@@ -147,11 +154,12 @@ namespace ei8.Cortex.Coding.d23.Grannies
         {
             result = null;
 
-            var tempResult = new Expression().AggregateTryParse(
+            var tempResult = new Expression(this.unitProcessor).AggregateTryParse(
                 parameters.UnitsParameters.Select(
-                    u => new InnerProcess<Unit, IUnit, IUnitParameterSet, Expression>(
+                    u => new InnerProcess<IUnit, IUnitParameterSet, IExpression>(
+                        this.unitProcessor,
                         (g) => u,
-                        (g, r) => r.units.Add(g),
+                        (g, r) => r.Units.Add(g),
                         ProcessHelper.TryParse
                     )
                 ),
@@ -190,8 +198,8 @@ namespace ei8.Cortex.Coding.d23.Grannies
             return result != null;
         }
 
-        public IEnumerable<IUnit> Units => this.units.ToArray();
+        public IList<IUnit> Units { get; } = new List<IUnit>();
 
-        public Neuron Neuron { get; private set; }
+        public Neuron Neuron { get; set; }
     }
 }

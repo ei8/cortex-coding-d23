@@ -7,6 +7,6 @@ namespace ei8.Cortex.Coding.d23.Grannies
 {
     public interface IValue : IGranny<IValue, IValueParameterSet>
     {
-        IInstantiatesClass InstantiatesClass { get; }
+        IInstantiatesClass InstantiatesClass { get; set; }
     }
 }

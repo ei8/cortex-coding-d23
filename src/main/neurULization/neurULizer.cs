@@ -1,4 +1,5 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
+using Microsoft.Extensions.DependencyInjection;
 using neurUL.Common.Domain.Model;
 using System;
 using System.Linq;
@@ -47,16 +48,18 @@ namespace ei8.Cortex.Coding.d23.neurULization
                 .Distinct();
 
             // use key to retrieve external reference url from library
-            var externalReferences = await d23Options.EnsembleRepository.GetExternalReferencesAsync(
-                d23Options.UserId,
-                new string[] {
-                    valueClassKey
-                }.Concat(
-                    propertyKeys
-                ).ToArray());
+            var externalReferences = await d23Options.ServiceProvider.GetRequiredService<IEnsembleRepository>()
+                .GetExternalReferencesAsync(
+                    d23Options.UserId,
+                    new string[] {
+                        valueClassKey
+                    }.Concat(
+                        propertyKeys
+                    ).ToArray()
+                );
 
             // instantiates
-            var instantiatesClass = await new InstantiatesClass().ObtainAsync(
+            var instantiatesClass = await d23Options.ServiceProvider.GetRequiredService<IInstantiatesClass>().ObtainAsync(
                 result,
                 d23Options,
                 new InstantiatesClassParameterSet(externalReferences[valueClassKey])
@@ -76,7 +79,7 @@ namespace ei8.Cortex.Coding.d23.neurULization
                     Neuron.CreateTransient(Guid.Parse(gp.Value), null, null, regionId) :
                     Neuron.CreateTransient(gp.Value, null, regionId);
 
-                var propertyAssociation = await new PropertyAssociation().ObtainAsync(
+                var propertyAssociation = await d23Options.ServiceProvider.GetRequiredService<IPropertyAssociation>().ObtainAsync(
                     result,
                     d23Options,
                     new PropertyAssociationParameterSet(

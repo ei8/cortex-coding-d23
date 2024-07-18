@@ -6,8 +6,8 @@ namespace ei8.Cortex.Coding.d23.Grannies
 {
     public interface IUnit : IGranny<IUnit, IUnitParameterSet>
     {
-        Neuron Value { get; }
+        Neuron Value { get; set; }
 
-        Neuron Type { get; }
+        Neuron Type { get; set; }
     }
 }

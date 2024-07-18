@@ -6,8 +6,8 @@ namespace ei8.Cortex.Coding.d23.Grannies
 {
     public interface IPropertyAssociation : IGranny<IPropertyAssociation, IPropertyAssociationParameterSet>
     {
-        IPropertyAssignment PropertyAssignment { get; }
+        IPropertyAssignment PropertyAssignment { get; set; }
 
-        IExpression Expression { get; }
+        IExpression Expression { get; set; }
     }
 }

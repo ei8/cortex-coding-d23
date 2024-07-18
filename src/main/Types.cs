@@ -5,27 +5,25 @@ using System.Threading.Tasks;
 
 namespace ei8.Cortex.Coding.d23
 {
-    public delegate IGranny GrannyProcessCallback<T, TIGranny, TParameterSet, TResult>(
-        T granny, 
+    public delegate IGranny GrannyProcessCallback<TIGranny, TParameterSet, TResult>(
+        TIGranny granny, 
         Ensemble ensemble, 
         Id23neurULizerOptions options,
         TParameterSet parameters, 
         Action<TIGranny, TResult> resultUpdater, 
         TResult tempResult
     )
-        where T : TIGranny, new()
         where TIGranny : IGranny<TIGranny, TParameterSet>
         where TParameterSet : IParameterSet;
 
-    public delegate Task<IGranny> AsyncGrannyProcessCallback<T, TIGranny, TParameterSet, TResult>(
-        T granny,
+    public delegate Task<IGranny> AsyncGrannyProcessCallback<TIGranny, TParameterSet, TResult>(
+        TIGranny granny,
         Ensemble ensemble,
         Id23neurULizerOptions options,
         TParameterSet parameters,
         Action<TIGranny, TResult> resultUpdater,
         TResult tempResult
     )
-        where T : TIGranny, new()
         where TIGranny : IGranny<TIGranny, TParameterSet>
         where TParameterSet : IParameterSet;
 }

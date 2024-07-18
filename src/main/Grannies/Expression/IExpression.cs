@@ -6,6 +6,6 @@ namespace ei8.Cortex.Coding.d23.Grannies
 {
     public interface IExpression : IGranny<IExpression, IExpressionParameterSet>
     {
-        IEnumerable<IUnit> Units { get; }
+        IList<IUnit> Units { get; }
     }
 }

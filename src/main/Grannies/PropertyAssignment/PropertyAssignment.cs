@@ -7,16 +7,27 @@ namespace ei8.Cortex.Coding.d23.Grannies
 {
     public class PropertyAssignment : IPropertyAssignment
     {
+        private readonly IPropertyValueExpression propertyValueExpressionProcessor;
+        private readonly IExpression expressionProcessor;
+
+        public PropertyAssignment(IPropertyValueExpression propertyValueExpressionProcessor, IExpression expressionProcessor)
+        {
+            this.propertyValueExpressionProcessor = propertyValueExpressionProcessor;
+            this.expressionProcessor = expressionProcessor;
+        }
+
         public async Task<IPropertyAssignment> BuildAsync(Ensemble ensemble, Id23neurULizerOptions options, IPropertyAssignmentParameterSet parameters) =>
-            await new PropertyAssignment().AggregateBuildAsync(
-                new IInnerProcess<PropertyAssignment>[]
+            await new PropertyAssignment(this.propertyValueExpressionProcessor, this.expressionProcessor).AggregateBuildAsync(
+                new IInnerProcess<IPropertyAssignment>[]
                 {
-                    new InnerProcess<PropertyValueExpression, IPropertyValueExpression, IPropertyValueExpressionParameterSet, PropertyAssignment>(
+                    new InnerProcess<IPropertyValueExpression, IPropertyValueExpressionParameterSet, IPropertyAssignment>(
+                        this.propertyValueExpressionProcessor,
                         (g) => PropertyAssignment.CreatePropertyValueExpressionParameterSet(parameters),
                         (g, r) => r.PropertyValueExpression = g,
                         ProcessHelper.ObtainWithAggregateParamsAsync
                     ),
-                    new InnerProcess<Expression, IExpression, IExpressionParameterSet, PropertyAssignment>(
+                    new InnerProcess<IExpression, IExpressionParameterSet, IPropertyAssignment>(
+                        this.expressionProcessor,
                         (g) => PropertyAssignment.CreateExpressionParameterSet(options.Primitives, parameters, g.Neuron),
                         (g, r) => r.Expression = g,
                         ProcessHelper.ObtainWithAggregateParamsAsync
@@ -51,24 +62,28 @@ namespace ei8.Cortex.Coding.d23.Grannies
 
         public IEnumerable<IGrannyQuery> GetQueries(Id23neurULizerOptions options, IPropertyAssignmentParameterSet parameters) =>
             new IGrannyQuery[] {
-                new GrannyQueryInner<PropertyValueExpression, IPropertyValueExpression, IPropertyValueExpressionParameterSet>(
+                new GrannyQueryInner<IPropertyValueExpression, IPropertyValueExpressionParameterSet>(
+                    this.propertyValueExpressionProcessor,
                     (n) => PropertyAssignment.CreatePropertyValueExpressionParameterSet(parameters)
                 ),
-                new GrannyQueryInner<Expression, IExpression, IExpressionParameterSet>(
+                new GrannyQueryInner<IExpression, IExpressionParameterSet>(
+                    this.expressionProcessor,
                     (n) => PropertyAssignment.CreateExpressionParameterSet(options.Primitives, parameters, n)
                 )
             };
 
         public bool TryParse(Ensemble ensemble, Id23neurULizerOptions options, IPropertyAssignmentParameterSet parameters, out IPropertyAssignment result) =>
-            (result = new PropertyAssignment().AggregateTryParse(
-                new IInnerProcess<PropertyAssignment>[]
+            (result = new PropertyAssignment(this.propertyValueExpressionProcessor, this.expressionProcessor).AggregateTryParse(
+                new IInnerProcess<IPropertyAssignment>[]
                 {
-                    new InnerProcess<PropertyValueExpression, IPropertyValueExpression, IPropertyValueExpressionParameterSet, PropertyAssignment>(
+                    new InnerProcess<IPropertyValueExpression, IPropertyValueExpressionParameterSet, IPropertyAssignment>(
+                        this.propertyValueExpressionProcessor,
                         (g) => PropertyAssignment.CreatePropertyValueExpressionParameterSet(parameters),
                         (g, r) => r.PropertyValueExpression = g,
                         ProcessHelper.TryParse
                         ),
-                    new InnerProcess<Expression, IExpression, IExpressionParameterSet, PropertyAssignment>(
+                    new InnerProcess<IExpression, IExpressionParameterSet, IPropertyAssignment>(
+                        this.expressionProcessor,
                         (g) => PropertyAssignment.CreateExpressionParameterSet(options.Primitives, parameters, g.Neuron),
                         (g, r) => r.Expression = g,
                         ProcessHelper.TryParse
@@ -79,10 +94,10 @@ namespace ei8.Cortex.Coding.d23.Grannies
                 (n, r) => r.Neuron = n
             )) != null;
 
-        public IPropertyValueExpression PropertyValueExpression { get; private set; }
+        public IPropertyValueExpression PropertyValueExpression { get; set; }
 
-        public IExpression Expression { get; private set; }
+        public IExpression Expression { get; set; }
 
-        public Neuron Neuron { get; private set; }
+        public Neuron Neuron { get; set; }
     }
 }
