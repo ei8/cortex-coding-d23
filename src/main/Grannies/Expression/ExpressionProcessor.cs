@@ -78,7 +78,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
                                         Depth = 3,
                                         Ids = new[] { primitives.Subordination.Id }
                                     },
-                                    // 2 edges away and should have postsynaptic of direct object
+                                    // 2 edges away and should have postsynaptic of non-head unit (eg. direct object)
                                     new DepthIdsPair {
                                         Depth = 2,
                                         Ids = parameters.UnitsParameters.GetByTypeId(primitives.Unit.Id, false)

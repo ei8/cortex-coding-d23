@@ -6,12 +6,12 @@ namespace ei8.Cortex.Coding.d23.Grannies
     public class ExpressionParameterSet : IExpressionParameterSet
     {
         public ExpressionParameterSet(
-            IEnumerable<IUnitParameterSet> dependentsParameters
+            IEnumerable<IUnitParameterSet> unitsParameters
             )
         {
-            AssertionConcern.AssertArgumentNotNull(dependentsParameters, nameof(dependentsParameters));
+            AssertionConcern.AssertArgumentNotNull(unitsParameters, nameof(unitsParameters));
 
-            this.UnitsParameters = dependentsParameters;
+            this.UnitsParameters = unitsParameters;
         }
 
         public IEnumerable<IUnitParameterSet> UnitsParameters { get; }

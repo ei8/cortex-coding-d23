@@ -17,7 +17,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
 
         public async Task<IInstantiatesClass> BuildAsync(Ensemble ensemble, Id23neurULizerOptions options, IInstantiatesClassParameterSet parameters) =>
             await new InstantiatesClass().AggregateBuildAsync(
-                new IInnerProcess<IInstantiatesClass>[]
+                new[]
                 {
                     new InnerProcess<IExpression, IExpressionProcessor, IExpressionParameterSet, IInstantiatesClass>(
                         this.expressionProcessor,
@@ -40,7 +40,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
         private static ExpressionParameterSet CreateSubordinationParameterSet(PrimitiveSet primitives, IInstantiatesClassParameterSet parameters)
         {
             return new ExpressionParameterSet(
-                new IUnitParameterSet[]
+                new[]
                 {
                     new UnitParameterSet(
                         primitives.Instantiates,
@@ -56,7 +56,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
 
         public bool TryParse(Ensemble ensemble, Id23neurULizerOptions options, IInstantiatesClassParameterSet parameters, out IInstantiatesClass result) =>
             (result = new InstantiatesClass().AggregateTryParse(
-                new IInnerProcess<IInstantiatesClass>[]
+                new[]
                 {
                     new InnerProcess<IExpression, IExpressionProcessor, IExpressionParameterSet, IInstantiatesClass>(
                         this.expressionProcessor,
