@@ -30,7 +30,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
                 ),
                 ensemble,
                 options,
-                (n, r) => r.Neuron = ensemble.Obtain(Neuron.CreateTransient(null, null, null)),
+                () => ensemble.Obtain(Neuron.CreateTransient(null, null, null)),
                 (r) =>
                     // concat applicable expression types
                     ExpressionProcessor.GetExpressionTypes(parameters, options.Primitives).Select(et => ensemble.Obtain(et)).Concat(
@@ -153,8 +153,8 @@ namespace ei8.Cortex.Coding.d23.Grannies
         {
             result = null;
 
-            var tempResult = new Expression().AggregateTryParse(
-                parameters.UnitsParameters.Select(
+            new Expression().AggregateTryParse(
+               (IEnumerable<IInnerProcess<Expression>>) parameters.UnitsParameters.Select(
                     u => new InnerProcess<IUnit, IUnitProcessor, IUnitParameterSet, IExpression>(
                         this.unitProcessor,
                         (g) => u,
@@ -163,7 +163,9 @@ namespace ei8.Cortex.Coding.d23.Grannies
                     )
                 ),
                 ensemble,
-                options
+                options,
+                out Expression tempResult,
+                false
             );
 
             if (tempResult != null && tempResult.Units.Count() == parameters.UnitsParameters.Count())

@@ -31,7 +31,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
                 },
                 ensemble,
                 options,
-                (n, r) => r.Neuron = ensemble.Obtain(parameters.Value),
+                () => ensemble.Obtain(parameters.Value),
                 (g) => new[] { g.InstantiatesClass.Neuron }
             );
 
@@ -72,8 +72,8 @@ namespace ei8.Cortex.Coding.d23.Grannies
         {
             result = null;
 
-            var tempResult = new Value().AggregateTryParse(
-                new IInnerProcess<IValue>[]
+            new Value().AggregateTryParse(
+                (IEnumerable<IInnerProcess<Value>>) new[]
                 {
                     new InnerProcess<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IValue>(
                         this.instantiatesClassProcessor,
@@ -83,7 +83,9 @@ namespace ei8.Cortex.Coding.d23.Grannies
                         )
                 },
                 ensemble,
-                options
+                options,
+                out Value tempResult,
+                false
             );
 
             if (tempResult != null)

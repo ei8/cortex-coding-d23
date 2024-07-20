@@ -166,16 +166,17 @@ namespace ei8.Cortex.Coding.d23
             }
         }
 
-        internal static TResult AggregateTryParse<TResult>(
+        internal static bool AggregateTryParse<TResult>(
                 this TResult tempResult,
                 IEnumerable<IInnerProcess<TResult>> processes,
                 Ensemble ensemble,
                 Id23neurULizerOptions options,
-                Action<Neuron, TResult> grannyNeuronSetter = null
+                out TResult result,
+                bool setGrannyNeuronOnCompletion = true
             )
             where TResult : IGranny
         {
-            TResult result = default;
+            result = default;
 
             IGranny precedingGranny = null;
             var ps = processes.ToArray();
@@ -190,13 +191,13 @@ namespace ei8.Cortex.Coding.d23
                     break;
                 else if (i == ps.Length - 1)
                 {
-                    if (grannyNeuronSetter != null)
-                        grannyNeuronSetter(precedingGranny.Neuron, tempResult);
+                    if (setGrannyNeuronOnCompletion)
+                        tempResult.Neuron = precedingGranny.Neuron;
                     result = tempResult;
                 }
             }
 
-            return result;
+            return result != null;
         }
 
         internal static async Task<TResult> AggregateBuildAsync<TResult>(
@@ -204,7 +205,7 @@ namespace ei8.Cortex.Coding.d23
                 IEnumerable<IInnerProcess<TResult>> processes,
                 Ensemble ensemble,
                 Id23neurULizerOptions options,
-                Action<Neuron, TResult> grannyNeuronSetter,
+                Func<Neuron> grannyNeuronCreator = null,
                 Func<TResult, IEnumerable<Neuron>> postsynapticsRetriever = null
             )
             where TResult : IGranny
@@ -218,7 +219,9 @@ namespace ei8.Cortex.Coding.d23
                     tempResult
                     );
 
-            grannyNeuronSetter(precedingGranny.Neuron, tempResult);
+            tempResult.Neuron = grannyNeuronCreator != null ? 
+                grannyNeuronCreator() : 
+                precedingGranny.Neuron;
 
             IEnumerable<Neuron> postsynaptics = null;
             if (

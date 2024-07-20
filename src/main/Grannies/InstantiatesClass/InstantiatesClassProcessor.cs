@@ -27,8 +27,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
                         )
                 },
                 ensemble,
-                options,
-                (n, r) => r.Neuron = n
+                options
             );
 
         public IEnumerable<IGrannyQuery> GetQueries(Id23neurULizerOptions options, IInstantiatesClassParameterSet parameters) =>
@@ -55,7 +54,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
         }
 
         public bool TryParse(Ensemble ensemble, Id23neurULizerOptions options, IInstantiatesClassParameterSet parameters, out IInstantiatesClass result) =>
-            (result = new InstantiatesClass().AggregateTryParse(
+            new InstantiatesClass().AggregateTryParse(
                 new[]
                 {
                     new InnerProcess<IExpression, IExpressionProcessor, IExpressionParameterSet, IInstantiatesClass>(
@@ -67,7 +66,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
                 },
                 ensemble,
                 options,
-                (n, r) => r.Neuron = n
-            )) != null;
+                out result
+            );
     }
 }

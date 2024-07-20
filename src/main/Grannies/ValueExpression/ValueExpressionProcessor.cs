@@ -35,8 +35,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
                         )
                 },
                 ensemble,
-                options,
-                (n, r) => r.Neuron = n
+                options
             );
 
         private static IValueParameterSet CreateValueParameterSet(IValueExpressionParameterSet parameters) =>
@@ -69,7 +68,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
             );
 
         public bool TryParse(Ensemble ensemble, Id23neurULizerOptions options, IValueExpressionParameterSet parameters, out IValueExpression result) =>
-            (result = new ValueExpression().AggregateTryParse(
+            new ValueExpression().AggregateTryParse(
                 new IInnerProcess<IValueExpression>[]
                 {
                     new InnerProcess<IValue, IValueProcessor, IValueParameterSet, IValueExpression>(
@@ -87,7 +86,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
                 },
                 ensemble,
                 options,
-                (n, r) => r.Neuron = n
-            )) != null;
+                out result
+            );
     }
 }

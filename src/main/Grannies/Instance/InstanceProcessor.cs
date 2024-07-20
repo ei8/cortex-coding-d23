@@ -41,10 +41,10 @@ namespace ei8.Cortex.Coding.d23.Grannies
                 ),
                 ensemble,
                 options,
-                (n, r) => r.Neuron = ensemble.Obtain(Neuron.CreateTransient(null, null, null)),
+                () => ensemble.Obtain(Neuron.CreateTransient(null, null, null)),
                 (r) => new[]
                     {
-                        r.InstantiatesClass.Neuron 
+                        r.InstantiatesClass.Neuron
                     }.Concat(
                         // with PropertyAssociations in result
                         r.PropertyAssociations.Select(pa => pa.Neuron)
@@ -61,22 +61,52 @@ namespace ei8.Cortex.Coding.d23.Grannies
                 new GrannyQueryInner<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet>(
                     this.instantiatesClassProcessor,
                     (n) => InstanceProcessor.CreateInstantiatesClassParameterSet(parameters)
-                ) ,
-                // TODO: create GrannyQueryInner for each PropertyAssociation in parameters
-                // ... use Granny neurons of PropertyAssociations in PostsynapticIds along with id of InstantiatesClass
-                new GrannyQueryBuilder(
-                    (n) => new NeuronQuery()
-                    {
-                        DirectionValues = DirectionValues.Outbound,
-                        Depth = 1,
-                        Postsynaptic = n.Select(ne => ne.Neuron.Id.ToString())
-                    }
                 )
-            };
+            }.Concat(
+                // create GrannyQueryInner for each PropertyAssociation in parameters
+                parameters.PropertyAssociationsParameters.Select(
+                    pa => new GrannyQueryInner<IPropertyAssociation, IPropertyAssociationProcessor, IPropertyAssociationParameterSet>(
+                        this.propertyAssociationProcessor,
+                        (n) => pa
+                    )
+                )
+            ).Concat(
+                new IGrannyQuery[] {
+                    // ... use Granny neurons of PropertyAssociations in PostsynapticIds along with id of InstantiatesClass
+                    new GrannyQueryBuilder(
+                        (n) => new NeuronQuery()
+                        {
+                            DirectionValues = DirectionValues.Outbound,
+                            Depth = 1,
+                            Postsynaptic = n.Select(ne => ne.Neuron.Id.ToString())
+                        }
+                    )
+                }
+            );
 
-        public bool TryParse(Ensemble ensemble, Id23neurULizerOptions options, IInstanceParameterSet parameters, out IInstance result)
-        {
-            throw new NotImplementedException();
-        }
+        public bool TryParse(Ensemble ensemble, Id23neurULizerOptions options, IInstanceParameterSet parameters, out IInstance result) =>
+            new Instance().AggregateTryParse(
+                new IInnerProcess<IInstance>[]
+                {
+                    new InnerProcess<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IInstance>(
+                        this.instantiatesClassProcessor,
+                        (g) => InstanceProcessor.CreateInstantiatesClassParameterSet(parameters),
+                        (g, r) => r.InstantiatesClass = g,
+                        ProcessHelper.TryParse
+                        )
+                }.Concat(
+                    parameters.PropertyAssociationsParameters.Select(
+                        u => new InnerProcess<IPropertyAssociation, IPropertyAssociationProcessor, IPropertyAssociationParameterSet, IInstance>(
+                            this.propertyAssociationProcessor,
+                            (g) => u,
+                            (g, r) => r.PropertyAssociations.Add(g),
+                            ProcessHelper.TryParse
+                            )
+                    )
+                ),
+                ensemble,
+                options,
+                out result
+            );
     }
 }
