@@ -1,32 +1,26 @@
-﻿using ei8.Cortex.Library.Common;
+﻿using ei8.Cortex.Coding.d23.Grannies;
+using ei8.Cortex.Library.Common;
 using neurUL.Common.Domain.Model;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ei8.Cortex.Coding.d23.Queries
 {
-    public class GrannyQueryBuilder : IReceiver
+    public class GrannyQueryBuilder : IGrannyQuery
     {
-        private Func<Neuron, NeuronQuery> queryWithNeuronBuilder;
-        private Neuron retrievalResult;
+        private Func<IEnumerable<IGranny>, NeuronQuery> queryWithNeuronBuilder;
 
-        public GrannyQueryBuilder(Func<Neuron, NeuronQuery> queryWithNeuronBuilder)
+        public GrannyQueryBuilder(Func<IEnumerable<IGranny>, NeuronQuery> queryWithNeuronBuilder)
         {
             AssertionConcern.AssertArgumentNotNull(queryWithNeuronBuilder, nameof(queryWithNeuronBuilder));
             this.queryWithNeuronBuilder = queryWithNeuronBuilder;
-            this.retrievalResult = null;
         }
 
-        public Task<NeuronQuery> GetQuery(ObtainParameters obtainParameters)
+        public Task<NeuronQuery> GetQuery(ObtainParameters obtainParameters, IList<IGranny> retrievedGrannies)
         {
-            AssertionConcern.AssertStateTrue(this.retrievalResult != null, "RetrievalResult is required to invoke GetQuery.");
-            return Task.FromResult(queryWithNeuronBuilder(this.retrievalResult));
-        }
-
-        public void SetPrecedingRetrievalResult(Neuron value)
-        {
-            AssertionConcern.AssertArgumentNotNull(value, nameof(value));
-            this.retrievalResult = value;
+            return Task.FromResult(queryWithNeuronBuilder(retrievedGrannies.AsEnumerable()));
         }
     }
 }

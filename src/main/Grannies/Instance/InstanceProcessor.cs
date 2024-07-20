@@ -61,28 +61,17 @@ namespace ei8.Cortex.Coding.d23.Grannies
                 new GrannyQueryInner<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet>(
                     this.instantiatesClassProcessor,
                     (n) => InstanceProcessor.CreateInstantiatesClassParameterSet(parameters)
-                ) //,
+                ) ,
                 // TODO: create GrannyQueryInner for each PropertyAssociation in parameters
                 // ... use Granny neurons of PropertyAssociations in PostsynapticIds along with id of InstantiatesClass
-                //new GrannyQueryBuilder(
-                //    (n) => new NeuronQuery()
-                //    {
-                //        DirectionValues = DirectionValues.Outbound,
-                //        Depth = 1,
-                //        TraversalDepthPostsynaptic = new[] {
-                //            // 1 edge away and should have postsynaptic of previous granny
-                //            new DepthIdsPair {
-                //                Depth = 1,
-                //                Ids = new[] 
-                //                { 
-                //                    n.Id 
-                //                }.Concat(
-                //                    parameters.PropertyAssociationsParameters.Select(pa => pa.
-                //                )
-                //            },
-                //        }
-                //    }
-                //)
+                new GrannyQueryBuilder(
+                    (n) => new NeuronQuery()
+                    {
+                        DirectionValues = DirectionValues.Outbound,
+                        Depth = 1,
+                        Postsynaptic = n.Select(ne => ne.Neuron.Id.ToString())
+                    }
+                )
             };
 
         public bool TryParse(Ensemble ensemble, Id23neurULizerOptions options, IInstanceParameterSet parameters, out IInstance result)

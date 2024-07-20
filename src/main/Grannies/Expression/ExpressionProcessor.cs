@@ -100,7 +100,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
                             (n) => new NeuronQuery()
                             {
                                 Postsynaptic = new []{
-                                    n.Id.ToString(),
+                                    n.Last().Neuron.Id.ToString(),
                                     primitives.Simple.Id.ToString()
                                 },
                                 DirectionValues = DirectionValues.Outbound,

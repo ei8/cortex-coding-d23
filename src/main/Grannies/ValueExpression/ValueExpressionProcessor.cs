@@ -1,6 +1,7 @@
 ﻿using ei8.Cortex.Coding.d23.neurULization;
 using ei8.Cortex.Coding.d23.Queries;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ei8.Cortex.Coding.d23.Grannies
@@ -53,7 +54,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
                 ),
                 new GrannyQueryInner<IExpression, IExpressionProcessor, IExpressionParameterSet>(
                     this.expressionProcessor,
-                    (n) => ValueExpressionProcessor.CreateExpressionParameterSet(options.Primitives, parameters, n)
+                    (n) => ValueExpressionProcessor.CreateExpressionParameterSet(options.Primitives, parameters, n.Last().Neuron)
                 )
             };
 

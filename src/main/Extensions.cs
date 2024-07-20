@@ -64,7 +64,7 @@ namespace ei8.Cortex.Coding.d23
                 // retrieve target from DB
                 var grannyQueries = grannyProcessor.GetQueries(obtainParameters.Options, parameters);
 
-                await grannyQueries.Process(obtainParameters);
+                await grannyQueries.Process(obtainParameters, new List<IGranny>());
 
                 // if target is in DB
                 if (grannyProcessor.TryParse(obtainParameters.Ensemble, obtainParameters.Options, parameters, out TGranny dbParseResult))
@@ -88,18 +88,14 @@ namespace ei8.Cortex.Coding.d23
         internal static async Task<bool> Process(
             this IEnumerable<IGrannyQuery> grannyQueries,
             ObtainParameters obtainParameters,
-            bool breakBeforeLastGetQuery = false,
-            Neuron previousGrannyNeuron = null
+            IList<IGranny> retrievedGrannies,
+            bool breakBeforeLastGetQuery = false
             )
         {
             var result = false;
             // loop through each grannyQuery
             foreach (var grannyQuery in grannyQueries)
             {
-                // if current grannyQuery requires retrievalResult
-                if (grannyQuery is IReceiver gqrcv && previousGrannyNeuron != null)
-                    gqrcv.SetPrecedingRetrievalResult(previousGrannyNeuron);
-
                 // if last is supposed to be skipped
                 if (breakBeforeLastGetQuery && grannyQueries.Last() == grannyQuery)
                 {
@@ -111,7 +107,7 @@ namespace ei8.Cortex.Coding.d23
                 NeuronQuery query = null;
 
                 // if query is obtained successfully
-                if ((query = await grannyQuery.GetQuery(obtainParameters)) != null)
+                if ((query = await grannyQuery.GetQuery(obtainParameters, retrievedGrannies)) != null)
                 {
                     // get ensemble based on parameters and previous granny neuron if it's assigned
                     var queryResult = await obtainParameters.Options.ServiceProvider.GetRequiredService<IEnsembleRepository>().GetByQueryAsync(
@@ -123,9 +119,11 @@ namespace ei8.Cortex.Coding.d23
                     // if granny query is retriever
                     if (grannyQuery is IRetriever gqr)
                     {
-                        previousGrannyNeuron = gqr.RetrieveNeuron(obtainParameters.Ensemble, obtainParameters.Options);
+                        var retrievalResult = gqr.RetrieveGranny(obtainParameters.Ensemble, obtainParameters.Options, retrievedGrannies.AsEnumerable());
+                        if (retrievalResult != null)
+                            retrievedGrannies.Add(retrievalResult);
                         // if retrieval fails and this is not the last query
-                        if (previousGrannyNeuron == null && grannyQueries.Last() != grannyQuery)
+                        else if (grannyQueries.Last() != grannyQuery)
                             // break with a failure indication
                             break;
                     }

@@ -4,6 +4,7 @@ using ei8.Cortex.Coding.d23.Selectors;
 using ei8.Cortex.Library.Common;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ei8.Cortex.Coding.d23.Grannies
@@ -55,7 +56,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
                             // 1 edge away and should have postsynaptic of previous granny
                             new DepthIdsPair {
                                 Depth = 1,
-                                Ids = new[] { n.Id }
+                                Ids = new[] { n.Last().Neuron.Id }
                             },
                         }
                     }
