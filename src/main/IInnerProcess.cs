@@ -6,18 +6,5 @@ namespace ei8.Cortex.Coding.d23
 {
     internal interface IInnerProcess<TResult>
     {
-        IGranny Execute(
-            Ensemble ensemble, 
-            Id23neurULizerOptions options,
-            IGranny precedingGranny, 
-            TResult tempResult
-            );
-
-        Task<IGranny> ExecuteAsync(
-            Ensemble ensemble,
-            Id23neurULizerOptions options,
-            IGranny precedingGranny,
-            TResult tempResult
-            );
     }
 }

@@ -20,13 +20,11 @@ namespace ei8.Cortex.Coding.d23.Grannies
 
         public async Task<IExpression> BuildAsync(Ensemble ensemble, Id23neurULizerOptions options, IExpressionParameterSet parameters) =>
             await new Expression().AggregateBuildAsync(
+                this.CreateInnerProcesses(options, parameters),
                 parameters.UnitsParameters.Select(
-                    u => new InnerProcess<IUnit, IUnitProcessor, IUnitParameterSet, IExpression>(
-                        this.unitProcessor,
-                        (g) => u,
-                        (g, r) => r.Units.Add(g),
+                    u => new InnerProcessTargetAsync<IUnit, IUnitProcessor, IUnitParameterSet, IExpression>(
                         ProcessHelper.ObtainAsync
-                        )
+                    )
                 ),
                 ensemble,
                 options,
@@ -37,6 +35,15 @@ namespace ei8.Cortex.Coding.d23.Grannies
                         // with Units in result
                         r.Units.Select(u => u.Neuron)
                     )
+            );
+
+        private IEnumerable<IInnerProcess<IExpression>> CreateInnerProcesses(Id23neurULizerOptions options, IExpressionParameterSet parameters) =>
+            parameters.UnitsParameters.Select(
+                u => new InnerProcess<IUnit, IUnitProcessor, IUnitParameterSet, IExpression>(
+                    this.unitProcessor,
+                    (g) => u,
+                    (g, r) => r.Units.Add(g)
+                )
             );
 
         public IEnumerable<IGrannyQuery> GetQueries(Id23neurULizerOptions options, IExpressionParameterSet parameters) =>
@@ -154,17 +161,15 @@ namespace ei8.Cortex.Coding.d23.Grannies
             result = null;
 
             new Expression().AggregateTryParse(
-               (IEnumerable<IInnerProcess<Expression>>) parameters.UnitsParameters.Select(
-                    u => new InnerProcess<IUnit, IUnitProcessor, IUnitParameterSet, IExpression>(
-                        this.unitProcessor,
-                        (g) => u,
-                        (g, r) => r.Units.Add(g),
+                this.CreateInnerProcesses(options, parameters),
+                parameters.UnitsParameters.Select(
+                    u => new InnerProcessTarget<IUnit, IUnitProcessor, IUnitParameterSet, IExpression>(
                         ProcessHelper.TryParse
                     )
                 ),
                 ensemble,
                 options,
-                out Expression tempResult,
+                out IExpression tempResult,
                 false
             );
 

@@ -167,29 +167,31 @@ namespace ei8.Cortex.Coding.d23
         }
 
         internal static bool AggregateTryParse<TResult>(
-                this TResult tempResult,
-                IEnumerable<IInnerProcess<TResult>> processes,
-                Ensemble ensemble,
-                Id23neurULizerOptions options,
-                out TResult result,
-                bool setGrannyNeuronOnCompletion = true
-            )
+            this TResult tempResult,
+            IEnumerable<IInnerProcess<TResult>> processes,
+            IEnumerable<IInnerProcessTarget<TResult>> targets,
+            Ensemble ensemble,
+            Id23neurULizerOptions options,
+            out TResult result,
+            bool setGrannyNeuronOnCompletion = true
+        )
             where TResult : IGranny
         {
             result = default;
 
             IGranny precedingGranny = null;
-            var ps = processes.ToArray();
-            for(int i = 0; i < ps.Length; i++)
+            var ts = targets.ToArray();
+            for(int i = 0; i < ts.Length; i++)
             {
-                if ((precedingGranny = ps[i].Execute(
+                if ((precedingGranny = ts[i].Execute(
+                    processes.ElementAt(i),
                     ensemble, 
                     options, 
                     precedingGranny, 
                     tempResult
                     )) == null)
                     break;
-                else if (i == ps.Length - 1)
+                else if (i == ts.Length - 1)
                 {
                     if (setGrannyNeuronOnCompletion)
                         tempResult.Neuron = precedingGranny.Neuron;
@@ -201,23 +203,29 @@ namespace ei8.Cortex.Coding.d23
         }
 
         internal static async Task<TResult> AggregateBuildAsync<TResult>(
-                this TResult tempResult,
-                IEnumerable<IInnerProcess<TResult>> processes,
-                Ensemble ensemble,
-                Id23neurULizerOptions options,
-                Func<Neuron> grannyNeuronCreator = null,
-                Func<TResult, IEnumerable<Neuron>> postsynapticsRetriever = null
-            )
+            this TResult tempResult,
+            IEnumerable<IInnerProcess<TResult>> processes,
+            IEnumerable<IInnerProcessTargetAsync<TResult>> targets,
+            Ensemble ensemble,
+            Id23neurULizerOptions options,
+            Func<Neuron> grannyNeuronCreator = null,
+            Func<TResult, IEnumerable<Neuron>> postsynapticsRetriever = null
+        )
             where TResult : IGranny
         {
             IGranny precedingGranny = null;
-            foreach (var p in processes)
-                precedingGranny = await p.ExecuteAsync(
+
+            var ts = targets.ToArray();
+            for (int i = 0; i < ts.Length; i++)
+            {
+                precedingGranny = await ts[i].ExecuteAsync(
+                    processes.ElementAt(i),
                     ensemble,
                     options,
                     precedingGranny,
                     tempResult
                     );
+            }
 
             tempResult.Neuron = grannyNeuronCreator != null ? 
                 grannyNeuronCreator() : 

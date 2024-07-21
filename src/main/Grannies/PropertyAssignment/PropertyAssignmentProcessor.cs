@@ -19,24 +19,34 @@ namespace ei8.Cortex.Coding.d23.Grannies
 
         public async Task<IPropertyAssignment> BuildAsync(Ensemble ensemble, Id23neurULizerOptions options, IPropertyAssignmentParameterSet parameters) =>
             await new PropertyAssignment().AggregateBuildAsync(
-                new IInnerProcess<IPropertyAssignment>[]
+                this.CreateInnerProcesses(options, parameters),
+                new IInnerProcessTargetAsync<IPropertyAssignment>[]
                 {
-                    new InnerProcess<IPropertyValueExpression, IPropertyValueExpressionProcessor, IPropertyValueExpressionParameterSet, IPropertyAssignment>(
-                        this.propertyValueExpressionProcessor,
-                        (g) => PropertyAssignmentProcessor.CreatePropertyValueExpressionParameterSet(parameters),
-                        (g, r) => r.PropertyValueExpression = g,
-                        ProcessHelper.ObtainWithAggregateParamsAsync
+                    new InnerProcessTargetAsync<IPropertyValueExpression, IPropertyValueExpressionProcessor, IPropertyValueExpressionParameterSet, IPropertyAssignment>(
+                         ProcessHelper.ObtainWithAggregateParamsAsync
                     ),
-                    new InnerProcess<IExpression, IExpressionProcessor, IExpressionParameterSet, IPropertyAssignment>(
-                        this.expressionProcessor,
-                        (g) => PropertyAssignmentProcessor.CreateExpressionParameterSet(options.Primitives, parameters, g.Neuron),
-                        (g, r) => r.Expression = g,
+                    new InnerProcessTargetAsync<IExpression, IExpressionProcessor, IExpressionParameterSet, IPropertyAssignment>(
                         ProcessHelper.ObtainWithAggregateParamsAsync
                     )
                 },
                 ensemble,
                 options
             );
+
+        private IEnumerable<IInnerProcess<IPropertyAssignment>> CreateInnerProcesses(Id23neurULizerOptions options, IPropertyAssignmentParameterSet parameters) =>
+            new IInnerProcess<IPropertyAssignment>[]
+            {
+                new InnerProcess<IPropertyValueExpression, IPropertyValueExpressionProcessor, IPropertyValueExpressionParameterSet, IPropertyAssignment>(
+                    this.propertyValueExpressionProcessor,
+                    (g) => PropertyAssignmentProcessor.CreatePropertyValueExpressionParameterSet(parameters),
+                    (g, r) => r.PropertyValueExpression = g
+                ),
+                new InnerProcess<IExpression, IExpressionProcessor, IExpressionParameterSet, IPropertyAssignment>(
+                    this.expressionProcessor,
+                    (g) => PropertyAssignmentProcessor.CreateExpressionParameterSet(options.Primitives, parameters, g.Neuron),
+                    (g, r) => r.Expression = g
+                )
+            };
 
         private static IPropertyValueExpressionParameterSet CreatePropertyValueExpressionParameterSet(IPropertyAssignmentParameterSet parameters) =>
           new PropertyValueExpressionParameterSet(
@@ -73,19 +83,14 @@ namespace ei8.Cortex.Coding.d23.Grannies
             };
 
         public bool TryParse(Ensemble ensemble, Id23neurULizerOptions options, IPropertyAssignmentParameterSet parameters, out IPropertyAssignment result) =>
-             new PropertyAssignment().AggregateTryParse(
-                new IInnerProcess<IPropertyAssignment>[]
+            new PropertyAssignment().AggregateTryParse(
+                this.CreateInnerProcesses(options, parameters),
+                new IInnerProcessTarget<IPropertyAssignment>[]
                 {
-                    new InnerProcess<IPropertyValueExpression, IPropertyValueExpressionProcessor, IPropertyValueExpressionParameterSet, IPropertyAssignment>(
-                        this.propertyValueExpressionProcessor,
-                        (g) => PropertyAssignmentProcessor.CreatePropertyValueExpressionParameterSet(parameters),
-                        (g, r) => r.PropertyValueExpression = g,
+                    new InnerProcessTarget<IPropertyValueExpression, IPropertyValueExpressionProcessor, IPropertyValueExpressionParameterSet, IPropertyAssignment>(
                         ProcessHelper.TryParse
                         ),
-                    new InnerProcess<IExpression, IExpressionProcessor, IExpressionParameterSet, IPropertyAssignment>(
-                        this.expressionProcessor,
-                        (g) => PropertyAssignmentProcessor.CreateExpressionParameterSet(options.Primitives, parameters, g.Neuron),
-                        (g, r) => r.Expression = g,
+                    new InnerProcessTarget<IExpression, IExpressionProcessor, IExpressionParameterSet, IPropertyAssignment>(
                         ProcessHelper.TryParse
                         )
                 },

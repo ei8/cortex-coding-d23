@@ -1,7 +1,6 @@
 ﻿using ei8.Cortex.Coding.d23.neurULization;
 using ei8.Cortex.Coding.d23.Queries;
 using ei8.Cortex.Library.Common;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -21,22 +20,17 @@ namespace ei8.Cortex.Coding.d23.Grannies
 
         public async Task<IInstance> BuildAsync(Ensemble ensemble, Id23neurULizerOptions options, IInstanceParameterSet parameters) =>
             await new Instance().AggregateBuildAsync(
-                new IInnerProcess<IInstance>[]
+                this.CreateInnerProcesses(options, parameters),
+                new IInnerProcessTargetAsync<IInstance>[]
                 {
-                    new InnerProcess<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IInstance>(
-                        this.instantiatesClassProcessor,
-                        (g) => InstanceProcessor.CreateInstantiatesClassParameterSet(parameters),
-                        (g, r) => r.InstantiatesClass = g,
+                    new InnerProcessTargetAsync<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IInstance>(
                         ProcessHelper.ObtainWithAggregateParamsAsync
                         )
                 }.Concat(
                     parameters.PropertyAssociationsParameters.Select(
-                        u => new InnerProcess<IPropertyAssociation, IPropertyAssociationProcessor, IPropertyAssociationParameterSet, IInstance>(
-                            this.propertyAssociationProcessor,
-                            (g) => u,
-                            (g, r) => r.PropertyAssociations.Add(g),
+                        u => new InnerProcessTargetAsync<IPropertyAssociation, IPropertyAssociationProcessor, IPropertyAssociationParameterSet, IInstance>(
                             ProcessHelper.ObtainWithAggregateParamsAsync
-                            )
+                        )
                     )
                 ),
                 ensemble,
@@ -50,6 +44,25 @@ namespace ei8.Cortex.Coding.d23.Grannies
                         r.PropertyAssociations.Select(pa => pa.Neuron)
                     )
             );
+
+        private IEnumerable<IInnerProcess<IInstance>> CreateInnerProcesses(Id23neurULizerOptions options, IInstanceParameterSet parameters) =>
+            new IInnerProcess<IInstance>[]
+            {
+                new InnerProcess<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IInstance>(
+                    this.instantiatesClassProcessor,
+                    (g) => InstanceProcessor.CreateInstantiatesClassParameterSet(parameters),
+                    (g, r) => r.InstantiatesClass = g
+                )
+            }.Concat(
+                parameters.PropertyAssociationsParameters.Select(
+                    u => new InnerProcess<IPropertyAssociation, IPropertyAssociationProcessor, IPropertyAssociationParameterSet, IInstance>(
+                    this.propertyAssociationProcessor,
+                    (g) => u,
+                    (g, r) => r.PropertyAssociations.Add(g)
+                    )
+                )
+            );
+          
 
         private static IInstantiatesClassParameterSet CreateInstantiatesClassParameterSet(IInstanceParameterSet parameters) =>
             new InstantiatesClassParameterSet(
@@ -86,22 +99,17 @@ namespace ei8.Cortex.Coding.d23.Grannies
 
         public bool TryParse(Ensemble ensemble, Id23neurULizerOptions options, IInstanceParameterSet parameters, out IInstance result) =>
             new Instance().AggregateTryParse(
-                new IInnerProcess<IInstance>[]
+                this.CreateInnerProcesses(options, parameters),
+                new IInnerProcessTarget<IInstance>[]
                 {
-                    new InnerProcess<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IInstance>(
-                        this.instantiatesClassProcessor,
-                        (g) => InstanceProcessor.CreateInstantiatesClassParameterSet(parameters),
-                        (g, r) => r.InstantiatesClass = g,
+                    new InnerProcessTarget<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IInstance>(
                         ProcessHelper.TryParse
-                        )
+                    )
                 }.Concat(
                     parameters.PropertyAssociationsParameters.Select(
-                        u => new InnerProcess<IPropertyAssociation, IPropertyAssociationProcessor, IPropertyAssociationParameterSet, IInstance>(
-                            this.propertyAssociationProcessor,
-                            (g) => u,
-                            (g, r) => r.PropertyAssociations.Add(g),
+                        u => new InnerProcessTarget<IPropertyAssociation, IPropertyAssociationProcessor, IPropertyAssociationParameterSet, IInstance>(
                             ProcessHelper.TryParse
-                            )
+                        )
                     )
                 ),
                 ensemble,

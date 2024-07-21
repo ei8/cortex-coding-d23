@@ -20,20 +20,28 @@ namespace ei8.Cortex.Coding.d23.Grannies
 
         public async Task<IValue> BuildAsync(Ensemble ensemble, Id23neurULizerOptions options, IValueParameterSet parameters) =>
             await new Value().AggregateBuildAsync(
-                new IInnerProcess<IValue>[]
+                this.CreateInnerProcesses(options, parameters),
+                new IInnerProcessTargetAsync<IValue>[]
                 {
-                    new InnerProcess<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IValue>(
-                        this.instantiatesClassProcessor,
-                        (g) => ValueProcessor.CreateInstantiatesClassParameterSet(parameters),
-                        (g, r) => r.InstantiatesClass = g,
+                    new InnerProcessTargetAsync<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IValue>(
                         ProcessHelper.ObtainWithAggregateParamsAsync
-                        )
+                    )
                 },
                 ensemble,
                 options,
                 () => ensemble.Obtain(parameters.Value),
                 (g) => new[] { g.InstantiatesClass.Neuron }
             );
+
+        private IEnumerable<IInnerProcess<IValue>> CreateInnerProcesses(Id23neurULizerOptions options, IValueParameterSet parameters) =>
+            new IInnerProcess<IValue>[]
+            {
+                new InnerProcess<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IValue>(
+                    this.instantiatesClassProcessor,
+                    (g) => ValueProcessor.CreateInstantiatesClassParameterSet(parameters),
+                    (g, r) => r.InstantiatesClass = g
+                )
+            };
 
         public IEnumerable<IGrannyQuery> GetQueries(Id23neurULizerOptions options, IValueParameterSet parameters) =>
             new IGrannyQuery[] {
@@ -73,18 +81,16 @@ namespace ei8.Cortex.Coding.d23.Grannies
             result = null;
 
             new Value().AggregateTryParse(
-                (IEnumerable<IInnerProcess<Value>>) new[]
+                this.CreateInnerProcesses(options, parameters),
+                new IInnerProcessTarget<IValue>[]
                 {
-                    new InnerProcess<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IValue>(
-                        this.instantiatesClassProcessor,
-                        (g) => ValueProcessor.CreateInstantiatesClassParameterSet(parameters),
-                        (g, r) => r.InstantiatesClass = g,
+                    new InnerProcessTarget<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IValue>(
                         ProcessHelper.TryParse
-                        )
+                    )
                 },
                 ensemble,
                 options,
-                out Value tempResult,
+                out IValue tempResult,
                 false
             );
 
