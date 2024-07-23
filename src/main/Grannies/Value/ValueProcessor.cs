@@ -20,10 +20,10 @@ namespace ei8.Cortex.Coding.d23.Grannies
 
         public async Task<IValue> BuildAsync(Ensemble ensemble, Id23neurULizerOptions options, IValueParameterSet parameters) =>
             await new Value().AggregateBuildAsync(
-                this.CreateInnerProcesses(options, parameters),
-                new IInnerProcessTargetAsync<IValue>[]
+                this.CreateGreatGrannies(options, parameters),
+                new IGreatGrannyProcessAsync<IValue>[]
                 {
-                    new InnerProcessTargetAsync<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IValue>(
+                    new GreatGrannyProcessAsync<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IValue>(
                         ProcessHelper.ObtainWithAggregateParamsAsync
                     )
                 },
@@ -33,10 +33,10 @@ namespace ei8.Cortex.Coding.d23.Grannies
                 (g) => new[] { g.InstantiatesClass.Neuron }
             );
 
-        private IEnumerable<IInnerProcess<IValue>> CreateInnerProcesses(Id23neurULizerOptions options, IValueParameterSet parameters) =>
-            new IInnerProcess<IValue>[]
+        private IEnumerable<IGreatGrannyInfo<IValue>> CreateGreatGrannies(Id23neurULizerOptions options, IValueParameterSet parameters) =>
+            new IGreatGrannyInfo<IValue>[]
             {
-                new InnerProcess<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IValue>(
+                new GreatGrannyInfo<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IValue>(
                     this.instantiatesClassProcessor,
                     (g) => ValueProcessor.CreateInstantiatesClassParameterSet(parameters),
                     (g, r) => r.InstantiatesClass = g
@@ -81,10 +81,10 @@ namespace ei8.Cortex.Coding.d23.Grannies
             result = null;
 
             new Value().AggregateTryParse(
-                this.CreateInnerProcesses(options, parameters),
-                new IInnerProcessTarget<IValue>[]
+                this.CreateGreatGrannies(options, parameters),
+                new IGreatGrannyProcess<IValue>[]
                 {
-                    new InnerProcessTarget<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IValue>(
+                    new GreatGrannyProcess<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IValue>(
                         ProcessHelper.TryParse
                     )
                 },

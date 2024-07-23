@@ -19,13 +19,13 @@ namespace ei8.Cortex.Coding.d23.Grannies
 
         public async Task<IValueExpression> BuildAsync(Ensemble ensemble, Id23neurULizerOptions options, IValueExpressionParameterSet parameters) =>
             await new ValueExpression().AggregateBuildAsync(
-                this.CreateInnerProcesses(options, parameters),
-                new IInnerProcessTargetAsync<IValueExpression>[]
+                this.CreateGreatGrannies(options, parameters),
+                new IGreatGrannyProcessAsync<IValueExpression>[]
                 {
-                    new InnerProcessTargetAsync<IValue, IValueProcessor, IValueParameterSet, IValueExpression>(
+                    new GreatGrannyProcessAsync<IValue, IValueProcessor, IValueParameterSet, IValueExpression>(
                         ProcessHelper.ObtainWithAggregateParamsAsync
                         ),
-                    new InnerProcessTargetAsync<IExpression, IExpressionProcessor, IExpressionParameterSet, IValueExpression>(
+                    new GreatGrannyProcessAsync<IExpression, IExpressionProcessor, IExpressionParameterSet, IValueExpression>(
                         ProcessHelper.ObtainWithAggregateParamsAsync
                         )
                 },
@@ -33,15 +33,15 @@ namespace ei8.Cortex.Coding.d23.Grannies
                 options
             );
 
-        private IEnumerable<IInnerProcess<IValueExpression>> CreateInnerProcesses(Id23neurULizerOptions options, IValueExpressionParameterSet parameters) =>
-            new IInnerProcess<IValueExpression>[]
+        private IEnumerable<IGreatGrannyInfo<IValueExpression>> CreateGreatGrannies(Id23neurULizerOptions options, IValueExpressionParameterSet parameters) =>
+            new IGreatGrannyInfo<IValueExpression>[]
             {
-                new InnerProcess<IValue, IValueProcessor, IValueParameterSet, IValueExpression>(
+                new GreatGrannyInfo<IValue, IValueProcessor, IValueParameterSet, IValueExpression>(
                     this.valueProcessor,
                     (g) => ValueExpressionProcessor.CreateValueParameterSet(parameters),
                     (g, r) => r.Value = g
                     ),
-                new InnerProcess<IExpression, IExpressionProcessor, IExpressionParameterSet, IValueExpression>(
+                new GreatGrannyInfo<IExpression, IExpressionProcessor, IExpressionParameterSet, IValueExpression>(
                     this.expressionProcessor,
                     (g) => ValueExpressionProcessor.CreateExpressionParameterSet(options.Primitives, parameters, g.Neuron),
                     (g, r) => r.Expression = g
@@ -79,13 +79,13 @@ namespace ei8.Cortex.Coding.d23.Grannies
 
         public bool TryParse(Ensemble ensemble, Id23neurULizerOptions options, IValueExpressionParameterSet parameters, out IValueExpression result) =>
             new ValueExpression().AggregateTryParse(
-                this.CreateInnerProcesses(options, parameters),
-                new IInnerProcessTarget<IValueExpression>[]
+                this.CreateGreatGrannies(options, parameters),
+                new IGreatGrannyProcess<IValueExpression>[]
                 {
-                    new InnerProcessTarget<IValue, IValueProcessor, IValueParameterSet, IValueExpression>(
+                    new GreatGrannyProcess<IValue, IValueProcessor, IValueParameterSet, IValueExpression>(
                         ProcessHelper.TryParse
                         ),
-                    new InnerProcessTarget<IExpression, IExpressionProcessor, IExpressionParameterSet, IValueExpression>(
+                    new GreatGrannyProcess<IExpression, IExpressionProcessor, IExpressionParameterSet, IValueExpression>(
                         ProcessHelper.TryParse
                         )
                 },

@@ -20,15 +20,15 @@ namespace ei8.Cortex.Coding.d23.Grannies
 
         public async Task<IInstance> BuildAsync(Ensemble ensemble, Id23neurULizerOptions options, IInstanceParameterSet parameters) =>
             await new Instance().AggregateBuildAsync(
-                this.CreateInnerProcesses(options, parameters),
-                new IInnerProcessTargetAsync<IInstance>[]
+                this.CreateGreatGrannies(options, parameters),
+                new IGreatGrannyProcessAsync<IInstance>[]
                 {
-                    new InnerProcessTargetAsync<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IInstance>(
+                    new GreatGrannyProcessAsync<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IInstance>(
                         ProcessHelper.ObtainWithAggregateParamsAsync
                         )
                 }.Concat(
                     parameters.PropertyAssociationsParameters.Select(
-                        u => new InnerProcessTargetAsync<IPropertyAssociation, IPropertyAssociationProcessor, IPropertyAssociationParameterSet, IInstance>(
+                        u => new GreatGrannyProcessAsync<IPropertyAssociation, IPropertyAssociationProcessor, IPropertyAssociationParameterSet, IInstance>(
                             ProcessHelper.ObtainWithAggregateParamsAsync
                         )
                     )
@@ -45,17 +45,17 @@ namespace ei8.Cortex.Coding.d23.Grannies
                     )
             );
 
-        private IEnumerable<IInnerProcess<IInstance>> CreateInnerProcesses(Id23neurULizerOptions options, IInstanceParameterSet parameters) =>
-            new IInnerProcess<IInstance>[]
+        private IEnumerable<IGreatGrannyInfo<IInstance>> CreateGreatGrannies(Id23neurULizerOptions options, IInstanceParameterSet parameters) =>
+            new IGreatGrannyInfo<IInstance>[]
             {
-                new InnerProcess<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IInstance>(
+                new GreatGrannyInfo<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IInstance>(
                     this.instantiatesClassProcessor,
                     (g) => InstanceProcessor.CreateInstantiatesClassParameterSet(parameters),
                     (g, r) => r.InstantiatesClass = g
                 )
             }.Concat(
                 parameters.PropertyAssociationsParameters.Select(
-                    u => new InnerProcess<IPropertyAssociation, IPropertyAssociationProcessor, IPropertyAssociationParameterSet, IInstance>(
+                    u => new GreatGrannyInfo<IPropertyAssociation, IPropertyAssociationProcessor, IPropertyAssociationParameterSet, IInstance>(
                     this.propertyAssociationProcessor,
                     (g) => u,
                     (g, r) => r.PropertyAssociations.Add(g)
@@ -99,15 +99,15 @@ namespace ei8.Cortex.Coding.d23.Grannies
 
         public bool TryParse(Ensemble ensemble, Id23neurULizerOptions options, IInstanceParameterSet parameters, out IInstance result) =>
             new Instance().AggregateTryParse(
-                this.CreateInnerProcesses(options, parameters),
-                new IInnerProcessTarget<IInstance>[]
+                this.CreateGreatGrannies(options, parameters),
+                new IGreatGrannyProcess<IInstance>[]
                 {
-                    new InnerProcessTarget<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IInstance>(
+                    new GreatGrannyProcess<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IInstance>(
                         ProcessHelper.TryParse
                     )
                 }.Concat(
                     parameters.PropertyAssociationsParameters.Select(
-                        u => new InnerProcessTarget<IPropertyAssociation, IPropertyAssociationProcessor, IPropertyAssociationParameterSet, IInstance>(
+                        u => new GreatGrannyProcess<IPropertyAssociation, IPropertyAssociationProcessor, IPropertyAssociationParameterSet, IInstance>(
                             ProcessHelper.TryParse
                         )
                     )

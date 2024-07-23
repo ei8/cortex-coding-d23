@@ -19,13 +19,13 @@ namespace ei8.Cortex.Coding.d23.Grannies
 
         public async Task<IPropertyAssociation> BuildAsync(Ensemble ensemble, Id23neurULizerOptions options, IPropertyAssociationParameterSet parameters) =>
             await new PropertyAssociation().AggregateBuildAsync(
-                this.CreateInnerProcesses(options, parameters),
-                new IInnerProcessTargetAsync<IPropertyAssociation>[]
+                this.CreateGreatGrannies(options, parameters),
+                new IGreatGrannyProcessAsync<IPropertyAssociation>[]
                 {
-                    new InnerProcessTargetAsync<IPropertyAssignment, IPropertyAssignmentProcessor, IPropertyAssignmentParameterSet, IPropertyAssociation>(
+                    new GreatGrannyProcessAsync<IPropertyAssignment, IPropertyAssignmentProcessor, IPropertyAssignmentParameterSet, IPropertyAssociation>(
                         ProcessHelper.ObtainWithAggregateParamsAsync
                     ),
-                    new InnerProcessTargetAsync<IExpression, IExpressionProcessor, IExpressionParameterSet, IPropertyAssociation>(
+                    new GreatGrannyProcessAsync<IExpression, IExpressionProcessor, IExpressionParameterSet, IPropertyAssociation>(
                         ProcessHelper.ObtainWithAggregateParamsAsync
                     )
                 },
@@ -33,15 +33,15 @@ namespace ei8.Cortex.Coding.d23.Grannies
                 options
             );
 
-        private IEnumerable<IInnerProcess<IPropertyAssociation>> CreateInnerProcesses(Id23neurULizerOptions options, IPropertyAssociationParameterSet parameters) =>
-          new IInnerProcess<IPropertyAssociation>[]
+        private IEnumerable<IGreatGrannyInfo<IPropertyAssociation>> CreateGreatGrannies(Id23neurULizerOptions options, IPropertyAssociationParameterSet parameters) =>
+          new IGreatGrannyInfo<IPropertyAssociation>[]
           {
-              new InnerProcess<IPropertyAssignment, IPropertyAssignmentProcessor, IPropertyAssignmentParameterSet, IPropertyAssociation>(
+              new GreatGrannyInfo<IPropertyAssignment, IPropertyAssignmentProcessor, IPropertyAssignmentParameterSet, IPropertyAssociation>(
                     this.propertyAssignmentProcessor,
                     (g) => PropertyAssociationProcessor.CreatePropertyAssignmentParameterSet(parameters),
                     (g, r) => r.PropertyAssignment = g
                 ),
-                new InnerProcess<IExpression, IExpressionProcessor, IExpressionParameterSet, IPropertyAssociation>(
+                new GreatGrannyInfo<IExpression, IExpressionProcessor, IExpressionParameterSet, IPropertyAssociation>(
                     this.expressionProcessor,
                     (g) => PropertyAssociationProcessor.CreateExpressionParameterSet(options.Primitives, parameters, g.Neuron),
                     (g, r) => r.Expression = g
@@ -85,13 +85,13 @@ namespace ei8.Cortex.Coding.d23.Grannies
 
         public bool TryParse(Ensemble ensemble, Id23neurULizerOptions options, IPropertyAssociationParameterSet parameters, out IPropertyAssociation result) =>
             new PropertyAssociation().AggregateTryParse(
-                this.CreateInnerProcesses(options, parameters),
-                new IInnerProcessTarget<IPropertyAssociation>[]
+                this.CreateGreatGrannies(options, parameters),
+                new IGreatGrannyProcess<IPropertyAssociation>[]
                 {
-                    new InnerProcessTarget<IPropertyAssignment, IPropertyAssignmentProcessor, IPropertyAssignmentParameterSet, IPropertyAssociation>(
+                    new GreatGrannyProcess<IPropertyAssignment, IPropertyAssignmentProcessor, IPropertyAssignmentParameterSet, IPropertyAssociation>(
                         ProcessHelper.TryParse
                         ),
-                    new InnerProcessTarget<IExpression, IExpressionProcessor, IExpressionParameterSet, IPropertyAssociation>(
+                    new GreatGrannyProcess<IExpression, IExpressionProcessor, IExpressionParameterSet, IPropertyAssociation>(
                         ProcessHelper.TryParse
                         )
                 },

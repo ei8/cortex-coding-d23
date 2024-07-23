@@ -20,9 +20,9 @@ namespace ei8.Cortex.Coding.d23.Grannies
 
         public async Task<IExpression> BuildAsync(Ensemble ensemble, Id23neurULizerOptions options, IExpressionParameterSet parameters) =>
             await new Expression().AggregateBuildAsync(
-                this.CreateInnerProcesses(options, parameters),
+                this.CreateGreatGrannies(options, parameters),
                 parameters.UnitsParameters.Select(
-                    u => new InnerProcessTargetAsync<IUnit, IUnitProcessor, IUnitParameterSet, IExpression>(
+                    u => new GreatGrannyProcessAsync<IUnit, IUnitProcessor, IUnitParameterSet, IExpression>(
                         ProcessHelper.ObtainAsync
                     )
                 ),
@@ -37,9 +37,9 @@ namespace ei8.Cortex.Coding.d23.Grannies
                     )
             );
 
-        private IEnumerable<IInnerProcess<IExpression>> CreateInnerProcesses(Id23neurULizerOptions options, IExpressionParameterSet parameters) =>
+        private IEnumerable<IGreatGrannyInfo<IExpression>> CreateGreatGrannies(Id23neurULizerOptions options, IExpressionParameterSet parameters) =>
             parameters.UnitsParameters.Select(
-                u => new InnerProcess<IUnit, IUnitProcessor, IUnitParameterSet, IExpression>(
+                u => new GreatGrannyInfo<IUnit, IUnitProcessor, IUnitParameterSet, IExpression>(
                     this.unitProcessor,
                     (g) => u,
                     (g, r) => r.Units.Add(g)
@@ -161,9 +161,9 @@ namespace ei8.Cortex.Coding.d23.Grannies
             result = null;
 
             new Expression().AggregateTryParse(
-                this.CreateInnerProcesses(options, parameters),
+                this.CreateGreatGrannies(options, parameters),
                 parameters.UnitsParameters.Select(
-                    u => new InnerProcessTarget<IUnit, IUnitProcessor, IUnitParameterSet, IExpression>(
+                    u => new GreatGrannyProcess<IUnit, IUnitProcessor, IUnitParameterSet, IExpression>(
                         ProcessHelper.TryParse
                     )
                 ),

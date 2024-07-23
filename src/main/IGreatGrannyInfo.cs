@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace ei8.Cortex.Coding.d23
 {
-    internal interface IInnerProcess<TResult>
+    internal interface IGreatGrannyInfo<TResult>
     {
     }
 }

@@ -4,10 +4,10 @@ using System.Threading.Tasks;
 
 namespace ei8.Cortex.Coding.d23
 {
-    internal interface IInnerProcessTargetAsync<TResult>
+    internal interface IGreatGrannyProcessAsync<TResult>
     {
         Task<IGranny> ExecuteAsync(
-            IInnerProcess<TResult> innerProcess,
+            IGreatGrannyInfo<TResult> greatGrannyProcess,
             Ensemble ensemble,
             Id23neurULizerOptions options,
             IGranny precedingGranny,
@@ -15,10 +15,10 @@ namespace ei8.Cortex.Coding.d23
             );
     }
 
-    internal interface IInnerProcessTarget<TResult>
+    internal interface IGreatGrannyProcess<TResult>
     {
         IGranny Execute(
-            IInnerProcess<TResult> innerProcess,
+            IGreatGrannyInfo<TResult> greatGrannyProcess,
             Ensemble ensemble,
             Id23neurULizerOptions options,
             IGranny precedingGranny,

@@ -17,10 +17,10 @@ namespace ei8.Cortex.Coding.d23.Grannies
 
         public async Task<IInstantiatesClass> BuildAsync(Ensemble ensemble, Id23neurULizerOptions options, IInstantiatesClassParameterSet parameters) =>
             await new InstantiatesClass().AggregateBuildAsync(
-                this.CreateInnerProcesses(options, parameters),
-                new IInnerProcessTargetAsync<IInstantiatesClass>[]
+                this.CreateGreatGrannies(options, parameters),
+                new IGreatGrannyProcessAsync<IInstantiatesClass>[]
                 {
-                    new InnerProcessTargetAsync<IExpression, IExpressionProcessor, IExpressionParameterSet, IInstantiatesClass>(
+                    new GreatGrannyProcessAsync<IExpression, IExpressionProcessor, IExpressionParameterSet, IInstantiatesClass>(
                         ProcessHelper.ObtainWithAggregateParamsAsync
                     )
                 },
@@ -28,10 +28,10 @@ namespace ei8.Cortex.Coding.d23.Grannies
                 options
             );
 
-        private IEnumerable<IInnerProcess<IInstantiatesClass>> CreateInnerProcesses(Id23neurULizerOptions options, IInstantiatesClassParameterSet parameters) =>
-           new IInnerProcess<IInstantiatesClass>[]
+        private IEnumerable<IGreatGrannyInfo<IInstantiatesClass>> CreateGreatGrannies(Id23neurULizerOptions options, IInstantiatesClassParameterSet parameters) =>
+           new IGreatGrannyInfo<IInstantiatesClass>[]
            {
-                new InnerProcess<IExpression, IExpressionProcessor, IExpressionParameterSet, IInstantiatesClass>(
+                new GreatGrannyInfo<IExpression, IExpressionProcessor, IExpressionParameterSet, IInstantiatesClass>(
                     this.expressionProcessor,
                     (g) => InstantiatesClassProcessor.CreateSubordinationParameterSet(options.Primitives, parameters),
                     (g, r) => r.Class = g.Units.GetByTypeId(options.Primitives.DirectObject.Id).Single()
@@ -63,10 +63,10 @@ namespace ei8.Cortex.Coding.d23.Grannies
 
         public bool TryParse(Ensemble ensemble, Id23neurULizerOptions options, IInstantiatesClassParameterSet parameters, out IInstantiatesClass result) =>
             new InstantiatesClass().AggregateTryParse(
-                this.CreateInnerProcesses(options, parameters),
-                new IInnerProcessTarget<IInstantiatesClass>[]
+                this.CreateGreatGrannies(options, parameters),
+                new IGreatGrannyProcess<IInstantiatesClass>[]
                 {
-                    new InnerProcessTarget<IExpression, IExpressionProcessor, IExpressionParameterSet, IInstantiatesClass>(
+                    new GreatGrannyProcess<IExpression, IExpressionProcessor, IExpressionParameterSet, IInstantiatesClass>(
                         ProcessHelper.TryParse
                     )
                 },

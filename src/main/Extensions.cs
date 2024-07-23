@@ -168,8 +168,8 @@ namespace ei8.Cortex.Coding.d23
 
         internal static bool AggregateTryParse<TResult>(
             this TResult tempResult,
-            IEnumerable<IInnerProcess<TResult>> processes,
-            IEnumerable<IInnerProcessTarget<TResult>> targets,
+            IEnumerable<IGreatGrannyInfo<TResult>> processes,
+            IEnumerable<IGreatGrannyProcess<TResult>> targets,
             Ensemble ensemble,
             Id23neurULizerOptions options,
             out TResult result,
@@ -204,8 +204,8 @@ namespace ei8.Cortex.Coding.d23
 
         internal static async Task<TResult> AggregateBuildAsync<TResult>(
             this TResult tempResult,
-            IEnumerable<IInnerProcess<TResult>> processes,
-            IEnumerable<IInnerProcessTargetAsync<TResult>> targets,
+            IEnumerable<IGreatGrannyInfo<TResult>> processes,
+            IEnumerable<IGreatGrannyProcessAsync<TResult>> targets,
             Ensemble ensemble,
             Id23neurULizerOptions options,
             Func<Neuron> grannyNeuronCreator = null,
