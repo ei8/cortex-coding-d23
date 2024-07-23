@@ -35,7 +35,14 @@ namespace ei8.Cortex.Coding.d23.Grannies
                 ),
                 ensemble,
                 options,
-                () => ensemble.Obtain(Neuron.CreateTransient(null, null, null)),
+                () => ensemble.Obtain(
+                        Neuron.CreateTransient(
+                            parameters.Id, 
+                            parameters.Tag, 
+                            parameters.ExternalReferenceUrl, 
+                            parameters.RegionId
+                        )
+                    ),
                 (r) => new[]
                     {
                         r.InstantiatesClass.Neuron

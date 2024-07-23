@@ -4,9 +4,12 @@ using ei8.Cortex.Coding.d23.Queries;
 using ei8.Cortex.Coding.d23.Selectors;
 using ei8.Cortex.Library.Common;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 using neurUL.Common.Domain.Model;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
@@ -181,13 +184,13 @@ namespace ei8.Cortex.Coding.d23
 
             IGranny precedingGranny = null;
             var ts = targets.ToArray();
-            for(int i = 0; i < ts.Length; i++)
+            for (int i = 0; i < ts.Length; i++)
             {
                 if ((precedingGranny = ts[i].Execute(
                     processes.ElementAt(i),
-                    ensemble, 
-                    options, 
-                    precedingGranny, 
+                    ensemble,
+                    options,
+                    precedingGranny,
                     tempResult
                     )) == null)
                     break;
@@ -227,8 +230,8 @@ namespace ei8.Cortex.Coding.d23
                     );
             }
 
-            tempResult.Neuron = grannyNeuronCreator != null ? 
-                grannyNeuronCreator() : 
+            tempResult.Neuron = grannyNeuronCreator != null ?
+                grannyNeuronCreator() :
                 precedingGranny.Neuron;
 
             IEnumerable<Neuron> postsynaptics = null;
@@ -303,7 +306,7 @@ namespace ei8.Cortex.Coding.d23
                     result = new PropertyData(
                         propertyKey,
                         // if classAttribute was specified
-                        classAttribute?.Type != null ? 
+                        classAttribute?.Type != null ?
                             // use classAttribute type
                             classAttribute.Type.ToExternalReferenceKeyString() :
                             // otherwise, use property type
@@ -315,7 +318,7 @@ namespace ei8.Cortex.Coding.d23
             }
 
             return result;
-        } 
+        }
 
         private static PropertyData GetNeuronPropertyData(neurULNeuronPropertyAttribute neuronPropertyAttribute, string propertyName, object propertyValue)
         {
@@ -367,6 +370,24 @@ namespace ei8.Cortex.Coding.d23
             else
                 throw new ArgumentOutOfRangeException(nameof(value));
             return key;
+        }
+
+        public static IServiceCollection AddGrannies(this IServiceCollection services)
+        {
+            AssertionConcern.AssertArgumentNotNull(services, nameof(services));
+
+            services.TryAdd(ServiceDescriptor.Transient<IExpressionProcessor, ExpressionProcessor>());
+            services.TryAdd(ServiceDescriptor.Transient<IExpressionProcessor, ExpressionProcessor>());
+            services.TryAdd(ServiceDescriptor.Transient<IInstantiatesClassProcessor, InstantiatesClassProcessor>());
+            services.TryAdd(ServiceDescriptor.Transient<IPropertyAssignmentProcessor, PropertyAssignmentProcessor>());
+            services.TryAdd(ServiceDescriptor.Transient<IPropertyAssociationProcessor, PropertyAssociationProcessor>());
+            services.TryAdd(ServiceDescriptor.Transient<IPropertyValueExpressionProcessor, PropertyValueExpressionProcessor>());
+            services.TryAdd(ServiceDescriptor.Transient<IUnitProcessor, UnitProcessor>());
+            services.TryAdd(ServiceDescriptor.Transient<IValueProcessor, ValueProcessor>());
+            services.TryAdd(ServiceDescriptor.Transient<IValueExpressionProcessor, ValueExpressionProcessor>());
+            services.TryAdd(ServiceDescriptor.Transient<IInstanceProcessor, InstanceProcessor>());
+
+            return services;
         }
     }
 }

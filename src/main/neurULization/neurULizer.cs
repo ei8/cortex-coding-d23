@@ -32,17 +32,6 @@ namespace ei8.Cortex.Coding.d23.neurULization
             var grannyProperties = propertyData.Where(pd => pd.NeuronProperty == null);
             Guid? regionId = neuronProperties.OfType<RegionIdProperty>().SingleOrDefault()?.Value;
 
-            IdProperty idp = null;
-            var granny = Neuron.CreateTransient(
-                (idp = neuronProperties.OfType<IdProperty>().SingleOrDefault()) != null ? 
-                    idp.Value :
-                    Guid.NewGuid(),
-                neuronProperties.OfType<TagProperty>().SingleOrDefault()?.Value,
-                neuronProperties.OfType<ExternalReferenceUrlProperty>().SingleOrDefault()?.Value,
-                regionId
-                );
-            result.AddReplace(granny);
-
             var propertyKeys = grannyProperties.Select(gp => gp.Key)
                 .Concat(grannyProperties.Select(gp => gp.ClassKey))
                 .Distinct();
@@ -58,43 +47,37 @@ namespace ei8.Cortex.Coding.d23.neurULization
                     ).ToArray()
                 );
 
-            // instantiates
-            var instantiatesClass = await d23Options.ServiceProvider.GetRequiredService<IInstantiatesClassProcessor>()
-                .ObtainAsync<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet>(
+            IdProperty idp = null;
+
+            // Unnecessary to validate null id and tag values since another service can be
+            // responsible for pruning grannies containing null or empty values.
+            // Null values can also be considered as valid new values.
+            await d23Options.ServiceProvider.GetRequiredService<IInstanceProcessor>()
+                .ObtainAsync<IInstance, IInstanceProcessor, IInstanceParameterSet>(
                     result,
                     d23Options,
-                    new InstantiatesClassParameterSet(externalReferences[valueClassKey])
-                );
-
-            // link granny neuron to InstantiatesClass neuron
-            result.AddReplace(Terminal.CreateTransient(granny.Id, instantiatesClass.Neuron.Id));
-
-            foreach(var gp in grannyProperties)
-            {
-                // Unnecessary to validate null id and tag values since another service can be
-                // responsible for pruning grannies containing null or empty values.
-                // Null values can also be considered as valid new values.
-
-                // createtransient pass gp.value to either id or tag of neuron based on valuematchby
-                var propertyValue = gp.ValueMatchBy == ValueMatchBy.Id ?
-                    Neuron.CreateTransient(Guid.Parse(gp.Value), null, null, regionId) :
-                    Neuron.CreateTransient(gp.Value, null, regionId);
-
-                var propertyAssociation = await d23Options.ServiceProvider.GetRequiredService<IPropertyAssociationProcessor>()
-                    .ObtainAsync<IPropertyAssociation, IPropertyAssociationProcessor, IPropertyAssociationParameterSet>(
-                        result,
-                        d23Options,
-                        new PropertyAssociationParameterSet(
-                            externalReferences[gp.Key],
-                            propertyValue,
-                            externalReferences[gp.ClassKey],
-                            ValueMatchBy.Tag
+                    new InstanceParameterSet(
+                        (idp = neuronProperties.OfType<IdProperty>().SingleOrDefault()) != null ?
+                            idp.Value :
+                            Guid.NewGuid(),
+                        neuronProperties.OfType<TagProperty>().SingleOrDefault()?.Value,
+                        neuronProperties.OfType<ExternalReferenceUrlProperty>().SingleOrDefault()?.Value,
+                        regionId,
+                        externalReferences[valueClassKey],
+                        grannyProperties.Select(gp =>
+                            new PropertyAssociationParameterSet(
+                                externalReferences[gp.Key],
+                                (
+                                    gp.ValueMatchBy == ValueMatchBy.Id ?
+                                        Neuron.CreateTransient(Guid.Parse(gp.Value), null, null, regionId) :
+                                        Neuron.CreateTransient(gp.Value, null, regionId)
+                                ),
+                                externalReferences[gp.ClassKey],
+                                gp.ValueMatchBy
                             )
-                    );
-
-                // link granny neuron to PropertyAssociation neuron
-                result.AddReplace(Terminal.CreateTransient(granny.Id, propertyAssociation.Neuron.Id));
-            }
+                        )
+                    )
+                );
 
             return result;
         }
