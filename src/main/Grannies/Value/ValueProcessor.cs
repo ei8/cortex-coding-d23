@@ -55,7 +55,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
                         Id = parameters.ValueMatchBy == ValueMatchBy.Id ?
                             new[] { parameters.Value.Id.ToString() } :
                             Array.Empty<string>(),
-                        TagContains = parameters.ValueMatchBy == ValueMatchBy.Tag ?
+                        Tag = parameters.ValueMatchBy == ValueMatchBy.Tag ?
                             new[] { parameters.Value.Tag } :
                             Array.Empty<string>(),
                         DirectionValues = DirectionValues.Outbound,

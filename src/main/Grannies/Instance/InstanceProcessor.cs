@@ -37,11 +37,12 @@ namespace ei8.Cortex.Coding.d23.Grannies
                 options,
                 () => ensemble.Obtain(
                         Neuron.CreateTransient(
-                            parameters.Id, 
-                            parameters.Tag, 
-                            parameters.ExternalReferenceUrl, 
+                            parameters.Id,
+                            parameters.Tag,
+                            parameters.ExternalReferenceUrl,
                             parameters.RegionId
-                        )
+                        ),
+                        parameters.WriteMode == WriteMode.Update
                     ),
                 (r) => new[]
                     {

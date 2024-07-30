@@ -52,7 +52,7 @@ namespace ei8.Cortex.Coding.d23.neurULization
             // Unnecessary to validate null id and tag values since another service can be
             // responsible for pruning grannies containing null or empty values.
             // Null values can also be considered as valid new values.
-            await d23Options.ServiceProvider.GetRequiredService<IInstanceProcessor>()
+            var instance = await d23Options.ServiceProvider.GetRequiredService<IInstanceProcessor>()
                 .ObtainAsync<IInstance, IInstanceProcessor, IInstanceParameterSet>(
                     result,
                     d23Options,
@@ -75,7 +75,8 @@ namespace ei8.Cortex.Coding.d23.neurULization
                                 externalReferences[gp.ClassKey],
                                 gp.ValueMatchBy
                             )
-                        )
+                        ),
+                        options.WriteMode
                     )
                 );
 
