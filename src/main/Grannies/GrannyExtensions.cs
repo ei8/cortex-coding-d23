@@ -1,25 +1,20 @@
-﻿using ei8.Cortex.Coding.d23.Grannies;
-using ei8.Cortex.Coding.d23.neurULization;
+﻿using ei8.Cortex.Coding.d23.neurULization;
 using ei8.Cortex.Coding.d23.Queries;
 using ei8.Cortex.Coding.d23.Selectors;
 using ei8.Cortex.Library.Common;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Options;
 using neurUL.Common.Domain.Model;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
 
-namespace ei8.Cortex.Coding.d23
+namespace ei8.Cortex.Coding.d23.Grannies
 {
-    public static class Extensions
+    internal static class GrannyExtensions
     {
-        #region IGranny
         internal async static Task<TGranny> ObtainAsync<TGranny, TGrannyProcessor, TParameterSet>(
             this TGrannyProcessor grannyProcessor,
             Ensemble ensemble,
@@ -250,144 +245,24 @@ namespace ei8.Cortex.Coding.d23
 
             return tempResult;
         }
-        #endregion
 
-        #region Units
-        internal static IEnumerable<IUnit> GetByTypeId(this IEnumerable<IUnit> units, Guid id, bool isEqual = true) =>
-            units.Where(u => isEqual ? u.Type.Id == id : u.Type.Id != id);
+        // TODO: see if useful later
+        // public static IServiceCollection AddGrannies(this IServiceCollection services)
+        //{
+        //    AssertionConcern.AssertArgumentNotNull(services, nameof(services));
 
-        internal static IEnumerable<IUnitParameterSet> GetByTypeId(this IEnumerable<IUnitParameterSet> units, Guid id, bool isEqual = true) =>
-            units.Where(u => isEqual ? u.Type.Id == id : u.Type.Id != id);
-        #endregion
+        //    services.TryAdd(ServiceDescriptor.Transient<IExpressionProcessor, ExpressionProcessor>());
+        //    services.TryAdd(ServiceDescriptor.Transient<IExpressionProcessor, ExpressionProcessor>());
+        //    services.TryAdd(ServiceDescriptor.Transient<IInstantiatesClassProcessor, InstantiatesClassProcessor>());
+        //    services.TryAdd(ServiceDescriptor.Transient<IPropertyAssignmentProcessor, PropertyAssignmentProcessor>());
+        //    services.TryAdd(ServiceDescriptor.Transient<IPropertyAssociationProcessor, PropertyAssociationProcessor>());
+        //    services.TryAdd(ServiceDescriptor.Transient<IPropertyValueExpressionProcessor, PropertyValueExpressionProcessor>());
+        //    services.TryAdd(ServiceDescriptor.Transient<IUnitProcessor, UnitProcessor>());
+        //    services.TryAdd(ServiceDescriptor.Transient<IValueProcessor, ValueProcessor>());
+        //    services.TryAdd(ServiceDescriptor.Transient<IValueExpressionProcessor, ValueExpressionProcessor>());
+        //    services.TryAdd(ServiceDescriptor.Transient<IInstanceProcessor, InstanceProcessor>());
 
-        public static bool HasSameElementsAs<T>(
-            this IEnumerable<T> first,
-            IEnumerable<T> second
-            )
-        {
-            var firstMap = first
-                .GroupBy(x => x)
-                .ToDictionary(x => x.Key, x => x.Count());
-            var secondMap = second
-                .GroupBy(x => x)
-                .ToDictionary(x => x.Key, x => x.Count());
-            return
-                firstMap.Keys.All(x =>
-                    secondMap.Keys.Contains(x) && firstMap[x] == secondMap[x]
-                ) &&
-                secondMap.Keys.All(x =>
-                    firstMap.Keys.Contains(x) && secondMap[x] == firstMap[x]
-                );
-        }
-
-        internal static PropertyData ToPropertyData(this PropertyInfo property, object obj)
-        {
-            PropertyData result = null;
-            var ignore = property.GetCustomAttributes<neurULIgnoreAttribute>().SingleOrDefault();
-            if (ignore == null)
-            {
-                var neuronPropertyAttribute = property.GetCustomAttributes<neurULNeuronPropertyAttribute>().SingleOrDefault();
-                if (neuronPropertyAttribute != null)
-                {
-                    result = Extensions.GetNeuronPropertyData(neuronPropertyAttribute, property.Name, property.GetValue(obj));
-                }
-                else
-                {
-                    var classAttribute = property.GetCustomAttributes<neurULClassAttribute>().SingleOrDefault();
-                    // if property type is Guid and property is decorated by classAttribute
-                    var matchBy = property.PropertyType == typeof(Guid) && classAttribute != null ?
-                            // match by id
-                            ValueMatchBy.Id :
-                            // otherwise, match by tag
-                            ValueMatchBy.Tag;
-                    var propertyValue = property.GetValue(obj)?.ToString();
-                    string propertyKey = property.ToExternalReferenceKeyString();
-
-                    result = new PropertyData(
-                        propertyKey,
-                        // if classAttribute was specified
-                        classAttribute?.Type != null ?
-                            // use classAttribute type
-                            classAttribute.Type.ToExternalReferenceKeyString() :
-                            // otherwise, use property type
-                            property.PropertyType.ToExternalReferenceKeyString(),
-                        propertyValue,
-                        matchBy
-                        );
-                }
-            }
-
-            return result;
-        }
-
-        private static PropertyData GetNeuronPropertyData(neurULNeuronPropertyAttribute neuronPropertyAttribute, string propertyName, object propertyValue)
-        {
-            PropertyData result = null;
-
-            if (!neuronPropertyAttribute.IsReadOnly)
-            {
-                var property = neuronPropertyAttribute.PropertyName ?? propertyName;
-                INeuronProperty neuronProperty;
-                switch (property)
-                {
-                    case nameof(Neuron.Id):
-                        neuronProperty = new IdProperty((Guid)propertyValue);
-                        break;
-                    case nameof(Neuron.Tag):
-                        neuronProperty = new TagProperty((string)
-                            propertyValue);
-                        break;
-                    case nameof(Neuron.ExternalReferenceUrl):
-                        neuronProperty = new ExternalReferenceUrlProperty((string)propertyValue);
-                        break;
-                    case nameof(Neuron.RegionId):
-                        neuronProperty = new RegionIdProperty((Guid?)propertyValue);
-                        break;
-                    default:
-                        throw new NotImplementedException($"Neuron Property '{property}' not yet implemented.");
-                }
-
-                if (neuronProperty != null)
-                    result = new PropertyData(neuronProperty);
-            }
-
-            return result;
-        }
-
-        internal static string GetExternalReferenceKey(this MemberInfo value)
-        {
-            // get ExternalReferenceKeyAttribute of root type
-            var erka = value.GetCustomAttributes<neurULKeyAttribute>().SingleOrDefault();
-            string key;
-            // if attribute exists
-            if (erka != null)
-                key = erka.Key;
-            else if (value is PropertyInfo pi)
-                key = pi.ToExternalReferenceKeyString();
-            else if (value is Type t)
-                // assembly qualified name 
-                key = t.ToExternalReferenceKeyString();
-            else
-                throw new ArgumentOutOfRangeException(nameof(value));
-            return key;
-        }
-
-        public static IServiceCollection AddGrannies(this IServiceCollection services)
-        {
-            AssertionConcern.AssertArgumentNotNull(services, nameof(services));
-
-            services.TryAdd(ServiceDescriptor.Transient<IExpressionProcessor, ExpressionProcessor>());
-            services.TryAdd(ServiceDescriptor.Transient<IExpressionProcessor, ExpressionProcessor>());
-            services.TryAdd(ServiceDescriptor.Transient<IInstantiatesClassProcessor, InstantiatesClassProcessor>());
-            services.TryAdd(ServiceDescriptor.Transient<IPropertyAssignmentProcessor, PropertyAssignmentProcessor>());
-            services.TryAdd(ServiceDescriptor.Transient<IPropertyAssociationProcessor, PropertyAssociationProcessor>());
-            services.TryAdd(ServiceDescriptor.Transient<IPropertyValueExpressionProcessor, PropertyValueExpressionProcessor>());
-            services.TryAdd(ServiceDescriptor.Transient<IUnitProcessor, UnitProcessor>());
-            services.TryAdd(ServiceDescriptor.Transient<IValueProcessor, ValueProcessor>());
-            services.TryAdd(ServiceDescriptor.Transient<IValueExpressionProcessor, ValueExpressionProcessor>());
-            services.TryAdd(ServiceDescriptor.Transient<IInstanceProcessor, InstanceProcessor>());
-
-            return services;
-        }
+        //    return services;
+        //}
     }
 }

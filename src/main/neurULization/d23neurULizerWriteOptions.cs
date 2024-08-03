@@ -2,19 +2,19 @@
 
 namespace ei8.Cortex.Coding.d23.neurULization
 {
-    public class neurULizerOptions : Id23neurULizerOptions
+    public class d23neurULizerWriteOptions : Id23neurULizerWriteOptions
     {
-        public neurULizerOptions(IServiceProvider serviceProvider, PrimitiveSet primitives, string userId, WriteMode writeMode)
+        public d23neurULizerWriteOptions(IServiceProvider serviceProvider, PrimitiveSet primitives, string userId, WriteOptions operationOptions)
         {
             this.ServiceProvider = serviceProvider;
             this.Primitives = primitives;
             this.UserId = userId;
-            this.WriteMode = writeMode;
+            this.OperationOptions = operationOptions;
         }
 
         public IServiceProvider ServiceProvider { get; }
         public PrimitiveSet Primitives { get; }
         public string UserId { get; }
-        public WriteMode WriteMode { get; }
+        public WriteOptions OperationOptions { get; }
     }
 }
