@@ -35,15 +35,20 @@ namespace ei8.Cortex.Coding.d23.Grannies
                 ),
                 ensemble,
                 options,
-                () => ensemble.Obtain(
-                        Neuron.CreateTransient(
-                            parameters.Id,
-                            parameters.Tag,
-                            parameters.ExternalReferenceUrl,
-                            parameters.RegionId
-                        ),
-                        parameters.WriteMode == WriteMode.Update
-                    ),
+                () => {
+                        Neuron result = null;
+                        if (options is Id23neurULizerWriteOptions writeOptions)
+                            ensemble.Obtain(
+                                Neuron.CreateTransient(
+                                    parameters.Id,
+                                    parameters.Tag,
+                                    parameters.ExternalReferenceUrl,
+                                    parameters.RegionId
+                                ),
+                                writeOptions.OperationOptions.Mode == WriteMode.Update
+                            );
+                        return result;
+                    },
                 (r) => new[]
                     {
                         r.InstantiatesClass.Neuron

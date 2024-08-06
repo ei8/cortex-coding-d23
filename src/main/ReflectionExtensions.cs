@@ -79,23 +79,5 @@ namespace ei8.Cortex.Coding.d23
 
             return result;
         }
-
-        internal static string GetExternalReferenceKey(this MemberInfo value)
-        {
-            // get ExternalReferenceKeyAttribute of root type
-            var erka = value.GetCustomAttributes<neurULKeyAttribute>().SingleOrDefault();
-            string key;
-            // if attribute exists
-            if (erka != null)
-                key = erka.Key;
-            else if (value is PropertyInfo pi)
-                key = ExternalReference.ToKeyString(pi);
-            else if (value is Type t)
-                // assembly qualified name 
-                key = ExternalReference.ToKeyString(t);
-            else
-                throw new ArgumentOutOfRangeException(nameof(value));
-            return key;
-        }
     }
 }

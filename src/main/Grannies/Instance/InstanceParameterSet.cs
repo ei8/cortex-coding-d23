@@ -12,8 +12,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
             string externalReferenceUrl,
             Guid? regionId,
             Neuron @class,
-            IEnumerable<IPropertyAssociationParameterSet> propertyAssociationsParameters,
-            WriteMode writeMode
+            IEnumerable<IPropertyAssociationParameterSet> propertyAssociationsParameters
             )
         {
             AssertionConcern.AssertArgumentValid(i => i != Guid.Empty, id, $"Id cannot be equal to '{Guid.Empty}'.", nameof(id));
@@ -26,7 +25,6 @@ namespace ei8.Cortex.Coding.d23.Grannies
             this.RegionId = regionId;
             this.Class = @class;
             this.PropertyAssociationsParameters = propertyAssociationsParameters;
-            this.WriteMode = writeMode;
         }
 
         public Guid Id { get; }
@@ -40,7 +38,5 @@ namespace ei8.Cortex.Coding.d23.Grannies
         public Neuron Class { get; }
 
         public IEnumerable<IPropertyAssociationParameterSet> PropertyAssociationsParameters { get; }
-
-        public WriteMode WriteMode { get; }
     }
 }

@@ -2,7 +2,6 @@
 using ei8.Cortex.Coding.d23.Queries;
 using ei8.Cortex.Coding.d23.Selectors;
 using ei8.Cortex.Library.Common;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -54,10 +53,10 @@ namespace ei8.Cortex.Coding.d23.Grannies
                     {
                         Id = parameters.ValueMatchBy == ValueMatchBy.Id ?
                             new[] { parameters.Value.Id.ToString() } :
-                            Array.Empty<string>(),
+                            null,
                         Tag = parameters.ValueMatchBy == ValueMatchBy.Tag ?
                             new[] { parameters.Value.Tag } :
-                            Array.Empty<string>(),
+                            null,
                         DirectionValues = DirectionValues.Outbound,
                         Depth = 1,
                         TraversalDepthPostsynaptic = new[] {

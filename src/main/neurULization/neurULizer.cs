@@ -9,9 +9,9 @@ namespace ei8.Cortex.Coding.d23.neurULization
             where TOptions : IneurULizerWriteOptions
             => await this.neurULizeAsync<TValue>(value, (Id23neurULizerWriteOptions) options);
 
-        public IEnumerable<TValue> DeneurULize<TValue, TOptions>(Ensemble value, TOptions options)
+        public async Task<IEnumerable<TValue>> DeneurULizeAsync<TValue, TOptions>(Ensemble value, TOptions options)
             where TValue : class, new()
             where TOptions : IneurULizerReadOptions
-            => this.DeneurULize<TValue>(value, (Id23neurULizerReadOptions) options);
+            => await this.DeneurULizeAsync<TValue>(value, (Id23neurULizerReadOptions) options);
     }
 }

@@ -17,7 +17,7 @@ namespace ei8.Cortex.Coding.d23.neurULization
 
             var result = new Ensemble();
 
-            string valueClassKey = value.GetType().GetExternalReferenceKey();
+            string valueClassKey = ExternalReference.ToKeyString(value.GetType());
 
             var propertyData = value.GetType().GetProperties()
                 .Select(pi => pi.ToPropertyData(value))
@@ -70,18 +70,19 @@ namespace ei8.Cortex.Coding.d23.neurULization
                                 externalReferences[gp.ClassKey],
                                 gp.ValueMatchBy
                             )
-                        ),
-                        options.OperationOptions.Mode
+                        )
                     )
                 );
 
             return result;
         }
 
-        public static IEnumerable<TValue> DeneurULize<TValue>(this neurULizer neurULizer, Ensemble value, Id23neurULizerReadOptions options)
+        public static async Task<IEnumerable<TValue>> DeneurULizeAsync<TValue>(this neurULizer neurULizer, Ensemble value, Id23neurULizerReadOptions options)
             where TValue : class, new()
         {
             TValue result = new TValue();
+
+            string valueClassKey = ExternalReference.ToKeyString(typeof(TValue));
 
             // get properties
             var propertyData = value.GetType().GetProperties()
@@ -91,12 +92,40 @@ namespace ei8.Cortex.Coding.d23.neurULization
             var neuronProperties = propertyData.Where(pd => pd.NeuronProperty != null).Select(pd => pd.NeuronProperty);
             var grannyProperties = propertyData.Where(pd => pd.NeuronProperty == null);
 
-            //options.ServiceProvider.GetRequiredService<IInstanceProcessor>().TryParse(
-            //    value,
-            //    options,
-            //    new InstanceParameterSet(
-            //        ))
+            var propertyKeys = grannyProperties.Select(gp => gp.Key)
+                .Concat(grannyProperties.Select(gp => gp.ClassKey))
+                .Distinct();
 
+            // use key to retrieve external reference url from library
+            var externalReferences = await options.ServiceProvider.GetRequiredService<IEnsembleRepository>()
+                .GetExternalReferencesAsync(
+                    options.UserId,
+                    new string[] {
+                        valueClassKey
+                    }.Concat(
+                        propertyKeys
+                    ).ToArray()
+                );
+
+            // TODO: options.ServiceProvider.GetRequiredService<IInstanceProcessor>().TryParse(
+            //   value,
+            //   options,
+            //   new InstanceParameterSet(
+            //       externalReferences[valueClassKey],
+            //       grannyProperties.Select(gp =>
+            //           new PropertyAssociationParameterSet(
+            //               externalReferences[gp.Key],
+            //               (
+            //                   gp.ValueMatchBy == ValueMatchBy.Id ?
+            //                       Neuron.CreateTransient(Guid.Parse(gp.Value), null, null, regionId) :
+            //                       Neuron.CreateTransient(gp.Value, null, regionId)
+            //               ),
+            //               externalReferences[gp.ClassKey],
+            //               gp.ValueMatchBy
+            //           )
+            //       )
+            //   )
+            //);
 
             return new TValue[] { result };
         }

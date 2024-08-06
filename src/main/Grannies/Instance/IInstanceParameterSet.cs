@@ -16,7 +16,5 @@ namespace ei8.Cortex.Coding.d23.Grannies
         Neuron Class { get; }
 
         IEnumerable<IPropertyAssociationParameterSet> PropertyAssociationsParameters { get; }
-
-        WriteMode WriteMode { get; }
     }
 }
