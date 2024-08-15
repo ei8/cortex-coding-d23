@@ -17,10 +17,10 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
             this.expressionProcessor = expressionProcessor;
         }
 
-        public async Task<IPropertyValueExpression> BuildAsync(Ensemble ensemble, Id23neurULizerOptions options, IPropertyValueExpressionParameterSet parameters) =>
+        public async Task<IPropertyValueExpression> BuildAsync(Ensemble ensemble, Id23neurULizerWriteOptions options, IPropertyValueExpressionParameterSet parameters) =>
             await new PropertyValueExpression().AggregateBuildAsync(
                 CreateGreatGrannies(options, parameters),
-                new IGreatGrannyProcessAsync<IPropertyValueExpression>[]
+                new IGreatGrannyWriteProcessAsync<IPropertyValueExpression>[]
                 {
                     new GreatGrannyWriteProcessAsync<IValueExpression, IValueExpressionProcessor, IValueExpressionParameterSet, IPropertyValueExpression>(
                         ProcessHelper.ObtainWithAggregateParamsAsync
@@ -33,7 +33,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
                 options
             );
 
-        private IEnumerable<IGreatGrannyInfo<IPropertyValueExpression>> CreateGreatGrannies(Id23neurULizerOptions options, IPropertyValueExpressionParameterSet parameters) =>
+        private IEnumerable<IGreatGrannyInfo<IPropertyValueExpression>> CreateGreatGrannies(Id23neurULizerWriteOptions options, IPropertyValueExpressionParameterSet parameters) =>
             new IGreatGrannyInfo<IPropertyValueExpression>[]
             {
                 new GreatGrannyWriteInfo<IValueExpression, IValueExpressionProcessor, IValueExpressionParameterSet, IPropertyValueExpression>(
@@ -70,7 +70,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
                 parameters.ValueMatchBy
             );
 
-        public IEnumerable<IGrannyQuery> GetQueries(Id23neurULizerOptions options, IPropertyValueExpressionParameterSet parameters) =>
+        public IEnumerable<IGrannyQuery> GetQueries(Id23neurULizerWriteOptions options, IPropertyValueExpressionParameterSet parameters) =>
             new IGrannyQuery[] {
                 new GrannyQueryInner<IValueExpression, IValueExpressionProcessor, IValueExpressionParameterSet>(
                     valueExpressionProcessor,
@@ -82,10 +82,10 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
                 )
             };
 
-        public bool TryParse(Ensemble ensemble, Id23neurULizerOptions options, IPropertyValueExpressionParameterSet parameters, out IPropertyValueExpression result) =>
+        public bool TryParse(Ensemble ensemble, Id23neurULizerWriteOptions options, IPropertyValueExpressionParameterSet parameters, out IPropertyValueExpression result) =>
             new PropertyValueExpression().AggregateTryParse(
                 CreateGreatGrannies(options, parameters),
-                new IGreatGrannyProcess<IPropertyValueExpression>[]
+                new IGreatGrannyWriteProcess<IPropertyValueExpression>[]
                 {
                     new GreatGrannyWriteProcess<IValueExpression, IValueExpressionProcessor, IValueExpressionParameterSet, IPropertyValueExpression>(
                         ProcessHelper.TryParse

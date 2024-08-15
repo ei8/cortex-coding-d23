@@ -27,7 +27,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
 
         public async Task<NeuronQuery> GetQuery(ProcessParameters processParameters, IList<IGranny> retrievedGrannies)
         {
-            var gqs = grannyWriteProcessor.GetQueries(processParameters.Options, writeParametersBuilder(retrievedGrannies.AsEnumerable()));
+            var gqs = grannyWriteProcessor.GetQueries((Id23neurULizerWriteOptions) processParameters.Options, writeParametersBuilder(retrievedGrannies.AsEnumerable()));
             // process granny queries just like in Extensions.ObtainSync
             var completed = await gqs.Process(processParameters, retrievedGrannies, true);
             // then call GetQuery on last granny query if completed successfully
@@ -38,7 +38,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
         {
             IGranny result = null;
 
-            if (grannyWriteProcessor.TryParse(ensemble, options, writeParametersBuilder(retrievedGrannies), out TGranny granny))
+            if (grannyWriteProcessor.TryParse(ensemble, (Id23neurULizerWriteOptions) options, writeParametersBuilder(retrievedGrannies), out TGranny granny))
                 result = granny;
 
             return result;

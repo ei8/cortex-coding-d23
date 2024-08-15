@@ -1,9 +1,9 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
 using System.Threading.Tasks;
 
-namespace ei8.Cortex.Coding.d23.neurULization
+namespace ei8.Cortex.Coding.d23.neurULization.Writers
 {
-    internal interface IGreatGrannyProcessAsync<TResult>
+    internal interface IGreatGrannyWriteProcessAsync<TResult>
     {
         Task<IGranny> ExecuteAsync(
             IGreatGrannyInfo<TResult> greatGrannyProcess,
@@ -14,7 +14,7 @@ namespace ei8.Cortex.Coding.d23.neurULization
             );
     }
 
-    internal interface IGreatGrannyProcess<TResult>
+    internal interface IGreatGrannyWriteProcess<TResult>
     {
         IGranny Execute(
             IGreatGrannyInfo<TResult> greatGrannyProcess,

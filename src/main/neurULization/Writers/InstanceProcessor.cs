@@ -18,10 +18,10 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
             this.propertyAssociationProcessor = propertyAssociationProcessor;
         }
 
-        public async Task<IInstance> BuildAsync(Ensemble ensemble, Id23neurULizerOptions options, IInstanceParameterSet parameters) =>
+        public async Task<IInstance> BuildAsync(Ensemble ensemble, Id23neurULizerWriteOptions options, IInstanceParameterSet parameters) =>
             await new Instance().AggregateBuildAsync(
                 CreateGreatGrannies(options, parameters),
-                new IGreatGrannyProcessAsync<IInstance>[]
+                new IGreatGrannyWriteProcessAsync<IInstance>[]
                 {
                     new GreatGrannyWriteProcessAsync<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IInstance>(
                         ProcessHelper.ObtainWithAggregateParamsAsync
@@ -59,7 +59,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
                     )
             );
 
-        private IEnumerable<IGreatGrannyInfo<IInstance>> CreateGreatGrannies(Id23neurULizerOptions options, IInstanceParameterSet parameters) =>
+        private IEnumerable<IGreatGrannyInfo<IInstance>> CreateGreatGrannies(Id23neurULizerWriteOptions options, IInstanceParameterSet parameters) =>
             new IGreatGrannyInfo<IInstance>[]
             {
                 new GreatGrannyWriteInfo<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IInstance>(
@@ -83,7 +83,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
                 parameters.Class
             );
 
-        public IEnumerable<IGrannyQuery> GetQueries(Id23neurULizerOptions options, IInstanceParameterSet parameters) =>
+        public IEnumerable<IGrannyQuery> GetQueries(Id23neurULizerWriteOptions options, IInstanceParameterSet parameters) =>
             new IGrannyQuery[] {
                 new GrannyQueryInner<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet>(
                     instantiatesClassProcessor,
@@ -111,10 +111,10 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
                 }
             );
 
-        public bool TryParse(Ensemble ensemble, Id23neurULizerOptions options, IInstanceParameterSet parameters, out IInstance result) =>
+        public bool TryParse(Ensemble ensemble, Id23neurULizerWriteOptions options, IInstanceParameterSet parameters, out IInstance result) =>
             new Instance().AggregateTryParse(
                 CreateGreatGrannies(options, parameters),
-                new IGreatGrannyProcess<IInstance>[]
+                new IGreatGrannyWriteProcess<IInstance>[]
                 {
                     new GreatGrannyWriteProcess<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IInstance>(
                         ProcessHelper.TryParse

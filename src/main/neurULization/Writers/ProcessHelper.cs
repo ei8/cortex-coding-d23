@@ -9,7 +9,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
         public static async Task<IGranny> ObtainWithAggregateParamsAsync<TGranny, TGrannyWriteProcessor, TWriteParameterSet, TResult>(
             TGrannyWriteProcessor grannyWriteProcessor,
             Ensemble ensemble,
-            Id23neurULizerOptions options,
+            Id23neurULizerWriteOptions options,
             TWriteParameterSet writeParameters,
             Action<TGranny, TResult> resultUpdater,
             TResult tempResult
@@ -32,7 +32,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
         public static async Task<IGranny> ObtainAsync<TGranny, TGrannyWriteProcessor, TWriteParameterSet, TResult>(
             TGrannyWriteProcessor grannyWriteProcessor,
             Ensemble ensemble,
-            Id23neurULizerOptions options,
+            Id23neurULizerWriteOptions options,
             TWriteParameterSet writeParameters,
             Action<TGranny, TResult> resultUpdater,
             TResult tempResult
@@ -57,7 +57,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
         public static IGranny TryParse<TGranny, TGrannyWriteProcessor, TWriteParameterSet, TResult>(
             TGrannyWriteProcessor grannyWriteProcessor,
             Ensemble ensemble,
-            Id23neurULizerOptions options,
+            Id23neurULizerWriteOptions options,
             TWriteParameterSet writeParameters,
             Action<TGranny, TResult> resultUpdater,
             TResult tempResult

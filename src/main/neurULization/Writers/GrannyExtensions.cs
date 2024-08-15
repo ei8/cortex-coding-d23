@@ -17,7 +17,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
         internal async static Task<TGranny> ObtainAsync<TGranny, TGrannyWriteProcessor, TWriteParameterSet>(
             this TGrannyWriteProcessor grannyWriteProcessor,
             Ensemble ensemble,
-            Id23neurULizerOptions options,
+            Id23neurULizerWriteOptions options,
             TWriteParameterSet writeParameters
             )
             where TGranny : IGranny
@@ -56,15 +56,15 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
 
             TGranny result = default;
             // if target is not in specified ensemble
-            if (!grannyWriteProcessor.TryParse(processParameters.Ensemble, processParameters.Options, writeParameters, out TGranny ensembleParseResult))
+            if (!grannyWriteProcessor.TryParse(processParameters.Ensemble, (Id23neurULizerWriteOptions) processParameters.Options, writeParameters, out TGranny ensembleParseResult))
             {
                 // retrieve target from DB
-                var grannyQueries = grannyWriteProcessor.GetQueries(processParameters.Options, writeParameters);
+                var grannyQueries = grannyWriteProcessor.GetQueries((Id23neurULizerWriteOptions) processParameters.Options, writeParameters);
 
                 await grannyQueries.Process(processParameters, new List<IGranny>());
 
                 // if target is in DB
-                if (grannyWriteProcessor.TryParse(processParameters.Ensemble, processParameters.Options, writeParameters, out TGranny dbParseResult))
+                if (grannyWriteProcessor.TryParse(processParameters.Ensemble, (Id23neurULizerWriteOptions) processParameters.Options, writeParameters, out TGranny dbParseResult))
                 {
                     result = dbParseResult;
                 }
@@ -72,7 +72,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
                 else
                 {
                     // build in ensemble
-                    result = await grannyWriteProcessor.BuildAsync(processParameters.Ensemble, processParameters.Options, writeParameters);
+                    result = await grannyWriteProcessor.BuildAsync(processParameters.Ensemble, (Id23neurULizerWriteOptions) processParameters.Options, writeParameters);
                 }
             }
             // if target was found in ensemble
@@ -138,73 +138,12 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
             return result;
         }
 
-        internal static void TryParseCore<TGranny, TGrannyProcessor, TParameterSet>(
-            this TGrannyProcessor grannyProcessor,
-            TParameterSet parameters,
-            Ensemble ensemble,
-            TGranny tempResult,
-            IEnumerable<Guid> selection,
-            LevelParser[] levelParsers,
-            Action<Neuron> grannySetter,
-            ref TGranny result
-            )
-            where TGranny : IGranny
-            where TGrannyProcessor : IGrannyWriteProcessor<TGranny, TParameterSet>
-            where TParameterSet : IWriteParameterSet
-        {
-            foreach (var levelParser in levelParsers)
-                selection = levelParser.Evaluate(ensemble, selection);
-
-            Trace.WriteLineIf(selection.Count() > 1, "Redundant data encountered.");
-            if (selection.Count() == 1 && ensemble.TryGetById(selection.Single(), out Neuron ensembleResult))
-            {
-                grannySetter(ensembleResult);
-                result = tempResult;
-            }
-        }
-
-        internal static bool AggregateTryParse<TResult>(
-            this TResult tempResult,
-            IEnumerable<IGreatGrannyInfo<TResult>> processes,
-            IEnumerable<IGreatGrannyProcess<TResult>> targets,
-            Ensemble ensemble,
-            Id23neurULizerOptions options,
-            out TResult result,
-            bool setGrannyNeuronOnCompletion = true
-        )
-            where TResult : IGranny
-        {
-            result = default;
-
-            IGranny precedingGranny = null;
-            var ts = targets.ToArray();
-            for (int i = 0; i < ts.Length; i++)
-            {
-                if ((precedingGranny = ts[i].Execute(
-                    processes.ElementAt(i),
-                    ensemble,
-                    options,
-                    precedingGranny,
-                    tempResult
-                    )) == null)
-                    break;
-                else if (i == ts.Length - 1)
-                {
-                    if (setGrannyNeuronOnCompletion)
-                        tempResult.Neuron = precedingGranny.Neuron;
-                    result = tempResult;
-                }
-            }
-
-            return result != null;
-        }
-
         internal static async Task<TResult> AggregateBuildAsync<TResult>(
             this TResult tempResult,
             IEnumerable<IGreatGrannyInfo<TResult>> processes,
-            IEnumerable<IGreatGrannyProcessAsync<TResult>> targets,
+            IEnumerable<IGreatGrannyWriteProcessAsync<TResult>> targets,
             Ensemble ensemble,
-            Id23neurULizerOptions options,
+            Id23neurULizerWriteOptions options,
             Func<Neuron> grannyNeuronCreator = null,
             Func<TResult, IEnumerable<Neuron>> postsynapticsRetriever = null
         )
@@ -243,6 +182,42 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
                 );
 
             return tempResult;
+        }
+
+        internal static bool AggregateTryParse<TResult>(
+            this TResult tempResult,
+            IEnumerable<IGreatGrannyInfo<TResult>> processes,
+            IEnumerable<IGreatGrannyWriteProcess<TResult>> targets,
+            Ensemble ensemble,
+            Id23neurULizerOptions options,
+            out TResult result,
+            bool setGrannyNeuronOnCompletion = true
+        )
+            where TResult : IGranny
+        {
+            result = default;
+
+            IGranny precedingGranny = null;
+            var ts = targets.ToArray();
+            for (int i = 0; i < ts.Length; i++)
+            {
+                if ((precedingGranny = ts[i].Execute(
+                    processes.ElementAt(i),
+                    ensemble,
+                    options,
+                    precedingGranny,
+                    tempResult
+                    )) == null)
+                    break;
+                else if (i == ts.Length - 1)
+                {
+                    if (setGrannyNeuronOnCompletion)
+                        tempResult.Neuron = precedingGranny.Neuron;
+                    result = tempResult;
+                }
+            }
+
+            return result != null;
         }
 
         // TODO: see if useful later

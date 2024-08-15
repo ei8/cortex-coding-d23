@@ -9,7 +9,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
 {
     public class UnitProcessor : IUnitProcessor
     {
-        public async Task<IUnit> BuildAsync(Ensemble ensemble, Id23neurULizerOptions options, IUnitParameterSet parameters)
+        public async Task<IUnit> BuildAsync(Ensemble ensemble, Id23neurULizerWriteOptions options, IUnitParameterSet parameters)
         {
             var result = new Unit();
             result.Value = ensemble.Obtain(parameters.Value);
@@ -21,7 +21,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
             return result;
         }
 
-        public IEnumerable<IGrannyQuery> GetQueries(Id23neurULizerOptions options, IUnitParameterSet parameters) =>
+        public IEnumerable<IGrannyQuery> GetQueries(Id23neurULizerWriteOptions options, IUnitParameterSet parameters) =>
             new[] {
                 new GrannyQuery(
                     new NeuronQuery()
@@ -36,7 +36,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
                 )
             };
 
-        public bool TryParse(Ensemble ensemble, Id23neurULizerOptions options, IUnitParameterSet parameters, out IUnit result)
+        public bool TryParse(Ensemble ensemble, Id23neurULizerWriteOptions options, IUnitParameterSet parameters, out IUnit result)
         {
             result = null;
 
@@ -45,11 +45,10 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
             tempResult.Type = parameters.Type;
 
             this.TryParseCore(
-                parameters,
                 ensemble,
                 tempResult,
                 new[] { tempResult.Value.Id },
-                new[] { new LevelParser(new PresynapticBySibling(tempResult.Type.Id)) },
+                new[] { new LevelParser(new PresynapticByPostsynapticSibling(tempResult.Type.Id)) },
                 (n) => tempResult.Neuron = n,
                 ref result
                 );

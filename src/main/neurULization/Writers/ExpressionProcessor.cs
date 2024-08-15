@@ -1,7 +1,7 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
+using ei8.Cortex.Coding.d23.neurULization;
 using ei8.Cortex.Coding.d23.neurULization.Queries;
 using ei8.Cortex.Coding.d23.neurULization.Selectors;
-using ei8.Cortex.Coding.d23.neurULization.Writers;
 using ei8.Cortex.Library.Common;
 using System;
 using System.Collections.Generic;
@@ -19,7 +19,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
             this.unitProcessor = unitProcessor;
         }
 
-        public async Task<IExpression> BuildAsync(Ensemble ensemble, Id23neurULizerOptions options, IExpressionParameterSet parameters) =>
+        public async Task<IExpression> BuildAsync(Ensemble ensemble, Id23neurULizerWriteOptions options, IExpressionParameterSet parameters) =>
             await new Expression().AggregateBuildAsync(
                 CreateGreatGrannies(options, parameters),
                 parameters.UnitsParameters.Select(
@@ -32,13 +32,18 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
                 () => ensemble.Obtain(Neuron.CreateTransient(null, null, null)),
                 (r) =>
                     // concat applicable expression types
-                    GetExpressionTypes(parameters, options.Primitives).Select(et => ensemble.Obtain(et)).Concat(
+                    ExpressionProcessor.GetExpressionTypes(
+                        (id, isEqual) => parameters.UnitsParameters.GetByTypeId(id, isEqual).Count(),
+                        options.Primitives
+                    )
+                    .Select(et => ensemble.Obtain(et))
+                    .Concat(
                         // with Units in result
                         r.Units.Select(u => u.Neuron)
                     )
             );
 
-        private IEnumerable<IGreatGrannyInfo<IExpression>> CreateGreatGrannies(Id23neurULizerOptions options, IExpressionParameterSet parameters) =>
+        private IEnumerable<IGreatGrannyInfo<IExpression>> CreateGreatGrannies(Id23neurULizerWriteOptions options, IExpressionParameterSet parameters) =>
             parameters.UnitsParameters.Select(
                 u => new GreatGrannyWriteInfo<IUnit, IUnitProcessor, IUnitParameterSet, IExpression>(
                     unitProcessor,
@@ -47,14 +52,17 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
                 )
             );
 
-        public IEnumerable<IGrannyQuery> GetQueries(Id23neurULizerOptions options, IExpressionParameterSet parameters) =>
-            GetQueryByType(options.Primitives, parameters);
+        public IEnumerable<IGrannyQuery> GetQueries(Id23neurULizerWriteOptions options, IExpressionParameterSet parameters) =>
+            ExpressionProcessor.GetQueryByType(options.Primitives, parameters, this.unitProcessor);
 
-        private IEnumerable<IGrannyQuery> GetQueryByType(PrimitiveSet primitives, IExpressionParameterSet parameters)
+        private static IEnumerable<IGrannyQuery> GetQueryByType(PrimitiveSet primitives, IExpressionParameterSet parameters, IUnitProcessor unitProcessor)
         {
             IEnumerable<IGrannyQuery> result = null;
 
-            var types = GetExpressionTypes(parameters, primitives);
+            var types = ExpressionProcessor.GetExpressionTypes(
+                (id, isEqual) => parameters.UnitsParameters.GetByTypeId(id, isEqual).Count(),
+                primitives
+                );
 
             if (types.Count() == 1)
             {
@@ -129,12 +137,15 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
             return result;
         }
 
-        private static IEnumerable<Neuron> GetExpressionTypes(IExpressionParameterSet expressionParameters, PrimitiveSet primitives)
+        internal static IEnumerable<Neuron> GetExpressionTypes(
+            Func<Guid, bool, int> headCountRetriever,
+            PrimitiveSet primitives
+            )
         {
             var result = new List<Neuron>();
 
-            var headCount = expressionParameters.UnitsParameters.Count(up => up.Type.Id == primitives.Unit.Id);
-            var dependentCount = expressionParameters.UnitsParameters.Count() - headCount;
+            var headCount = headCountRetriever(primitives.Unit.Id, true);
+            var dependentCount = headCountRetriever(primitives.Unit.Id, false);
 
             if (headCount > 0)
             {
@@ -157,7 +168,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
             return result.ToArray();
         }
 
-        public bool TryParse(Ensemble ensemble, Id23neurULizerOptions options, IExpressionParameterSet parameters, out IExpression result)
+        public bool TryParse(Ensemble ensemble, Id23neurULizerWriteOptions options, IExpressionParameterSet parameters, out IExpression result)
         {
             result = null;
 
@@ -174,10 +185,10 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
                 false
             );
 
+
             if (tempResult != null && tempResult.Units.Count() == parameters.UnitsParameters.Count())
             {
                 this.TryParseCore(
-                    parameters,
                     ensemble,
                     tempResult,
                     // start from the Head units
@@ -185,12 +196,12 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
                     new[]
                     {
                         // get the presynaptic via the siblings of the head and subordination
-                        new LevelParser(new PresynapticBySibling(
+                        new LevelParser(new PresynapticByPostsynapticSibling(
                             tempResult.Units.GetByTypeId(options.Primitives.Unit.Id, false)
                                 .Select(i => i.Neuron.Id)
                                 .Concat(
-                                    GetExpressionTypes(
-                                        parameters,
+                                    ExpressionProcessor.GetExpressionTypes(
+                                        (id, isEqual) => parameters.UnitsParameters.GetByTypeId(id, isEqual).Count(),
                                         options.Primitives
                                     ).Select(t => t.Id)
                                 ).ToArray()

@@ -7,7 +7,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
     public delegate IGranny GrannyWriteProcessCallback<TGranny, TGrannyWriteProcessor, TParameterWriteSet, TResult>(
         TGrannyWriteProcessor grannyWriteProcessor,
         Ensemble ensemble,
-        Id23neurULizerOptions options,
+        Id23neurULizerWriteOptions options,
         TParameterWriteSet writeParameters,
         Action<TGranny, TResult> resultUpdater,
         TResult tempResult
@@ -19,7 +19,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
     public delegate Task<IGranny> AsyncGrannyWriteProcessCallback<TGranny, TGrannyWriteProcessor, TWriteParameterSet, TResult>(
         TGrannyWriteProcessor grannyWriteProcessor,
         Ensemble ensemble,
-        Id23neurULizerOptions options,
+        Id23neurULizerWriteOptions options,
         TWriteParameterSet writeParameters,
         Action<TGranny, TResult> resultUpdater,
         TResult tempResult

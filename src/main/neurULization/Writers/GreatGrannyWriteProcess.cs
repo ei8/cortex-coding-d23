@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace ei8.Cortex.Coding.d23.neurULization.Writers
 {
-    internal class GreatGrannyWriteProcessAsync<TGranny, TGrannyWriteProcessor, TWriteParameterSet, TResult> : IGreatGrannyProcessAsync<TResult>
+    internal class GreatGrannyWriteProcessAsync<TGranny, TGrannyWriteProcessor, TWriteParameterSet, TResult> : IGreatGrannyWriteProcessAsync<TResult>
         where TGranny : IGranny
         where TGrannyWriteProcessor : IGrannyWriteProcessor<TGranny, TWriteParameterSet>
         where TWriteParameterSet : IWriteParameterSet
@@ -30,7 +30,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
             return await asyncProcess(
                 typedGreatGrannyProcess.WriteProcessor,
                 ensemble,
-                options,
+                (Id23neurULizerWriteOptions) options,
                 typedGreatGrannyProcess.WriteParametersBuilder(precedingGranny),
                 typedGreatGrannyProcess.DerivedGrannyUpdater,
                 tempResult
@@ -38,7 +38,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
         }
     }
 
-    internal class GreatGrannyWriteProcess<TGranny, TGrannyProcessor, TParameterSet, TResult> : IGreatGrannyProcess<TResult>
+    internal class GreatGrannyWriteProcess<TGranny, TGrannyProcessor, TParameterSet, TResult> : IGreatGrannyWriteProcess<TResult>
         where TGranny : IGranny
         where TGrannyProcessor : IGrannyWriteProcessor<TGranny, TParameterSet>
         where TParameterSet : IWriteParameterSet
@@ -64,7 +64,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
             return process(
                 typedGreatGrannyProcess.WriteProcessor,
                 ensemble,
-                options,
+                (Id23neurULizerWriteOptions) options,
                 typedGreatGrannyProcess.WriteParametersBuilder(precedingGranny),
                 typedGreatGrannyProcess.DerivedGrannyUpdater,
                 tempResult
