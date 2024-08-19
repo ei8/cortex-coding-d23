@@ -20,9 +20,9 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
         public async Task<IValue> BuildAsync(Ensemble ensemble, Id23neurULizerWriteOptions options, IValueParameterSet parameters) =>
             await new Value().AggregateBuildAsync(
                 CreateGreatGrannies(options, parameters),
-                new IGreatGrannyWriteProcessAsync<IValue>[]
+                new IGreatGrannyProcessAsync<IValue>[]
                 {
-                    new GreatGrannyWriteProcessAsync<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IValue>(
+                    new GreatGrannyProcessAsync<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IValue>(
                         ProcessHelper.ObtainWithAggregateParamsAsync
                     )
                 },
@@ -35,7 +35,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
         private IEnumerable<IGreatGrannyInfo<IValue>> CreateGreatGrannies(Id23neurULizerWriteOptions options, IValueParameterSet parameters) =>
             new IGreatGrannyInfo<IValue>[]
             {
-                new GreatGrannyWriteInfo<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IValue>(
+                new GreatGrannyInfo<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IValue>(
                     instantiatesClassProcessor,
                     (g) => CreateInstantiatesClassParameterSet(parameters),
                     (g, r) => r.InstantiatesClass = g
@@ -81,9 +81,9 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
 
             new Value().AggregateTryParse(
                 CreateGreatGrannies(options, parameters),
-                new IGreatGrannyWriteProcess<IValue>[]
+                new IGreatGrannyProcess<IValue>[]
                 {
-                    new GreatGrannyWriteProcess<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IValue>(
+                    new GreatGrannyProcess<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IValue>(
                         ProcessHelper.TryParse
                     )
                 },
@@ -94,9 +94,8 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
             );
 
             if (tempResult != null)
-                this.TryParseCore(
+                tempResult.TryParseCore(
                     ensemble,
-                    tempResult,
                     // start from InstantiatesClass neuron
                     new[] { tempResult.InstantiatesClass.Neuron.Id },
                     new[] { new LevelParser(

@@ -9,7 +9,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
     /// </summary>
     /// <typeparam name="TGranny"></typeparam>
     /// <typeparam name="TParameterSet"></typeparam>
-    public interface IGrannyWriteProcessor<TGranny, TParameterSet> : IGrannyProcessor
+    public interface IGrannyWriteProcessor<TGranny, TParameterSet> : IGrannyProcessor<TGranny, TParameterSet>
         where TGranny : IGranny
         where TParameterSet : IWriteParameterSet
     {

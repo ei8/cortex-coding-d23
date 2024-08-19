@@ -18,9 +18,8 @@ namespace ei8.Cortex.Coding.d23.neurULization.Readers
                     tempResult.Neuron = parameters.Granny;
                     tempResult.Type = parameters.Type;
 
-                    this.TryParseCore(
+                    tempResult.TryParseCore(
                         ensemble,
-                        tempResult,
                         new[] { tempResult.Neuron.Id },
                         new[] { new LevelParser(new PostsynapticByPostsynapticSibling(tempResult.Type.Id)) },
                         (n) => tempResult.Value = n,
@@ -40,9 +39,8 @@ namespace ei8.Cortex.Coding.d23.neurULization.Readers
                     tempResult.Value = parameters.Value;
                     tempResult.Type = parameters.Type;
 
-                    this.TryParseCore(
+                    tempResult.TryParseCore(
                         ensemble,
-                        tempResult,
                         new[] { tempResult.Value.Id },
                         new[] { new LevelParser(new PresynapticByPostsynapticSibling(tempResult.Type.Id)) },
                         (n) => tempResult.Neuron = n,

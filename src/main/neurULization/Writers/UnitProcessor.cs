@@ -44,9 +44,8 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
             tempResult.Value = parameters.Value;
             tempResult.Type = parameters.Type;
 
-            this.TryParseCore(
+            tempResult.TryParseCore(
                 ensemble,
-                tempResult,
                 new[] { tempResult.Value.Id },
                 new[] { new LevelParser(new PresynapticByPostsynapticSibling(tempResult.Type.Id)) },
                 (n) => tempResult.Neuron = n,

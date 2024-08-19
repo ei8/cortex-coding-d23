@@ -1,6 +1,5 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace ei8.Cortex.Coding.d23.neurULization.Readers
 {
@@ -8,9 +7,9 @@ namespace ei8.Cortex.Coding.d23.neurULization.Readers
     {
         internal static bool AggregateTryParse<TResult>(
             this TResult tempResult,
-            IReadParameterSet parameters,
-            IEnumerable<IGreatGrannyInfo<TResult>> greatGrannyCandidateProcesses,
-            IEnumerable<IGreatGrannyReadProcess<TResult>> targets,
+            Neuron granny,
+            IEnumerable<IGreatGrannyInfo<TResult>> greatGrannyCandidates,
+            IEnumerable<IGreatGrannyProcess<TResult>> targets,
             Ensemble ensemble,
             Id23neurULizerOptions options,
             int expectedGreatGrannyCount,
@@ -20,14 +19,22 @@ namespace ei8.Cortex.Coding.d23.neurULization.Readers
         {
             result = default;
 
-            tempResult.Neuron = parameters.Granny;
+            tempResult.Neuron = granny;
 
             int successCount = 0;
-            foreach (var candidateProcess in greatGrannyCandidateProcesses)
+
+            IGranny precedingGranny = null;
+            foreach (var candidate in greatGrannyCandidates)
             {
                 foreach (var target in targets)
                 {
-                    if (target.Execute(candidateProcess, ensemble, options, tempResult) != null)
+                    if ((precedingGranny = target.Execute(
+                        candidate, 
+                        ensemble, 
+                        options, 
+                        precedingGranny, 
+                        tempResult
+                        )) != null)
                     {
                         successCount++;
                         break;

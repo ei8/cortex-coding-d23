@@ -1,4 +1,5 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
+using ei8.Cortex.Coding.d23.neurULization;
 using ei8.Cortex.Coding.d23.neurULization.Queries;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,9 +19,9 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
         public async Task<IInstantiatesClass> BuildAsync(Ensemble ensemble, Id23neurULizerWriteOptions options, IInstantiatesClassParameterSet parameters) =>
             await new InstantiatesClass().AggregateBuildAsync(
                 CreateGreatGrannies(options, parameters),
-                new IGreatGrannyWriteProcessAsync<IInstantiatesClass>[]
+                new IGreatGrannyProcessAsync<IInstantiatesClass>[]
                 {
-                    new GreatGrannyWriteProcessAsync<IExpression, IExpressionProcessor, IExpressionParameterSet, IInstantiatesClass>(
+                    new GreatGrannyProcessAsync<IExpression, IExpressionProcessor, IExpressionParameterSet, IInstantiatesClass>(
                         ProcessHelper.ObtainWithAggregateParamsAsync
                     )
                 },
@@ -31,7 +32,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
         private IEnumerable<IGreatGrannyInfo<IInstantiatesClass>> CreateGreatGrannies(Id23neurULizerWriteOptions options, IInstantiatesClassParameterSet parameters) =>
            new IGreatGrannyInfo<IInstantiatesClass>[]
            {
-                new GreatGrannyWriteInfo<IExpression, IExpressionProcessor, IExpressionParameterSet, IInstantiatesClass>(
+                new GreatGrannyInfo<IExpression, IExpressionProcessor, IExpressionParameterSet, IInstantiatesClass>(
                     expressionProcessor,
                     (g) => CreateSubordinationParameterSet(options.Primitives, parameters),
                     (g, r) => r.Class = g.Units.GetByTypeId(options.Primitives.DirectObject.Id).Single()
@@ -64,9 +65,9 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
         public bool TryParse(Ensemble ensemble, Id23neurULizerWriteOptions options, IInstantiatesClassParameterSet parameters, out IInstantiatesClass result) =>
             new InstantiatesClass().AggregateTryParse(
                 CreateGreatGrannies(options, parameters),
-                new IGreatGrannyWriteProcess<IInstantiatesClass>[]
+                new IGreatGrannyProcess<IInstantiatesClass>[]
                 {
-                    new GreatGrannyWriteProcess<IExpression, IExpressionProcessor, IExpressionParameterSet, IInstantiatesClass>(
+                    new GreatGrannyProcess<IExpression, IExpressionProcessor, IExpressionParameterSet, IInstantiatesClass>(
                         ProcessHelper.TryParse
                     )
                 },

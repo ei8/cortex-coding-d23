@@ -20,12 +20,12 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
         public async Task<IPropertyAssociation> BuildAsync(Ensemble ensemble, Id23neurULizerWriteOptions options, IPropertyAssociationParameterSet parameters) =>
             await new PropertyAssociation().AggregateBuildAsync(
                 CreateGreatGrannies(options, parameters),
-                new IGreatGrannyWriteProcessAsync<IPropertyAssociation>[]
+                new IGreatGrannyProcessAsync<IPropertyAssociation>[]
                 {
-                    new GreatGrannyWriteProcessAsync<IPropertyAssignment, IPropertyAssignmentProcessor, IPropertyAssignmentParameterSet, IPropertyAssociation>(
+                    new GreatGrannyProcessAsync<IPropertyAssignment, IPropertyAssignmentProcessor, IPropertyAssignmentParameterSet, IPropertyAssociation>(
                         ProcessHelper.ObtainWithAggregateParamsAsync
                     ),
-                    new GreatGrannyWriteProcessAsync<IExpression, IExpressionProcessor, IExpressionParameterSet, IPropertyAssociation>(
+                    new GreatGrannyProcessAsync<IExpression, IExpressionProcessor, IExpressionParameterSet, IPropertyAssociation>(
                         ProcessHelper.ObtainWithAggregateParamsAsync
                     )
                 },
@@ -36,12 +36,12 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
         private IEnumerable<IGreatGrannyInfo<IPropertyAssociation>> CreateGreatGrannies(Id23neurULizerWriteOptions options, IPropertyAssociationParameterSet parameters) =>
           new IGreatGrannyInfo<IPropertyAssociation>[]
           {
-              new GreatGrannyWriteInfo<IPropertyAssignment, IPropertyAssignmentProcessor, IPropertyAssignmentParameterSet, IPropertyAssociation>(
+              new GreatGrannyInfo<IPropertyAssignment, IPropertyAssignmentProcessor, IPropertyAssignmentParameterSet, IPropertyAssociation>(
                     propertyAssignmentProcessor,
                     (g) => CreatePropertyAssignmentParameterSet(parameters),
                     (g, r) => r.PropertyAssignment = g
                 ),
-                new GreatGrannyWriteInfo<IExpression, IExpressionProcessor, IExpressionParameterSet, IPropertyAssociation>(
+                new GreatGrannyInfo<IExpression, IExpressionProcessor, IExpressionParameterSet, IPropertyAssociation>(
                     expressionProcessor,
                     (g) => CreateExpressionParameterSet(options.Primitives, parameters, g.Neuron),
                     (g, r) => r.Expression = g
@@ -86,12 +86,12 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
         public bool TryParse(Ensemble ensemble, Id23neurULizerWriteOptions options, IPropertyAssociationParameterSet parameters, out IPropertyAssociation result) =>
             new PropertyAssociation().AggregateTryParse(
                 CreateGreatGrannies(options, parameters),
-                new IGreatGrannyWriteProcess<IPropertyAssociation>[]
+                new IGreatGrannyProcess<IPropertyAssociation>[]
                 {
-                    new GreatGrannyWriteProcess<IPropertyAssignment, IPropertyAssignmentProcessor, IPropertyAssignmentParameterSet, IPropertyAssociation>(
+                    new GreatGrannyProcess<IPropertyAssignment, IPropertyAssignmentProcessor, IPropertyAssignmentParameterSet, IPropertyAssociation>(
                         ProcessHelper.TryParse
                         ),
-                    new GreatGrannyWriteProcess<IExpression, IExpressionProcessor, IExpressionParameterSet, IPropertyAssociation>(
+                    new GreatGrannyProcess<IExpression, IExpressionProcessor, IExpressionParameterSet, IPropertyAssociation>(
                         ProcessHelper.TryParse
                         )
                 },

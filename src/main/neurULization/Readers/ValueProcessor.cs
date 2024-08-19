@@ -1,5 +1,4 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
-using ei8.Cortex.Coding.d23.neurULization.Selectors;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -19,10 +18,12 @@ namespace ei8.Cortex.Coding.d23.neurULization.Readers
             IValueParameterSet parameters,
             Ensemble ensemble
             ) =>
-            ensemble.GetPostsynapticNeurons(parameters.Granny.Id).Select(
-                gc => new GreatGrannyReadInfo<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IValue>(
+            ProcessHelper.CreateGreatGrannyCandidates(
+                ensemble,
+                parameters.Granny,
+                gc => new GreatGrannyInfo<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IValue>(
                     instantiatesClassProcessor,
-                    ValueProcessor.CreateInstantiatesClassParameterSet(parameters, gc),
+                    (g) => ValueProcessor.CreateInstantiatesClassParameterSet(parameters, gc),
                     (g, r) => r.InstantiatesClass = g
                 )
             );
@@ -38,11 +39,11 @@ namespace ei8.Cortex.Coding.d23.neurULization.Readers
 
         public bool TryParse(Ensemble ensemble, Id23neurULizerReadOptions options, IValueParameterSet parameters, out IValue result) =>
             new Value().AggregateTryParse(
-                parameters,
+                parameters.Granny,
                 ValueProcessor.CreateGreatGrannies(this.instantiatesClassProcessor, parameters, ensemble),
-                new IGreatGrannyReadProcess<IValue>[]
+                new IGreatGrannyProcess<IValue>[]
                 {
-                    new GreatGrannyReadProcess<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IValue>(
+                    new GreatGrannyProcess<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IValue>(
                         ProcessHelper.TryParse
                     )
                 },

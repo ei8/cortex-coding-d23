@@ -10,9 +10,8 @@ namespace ei8.Cortex.Coding.d23.neurULization
     internal static class GrannyExtensions
     {
         internal static void TryParseCore<TGranny>(
-            this IGrannyProcessor grannyProcessor,
+            this TGranny granny,
             Ensemble ensemble,
-            TGranny tempResult,
             IEnumerable<Guid> selection,
             LevelParser[] levelParsers,
             Action<Neuron> resultProcessor,
@@ -27,7 +26,7 @@ namespace ei8.Cortex.Coding.d23.neurULization
             if (selection.Count() == 1 && ensemble.TryGetById(selection.Single(), out Neuron ensembleResult))
             {
                 resultProcessor(ensembleResult);
-                result = tempResult;
+                result = granny;
             }
         }
     }

@@ -20,21 +20,22 @@ namespace ei8.Cortex.Coding.d23.neurULization.Readers
             IExpressionParameterSet parameters,
             Ensemble ensemble
             ) =>
-            // use each postsynaptic of granny as a granny candidate to find matching units
-            ensemble.GetPostsynapticNeurons(parameters.Granny.Id).SelectMany(
+            ProcessHelper.CreateGreatGrannyCandidates(
+                ensemble, 
+                parameters.Granny,
                 gc => parameters.UnitParameters.Select(
-                    up => new GreatGrannyReadInfo<IUnit, IUnitProcessor, IUnitParameterSet, IExpression>(
+                    up => new GreatGrannyInfo<IUnit, IUnitProcessor, IUnitParameterSet, IExpression>(
                         unitProcessor,
-                        up.Value != null ? 
-                        UnitParameterSet.Create(
-                            gc,
-                            up.Value,
-                            up.Type
-                            ) :
-                        UnitParameterSet.CreateWithGrannyAndType(
-                            gc, 
-                            up.Type
-                        ),
+                        g => up.Value != null ? 
+                            UnitParameterSet.Create(
+                                gc,
+                                up.Value,
+                                up.Type
+                                ) :
+                            UnitParameterSet.CreateWithGrannyAndType(
+                                gc, 
+                                up.Type
+                            ),
                         (g, r) => r.Units.Add(g)
                     )
                 )
@@ -42,15 +43,15 @@ namespace ei8.Cortex.Coding.d23.neurULization.Readers
 
         public bool TryParse(Ensemble ensemble, Id23neurULizerReadOptions options, IExpressionParameterSet parameters, out IExpression result) =>
             new Expression().AggregateTryParse(
-                parameters,
+                parameters.Granny,
                 ExpressionProcessor.CreateGreatGrannies(
                     this.unitProcessor,
                     parameters,
                     ensemble
                 ),
-                new IGreatGrannyReadProcess<IExpression>[]
+                new IGreatGrannyProcess<IExpression>[]
                 {
-                    new GreatGrannyReadProcess<IUnit, IUnitProcessor, IUnitParameterSet, IExpression>(
+                    new GreatGrannyProcess<IUnit, IUnitProcessor, IUnitParameterSet, IExpression>(
                         ProcessHelper.TryParse
                     )
                 },

@@ -23,7 +23,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
             await new Expression().AggregateBuildAsync(
                 CreateGreatGrannies(options, parameters),
                 parameters.UnitsParameters.Select(
-                    u => new GreatGrannyWriteProcessAsync<IUnit, IUnitProcessor, IUnitParameterSet, IExpression>(
+                    u => new GreatGrannyProcessAsync<IUnit, IUnitProcessor, IUnitParameterSet, IExpression>(
                         ProcessHelper.ObtainAsync
                     )
                 ),
@@ -45,7 +45,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
 
         private IEnumerable<IGreatGrannyInfo<IExpression>> CreateGreatGrannies(Id23neurULizerWriteOptions options, IExpressionParameterSet parameters) =>
             parameters.UnitsParameters.Select(
-                u => new GreatGrannyWriteInfo<IUnit, IUnitProcessor, IUnitParameterSet, IExpression>(
+                u => new GreatGrannyInfo<IUnit, IUnitProcessor, IUnitParameterSet, IExpression>(
                     unitProcessor,
                     (g) => u,
                     (g, r) => r.Units.Add(g)
@@ -175,7 +175,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
             new Expression().AggregateTryParse(
                 CreateGreatGrannies(options, parameters),
                 parameters.UnitsParameters.Select(
-                    u => new GreatGrannyWriteProcess<IUnit, IUnitProcessor, IUnitParameterSet, IExpression>(
+                    u => new GreatGrannyProcess<IUnit, IUnitProcessor, IUnitParameterSet, IExpression>(
                         ProcessHelper.TryParse
                     )
                 ),
@@ -188,9 +188,8 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
 
             if (tempResult != null && tempResult.Units.Count() == parameters.UnitsParameters.Count())
             {
-                this.TryParseCore(
+                tempResult.TryParseCore(
                     ensemble,
-                    tempResult,
                     // start from the Head units
                     tempResult.Units.GetByTypeId(options.Primitives.Unit.Id).Select(u => u.Neuron.Id),
                     new[]

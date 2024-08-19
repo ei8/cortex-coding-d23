@@ -20,12 +20,12 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
         public async Task<IValueExpression> BuildAsync(Ensemble ensemble, Id23neurULizerWriteOptions options, IValueExpressionParameterSet parameters) =>
             await new ValueExpression().AggregateBuildAsync(
                 CreateGreatGrannies(options, parameters),
-                new IGreatGrannyWriteProcessAsync<IValueExpression>[]
+                new IGreatGrannyProcessAsync<IValueExpression>[]
                 {
-                    new GreatGrannyWriteProcessAsync<IValue, IValueProcessor, IValueParameterSet, IValueExpression>(
+                    new GreatGrannyProcessAsync<IValue, IValueProcessor, IValueParameterSet, IValueExpression>(
                         ProcessHelper.ObtainWithAggregateParamsAsync
                         ),
-                    new GreatGrannyWriteProcessAsync<IExpression, IExpressionProcessor, IExpressionParameterSet, IValueExpression>(
+                    new GreatGrannyProcessAsync<IExpression, IExpressionProcessor, IExpressionParameterSet, IValueExpression>(
                         ProcessHelper.ObtainWithAggregateParamsAsync
                         )
                 },
@@ -36,12 +36,12 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
         private IEnumerable<IGreatGrannyInfo<IValueExpression>> CreateGreatGrannies(Id23neurULizerWriteOptions options, IValueExpressionParameterSet parameters) =>
             new IGreatGrannyInfo<IValueExpression>[]
             {
-                new GreatGrannyWriteInfo<IValue, IValueProcessor, IValueParameterSet, IValueExpression>(
+                new GreatGrannyInfo<IValue, IValueProcessor, IValueParameterSet, IValueExpression>(
                     valueProcessor,
                     (g) => CreateValueParameterSet(parameters),
                     (g, r) => r.Value = g
                     ),
-                new GreatGrannyWriteInfo<IExpression, IExpressionProcessor, IExpressionParameterSet, IValueExpression>(
+                new GreatGrannyInfo<IExpression, IExpressionProcessor, IExpressionParameterSet, IValueExpression>(
                     expressionProcessor,
                     (g) => CreateExpressionParameterSet(options.Primitives, parameters, g.Neuron),
                     (g, r) => r.Expression = g
@@ -80,12 +80,12 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
         public bool TryParse(Ensemble ensemble, Id23neurULizerWriteOptions options, IValueExpressionParameterSet parameters, out IValueExpression result) =>
             new ValueExpression().AggregateTryParse(
                 CreateGreatGrannies(options, parameters),
-                new IGreatGrannyWriteProcess<IValueExpression>[]
+                new IGreatGrannyProcess<IValueExpression>[]
                 {
-                    new GreatGrannyWriteProcess<IValue, IValueProcessor, IValueParameterSet, IValueExpression>(
+                    new GreatGrannyProcess<IValue, IValueProcessor, IValueParameterSet, IValueExpression>(
                         ProcessHelper.TryParse
                         ),
-                    new GreatGrannyWriteProcess<IExpression, IExpressionProcessor, IExpressionParameterSet, IValueExpression>(
+                    new GreatGrannyProcess<IExpression, IExpressionProcessor, IExpressionParameterSet, IValueExpression>(
                         ProcessHelper.TryParse
                         )
                 },
