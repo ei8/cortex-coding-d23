@@ -26,19 +26,24 @@ namespace ei8.Cortex.Coding.d23.neurULization.Readers
             ) =>
                 ProcessHelper.CreateGreatGrannyCandidates(
                     ensemble,
-                    ensemble.GetPostsynapticNeurons(parameters.Granny.Id).SingleOrDefault(n => n.Id != options.Primitives.Simple.Id),
+                    parameters.Granny,
                     gc => new GreatGrannyInfo<IExpression, IExpressionProcessor, IExpressionParameterSet, IValueExpression>(
                         expressionProcessor,
                         (g) => ValueExpressionProcessor.CreateExpressionParameterSet(options.Primitives, parameters, gc),
                         (g, r) => r.Expression = g
-                        )
-                    );
-                //    new GreatGrannyReadInfo<IValue, IValueProcessor, IValueParameterSet, IValueExpression>(
-                //        valueProcessor,
-                //        CreateValueParameterSet(parameters),
-                //        (g, r) => r.Value = g
-                //        )
-                //};
+                    )
+                ).Concat(
+                    new IGreatGrannyInfo<IValueExpression>[] {
+                        new GreatGrannyInfo<IValue, IValueProcessor, IValueParameterSet, IValueExpression>(
+                                valueProcessor,
+                                g => ValueExpressionProcessor.CreateValueParameterSet(
+                                    parameters, 
+                                    ((IExpression) g).Units.GetByTypeId(options.Primitives.Unit.Id).Single()
+                                    ),
+                                (g, r) => r.Value = g
+                            )
+                    }
+                );
 
         private static ExpressionParameterSet CreateExpressionParameterSet(
             PrimitiveSet primitives, 
@@ -54,12 +59,11 @@ namespace ei8.Cortex.Coding.d23.neurULization.Readers
                 }
             );
 
-        private static IValueParameterSet CreateValueParameterSet(IValueExpressionParameterSet parameters) =>
+        private static IValueParameterSet CreateValueParameterSet(IValueExpressionParameterSet parameters, IUnit unit) =>
             new ValueParameterSet(
-                parameters.Granny,
+                unit.Value,
                 parameters.Class
             );
-
 
         public bool TryParse(Ensemble ensemble, Id23neurULizerReadOptions options, IValueExpressionParameterSet parameters, out IValueExpression result) =>
             new ValueExpression().AggregateTryParse(
@@ -73,10 +77,10 @@ namespace ei8.Cortex.Coding.d23.neurULization.Readers
                     ),
                 new IGreatGrannyProcess<IValueExpression>[]
                 {
-                    new GreatGrannyProcess<IValue, IValueProcessor, IValueParameterSet, IValueExpression>(
+                    new GreatGrannyProcess<IExpression, IExpressionProcessor, IExpressionParameterSet, IValueExpression>(
                         ProcessHelper.TryParse
                         ),
-                    new GreatGrannyProcess<IExpression, IExpressionProcessor, IExpressionParameterSet, IValueExpression>(
+                    new GreatGrannyProcess<IValue, IValueProcessor, IValueParameterSet, IValueExpression>(
                         ProcessHelper.TryParse
                         )
                 },

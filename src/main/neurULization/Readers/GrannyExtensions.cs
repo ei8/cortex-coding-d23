@@ -28,7 +28,8 @@ namespace ei8.Cortex.Coding.d23.neurULization.Readers
             {
                 foreach (var target in targets)
                 {
-                    if ((precedingGranny = target.Execute(
+                    var tempPrecedingGranny = default(IGranny);
+                    if ((tempPrecedingGranny = target.Execute(
                         candidate, 
                         ensemble, 
                         options, 
@@ -36,6 +37,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Readers
                         tempResult
                         )) != null)
                     {
+                        precedingGranny = tempPrecedingGranny;
                         successCount++;
                         break;
                     }

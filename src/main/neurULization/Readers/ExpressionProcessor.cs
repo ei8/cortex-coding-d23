@@ -21,19 +21,25 @@ namespace ei8.Cortex.Coding.d23.neurULization.Readers
             Ensemble ensemble
             ) =>
             ProcessHelper.CreateGreatGrannyCandidates(
-                ensemble, 
+                ensemble,
                 parameters.Granny,
-                gc => parameters.UnitParameters.Select(
+                gc => parameters.UnitParameters.Where(up => up.Granny == null).Select(
                     up => new GreatGrannyInfo<IUnit, IUnitProcessor, IUnitParameterSet, IExpression>(
                         unitProcessor,
-                        g => up.Value != null ? 
-                            UnitParameterSet.Create(
+                        g => UnitParameterSet.Create(
                                 gc,
                                 up.Value,
                                 up.Type
-                                ) :
-                            UnitParameterSet.CreateWithGrannyAndType(
-                                gc, 
+                            ),
+                        (g, r) => r.Units.Add(g)
+                    )
+                )
+            ).Concat(
+                parameters.UnitParameters.Where(up => up.Granny != null).Select(
+                    up => new GreatGrannyInfo<IUnit, IUnitProcessor, IUnitParameterSet, IExpression>(
+                        unitProcessor,
+                        g => UnitParameterSet.CreateWithGrannyAndType(
+                                up.Granny,
                                 up.Type
                             ),
                         (g, r) => r.Units.Add(g)

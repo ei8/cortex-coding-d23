@@ -46,16 +46,21 @@ namespace ei8.Cortex.Coding.d23.neurULization
 
         public IGranny Execute(IGreatGrannyInfo<TResult> greatGrannyProcess, Ensemble ensemble, Id23neurULizerOptions options, IGranny precedingGranny, TResult tempResult)
         {
-            var typedGreatGrannyProcess = (GreatGrannyInfo<TGranny, TGrannyProcessor, TParameterSet, TResult>)greatGrannyProcess;
-
-            return process(
-                typedGreatGrannyProcess.Processor,
-                ensemble,
-                options,
-                typedGreatGrannyProcess.ParametersBuilder(precedingGranny),
-                typedGreatGrannyProcess.DerivedGrannyUpdater,
-                tempResult
+            var result = default(IGranny);
+            
+            if (greatGrannyProcess is GreatGrannyInfo<TGranny, TGrannyProcessor, TParameterSet, TResult> typedGreatGrannyProcess)
+            {
+                result = process(
+                    typedGreatGrannyProcess.Processor,
+                    ensemble,
+                    options,
+                    typedGreatGrannyProcess.ParametersBuilder(precedingGranny),
+                    typedGreatGrannyProcess.DerivedGrannyUpdater,
+                    tempResult
                 );
+            }
+
+            return result;
         }
     }
 }
