@@ -1,12 +1,10 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
 using ei8.Cortex.Coding.d23.neurULization.Queries;
-using ei8.Cortex.Coding.d23.neurULization.Selectors;
 using ei8.Cortex.Library.Common;
 using Microsoft.Extensions.DependencyInjection;
 using neurUL.Common.Domain.Model;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 

@@ -35,20 +35,21 @@ namespace ei8.Cortex.Coding.d23.neurULization.Readers
                 ).Concat(
                     new IGreatGrannyInfo<IValueExpression>[] {
                         new GreatGrannyInfo<IValue, IValueProcessor, IValueParameterSet, IValueExpression>(
-                                valueProcessor,
-                                g => ValueExpressionProcessor.CreateValueParameterSet(
-                                    parameters, 
-                                    ((IExpression) g).Units.GetByTypeId(options.Primitives.Unit.Id).Single()
-                                    ),
-                                (g, r) => r.Value = g
-                            )
+                            valueProcessor,
+                            g => ValueExpressionProcessor.CreateValueParameterSet(
+                                parameters, 
+                                ((IExpression) g).Units.GetByTypeId(options.Primitives.Unit.Id).Single().Value
+                                ),
+                            (g, r) => r.Value = g
+                        )
                     }
                 );
 
         private static ExpressionParameterSet CreateExpressionParameterSet(
             PrimitiveSet primitives, 
             IValueExpressionParameterSet parameters, 
-            Neuron unitGranny) =>
+            Neuron unitGranny
+            ) =>
             new ExpressionParameterSet(
                 parameters.Granny,
                 new[] {
@@ -59,9 +60,9 @@ namespace ei8.Cortex.Coding.d23.neurULization.Readers
                 }
             );
 
-        private static IValueParameterSet CreateValueParameterSet(IValueExpressionParameterSet parameters, IUnit unit) =>
+        private static IValueParameterSet CreateValueParameterSet(IValueExpressionParameterSet parameters, Neuron value) =>
             new ValueParameterSet(
-                unit.Value,
+                value,
                 parameters.Class
             );
 
