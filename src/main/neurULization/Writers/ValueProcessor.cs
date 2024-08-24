@@ -58,15 +58,18 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
                             new[] { parameters.Value.Tag } :
                             null,
                         DirectionValues = DirectionValues.Outbound,
-                        Depth = 1,
-                        TraversalDepthPostsynaptic = new[] {
-                            // 1 edge away and should have postsynaptic of previous granny
-                            new DepthIdsPair {
-                                Depth = 1,
-                                Ids = new[] { n.Last().Neuron.Id }
-                            },
-                        }
-                    }
+                        Depth = n.Last() != null ? 1 : (int?) null,
+                        TraversalDepthPostsynaptic = n.Last() != null ?
+                            new[] {
+                                // 1 edge away and should have postsynaptic of previous granny
+                                new DepthIdsPair {
+                                    Depth = 1,
+                                    Ids = new[] { n.Last().Neuron.Id }
+                                },
+                            } : 
+                            null
+                    },
+                    false
                 )
             };
 

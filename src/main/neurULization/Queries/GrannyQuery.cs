@@ -10,11 +10,14 @@ namespace ei8.Cortex.Coding.d23.neurULization.Queries
     {
         private NeuronQuery neuronQuery;
 
-        public GrannyQuery(NeuronQuery neuronQuery)
+        public GrannyQuery(NeuronQuery neuronQuery, bool requiresPrecedingGrannyQueryResult = true)
         {
             AssertionConcern.AssertArgumentNotNull(neuronQuery, nameof(neuronQuery));
             this.neuronQuery = neuronQuery;
+            this.RequiresPrecedingGrannyQueryResult = requiresPrecedingGrannyQueryResult;
         }
+
+        public bool RequiresPrecedingGrannyQueryResult { get; }
 
         public Task<NeuronQuery> GetQuery(ProcessParameters processParameters, IList<IGranny> retrievedGrannies)
         {

@@ -17,13 +17,20 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
         private readonly TGrannyWriteProcessor grannyWriteProcessor;
         private readonly Func<IEnumerable<IGranny>, TWriteParameterSet> writeParametersBuilder;
 
-        public GrannyQueryInner(TGrannyWriteProcessor grannyWriteProcessor, Func<IEnumerable<IGranny>, TWriteParameterSet> writeParametersBuilder)
+        public GrannyQueryInner(
+            TGrannyWriteProcessor grannyWriteProcessor, 
+            Func<IEnumerable<IGranny>, TWriteParameterSet> writeParametersBuilder,
+            bool requiresPrecedingGrannyQueryResult = true
+            )
         {
             AssertionConcern.AssertArgumentNotNull(writeParametersBuilder, nameof(writeParametersBuilder));
 
             this.grannyWriteProcessor = grannyWriteProcessor;
             this.writeParametersBuilder = writeParametersBuilder;
+            this.RequiresPrecedingGrannyQueryResult = requiresPrecedingGrannyQueryResult;
         }
+
+        public bool RequiresPrecedingGrannyQueryResult { get; }
 
         public async Task<NeuronQuery> GetQuery(ProcessParameters processParameters, IList<IGranny> retrievedGrannies)
         {

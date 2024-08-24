@@ -1,5 +1,6 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
 using ei8.Cortex.Coding.d23.neurULization.Selectors;
+using neurUL.Common.Domain.Model;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -15,18 +16,27 @@ namespace ei8.Cortex.Coding.d23.neurULization
             IEnumerable<Guid> selection,
             LevelParser[] levelParsers,
             Action<Neuron> resultProcessor,
-            ref TGranny result
+            ref TGranny result,
+            bool throwExceptionOnRedundantData = true
         )
             where TGranny : IGranny
         {
             foreach (var levelParser in levelParsers)
                 selection = levelParser.Evaluate(ensemble, selection);
 
-            Trace.WriteLineIf(selection.Count() > 1, "Redundant data encountered.");
-            if (selection.Count() == 1 && ensemble.TryGetById(selection.Single(), out Neuron ensembleResult))
+            if (selection.Any())
             {
-                resultProcessor(ensembleResult);
-                result = granny;
+                if (throwExceptionOnRedundantData)
+                    AssertionConcern.AssertStateTrue(
+                        selection.Count() == 1,
+                        $"Redundant items encountered while parsing ensemble: {string.Join(", ", selection)}"
+                        );
+
+                if (ensemble.TryGetById(selection.Single(), out Neuron ensembleResult))
+                {
+                    resultProcessor(ensembleResult);
+                    result = granny;
+                }
             }
         }
     }

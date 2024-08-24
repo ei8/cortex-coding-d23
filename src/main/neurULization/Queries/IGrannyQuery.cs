@@ -7,6 +7,8 @@ namespace ei8.Cortex.Coding.d23.neurULization.Queries
 {
     public interface IGrannyQuery
     {
+        bool RequiresPrecedingGrannyQueryResult { get; }
+
         Task<NeuronQuery> GetQuery(ProcessParameters processParameters, IList<IGranny> retrievedGrannies);
     }
 }

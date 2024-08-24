@@ -185,7 +185,6 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
                 false
             );
 
-
             if (tempResult != null && tempResult.Units.Count() == parameters.UnitsParameters.Count())
             {
                 tempResult.TryParseCore(

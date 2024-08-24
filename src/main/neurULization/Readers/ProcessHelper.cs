@@ -41,13 +41,21 @@ namespace ei8.Cortex.Coding.d23.neurULization.Readers
             Func<Neuron, IEnumerable<IGreatGrannyInfo<TResult>>> selector
         )
             where TResult : IGranny
-            =>
-            granny != null ?
+        {
+            var result = default(IEnumerable<IGreatGrannyInfo<TResult>>);
+            if (granny != null)
+            {
                 // use each postsynaptic of granny as a granny candidate
-                ensemble.GetPostsynapticNeurons(granny.Id).SelectMany(
+                var posts = ensemble.GetPostsynapticNeurons(granny.Id);
+                result = posts.SelectMany(
                     gc => selector(gc)
-                ) :
-                Array.Empty<IGreatGrannyInfo<TResult>>();
+                );
+            }
+            else
+                result = Array.Empty<IGreatGrannyInfo<TResult>>();
+
+            return result;
+        }
 
         internal static IEnumerable<IGreatGrannyInfo<TResult>> CreateGreatGrannyCandidates<TResult>(
             Ensemble ensemble,

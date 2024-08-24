@@ -89,8 +89,13 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
         {
             var result = false;
             // loop through each grannyQuery
-            foreach (var grannyQuery in grannyQueries)
+            var grannyQueriesArr = grannyQueries.ToArray();
+            for (int i = 0; i < grannyQueriesArr.Length; i++)
             {
+                var grannyQuery = grannyQueriesArr[i];
+                var nextGrannyQuery = i < grannyQueriesArr.Length - 1?
+                    grannyQueriesArr[i + 1] :
+                    null;
                 // if last is supposed to be skipped
                 if (breakBeforeLastGetQuery && grannyQueries.Last() == grannyQuery)
                 {
@@ -114,16 +119,28 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
                     // if granny query is retriever
                     if (grannyQuery is IRetriever gqr)
                     {
-                        var retrievalResult = gqr.RetrieveGranny(processParameters.Ensemble, processParameters.Options, retrievedGrannies.AsEnumerable());
-                        if (retrievalResult != null)
-                            retrievedGrannies.Add(retrievalResult);
+                        var retrievalResult = gqr.RetrieveGranny(
+                            processParameters.Ensemble, 
+                            processParameters.Options, 
+                            retrievedGrannies.AsEnumerable()
+                            );
+                        retrievedGrannies.Add(retrievalResult);
                         // if retrieval fails and this is not the last query
-                        else if (grannyQueries.Last() != grannyQuery)
+                        // and next grannyQuery cannot continue without current result
+                        if (
+                                retrievalResult == null &&
+                                grannyQueries.Last() != grannyQuery && 
+                                (
+                                    nextGrannyQuery != null && 
+                                    nextGrannyQuery.RequiresPrecedingGrannyQueryResult
+                                )
+                            )
                             // break with a failure indication
                             break;
                     }
                 }
                 else
+                    // break with a failure indication
                     break;
 
                 // if this is the last granny

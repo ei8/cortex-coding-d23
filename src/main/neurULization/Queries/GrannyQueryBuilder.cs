@@ -12,12 +12,17 @@ namespace ei8.Cortex.Coding.d23.neurULization.Queries
     {
         private Func<IEnumerable<IGranny>, NeuronQuery> queryWithNeuronBuilder;
 
-        public GrannyQueryBuilder(Func<IEnumerable<IGranny>, NeuronQuery> queryWithNeuronBuilder)
+        public GrannyQueryBuilder(
+            Func<IEnumerable<IGranny>, NeuronQuery> queryWithNeuronBuilder, 
+            bool requiresPrecedingGrannyQueryResult = true
+            )
         {
             AssertionConcern.AssertArgumentNotNull(queryWithNeuronBuilder, nameof(queryWithNeuronBuilder));
             this.queryWithNeuronBuilder = queryWithNeuronBuilder;
+            this.RequiresPrecedingGrannyQueryResult = requiresPrecedingGrannyQueryResult;
         }
 
+        public bool RequiresPrecedingGrannyQueryResult { get; }
         public Task<NeuronQuery> GetQuery(ProcessParameters processParameters, IList<IGranny> retrievedGrannies)
         {
             return Task.FromResult(queryWithNeuronBuilder(retrievedGrannies.AsEnumerable()));
