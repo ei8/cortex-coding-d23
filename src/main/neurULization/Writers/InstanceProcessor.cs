@@ -62,16 +62,16 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
         private IEnumerable<IGreatGrannyInfo<IInstance>> CreateGreatGrannies(Id23neurULizerWriteOptions options, IInstanceParameterSet parameters) =>
             new IGreatGrannyInfo<IInstance>[]
             {
-                new GreatGrannyInfo<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IInstance>(
+                new IndependentGreatGrannyInfo<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IInstance>(
                     instantiatesClassProcessor,
-                    (g) => CreateInstantiatesClassParameterSet(parameters),
+                    () => CreateInstantiatesClassParameterSet(parameters),
                     (g, r) => r.InstantiatesClass = g
                 )
             }.Concat(
                 parameters.PropertyAssociationsParameters.Select(
-                    u => new GreatGrannyInfo<IPropertyAssociation, IPropertyAssociationProcessor, IPropertyAssociationParameterSet, IInstance>(
+                    u => new IndependentGreatGrannyInfo<IPropertyAssociation, IPropertyAssociationProcessor, IPropertyAssociationParameterSet, IInstance>(
                     propertyAssociationProcessor,
-                    (g) => u,
+                    () => u,
                     (g, r) => r.PropertyAssociations.Add(g)
                     )
                 )

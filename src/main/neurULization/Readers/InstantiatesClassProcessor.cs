@@ -17,9 +17,9 @@ namespace ei8.Cortex.Coding.d23.neurULization.Readers
         private static IEnumerable<IGreatGrannyInfo<IInstantiatesClass>> CreateGreatGrannies(IExpressionProcessor expressionProcessor, Id23neurULizerReadOptions options, IInstantiatesClassParameterSet parameters) =>
            new IGreatGrannyInfo<IInstantiatesClass>[]
            {
-                new GreatGrannyInfo<IExpression, IExpressionProcessor, IExpressionParameterSet, IInstantiatesClass>(
+                new IndependentGreatGrannyInfo<IExpression, IExpressionProcessor, IExpressionParameterSet, IInstantiatesClass>(
                     expressionProcessor,
-                    (g) => InstantiatesClassProcessor.CreateSubordinationParameterSet(options.Primitives, parameters),
+                    () => InstantiatesClassProcessor.CreateSubordinationParameterSet(options.Primitives, parameters),
                     (g, r) => r.Class = g.Units.GetByTypeId(options.Primitives.DirectObject.Id).Single()
                 )
            };

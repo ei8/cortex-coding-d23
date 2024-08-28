@@ -36,12 +36,12 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
         private IEnumerable<IGreatGrannyInfo<IValueExpression>> CreateGreatGrannies(Id23neurULizerWriteOptions options, IValueExpressionParameterSet parameters) =>
             new IGreatGrannyInfo<IValueExpression>[]
             {
-                new GreatGrannyInfo<IValue, IValueProcessor, IValueParameterSet, IValueExpression>(
+                new IndependentGreatGrannyInfo<IValue, IValueProcessor, IValueParameterSet, IValueExpression>(
                     valueProcessor,
-                    (g) => CreateValueParameterSet(parameters),
+                    () => CreateValueParameterSet(parameters),
                     (g, r) => r.Value = g
                     ),
-                new GreatGrannyInfo<IExpression, IExpressionProcessor, IExpressionParameterSet, IValueExpression>(
+                new DependentGreatGrannyInfo<IExpression, IExpressionProcessor, IExpressionParameterSet, IValueExpression>(
                     expressionProcessor,
                     (g) => CreateExpressionParameterSet(options.Primitives, parameters, g.Neuron),
                     (g, r) => r.Expression = g

@@ -1,7 +1,6 @@
 ﻿namespace ei8.Cortex.Coding.d23.neurULization.Readers
 {
-    public interface IInstantiatesClassParameterSet : IReadParameterSet
+    public interface IInstantiatesClassParameterSet : IClassReadParameterSet
     {
-        Neuron Class { get; }
     }
 }

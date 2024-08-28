@@ -22,21 +22,22 @@ namespace ei8.Cortex.Coding.d23.neurULization.Readers
             IInstanceParameterSet parameters,
             Ensemble ensemble
         ) =>
-            new IGreatGrannyInfo<IInstance>[]
-            {
-                new GreatGrannyInfo<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IInstance>(
+            ProcessHelper.CreateGreatGrannyCandidates(
+                ensemble,
+                parameters.Granny,
+                gc => new IndependentGreatGrannyInfo<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IInstance>(
                     instantiatesClassProcessor,
-                    g => InstanceProcessor.CreateInstantiatesClassParameterSet(parameters),
+                    () => InstanceProcessor.CreateInstantiatesClassParameterSet(gc, parameters),
                     (g, r) => r.InstantiatesClass = g
                 )
-            }.Concat(
+            ).Concat(
                 ProcessHelper.CreateGreatGrannyCandidates(
                     ensemble,
                     parameters.Granny,
                     gc => parameters.PropertyAssociationsParameters.Select(
-                        u => new GreatGrannyInfo<IPropertyAssociation, IPropertyAssociationProcessor, IPropertyAssociationParameterSet, IInstance>(
+                        u => new IndependentGreatGrannyInfo<IPropertyAssociation, IPropertyAssociationProcessor, IPropertyAssociationParameterSet, IInstance>(
                             propertyAssociationProcessor,
-                            g => PropertyAssociationParameterSet.CreateWithGranny(
+                            () => PropertyAssociationParameterSet.CreateWithGranny(
                                 gc,
                                 u.Property,
                                 u.Class
@@ -47,9 +48,9 @@ namespace ei8.Cortex.Coding.d23.neurULization.Readers
                 )
             );
 
-        private static IInstantiatesClassParameterSet CreateInstantiatesClassParameterSet(IInstanceParameterSet parameters) =>
+        private static IInstantiatesClassParameterSet CreateInstantiatesClassParameterSet(Neuron grannyCandidate, IInstanceParameterSet parameters) =>
             new InstantiatesClassParameterSet(
-                parameters.Granny,
+                grannyCandidate,
                 parameters.Class
             );
 

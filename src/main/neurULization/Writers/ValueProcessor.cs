@@ -35,9 +35,9 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
         private IEnumerable<IGreatGrannyInfo<IValue>> CreateGreatGrannies(Id23neurULizerWriteOptions options, IValueParameterSet parameters) =>
             new IGreatGrannyInfo<IValue>[]
             {
-                new GreatGrannyInfo<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IValue>(
+                new IndependentGreatGrannyInfo<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IValue>(
                     instantiatesClassProcessor,
-                    (g) => CreateInstantiatesClassParameterSet(parameters),
+                    () => CreateInstantiatesClassParameterSet(parameters),
                     (g, r) => r.InstantiatesClass = g
                 )
             };

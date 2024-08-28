@@ -3,10 +3,8 @@ using System.Collections.Generic;
 
 namespace ei8.Cortex.Coding.d23.neurULization.Readers
 {
-    public interface IInstanceParameterSet : IReadParameterSet
+    public interface IInstanceParameterSet : IClassReadParameterSet
     {
-        Neuron Class { get; }
-
         IEnumerable<IPropertyAssociationParameterSet> PropertyAssociationsParameters { get; }
     }
 }

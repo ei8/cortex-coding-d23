@@ -21,9 +21,9 @@ namespace ei8.Cortex.Coding.d23.neurULization.Readers
             ProcessHelper.CreateGreatGrannyCandidates(
                 ensemble,
                 parameters.Granny,
-                gc => new GreatGrannyInfo<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IValue>(
+                gc => new IndependentGreatGrannyInfo<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IValue>(
                     instantiatesClassProcessor,
-                    (g) => ValueProcessor.CreateInstantiatesClassParameterSet(parameters, gc),
+                    () => ValueProcessor.CreateInstantiatesClassParameterSet(parameters, gc),
                     (g, r) => r.InstantiatesClass = g
                 )
             );

@@ -1,4 +1,7 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
+using ei8.Cortex.Coding.d23.neurULization.Readers;
+using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace ei8.Cortex.Coding.d23.neurULization
@@ -6,7 +9,7 @@ namespace ei8.Cortex.Coding.d23.neurULization
     internal class GreatGrannyProcessAsync<TGranny, TGrannyProcessor, TParameterSet, TResult> : IGreatGrannyProcessAsync<TResult>
         where TGranny : IGranny
         where TGrannyProcessor : IGrannyProcessor<TGranny, TParameterSet>
-        where TParameterSet : IParameterSet
+        where TParameterSet : class, IParameterSet
         where TResult : IGranny
     {
         private readonly AsyncGrannyProcessCallback<TGranny, TGrannyProcessor, TParameterSet, TResult> asyncProcess;
@@ -16,25 +19,33 @@ namespace ei8.Cortex.Coding.d23.neurULization
             this.asyncProcess = asyncProcess;
         }
 
-        public async Task<IGranny> ExecuteAsync(IGreatGrannyInfo<TResult> greatGrannyProcess, Ensemble ensemble, Id23neurULizerOptions options, IGranny precedingGranny, TResult tempResult)
+        public async Task<IGranny> ExecuteAsync(IGreatGrannyInfo<TResult> greatGrannyInfo, Ensemble ensemble, Id23neurULizerOptions options, IGranny precedingGranny, TResult tempResult)
         {
-            var typedGreatGrannyProcess = (GreatGrannyInfo<TGranny, TGrannyProcessor, TParameterSet, TResult>)greatGrannyProcess;
+            var result = default(IGranny);
 
-            return await asyncProcess(
-                typedGreatGrannyProcess.Processor,
-                ensemble,
-                options,
-                typedGreatGrannyProcess.ParametersBuilder(precedingGranny),
-                typedGreatGrannyProcess.DerivedGrannyUpdater,
-                tempResult
-                );
+            if (GreatGrannyProcess<TGranny, TGrannyProcessor, TParameterSet, TResult>.TryGetParameters(
+                precedingGranny,
+                greatGrannyInfo,
+                out TParameterSet parameters,
+                out ICoreGreatGrannyInfo<TGranny, TGrannyProcessor, TResult> coreGreatGrannyInfo
+            ))
+                result = await asyncProcess(
+                        coreGreatGrannyInfo.Processor,
+                        ensemble,
+                        options,
+                        parameters,
+                        coreGreatGrannyInfo.DerivedGrannyUpdater,
+                        tempResult
+                    );
+
+            return result;
         }
     }
 
     internal class GreatGrannyProcess<TGranny, TGrannyProcessor, TParameterSet, TResult> : IGreatGrannyProcess<TResult>
         where TGranny : IGranny
         where TGrannyProcessor : IGrannyProcessor<TGranny, TParameterSet>
-        where TParameterSet : IParameterSet
+        where TParameterSet : class, IParameterSet
         where TResult : IGranny
     {
         private readonly GrannyProcessCallback<TGranny, TGrannyProcessor, TParameterSet, TResult> process;
@@ -44,23 +55,64 @@ namespace ei8.Cortex.Coding.d23.neurULization
             this.process = process;
         }
 
-        public IGranny Execute(IGreatGrannyInfo<TResult> greatGrannyProcess, Ensemble ensemble, Id23neurULizerOptions options, IGranny precedingGranny, TResult tempResult)
+        public IGranny Execute(IGreatGrannyInfo<TResult> greatGrannyInfo, Ensemble ensemble, Id23neurULizerOptions options, IGranny precedingGranny, TResult tempResult)
         {
             var result = default(IGranny);
-            
-            if (greatGrannyProcess is GreatGrannyInfo<TGranny, TGrannyProcessor, TParameterSet, TResult> typedGreatGrannyProcess)
-            {
+
+            if (TryGetParameters(
+                precedingGranny, 
+                greatGrannyInfo, 
+                out TParameterSet parameters,
+                out ICoreGreatGrannyInfo<TGranny, TGrannyProcessor, TResult> coreGreatGrannyInfo
+            ))
                 result = process(
-                    typedGreatGrannyProcess.Processor,
+                    coreGreatGrannyInfo.Processor,
                     ensemble,
                     options,
-                    typedGreatGrannyProcess.ParametersBuilder(precedingGranny),
-                    typedGreatGrannyProcess.DerivedGrannyUpdater,
+                    parameters,
+                    coreGreatGrannyInfo.DerivedGrannyUpdater,
                     tempResult
                 );
-            }
 
             return result;
+        }
+
+        internal static bool TryGetParameters(
+            IGranny precedingGranny, 
+            IGreatGrannyInfo<TResult> greatGrannyInfo, 
+            out TParameterSet parameters,
+            out ICoreGreatGrannyInfo<TGranny, TGrannyProcessor, TResult> resultCoreGreatGrannyInfo
+            )
+
+        {
+            parameters = default;
+            resultCoreGreatGrannyInfo = null;
+
+            if (greatGrannyInfo is ICoreGreatGrannyInfo<TGranny, TGrannyProcessor, TResult> coreGreatGrannyInfo)
+            {
+                resultCoreGreatGrannyInfo = coreGreatGrannyInfo;
+
+                if (
+                    resultCoreGreatGrannyInfo is IDependentGreatGrannyInfo<TGranny, TGrannyProcessor, TParameterSet, TResult> dependentGreatGrannyInfo &&
+                    precedingGranny != null
+                )
+                    parameters = dependentGreatGrannyInfo.ParametersBuilder(precedingGranny);
+                else if (
+                    resultCoreGreatGrannyInfo is IIndependentGreatGrannyInfo<TGranny, TGrannyProcessor, TParameterSet, TResult> independentGreatGrannyInfo
+                )
+                    parameters = independentGreatGrannyInfo.ParametersBuilder();
+            }
+
+            GreatGrannyProcess<TGranny, TGrannyProcessor, TParameterSet, TResult>.LogPropertyName(parameters);
+
+            return parameters != default && resultCoreGreatGrannyInfo != null;
+        }
+
+        [Conditional("DEBUG")]
+        private static void LogPropertyName(TParameterSet parameters)
+        {
+            if (parameters is IPropertyReadParameterSet prop)
+                Debug.WriteLine($">>> Property Name: {prop.Property.Tag}");
         }
     }
 }

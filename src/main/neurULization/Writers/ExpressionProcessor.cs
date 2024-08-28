@@ -45,9 +45,9 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
 
         private IEnumerable<IGreatGrannyInfo<IExpression>> CreateGreatGrannies(Id23neurULizerWriteOptions options, IExpressionParameterSet parameters) =>
             parameters.UnitsParameters.Select(
-                u => new GreatGrannyInfo<IUnit, IUnitProcessor, IUnitParameterSet, IExpression>(
+                u => new IndependentGreatGrannyInfo<IUnit, IUnitProcessor, IUnitParameterSet, IExpression>(
                     unitProcessor,
-                    (g) => u,
+                    () => u,
                     (g, r) => r.Units.Add(g)
                 )
             );

@@ -25,15 +25,15 @@ namespace ei8.Cortex.Coding.d23.neurULization.Readers
             ProcessHelper.CreateGreatGrannyCandidates(
                 ensemble,
                 parameters.Granny,
-                gc => new GreatGrannyInfo<IExpression, IExpressionProcessor, IExpressionParameterSet, IPropertyAssignment>(
+                gc => new IndependentGreatGrannyInfo<IExpression, IExpressionProcessor, IExpressionParameterSet, IPropertyAssignment>(
                     expressionProcessor,
-                    g => PropertyAssignmentProcessor.CreateExpressionParameterSet(options.Primitives, parameters, gc),
+                    () => PropertyAssignmentProcessor.CreateExpressionParameterSet(options.Primitives, parameters, gc),
                     (g, r) => r.Expression = g
                 )
             ).Concat(
                 new IGreatGrannyInfo<IPropertyAssignment>[]
                 {
-                    new GreatGrannyInfo<IPropertyValueExpression, IPropertyValueExpressionProcessor, IPropertyValueExpressionParameterSet, IPropertyAssignment>(
+                    new DependentGreatGrannyInfo<IPropertyValueExpression, IPropertyValueExpressionProcessor, IPropertyValueExpressionParameterSet, IPropertyAssignment>(
                         propertyValueExpressionProcessor,
                         g => PropertyAssignmentProcessor.CreatePropertyValueExpressionParameterSet(
                             parameters,

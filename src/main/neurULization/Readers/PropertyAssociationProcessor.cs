@@ -16,24 +16,26 @@ namespace ei8.Cortex.Coding.d23.neurULization.Readers
         }
 
         private static IEnumerable<IGreatGrannyInfo<IPropertyAssociation>> CreateGreatGrannies(
-            IPropertyAssignmentProcessor propertyAssignmentProcessor, 
+            IPropertyAssignmentProcessor propertyAssignmentProcessor,
             IExpressionProcessor expressionProcessor,
-            Id23neurULizerReadOptions options, 
+            Id23neurULizerReadOptions options,
             IPropertyAssociationParameterSet parameters,
             Ensemble ensemble
-        ) =>
-            ProcessHelper.CreateGreatGrannyCandidates(
+        )
+        {
+            var ppid = parameters.Property.Tag.ToString();
+            return ProcessHelper.CreateGreatGrannyCandidates(
                 ensemble,
                 parameters.Granny,
-                gc => new GreatGrannyInfo<IExpression, IExpressionProcessor, IExpressionParameterSet, IPropertyAssociation>(
+                gc => new IndependentGreatGrannyInfo<IExpression, IExpressionProcessor, IExpressionParameterSet, IPropertyAssociation>(
                     expressionProcessor,
-                    g => PropertyAssociationProcessor.CreateExpressionParameterSet(options.Primitives, parameters, gc),
+                    () => PropertyAssociationProcessor.CreateExpressionParameterSet(options.Primitives, parameters, gc),
                     (g, r) => r.Expression = g
                 )
             ).Concat(
                 new IGreatGrannyInfo<IPropertyAssociation>[]
                 {
-                    new GreatGrannyInfo<IPropertyAssignment, IPropertyAssignmentProcessor, IPropertyAssignmentParameterSet, IPropertyAssociation>(
+                    new DependentGreatGrannyInfo<IPropertyAssignment, IPropertyAssignmentProcessor, IPropertyAssignmentParameterSet, IPropertyAssociation>(
                         propertyAssignmentProcessor,
                         g => PropertyAssociationProcessor.CreatePropertyAssignmentParameterSet(
                             parameters,
@@ -43,6 +45,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Readers
                     )
                 }
             );
+        }
 
         private static ExpressionParameterSet CreateExpressionParameterSet(
             PrimitiveSet primitives, 

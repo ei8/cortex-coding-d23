@@ -24,9 +24,9 @@ namespace ei8.Cortex.Coding.d23.neurULization.Readers
                 ensemble,
                 parameters.Granny,
                 gc => parameters.UnitParameters.Where(up => up.Granny == null).Select(
-                    up => new GreatGrannyInfo<IUnit, IUnitProcessor, IUnitParameterSet, IExpression>(
+                    up => new IndependentGreatGrannyInfo<IUnit, IUnitProcessor, IUnitParameterSet, IExpression>(
                         unitProcessor,
-                        g => UnitParameterSet.Create(
+                        () => UnitParameterSet.Create(
                                 gc,
                                 up.Value,
                                 up.Type
@@ -36,9 +36,9 @@ namespace ei8.Cortex.Coding.d23.neurULization.Readers
                 )
             ).Concat(
                 parameters.UnitParameters.Where(up => up.Granny != null).Select(
-                    up => new GreatGrannyInfo<IUnit, IUnitProcessor, IUnitParameterSet, IExpression>(
+                    up => new IndependentGreatGrannyInfo<IUnit, IUnitProcessor, IUnitParameterSet, IExpression>(
                         unitProcessor,
-                        g => UnitParameterSet.CreateWithGrannyAndType(
+                        () => UnitParameterSet.CreateWithGrannyAndType(
                                 up.Granny,
                                 up.Type
                             ),
