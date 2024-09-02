@@ -36,7 +36,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Readers
                             valueProcessor,
                             g => ValueExpressionProcessor.CreateValueParameterSet(
                                 parameters, 
-                                ((IExpression) g).Units.GetByTypeId(options.Primitives.Unit.Id).Single().Value
+                                ((IExpression) g).Units.GetValueUnitGranniesByTypeId(options.Primitives.Unit.Id).Single().Value
                                 ),
                             (g, r) => r.Value = g
                         )

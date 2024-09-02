@@ -2,6 +2,7 @@
 using ei8.Cortex.Coding.d23.neurULization.Queries;
 using ei8.Cortex.Library.Common;
 using Microsoft.Extensions.DependencyInjection;
+using Nancy.TinyIoc;
 using neurUL.Common.Domain.Model;
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace ei8.Cortex.Coding.d23.neurULization.Writers
 {
-    internal static class GrannyExtensions
+    public static class GrannyExtensions
     {
         internal async static Task<TGranny> ObtainAsync<TGranny, TGrannyWriteProcessor, TWriteParameterSet>(
             this TGrannyWriteProcessor grannyWriteProcessor,
@@ -54,15 +55,15 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
 
             TGranny result = default;
             // if target is not in specified ensemble
-            if (!grannyWriteProcessor.TryParse(processParameters.Ensemble, (Id23neurULizerWriteOptions) processParameters.Options, writeParameters, out TGranny ensembleParseResult))
+            if (!grannyWriteProcessor.TryParse(processParameters.Ensemble, (Id23neurULizerWriteOptions)processParameters.Options, writeParameters, out TGranny ensembleParseResult))
             {
                 // retrieve target from DB
-                var grannyQueries = grannyWriteProcessor.GetQueries((Id23neurULizerWriteOptions) processParameters.Options, writeParameters);
+                var grannyQueries = grannyWriteProcessor.GetQueries((Id23neurULizerWriteOptions)processParameters.Options, writeParameters);
 
                 await grannyQueries.Process(processParameters, new List<IGranny>());
 
                 // if target is in DB
-                if (grannyWriteProcessor.TryParse(processParameters.Ensemble, (Id23neurULizerWriteOptions) processParameters.Options, writeParameters, out TGranny dbParseResult))
+                if (grannyWriteProcessor.TryParse(processParameters.Ensemble, (Id23neurULizerWriteOptions)processParameters.Options, writeParameters, out TGranny dbParseResult))
                 {
                     result = dbParseResult;
                 }
@@ -70,7 +71,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
                 else
                 {
                     // build in ensemble
-                    result = await grannyWriteProcessor.BuildAsync(processParameters.Ensemble, (Id23neurULizerWriteOptions) processParameters.Options, writeParameters);
+                    result = await grannyWriteProcessor.BuildAsync(processParameters.Ensemble, (Id23neurULizerWriteOptions)processParameters.Options, writeParameters);
                 }
             }
             // if target was found in ensemble
@@ -80,7 +81,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
             return result;
         }
 
-        internal static async Task<bool> Process(
+        public static async Task<bool> Process(
             this IEnumerable<IGrannyQuery> grannyQueries,
             ProcessParameters processParameters,
             IList<IGranny> retrievedGrannies,
@@ -93,7 +94,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
             for (int i = 0; i < grannyQueriesArr.Length; i++)
             {
                 var grannyQuery = grannyQueriesArr[i];
-                var nextGrannyQuery = i < grannyQueriesArr.Length - 1?
+                var nextGrannyQuery = i < grannyQueriesArr.Length - 1 ?
                     grannyQueriesArr[i + 1] :
                     null;
                 // if last is supposed to be skipped
@@ -120,8 +121,8 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
                     if (grannyQuery is IRetriever gqr)
                     {
                         var retrievalResult = gqr.RetrieveGranny(
-                            processParameters.Ensemble, 
-                            processParameters.Options, 
+                            processParameters.Ensemble,
+                            processParameters.Options,
                             retrievedGrannies.AsEnumerable()
                             );
                         retrievedGrannies.Add(retrievalResult);
@@ -129,9 +130,9 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
                         // and next grannyQuery cannot continue without current result
                         if (
                                 retrievalResult == null &&
-                                grannyQueries.Last() != grannyQuery && 
+                                grannyQueries.Last() != grannyQuery &&
                                 (
-                                    nextGrannyQuery != null && 
+                                    nextGrannyQuery != null &&
                                     nextGrannyQuery.RequiresPrecedingGrannyQueryResult
                                 )
                             )
@@ -253,5 +254,58 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
 
         //    return services;
         //}
+
+        public static void AddWriteProcessors(this TinyIoCContainer container)
+        {
+            container.Register<IExpressionProcessor, ExpressionProcessor>();
+            container.Register<IInstantiatesClassProcessor, InstantiatesClassProcessor>();
+            container.Register<IPropertyAssignmentProcessor, PropertyAssignmentProcessor>();
+            container.Register<IPropertyAssociationProcessor, PropertyAssociationProcessor>();
+            container.Register<IPropertyValueExpressionProcessor, PropertyValueExpressionProcessor>();
+            container.Register<IUnitProcessor, UnitProcessor>();
+            container.Register<IValueProcessor, ValueProcessor>();
+            container.Register<IValueExpressionProcessor, ValueExpressionProcessor>();
+            container.Register<IInstanceProcessor, InstanceProcessor>();
+        }
+
+        public static void AddReadProcessors(this TinyIoCContainer container)
+        {
+            container.Register<
+                Readers.IExpressionProcessor,
+                Readers.ExpressionProcessor
+            >();
+            container.Register<
+                Readers.IInstantiatesClassProcessor,
+                Readers.InstantiatesClassProcessor
+            >();
+            container.Register<
+                Readers.IPropertyAssignmentProcessor,
+                Readers.PropertyAssignmentProcessor
+                >();
+            container.Register<
+                Readers.IPropertyAssociationProcessor,
+                Readers.PropertyAssociationProcessor
+                >();
+            container.Register<
+               Readers.IPropertyValueExpressionProcessor,
+               Readers.PropertyValueExpressionProcessor
+            >();
+            container.Register<
+                Readers.IUnitProcessor,
+                Readers.UnitProcessor
+            >();
+            container.Register<
+                Readers.IValueProcessor,
+                Readers.ValueProcessor
+            >();
+            container.Register<
+                Readers.IValueExpressionProcessor,
+                Readers.ValueExpressionProcessor
+            >();
+            container.Register<
+                Readers.IInstanceProcessor,
+                Readers.InstanceProcessor
+            >();
+        }
     }
 }

@@ -37,7 +37,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Readers
                         propertyValueExpressionProcessor,
                         g => PropertyAssignmentProcessor.CreatePropertyValueExpressionParameterSet(
                             parameters,
-                            ((IExpression) g).Units.GetByTypeId(options.Primitives.NominalModifier.Id).Single().Value
+                            ((IExpression) g).Units.GetValueUnitGranniesByTypeId(options.Primitives.NominalModifier.Id).Single().Value
                             ),
                         (g, r) => r.PropertyValueExpression = g
                     )

@@ -15,7 +15,11 @@ namespace ei8.Cortex.Coding.d23
                 var neuronPropertyAttribute = property.GetCustomAttributes<neurULNeuronPropertyAttribute>().SingleOrDefault();
                 if (neuronPropertyAttribute != null)
                 {
-                    result = ReflectionExtensions.GetNeuronPropertyData(neuronPropertyAttribute, property.Name, property.GetValue(obj));
+                    result = ReflectionExtensions.GetNeuronPropertyData(
+                        neuronPropertyAttribute, 
+                        property.Name, 
+                        property.GetValue(obj)
+                    );
                 }
                 else
                 {
@@ -60,8 +64,7 @@ namespace ei8.Cortex.Coding.d23
                         neuronProperty = new IdProperty((Guid)propertyValue);
                         break;
                     case nameof(Neuron.Tag):
-                        neuronProperty = new TagProperty((string)
-                            propertyValue);
+                        neuronProperty = new TagProperty((string)propertyValue);
                         break;
                     case nameof(Neuron.ExternalReferenceUrl):
                         neuronProperty = new ExternalReferenceUrlProperty((string)propertyValue);

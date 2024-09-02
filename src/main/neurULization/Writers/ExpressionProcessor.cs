@@ -33,7 +33,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
                 (r) =>
                     // concat applicable expression types
                     ExpressionProcessor.GetExpressionTypes(
-                        (id, isEqual) => parameters.UnitsParameters.GetByTypeId(id, isEqual).Count(),
+                        (id, isEqual) => parameters.UnitsParameters.GetValueUnitParametersByTypeId(id, isEqual).Count(),
                         options.Primitives
                     )
                     .Select(et => ensemble.Obtain(et))
@@ -60,7 +60,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
             IEnumerable<IGrannyQuery> result = null;
 
             var types = ExpressionProcessor.GetExpressionTypes(
-                (id, isEqual) => parameters.UnitsParameters.GetByTypeId(id, isEqual).Count(),
+                (id, isEqual) => parameters.UnitsParameters.GetValueUnitParametersByTypeId(id, isEqual).Count(),
                 primitives
                 );
 
@@ -73,7 +73,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
                             new NeuronQuery()
                             {
                                 // set Id to values of Dependents (non-Head units)
-                                Id = parameters.UnitsParameters.GetByTypeId(primitives.Unit.Id, false)
+                                Id = parameters.UnitsParameters.GetValueUnitParametersByTypeId(primitives.Unit.Id, false)
                                         .Select(dp => dp.Value.Id.ToString()),
                                 DirectionValues = DirectionValues.Any,
                                 Depth = 4,
@@ -81,7 +81,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
                                     // 4 edges away and should have postsynaptic of unit or values of Head units
                                     new DepthIdsPair {
                                         Depth = 4,
-                                        Ids = parameters.UnitsParameters.GetByTypeId(primitives.Unit.Id)
+                                        Ids = parameters.UnitsParameters.GetValueUnitParametersByTypeId(primitives.Unit.Id)
                                             .Select(up => up.Value.Id)
                                             .Concat(
                                                 new[] {
@@ -97,7 +97,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
                                     // 2 edges away and should have postsynaptic of non-head unit (eg. direct object)
                                     new DepthIdsPair {
                                         Depth = 2,
-                                        Ids = parameters.UnitsParameters.GetByTypeId(primitives.Unit.Id, false)
+                                        Ids = parameters.UnitsParameters.GetValueUnitParametersByTypeId(primitives.Unit.Id, false)
                                                 .Select(up => up.Type.Id)
                                     }
                                 }
@@ -190,16 +190,16 @@ namespace ei8.Cortex.Coding.d23.neurULization.Writers
                 tempResult.TryParseCore(
                     ensemble,
                     // start from the Head units
-                    tempResult.Units.GetByTypeId(options.Primitives.Unit.Id).Select(u => u.Neuron.Id),
+                    tempResult.Units.GetValueUnitGranniesByTypeId(options.Primitives.Unit.Id).Select(u => u.Neuron.Id),
                     new[]
                     {
                         // get the presynaptic via the siblings of the head and subordination
                         new LevelParser(new PresynapticByPostsynapticSibling(
-                            tempResult.Units.GetByTypeId(options.Primitives.Unit.Id, false)
+                            tempResult.Units.GetValueUnitGranniesByTypeId(options.Primitives.Unit.Id, false)
                                 .Select(i => i.Neuron.Id)
                                 .Concat(
                                     ExpressionProcessor.GetExpressionTypes(
-                                        (id, isEqual) => parameters.UnitsParameters.GetByTypeId(id, isEqual).Count(),
+                                        (id, isEqual) => parameters.UnitsParameters.GetValueUnitParametersByTypeId(id, isEqual).Count(),
                                         options.Primitives
                                     ).Select(t => t.Id)
                                 ).ToArray()

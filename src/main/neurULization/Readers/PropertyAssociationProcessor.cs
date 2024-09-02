@@ -39,7 +39,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Readers
                         propertyAssignmentProcessor,
                         g => PropertyAssociationProcessor.CreatePropertyAssignmentParameterSet(
                             parameters,
-                            ((IExpression) g).Units.GetByTypeId(options.Primitives.DirectObject.Id).Single().Value
+                            ((IExpression) g).Units.GetValueUnitGranniesByTypeId(options.Primitives.DirectObject.Id).Single().Value
                         ),
                         (g, r) => r.PropertyAssignment = g
                     )
