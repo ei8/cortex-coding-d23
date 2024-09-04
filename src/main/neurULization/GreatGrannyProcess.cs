@@ -1,6 +1,5 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
-using ei8.Cortex.Coding.d23.neurULization.Readers;
-using System;
+using ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive;
 using System.Diagnostics;
 using System.Threading.Tasks;
 

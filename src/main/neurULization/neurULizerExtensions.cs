@@ -1,5 +1,5 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
-using ei8.Cortex.Coding.d23.neurULization.Writers;
+using ei8.Cortex.Coding.d23.neurULization.Processors.Writers;
 using Microsoft.Extensions.DependencyInjection;
 using neurUL.Common.Domain.Model;
 using System;
@@ -50,10 +50,10 @@ namespace ei8.Cortex.Coding.d23.neurULization
             // responsible for pruning grannies containing null or empty values.
             // Null values can also be considered as valid new values.
             var instance = await options.ServiceProvider.GetRequiredService<IInstanceProcessor>()
-                .ObtainAsync<IInstance, IInstanceProcessor, IInstanceParameterSet>(
+                .ObtainAsync<IInstance, IInstanceProcessor, Processors.Readers.Deductive.IInstanceParameterSet>(
                     result,
                     options,
-                    new InstanceParameterSet(
+                    new Processors.Readers.Deductive.InstanceParameterSet(
                         (idp = neuronProperties.OfType<IdProperty>().SingleOrDefault()) != null ?
                             idp.Value :
                             Guid.NewGuid(),
@@ -62,7 +62,7 @@ namespace ei8.Cortex.Coding.d23.neurULization
                         regionId,
                         externalReferences[valueClassKey],
                         grannyProperties.Select(gp =>
-                            new PropertyAssociationParameterSet(
+                            new Processors.Readers.Deductive.PropertyAssociationParameterSet(
                                 externalReferences[gp.Key],
                                 (
                                     gp.ValueMatchBy == ValueMatchBy.Id ?
@@ -114,14 +114,14 @@ namespace ei8.Cortex.Coding.d23.neurULization
 
             foreach (var instanceNeuron in instanceNeurons)
             {
-                if (options.ServiceProvider.GetRequiredService<Readers.IInstanceProcessor>().TryParse(
+                if (options.ServiceProvider.GetRequiredService<Processors.Readers.Inductive.IInstanceProcessor>().TryParse(
                     value,
                     options,
-                    new Readers.InstanceParameterSet(
+                    new Processors.Readers.Inductive.InstanceParameterSet(
                         instanceNeuron,
                         externalReferences[valueClassKey],
                         grannyProperties.Select(gp =>
-                            Readers.PropertyAssociationParameterSet.CreateWithoutGranny(
+                            Processors.Readers.Inductive.PropertyAssociationParameterSet.CreateWithoutGranny(
                                 externalReferences[gp.Key],
                                 externalReferences[gp.ClassKey]
                             )
