@@ -83,7 +83,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                 else if (types.Single().Id == primitives.Simple.Id)
                 {
                     result = new IGrannyQuery[] {
-                        new GrannyQueryInner<IUnit, IUnitProcessor, IUnitParameterSet>(
+                        new GreatGrannyQuery<IUnit, IUnitProcessor, IUnitParameterSet>(
                             unitProcessor,
                             (n) => parameters.UnitsParameters.Single(u => u.Type.Id == primitives.Unit.Id)
                         ),

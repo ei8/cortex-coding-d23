@@ -29,7 +29,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
 
         public IEnumerable<IGrannyQuery> GetQueries(Id23neurULizerWriteOptions options, IValueParameterSet parameters) =>
             new IGrannyQuery[] {
-                new GrannyQueryInner<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet>(
+                new GreatGrannyQuery<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet>(
                     instantiatesClassProcessor,
                     (n) => CreateInstantiatesClassParameterSet(parameters)
                 ),

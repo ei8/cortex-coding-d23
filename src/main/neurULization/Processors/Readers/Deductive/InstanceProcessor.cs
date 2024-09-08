@@ -44,14 +44,14 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
 
         public IEnumerable<IGrannyQuery> GetQueries(Id23neurULizerWriteOptions options, IInstanceParameterSet parameters) =>
             new IGrannyQuery[] {
-                new GrannyQueryInner<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet>(
+                new GreatGrannyQuery<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet>(
                     instantiatesClassProcessor,
                     (n) => CreateInstantiatesClassParameterSet(parameters)
                 )
             }.Concat(
                 // create GrannyQueryInner for each PropertyAssociation in parameters
                 parameters.PropertyAssociationsParameters.Select(
-                    pa => new GrannyQueryInner<IPropertyAssociation, IPropertyAssociationProcessor, IPropertyAssociationParameterSet>(
+                    pa => new GreatGrannyQuery<IPropertyAssociation, IPropertyAssociationProcessor, IPropertyAssociationParameterSet>(
                         propertyAssociationProcessor,
                         (n) => pa
                     )

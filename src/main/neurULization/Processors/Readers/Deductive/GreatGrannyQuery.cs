@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
 {
-    public class GrannyQueryInner<TGranny, TGrannyWriteProcessor, TWriteParameterSet> : IRetriever
+    public class GreatGrannyQuery<TGranny, TGrannyWriteProcessor, TWriteParameterSet> : IRetriever
         where TGranny : IGranny
         where TGrannyWriteProcessor : IGrannyReadProcessor<TGranny, TWriteParameterSet>
         where TWriteParameterSet : IDeductiveParameterSet
@@ -17,7 +17,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
         private readonly TGrannyWriteProcessor grannyWriteProcessor;
         private readonly Func<IEnumerable<IGranny>, TWriteParameterSet> writeParametersBuilder;
 
-        public GrannyQueryInner(
+        public GreatGrannyQuery(
             TGrannyWriteProcessor grannyWriteProcessor,
             Func<IEnumerable<IGranny>, TWriteParameterSet> writeParametersBuilder,
             bool requiresPrecedingGrannyQueryResult = true

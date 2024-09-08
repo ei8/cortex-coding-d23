@@ -56,11 +56,11 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
 
         public IEnumerable<IGrannyQuery> GetQueries(Id23neurULizerWriteOptions options, IPropertyValueExpressionParameterSet parameters) =>
             new IGrannyQuery[] {
-                new GrannyQueryInner<IValueExpression, IValueExpressionProcessor, IValueExpressionParameterSet>(
+                new GreatGrannyQuery<IValueExpression, IValueExpressionProcessor, IValueExpressionParameterSet>(
                     valueExpressionProcessor,
                     (n) => CreateValueExpressionParameterSet(parameters)
                 ),
-                new GrannyQueryInner<IExpression, IExpressionProcessor, IExpressionParameterSet>(
+                new GreatGrannyQuery<IExpression, IExpressionProcessor, IExpressionParameterSet>(
                     expressionProcessor,
                     (n) => CreateExpressionParameterSet(options.Primitives, parameters, n.Last().Neuron)
                 )
