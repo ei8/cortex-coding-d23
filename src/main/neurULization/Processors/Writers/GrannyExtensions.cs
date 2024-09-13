@@ -32,15 +32,13 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
             );
 
         /// <summary>
-        /// Retrieves granny from ensemble if present; Otherwise, retrieves it from persistence or builds it, and adds it to the ensemble.
+        /// Retrieves granny from ensemble if present, otherwise, builds and adds it to the ensemble.
         /// </summary>
         /// <typeparam name="TGranny"></typeparam>
         /// <typeparam name="TParameterSet"></typeparam>
         /// <param name="grannyWriteProcessor"></param>
-        /// <param name="ensemble"></param>
+        /// <param name="processParameters"></param>
         /// <param name="writeParameters"></param>
-        /// <param name="ensembleRepository"></param>
-        /// <param name="userId"></param>
         /// <returns></returns>
         internal async static Task<TGranny> ObtainAsync<TGranny, TGrannyWriteProcessor, TParameterSet>(
             this TGrannyWriteProcessor grannyWriteProcessor,
@@ -56,12 +54,9 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
 
             TGranny result = default;
             // if target is not in specified ensemble
-            if (!grannyWriteProcessor.ReadProcessor.TryParse(processParameters.Ensemble, (Id23neurULizerWriteOptions)processParameters.Options, writeParameters, out TGranny ensembleParseResult))
+            if (!grannyWriteProcessor.ReadProcessor.TryParse(processParameters.Ensemble, (Id23neurULizerWriteOptions)processParameters.Options, writeParameters, out result))
                 // build in ensemble
                 result = await grannyWriteProcessor.BuildAsync(processParameters.Ensemble, (Id23neurULizerWriteOptions)processParameters.Options, writeParameters);
-            // if target was found in ensemble
-            else if (ensembleParseResult != null)
-                result = ensembleParseResult;
 
             return result;
         }
