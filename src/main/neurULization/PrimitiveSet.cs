@@ -1,4 +1,6 @@
-﻿namespace ei8.Cortex.Coding.d23.neurULization
+﻿using System.Collections.Generic;
+
+namespace ei8.Cortex.Coding.d23.neurULization
 {
     public class PrimitiveSet
     {

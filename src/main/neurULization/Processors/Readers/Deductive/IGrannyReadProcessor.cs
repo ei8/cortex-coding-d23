@@ -15,6 +15,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
         // TODO: Id23neurULizerWriteOptions should this be here?
         bool TryParse(Ensemble ensemble, Id23neurULizerWriteOptions options, TParameterSet parameters, out TGranny result);
 
+        // TODO: transfer to separate processor (eg. IGrannyQueryProcessor)
         IEnumerable<IGrannyQuery> GetQueries(Id23neurULizerWriteOptions options, TParameterSet parameters);
     }
 }

@@ -57,24 +57,8 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
             TGranny result = default;
             // if target is not in specified ensemble
             if (!grannyWriteProcessor.ReadProcessor.TryParse(processParameters.Ensemble, (Id23neurULizerWriteOptions)processParameters.Options, writeParameters, out TGranny ensembleParseResult))
-            {
-                // retrieve target from DB
-                var grannyQueries = grannyWriteProcessor.ReadProcessor.GetQueries((Id23neurULizerWriteOptions)processParameters.Options, writeParameters);
-
-                await grannyQueries.Process(processParameters, new List<IGranny>());
-
-                // if target is in DB
-                if (grannyWriteProcessor.ReadProcessor.TryParse(processParameters.Ensemble, (Id23neurULizerWriteOptions)processParameters.Options, writeParameters, out TGranny dbParseResult))
-                {
-                    result = dbParseResult;
-                }
-                // else if target is not in DB 
-                else
-                {
-                    // build in ensemble
-                    result = await grannyWriteProcessor.BuildAsync(processParameters.Ensemble, (Id23neurULizerWriteOptions)processParameters.Options, writeParameters);
-                }
-            }
+                // build in ensemble
+                result = await grannyWriteProcessor.BuildAsync(processParameters.Ensemble, (Id23neurULizerWriteOptions)processParameters.Options, writeParameters);
             // if target was found in ensemble
             else if (ensembleParseResult != null)
                 result = ensembleParseResult;
