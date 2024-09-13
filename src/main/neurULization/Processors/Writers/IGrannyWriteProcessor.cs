@@ -14,6 +14,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
     {
         Task<TGranny> BuildAsync(Ensemble ensemble, Id23neurULizerWriteOptions options, TParameterSet parameters);
 
+        // TODO:DEL Remove if unnecessary?
         Readers.Deductive.IGrannyReadProcessor<TGranny, TParameterSet> ReadProcessor { get; }
     }
 }

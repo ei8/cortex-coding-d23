@@ -34,10 +34,8 @@ namespace ei8.Cortex.Coding.d23.neurULization
                 .Concat(grannyProperties.Select(gp => gp.ClassKey))
                 .Distinct();
 
-            var ensembleRepository = options.ServiceProvider.GetRequiredService<IEnsembleRepository>();
-
             // use key to retrieve external reference url from library
-            var externalReferences = await ensembleRepository.GetExternalReferencesAsync(
+            var externalReferences = await options.EnsembleRepository.GetExternalReferencesAsync(
                 options.UserId,
                 new string[] {
                     valueClassKey
@@ -51,8 +49,7 @@ namespace ei8.Cortex.Coding.d23.neurULization
             // Unnecessary to validate null id and tag values since another service can be
             // responsible for pruning grannies containing null or empty values.
             // Null values can also be considered as valid new values.
-            var instance = await options.ServiceProvider.GetRequiredService<IInstanceProcessor>()
-                .ObtainAsync<IInstance, IInstanceProcessor, Processors.Readers.Deductive.IInstanceParameterSet>(
+            var instance = await options.InstanceProcessor.ObtainAsync<IInstance, IInstanceProcessor, Processors.Readers.Deductive.IInstanceParameterSet>(
                     result,
                     options,
                     new Processors.Readers.Deductive.InstanceParameterSet(
@@ -64,7 +61,7 @@ namespace ei8.Cortex.Coding.d23.neurULization
                         regionId,
                         externalReferences[valueClassKey],
                         grannyProperties.Select(async gp =>
-                            await neurULizerExtensions.CreatePropertyAssociationParams(options, gp, regionId, ensembleRepository, externalReferences)
+                            await neurULizerExtensions.CreatePropertyAssociationParams(options, gp, regionId, options.EnsembleRepository, externalReferences)
                         )
                             .Select(t => t.Result)
                             .Where(i => i != null)
@@ -72,7 +69,7 @@ namespace ei8.Cortex.Coding.d23.neurULization
                     )
                 );
 
-            await options.ServiceProvider.GetRequiredService<IEnsembleRepository>().Uniquify(
+            await options.EnsembleRepository.Uniquify(
                 options.UserId,
                 result                
             );
@@ -120,8 +117,7 @@ namespace ei8.Cortex.Coding.d23.neurULization
                 .Distinct();
 
             // use key to retrieve external reference url from library
-            IEnsembleRepository ensembleRepository = options.ServiceProvider.GetRequiredService<IEnsembleRepository>();
-            var externalReferences = await ensembleRepository
+            var externalReferences = await options.EnsembleRepository
                 .GetExternalReferencesAsync(
                     options.UserId,
                     (new string[] {
@@ -135,7 +131,7 @@ namespace ei8.Cortex.Coding.d23.neurULization
 
             foreach (var instanceNeuron in instanceNeurons)
             {
-                if (options.ServiceProvider.GetRequiredService<Processors.Readers.Inductive.IInstanceProcessor>().TryParse(
+                if (options.InstanceProcessor.TryParse(
                     value,
                     options,
                     new Processors.Readers.Inductive.InstanceParameterSet(

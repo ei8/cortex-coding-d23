@@ -43,7 +43,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                 if ((query = await grannyQuery.GetQuery(processParameters, retrievedGrannies)) != null)
                 {
                     // get ensemble based on parameters and previous granny neuron if it's assigned
-                    var queryResult = await processParameters.Options.ServiceProvider.GetRequiredService<IEnsembleRepository>().GetByQueryAsync(
+                    var queryResult = await processParameters.Options.EnsembleRepository.GetByQueryAsync(
                         processParameters.Options.UserId,
                         query
                         );

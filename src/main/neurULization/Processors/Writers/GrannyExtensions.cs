@@ -54,6 +54,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
 
             TGranny result = default;
             // if target is not in specified ensemble
+            // TODO:DEL remove ReadProcessor?
             if (!grannyWriteProcessor.ReadProcessor.TryParse(processParameters.Ensemble, (Id23neurULizerWriteOptions)processParameters.Options, writeParameters, out result))
                 // build in ensemble
                 result = await grannyWriteProcessor.BuildAsync(processParameters.Ensemble, (Id23neurULizerWriteOptions)processParameters.Options, writeParameters);
