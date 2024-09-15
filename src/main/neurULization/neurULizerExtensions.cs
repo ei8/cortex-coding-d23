@@ -71,7 +71,8 @@ namespace ei8.Cortex.Coding.d23.neurULization
 
             await options.EnsembleRepository.Uniquify(
                 options.UserId,
-                result                
+                result,
+                options.Cache
             );
 
             return result;

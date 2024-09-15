@@ -1,5 +1,5 @@
 ﻿using ei8.Cortex.Coding.d23.neurULization.Processors.Writers;
-using System;
+using System.Collections.Generic;
 
 namespace ei8.Cortex.Coding.d23.neurULization
 {
@@ -10,7 +10,8 @@ namespace ei8.Cortex.Coding.d23.neurULization
             string userId, 
             WriteOptions operationOptions, 
             IInstanceProcessor instanceProcessor, 
-            IEnsembleRepository ensembleRepository
+            IEnsembleRepository ensembleRepository,
+            IDictionary<string, Ensemble> cache
         )
         {
             this.Primitives = primitives;
@@ -18,6 +19,7 @@ namespace ei8.Cortex.Coding.d23.neurULization
             this.OperationOptions = operationOptions;
             this.InstanceProcessor = instanceProcessor;
             this.EnsembleRepository = ensembleRepository;
+            this.Cache = cache;
         }
 
         public PrimitiveSet Primitives { get; }
@@ -29,5 +31,7 @@ namespace ei8.Cortex.Coding.d23.neurULization
         public IInstanceProcessor InstanceProcessor { get; }
 
         public IEnsembleRepository EnsembleRepository { get; }
+
+        public IDictionary<string, Ensemble> Cache { get; }
     }
 }

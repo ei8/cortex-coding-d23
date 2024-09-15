@@ -1,9 +1,9 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
 using ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive;
-using System;
 
 namespace ei8.Cortex.Coding.d23.neurULization
 {
+    // TODO: Rename to d23neurULizerInductiveReadOptions
     public class d23neurULizerReadOptions : Id23neurULizerReadOptions
     {
         public d23neurULizerReadOptions(
