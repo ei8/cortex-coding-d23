@@ -1,5 +1,7 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
 using ei8.Cortex.Coding.d23.neurULization.Processors.Writers;
+using ei8.Cortex.Coding.Properties;
+using ei8.Cortex.Coding.Properties.Neuron;
 using Microsoft.Extensions.DependencyInjection;
 using neurUL.Common.Domain.Model;
 using System;
@@ -106,9 +108,9 @@ namespace ei8.Cortex.Coding.d23.neurULization
             string valueClassKey = ExternalReference.ToKeyString(typeof(TValue));
 
             // get properties
-            var propertyData = typeof(TValue).GetProperties()
-                .Select(pi => pi.ToPropertyData(new TValue()))
-                .Where(pd => pd != null);
+            var props = typeof(TValue).GetProperties().ToArray();
+            var pds = props.Select(pi => pi.ToPropertyData(new TValue())).ToArray();
+            var propertyData = pds.Where(pd => pd != null);
 
             var neuronProperties = propertyData.Where(pd => pd.NeuronProperty != null).Select(pd => pd.NeuronProperty);
             var grannyProperties = propertyData.Where(pd => pd.NeuronProperty == null);
@@ -200,7 +202,12 @@ namespace ei8.Cortex.Coding.d23.neurULization
 
                     foreach (var np in neuronProperties)
                     {
+                        var instanceNeuronProperty = instance.Neuron.GetType().GetProperty(
+                            np.GetType().Name.Replace("Property", string.Empty)
+                        );
+                        object propertyValue = instanceNeuronProperty.GetValue(instance.Neuron);
 
+                        tempResult.GetType().GetProperty(np.Name).SetValue(tempResult, propertyValue);
                     }
 
                     result.Add(tempResult);

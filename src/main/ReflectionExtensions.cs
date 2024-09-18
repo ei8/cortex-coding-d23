@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using ei8.Cortex.Coding.Properties;
+using ei8.Cortex.Coding.Properties.Neuron;
 
 namespace ei8.Cortex.Coding.d23
 {
@@ -54,32 +56,56 @@ namespace ei8.Cortex.Coding.d23
         {
             PropertyData result = null;
 
-            if (!neuronPropertyAttribute.IsReadOnly)
+            var neuronPropertyName = neuronPropertyAttribute.PropertyName ?? propertyName;
+            INeuronProperty neuronProperty;
+            switch (neuronPropertyName)
             {
-                var property = neuronPropertyAttribute.PropertyName ?? propertyName;
-                INeuronProperty neuronProperty;
-                switch (property)
-                {
-                    case nameof(Neuron.Id):
-                        neuronProperty = new IdProperty((Guid)propertyValue);
-                        break;
-                    case nameof(Neuron.Tag):
-                        neuronProperty = new TagProperty((string)propertyValue);
-                        break;
-                    case nameof(Neuron.ExternalReferenceUrl):
-                        neuronProperty = new ExternalReferenceUrlProperty((string)propertyValue);
-                        break;
-                    case nameof(Neuron.RegionId):
-                        neuronProperty = new RegionIdProperty((Guid?)propertyValue);
-                        break;
-                    default:
-                        throw new NotImplementedException($"Neuron Property '{property}' not yet implemented.");
-                }
-
-                if (neuronProperty != null)
-                    result = new PropertyData(neuronProperty);
+                case nameof(Neuron.Id):
+                    neuronProperty = new IdProperty((Guid)propertyValue, propertyName);
+                    break;
+                case nameof(Neuron.Tag):
+                    neuronProperty = new TagProperty((string)propertyValue, propertyName);
+                    break;
+                case nameof(Neuron.ExternalReferenceUrl):
+                    neuronProperty = new ExternalReferenceUrlProperty((string)propertyValue, propertyName);
+                    break;
+                case nameof(Neuron.RegionId):
+                    neuronProperty = new RegionIdProperty((Guid?)propertyValue, propertyName);
+                    break;
+                case nameof(Neuron.RegionTag):
+                    neuronProperty = new RegionTagProperty((string)propertyValue, propertyName);
+                    break;
+                case nameof(Neuron.CreationTimestamp):
+                    neuronProperty = new CreationTimestampProperty((DateTimeOffset?)propertyValue, propertyName);
+                    break;
+                case nameof(Neuron.CreationAuthorId):
+                    neuronProperty = new CreationAuthorIdProperty((Guid)propertyValue, propertyName);
+                    break;
+                case nameof(Neuron.CreationAuthorTag):
+                    neuronProperty = new CreationAuthorTagProperty((string)propertyValue, propertyName);
+                    break;
+                case nameof(Neuron.UnifiedLastModificationTimestamp):
+                    neuronProperty = new UnifiedLastModificationTimestampProperty((DateTimeOffset?)propertyValue, propertyName);
+                    break;
+                case nameof(Neuron.UnifiedLastModificationAuthorId):
+                    neuronProperty = new UnifiedLastModificationAuthorIdProperty((Guid?)propertyValue, propertyName);
+                    break;
+                case nameof(Neuron.UnifiedLastModificationAuthorTag):
+                    neuronProperty = new UnifiedLastModificationAuthorTagProperty((string)propertyValue, propertyName);
+                    break;
+                case nameof(Neuron.Url):
+                    neuronProperty = new UrlProperty((string)propertyValue, propertyName);
+                    break;
+                case nameof(Neuron.Version):
+                    neuronProperty = new VersionProperty((int)propertyValue, propertyName);
+                    break;
+                default:
+                    throw new NotImplementedException($"Neuron Property '{neuronPropertyName}' not yet implemented.");
             }
 
+            if (neuronProperty != null)
+                result = new PropertyData(neuronProperty);
+        
             return result;
         }
     }
