@@ -17,15 +17,15 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
         public ValueProcessor(
             IInstantiatesClassProcessor instantiatesClassProcessor,
             Readers.Deductive.IValueProcessor readerProcessor
-            )
+        )
         {
             this.instantiatesClassProcessor = instantiatesClassProcessor;
             this.readerProcessor=readerProcessor;
         }
 
-        public async Task<IValue> BuildAsync(Ensemble ensemble, Id23neurULizerWriteOptions options, IValueParameterSet parameters) =>
+        public async Task<IValue> BuildAsync(Ensemble ensemble, IValueParameterSet parameters) =>
             await new Value().AggregateBuildAsync(
-                CreateGreatGrannies(options, parameters),
+                ValueProcessor.CreateGreatGrannies(this.instantiatesClassProcessor, parameters),
                 new IGreatGrannyProcessAsync<IValue>[]
                 {
                     new GreatGrannyProcessAsync<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IValue>(
@@ -33,12 +33,14 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
                     )
                 },
                 ensemble,
-                options,
                 () => ensemble.Obtain(parameters.Value),
                 (g) => new[] { g.InstantiatesClass.Neuron }
             );
 
-        private IEnumerable<IGreatGrannyInfo<IValue>> CreateGreatGrannies(Id23neurULizerWriteOptions options, IValueParameterSet parameters) =>
+        private static IEnumerable<IGreatGrannyInfo<IValue>> CreateGreatGrannies(
+            IInstantiatesClassProcessor instantiatesClassProcessor,
+            IValueParameterSet parameters
+        ) =>
             new IGreatGrannyInfo<IValue>[]
             {
                 new IndependentGreatGrannyInfo<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IValue>(

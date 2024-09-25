@@ -10,7 +10,6 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
         public static async Task<IGranny> ObtainWithAggregateParamsAsync<TGranny, TGrannyProcessor, TParameterSet, TResult>(
             TGrannyProcessor grannyProcessor,
             Ensemble ensemble,
-            Id23neurULizerOptions options,
             TParameterSet parameters,
             Action<TGranny, TResult> resultUpdater,
             TResult tempResult
@@ -22,7 +21,6 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
         {
             TGranny result = await grannyProcessor.ObtainAsync<TGranny, TGrannyProcessor, TParameterSet>(
                 ensemble,
-                (Id23neurULizerWriteOptions)options,
                 parameters
                 );
 
@@ -34,7 +32,6 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
         public static async Task<IGranny> ObtainAsync<TGranny, TGrannyProcessor, TParameterSet, TResult>(
             TGrannyProcessor grannyProcessor,
             Ensemble ensemble,
-            Id23neurULizerOptions options,
             TParameterSet parameters, Action<TGranny, TResult> resultUpdater,
             TResult tempResult
         )
@@ -43,10 +40,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
             where TParameterSet : IParameterSet, IDeductiveParameterSet
         {
             TGranny result = await grannyProcessor.ObtainAsync<TGranny, TGrannyProcessor, TParameterSet>(
-                new ProcessParameters(
-                    ensemble,
-                    options
-                ),
+                ensemble,
                 parameters
                 );
 

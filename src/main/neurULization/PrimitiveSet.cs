@@ -2,7 +2,7 @@
 
 namespace ei8.Cortex.Coding.d23.neurULization
 {
-    public class PrimitiveSet
+    public class PrimitiveSet : IPrimitiveSet
     {
         public PrimitiveSet()
         {

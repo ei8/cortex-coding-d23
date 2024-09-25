@@ -12,13 +12,20 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
         private readonly IInstantiatesClassProcessor instantiatesClassProcessor;
         private readonly IPropertyAssociationProcessor propertyAssociationProcessor;
 
-        public InstanceProcessor(IInstantiatesClassProcessor instantiatesClassProcessor, IPropertyAssociationProcessor propertyAssociationProcessor)
+        public InstanceProcessor(
+            IInstantiatesClassProcessor instantiatesClassProcessor, 
+            IPropertyAssociationProcessor propertyAssociationProcessor
+        )
         {
             this.instantiatesClassProcessor = instantiatesClassProcessor;
             this.propertyAssociationProcessor = propertyAssociationProcessor;
         }
 
-        private IEnumerable<IGreatGrannyInfo<IInstance>> CreateGreatGrannies(Id23neurULizerWriteOptions options, IInstanceParameterSet parameters) =>
+        private static IEnumerable<IGreatGrannyInfo<IInstance>> CreateGreatGrannies(
+            IInstantiatesClassProcessor instantiatesClassProcessor,
+            IPropertyAssociationProcessor propertyAssociationProcessor,
+            IInstanceParameterSet parameters
+        ) =>
             new IGreatGrannyInfo<IInstance>[]
             {
                 new IndependentGreatGrannyInfo<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IInstance>(
@@ -42,7 +49,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                 parameters.Class
             );
 
-        public IEnumerable<IGrannyQuery> GetQueries(Id23neurULizerWriteOptions options, IInstanceParameterSet parameters) =>
+        public IEnumerable<IGrannyQuery> GetQueries(IInstanceParameterSet parameters) =>
             new IGrannyQuery[] {
                 new GreatGrannyQuery<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet>(
                     instantiatesClassProcessor,
@@ -70,9 +77,13 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                 }
             );
 
-        public bool TryParse(Ensemble ensemble, Id23neurULizerWriteOptions options, IInstanceParameterSet parameters, out IInstance result) =>
+        public bool TryParse(Ensemble ensemble, IInstanceParameterSet parameters, out IInstance result) =>
             new Instance().AggregateTryParse(
-                CreateGreatGrannies(options, parameters),
+                InstanceProcessor.CreateGreatGrannies(
+                    this.instantiatesClassProcessor,
+                    this.propertyAssociationProcessor,
+                    parameters
+                ),
                 new IGreatGrannyProcess<IInstance>[]
                 {
                     new GreatGrannyProcess<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IInstance>(
@@ -86,7 +97,6 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                     )
                 ),
                 ensemble,
-                options,
                 out result
             );
     }

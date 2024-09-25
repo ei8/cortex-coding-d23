@@ -18,7 +18,7 @@ namespace ei8.Cortex.Coding.d23.neurULization
             this.asyncProcess = asyncProcess;
         }
 
-        public async Task<IGranny> ExecuteAsync(IGreatGrannyInfo<TResult> greatGrannyInfo, Ensemble ensemble, Id23neurULizerOptions options, IGranny precedingGranny, TResult tempResult)
+        public async Task<IGranny> ExecuteAsync(IGreatGrannyInfo<TResult> greatGrannyInfo, Ensemble ensemble, IGranny precedingGranny, TResult tempResult)
         {
             var result = default(IGranny);
 
@@ -31,7 +31,6 @@ namespace ei8.Cortex.Coding.d23.neurULization
                 result = await asyncProcess(
                         coreGreatGrannyInfo.Processor,
                         ensemble,
-                        options,
                         parameters,
                         coreGreatGrannyInfo.DerivedGrannyUpdater,
                         tempResult
@@ -54,11 +53,11 @@ namespace ei8.Cortex.Coding.d23.neurULization
             this.process = process;
         }
 
-        public IGranny Execute(IGreatGrannyInfo<TResult> greatGrannyInfo, Ensemble ensemble, Id23neurULizerOptions options, IGranny precedingGranny, TResult tempResult)
+        public IGranny Execute(IGreatGrannyInfo<TResult> greatGrannyInfo, Ensemble ensemble, IGranny precedingGranny, TResult tempResult)
         {
             var result = default(IGranny);
 
-            if (TryGetParameters(
+            if (GreatGrannyProcess<TGranny, TGrannyProcessor, TParameterSet, TResult>.TryGetParameters(
                 precedingGranny, 
                 greatGrannyInfo, 
                 out TParameterSet parameters,
@@ -67,7 +66,6 @@ namespace ei8.Cortex.Coding.d23.neurULization
                 result = process(
                     coreGreatGrannyInfo.Processor,
                     ensemble,
-                    options,
                     parameters,
                     coreGreatGrannyInfo.DerivedGrannyUpdater,
                     tempResult

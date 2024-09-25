@@ -17,7 +17,10 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
             this.instantiatesClassProcessor = instantiatesClassProcessor;
         }
 
-        private IEnumerable<IGreatGrannyInfo<IValue>> CreateGreatGrannies(Id23neurULizerWriteOptions options, IValueParameterSet parameters) =>
+        private static IEnumerable<IGreatGrannyInfo<IValue>> CreateGreatGrannies(
+            IInstantiatesClassProcessor instantiatesClassProcessor,
+            IValueParameterSet parameters
+        ) =>
             new IGreatGrannyInfo<IValue>[]
             {
                 new IndependentGreatGrannyInfo<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IValue>(
@@ -27,7 +30,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                 )
             };
 
-        public IEnumerable<IGrannyQuery> GetQueries(Id23neurULizerWriteOptions options, IValueParameterSet parameters) =>
+        public IEnumerable<IGrannyQuery> GetQueries(IValueParameterSet parameters) =>
             new IGrannyQuery[] {
                 new GreatGrannyQuery<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet>(
                     instantiatesClassProcessor,
@@ -63,12 +66,15 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                 parameters.Class
             );
 
-        public bool TryParse(Ensemble ensemble, Id23neurULizerWriteOptions options, IValueParameterSet parameters, out IValue result)
+        public bool TryParse(Ensemble ensemble, IValueParameterSet parameters, out IValue result)
         {
             result = null;
 
             new Value().AggregateTryParse(
-                CreateGreatGrannies(options, parameters),
+                ValueProcessor.CreateGreatGrannies(
+                    this.instantiatesClassProcessor,
+                    parameters
+                ),
                 new IGreatGrannyProcess<IValue>[]
                 {
                     new GreatGrannyProcess<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IValue>(
@@ -76,7 +82,6 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                     )
                 },
                 ensemble,
-                options,
                 out IValue tempResult,
                 false
             );

@@ -17,7 +17,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
             this.readProcessor = readProcessor;
         }
 
-        public async Task<IUnit> BuildAsync(Ensemble ensemble, Id23neurULizerWriteOptions options, IUnitParameterSet parameters)
+        public async Task<IUnit> BuildAsync(Ensemble ensemble, IUnitParameterSet parameters)
         {
             var result = new Unit();
             result.Value = ensemble.Obtain(parameters.Value);

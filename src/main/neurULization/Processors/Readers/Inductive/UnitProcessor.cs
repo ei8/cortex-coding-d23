@@ -5,7 +5,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
 {
     public class UnitProcessor : IUnitProcessor
     {
-        public bool TryParse(Ensemble ensemble, Id23neurULizerReadOptions options, IUnitParameterSet parameters, out IUnit result)
+        public bool TryParse(Ensemble ensemble, IUnitParameterSet parameters, out IUnit result)
         {
             result = null;
 

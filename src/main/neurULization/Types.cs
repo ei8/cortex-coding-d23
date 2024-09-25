@@ -7,7 +7,6 @@ namespace ei8.Cortex.Coding.d23.neurULization
     public delegate IGranny GrannyProcessCallback<TGranny, TGrannyProcessor, TParameterSet, TResult>(
         TGrannyProcessor grannyProcessor,
         Ensemble ensemble,
-        Id23neurULizerOptions options,
         TParameterSet parameters,
         Action<TGranny, TResult> resultUpdater,
         TResult tempResult
@@ -20,7 +19,6 @@ namespace ei8.Cortex.Coding.d23.neurULization
     public delegate Task<IGranny> AsyncGrannyProcessCallback<TGranny, TGrannyProcessor, TParameterSet, TResult>(
         TGrannyProcessor grannyProcessor,
         Ensemble ensemble,
-        Id23neurULizerOptions options,
         TParameterSet parameters,
         Action<TGranny, TResult> resultUpdater,
         TResult tempResult

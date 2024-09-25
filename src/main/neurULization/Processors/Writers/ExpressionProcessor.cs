@@ -1,8 +1,5 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
 using ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive;
-using ei8.Cortex.Coding.d23.neurULization.Queries;
-using ei8.Cortex.Coding.d23.neurULization.Selectors;
-using ei8.Cortex.Library.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,29 +11,37 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
     {
         private readonly IUnitProcessor unitProcessor;
         private readonly Readers.Deductive.IExpressionProcessor readProcessor;
-        
-        public ExpressionProcessor(IUnitProcessor unitProcessor, Readers.Deductive.IExpressionProcessor readProcessor)
+        private readonly IPrimitiveSet primitives;
+
+        public ExpressionProcessor(
+            IUnitProcessor unitProcessor, 
+            Readers.Deductive.IExpressionProcessor readProcessor, 
+            IPrimitiveSet primitives
+        )
         {
             this.unitProcessor = unitProcessor;
             this.readProcessor = readProcessor;
+            this.primitives = primitives;
         }
 
-        public async Task<IExpression> BuildAsync(Ensemble ensemble, Id23neurULizerWriteOptions options, IExpressionParameterSet parameters) =>
+        public async Task<IExpression> BuildAsync(Ensemble ensemble, IExpressionParameterSet parameters) =>
             await new Expression().AggregateBuildAsync(
-                CreateGreatGrannies(options, parameters),
+                ExpressionProcessor.CreateGreatGrannies(
+                    this.unitProcessor,
+                    parameters
+                ),
                 parameters.UnitsParameters.Select(
                     u => new GreatGrannyProcessAsync<IUnit, IUnitProcessor, IUnitParameterSet, IExpression>(
                         ProcessHelper.ObtainAsync
                     )
                 ),
                 ensemble,
-                options,
                 () => ensemble.Obtain(Neuron.CreateTransient(null, null, null)),
                 (r) =>
                     // concat applicable expression types
                     GetExpressionTypes(
                         (id, isEqual) => parameters.UnitsParameters.GetValueUnitParametersByTypeId(id, isEqual).Count(),
-                        options.Primitives
+                        this.primitives
                     )
                     .Select(et => ensemble.Obtain(et))
                     .Concat(
@@ -45,7 +50,10 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
                     )
             );
 
-        private IEnumerable<IGreatGrannyInfo<IExpression>> CreateGreatGrannies(Id23neurULizerWriteOptions options, IExpressionParameterSet parameters) =>
+        private static IEnumerable<IGreatGrannyInfo<IExpression>> CreateGreatGrannies(
+            IUnitProcessor unitProcessor,
+            IExpressionParameterSet parameters
+        ) =>
             parameters.UnitsParameters.Select(
                 u => new IndependentGreatGrannyInfo<IUnit, IUnitProcessor, IUnitParameterSet, IExpression>(
                     unitProcessor,
@@ -56,7 +64,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
 
         internal static IEnumerable<Neuron> GetExpressionTypes(
             Func<Guid, bool, int> headCountRetriever,
-            PrimitiveSet primitives
+            IPrimitiveSet primitives
             )
         {
             var result = new List<Neuron>();

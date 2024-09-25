@@ -8,26 +8,28 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
     {
         private readonly IPropertyValueExpressionProcessor propertyValueExpressionProcessor;
         private readonly IExpressionProcessor expressionProcessor;
+        private readonly IPrimitiveSet primitives;
 
-        public PropertyAssignmentProcessor(IPropertyValueExpressionProcessor propertyValueExpressionProcessor, IExpressionProcessor expressionProcessor)
+        public PropertyAssignmentProcessor(IPropertyValueExpressionProcessor propertyValueExpressionProcessor, IExpressionProcessor expressionProcessor, IPrimitiveSet primitives)
         {
             this.propertyValueExpressionProcessor = propertyValueExpressionProcessor;
             this.expressionProcessor = expressionProcessor;
+            this.primitives = primitives;
         }
 
         private static IEnumerable<IGreatGrannyInfo<IPropertyAssignment>> CreateGreatGrannies(
             IPropertyValueExpressionProcessor propertyValueExpressionProcessor,
             IExpressionProcessor expressionProcessor,
-            Id23neurULizerReadOptions options,
             IPropertyAssignmentParameterSet parameters,
-            Ensemble ensemble
+            Ensemble ensemble,
+            IPrimitiveSet primitives
         ) =>
             ProcessHelper.CreateGreatGrannyCandidates(
                 ensemble,
                 parameters.Granny,
                 gc => new IndependentGreatGrannyInfo<IExpression, IExpressionProcessor, IExpressionParameterSet, IPropertyAssignment>(
                     expressionProcessor,
-                    () => CreateExpressionParameterSet(options.Primitives, parameters, gc),
+                    () => PropertyAssignmentProcessor.CreateExpressionParameterSet(primitives, parameters, gc),
                     (g, r) => r.Expression = g
                 )
             ).Concat(
@@ -35,9 +37,9 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                 {
                     new DependentGreatGrannyInfo<IPropertyValueExpression, IPropertyValueExpressionProcessor, IPropertyValueExpressionParameterSet, IPropertyAssignment>(
                         propertyValueExpressionProcessor,
-                        g => CreatePropertyValueExpressionParameterSet(
+                        g => PropertyAssignmentProcessor.CreatePropertyValueExpressionParameterSet(
                             parameters,
-                            ((IExpression) g).Units.GetValueUnitGranniesByTypeId(options.Primitives.NominalModifier.Id).Single().Value
+                            ((IExpression) g).Units.GetValueUnitGranniesByTypeId(primitives.NominalModifier.Id).Single().Value
                             ),
                         (g, r) => r.PropertyValueExpression = g
                     )
@@ -45,7 +47,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
             );
 
         private static ExpressionParameterSet CreateExpressionParameterSet(
-            PrimitiveSet primitives,
+            IPrimitiveSet primitives,
             IPropertyAssignmentParameterSet parameters,
             Neuron unitGranny
         ) =>
@@ -70,15 +72,16 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                 parameters.Class
             );
 
-        public bool TryParse(Ensemble ensemble, Id23neurULizerReadOptions options, IPropertyAssignmentParameterSet parameters, out IPropertyAssignment result) =>
+        public bool TryParse(Ensemble ensemble, 
+            IPropertyAssignmentParameterSet parameters, out IPropertyAssignment result) =>
             new PropertyAssignment().AggregateTryParse(
                 parameters.Granny,
-                CreateGreatGrannies(
+                PropertyAssignmentProcessor.CreateGreatGrannies(
                     propertyValueExpressionProcessor,
                     expressionProcessor,
-                    options,
                     parameters,
-                    ensemble
+                    ensemble,
+                    this.primitives
                     ),
                 new IGreatGrannyProcess<IPropertyAssignment>[]
                 {
@@ -90,7 +93,6 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                         )
                 },
                 ensemble,
-                options,
                 2,
                 out result
             );

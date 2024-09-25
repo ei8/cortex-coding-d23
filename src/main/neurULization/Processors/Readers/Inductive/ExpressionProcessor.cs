@@ -17,7 +17,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
             IUnitProcessor unitProcessor,
             IExpressionParameterSet parameters,
             Ensemble ensemble
-            ) =>
+        ) =>
             ProcessHelper.CreateGreatGrannyCandidates(
                 ensemble,
                 parameters.Granny,
@@ -45,10 +45,10 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                 )
             );
 
-        public bool TryParse(Ensemble ensemble, Id23neurULizerReadOptions options, IExpressionParameterSet parameters, out IExpression result) =>
+        public bool TryParse(Ensemble ensemble, IExpressionParameterSet parameters, out IExpression result) =>
             new Expression().AggregateTryParse(
                 parameters.Granny,
-                CreateGreatGrannies(
+                ExpressionProcessor.CreateGreatGrannies(
                     unitProcessor,
                     parameters,
                     ensemble
@@ -60,7 +60,6 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                     )
                 },
                 ensemble,
-                options,
                 parameters.UnitParameters.Count(),
                 out result
             );

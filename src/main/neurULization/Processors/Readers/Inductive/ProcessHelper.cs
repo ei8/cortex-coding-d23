@@ -10,7 +10,6 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
         public static IGranny TryParse<TGranny, TGrannyProcessor, TParameterSet, TResult>(
             TGrannyProcessor grannyReadProcessor,
             Ensemble ensemble,
-            Id23neurULizerOptions options,
             TParameterSet readParameters,
             Action<TGranny, TResult> resultUpdater,
             TResult tempResult
@@ -23,7 +22,6 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
 
             if (grannyReadProcessor.TryParse(
                 ensemble,
-                (Id23neurULizerReadOptions)options,
                 readParameters,
                 out TGranny gr)
                 )

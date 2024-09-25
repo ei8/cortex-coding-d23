@@ -25,9 +25,13 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
             this.readProcessor = readProcessor;
         }
 
-        public async Task<IInstance> BuildAsync(Ensemble ensemble, Id23neurULizerWriteOptions options, IInstanceParameterSet parameters) =>
+        public async Task<IInstance> BuildAsync(Ensemble ensemble, IInstanceParameterSet parameters) =>
             await new Instance().AggregateBuildAsync(
-                CreateGreatGrannies(options, parameters),
+                InstanceProcessor.CreateGreatGrannies(
+                    this.instantiatesClassProcessor,
+                    this.propertyAssociationProcessor,
+                    parameters
+                ),
                 new IGreatGrannyProcessAsync<IInstance>[]
                 {
                     new GreatGrannyProcessAsync<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IInstance>(
@@ -41,20 +45,18 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
                     )
                 ),
                 ensemble,
-                options,
                 () =>
                 {
-                    Neuron result = null;
-                    if (options is Id23neurULizerWriteOptions writeOptions)
-                        result = ensemble.Obtain(
-                            Neuron.CreateTransient(
-                                parameters.Id,
-                                parameters.Tag,
-                                parameters.ExternalReferenceUrl,
-                                parameters.RegionId
-                            ),
-                            writeOptions.OperationOptions.Mode == WriteMode.Update
-                        );
+                    Neuron result = ensemble.Obtain(
+                        Neuron.CreateTransient(
+                            parameters.Id,
+                            parameters.Tag,
+                            parameters.ExternalReferenceUrl,
+                            parameters.RegionId
+                        )
+                        // TODO: no longer necessary?
+                        // writeOptions.OperationOptions.Mode == WriteMode.Update
+                    );
                     return result;
                 },
                 (r) => new[]
@@ -66,12 +68,16 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
                     )
             );
 
-        private IEnumerable<IGreatGrannyInfo<IInstance>> CreateGreatGrannies(Id23neurULizerWriteOptions options, IInstanceParameterSet parameters) =>
+        private static IEnumerable<IGreatGrannyInfo<IInstance>> CreateGreatGrannies(
+            IInstantiatesClassProcessor instantiatesClassProcessor,
+            IPropertyAssociationProcessor propertyAssociationProcessor, 
+            IInstanceParameterSet parameters
+        ) =>
             new IGreatGrannyInfo<IInstance>[]
             {
                 new IndependentGreatGrannyInfo<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IInstance>(
                     instantiatesClassProcessor,
-                    () => CreateInstantiatesClassParameterSet(parameters),
+                    () => InstanceProcessor.CreateInstantiatesClassParameterSet(parameters),
                     (g, r) => r.InstantiatesClass = g
                 )
             }.Concat(

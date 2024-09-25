@@ -1,5 +1,4 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -16,7 +15,6 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
             IEnumerable<IGreatGrannyInfo<TResult>> greatGrannyCandidates,
             IEnumerable<IGreatGrannyProcess<TResult>> targets,
             Ensemble ensemble,
-            Id23neurULizerOptions options,
             int expectedGreatGrannyCount,
             out TResult result
         )
@@ -40,7 +38,6 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                     if ((tempPrecedingGranny = target.Execute(
                         candidate,
                         ensemble,
-                        options,
                         precedingGranny,
                         tempResult
                         )) != null)

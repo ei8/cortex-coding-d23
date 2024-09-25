@@ -8,19 +8,21 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
     {
         private readonly IPropertyAssignmentProcessor propertyAssignmentProcessor;
         private readonly IExpressionProcessor expressionProcessor;
+        private readonly IPrimitiveSet primitives;
 
-        public PropertyAssociationProcessor(IPropertyAssignmentProcessor propertyAssignmentProcessor, IExpressionProcessor expressionProcessor)
+        public PropertyAssociationProcessor(IPropertyAssignmentProcessor propertyAssignmentProcessor, IExpressionProcessor expressionProcessor, IPrimitiveSet primitives)
         {
             this.propertyAssignmentProcessor = propertyAssignmentProcessor;
             this.expressionProcessor = expressionProcessor;
+            this.primitives = primitives;
         }
 
         private static IEnumerable<IGreatGrannyInfo<IPropertyAssociation>> CreateGreatGrannies(
             IPropertyAssignmentProcessor propertyAssignmentProcessor,
             IExpressionProcessor expressionProcessor,
-            Id23neurULizerReadOptions options,
             IPropertyAssociationParameterSet parameters,
-            Ensemble ensemble
+            Ensemble ensemble,
+            IPrimitiveSet primitives
         )
         {
             var ppid = parameters.Property.Tag.ToString();
@@ -29,7 +31,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                 parameters.Granny,
                 gc => new IndependentGreatGrannyInfo<IExpression, IExpressionProcessor, IExpressionParameterSet, IPropertyAssociation>(
                     expressionProcessor,
-                    () => CreateExpressionParameterSet(options.Primitives, parameters, gc),
+                    () => PropertyAssociationProcessor.CreateExpressionParameterSet(primitives, parameters, gc),
                     (g, r) => r.Expression = g
                 )
             ).Concat(
@@ -39,7 +41,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                         propertyAssignmentProcessor,
                         g => CreatePropertyAssignmentParameterSet(
                             parameters,
-                            ((IExpression) g).Units.GetValueUnitGranniesByTypeId(options.Primitives.DirectObject.Id).Single().Value
+                            ((IExpression) g).Units.GetValueUnitGranniesByTypeId(primitives.DirectObject.Id).Single().Value
                         ),
                         (g, r) => r.PropertyAssignment = g
                     )
@@ -48,7 +50,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
         }
 
         private static ExpressionParameterSet CreateExpressionParameterSet(
-            PrimitiveSet primitives,
+            IPrimitiveSet primitives,
             IPropertyAssociationParameterSet parameters,
             Neuron unitGranny
         ) =>
@@ -74,15 +76,15 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                 parameters.Class
             );
 
-        public bool TryParse(Ensemble ensemble, Id23neurULizerReadOptions options, IPropertyAssociationParameterSet parameters, out IPropertyAssociation result) =>
+        public bool TryParse(Ensemble ensemble, IPropertyAssociationParameterSet parameters, out IPropertyAssociation result) =>
             new PropertyAssociation().AggregateTryParse(
                 parameters.Granny,
-                CreateGreatGrannies(
+                PropertyAssociationProcessor.CreateGreatGrannies(
                     propertyAssignmentProcessor,
                     expressionProcessor,
-                    options,
                     parameters,
-                    ensemble
+                    ensemble,
+                    this.primitives
                 ),
                 new IGreatGrannyProcess<IPropertyAssociation>[]
                 {
@@ -94,7 +96,6 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                         )
                 },
                 ensemble,
-                options,
                 2,
                 out result
             );

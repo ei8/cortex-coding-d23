@@ -1,10 +1,6 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
 using ei8.Cortex.Coding.d23.neurULization.Queries;
 using ei8.Cortex.Library.Common;
-using Microsoft.Extensions.DependencyInjection;
-using Nancy.TinyIoc;
-using neurUL.Common.Domain.Model;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -15,8 +11,12 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
     {
         public static async Task<bool> Process(
             this IEnumerable<IGrannyQuery> grannyQueries,
-            ProcessParameters processParameters,
+            IEnsembleRepository ensembleRepository,
+            Ensemble ensemble,
             IList<IGranny> retrievedGrannies,
+            string userId,
+            string cortexLibraryOutBaseUrl, 
+            int queryResultLimit,
             bool breakBeforeLastGetQuery = false
             )
         {
@@ -40,21 +40,29 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                 NeuronQuery query = null;
 
                 // if query is obtained successfully
-                if ((query = await grannyQuery.GetQuery(processParameters, retrievedGrannies)) != null)
+                if ((query = await grannyQuery.GetQuery(
+                    ensembleRepository, 
+                    ensemble, 
+                    retrievedGrannies, 
+                    userId,
+                    cortexLibraryOutBaseUrl,
+                    queryResultLimit
+                )) != null)
                 {
                     // get ensemble based on parameters and previous granny neuron if it's assigned
-                    var queryResult = await processParameters.Options.EnsembleRepository.GetByQueryAsync(
-                        processParameters.Options.UserId,
-                        query
+                    var queryResult = await ensembleRepository.GetByQueryAsync(
+                        userId,
+                        query,
+                        cortexLibraryOutBaseUrl,
+                        queryResultLimit
                         );
                     // enrich ensemble
-                    processParameters.Ensemble.AddReplaceItems(queryResult);
+                    ensemble.AddReplaceItems(queryResult);
                     // if granny query is retriever
                     if (grannyQuery is IRetriever gqr)
                     {
                         var retrievalResult = gqr.RetrieveGranny(
-                            processParameters.Ensemble,
-                            processParameters.Options,
+                            ensemble,
                             retrievedGrannies.AsEnumerable()
                             );
                         retrievedGrannies.Add(retrievalResult);
@@ -91,7 +99,6 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
             IEnumerable<IGreatGrannyInfo<TResult>> processes,
             IEnumerable<IGreatGrannyProcess<TResult>> targets,
             Ensemble ensemble,
-            Id23neurULizerOptions options,
             out TResult result,
             bool setGrannyNeuronOnCompletion = true
         )
@@ -106,7 +113,6 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                 if ((precedingGranny = ts[i].Execute(
                     processes.ElementAt(i),
                     ensemble,
-                    options,
                     precedingGranny,
                     tempResult
                     )) == null)

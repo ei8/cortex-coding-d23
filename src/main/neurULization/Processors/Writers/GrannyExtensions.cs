@@ -1,9 +1,5 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
 using ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive;
-using ei8.Cortex.Coding.d23.neurULization.Queries;
-using ei8.Cortex.Library.Common;
-using Microsoft.Extensions.DependencyInjection;
-using Nancy.TinyIoc;
 using neurUL.Common.Domain.Model;
 using System;
 using System.Collections.Generic;
@@ -14,49 +10,40 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
 {
     public static class GrannyExtensions
     {
-        internal async static Task<TGranny> ObtainAsync<TGranny, TGrannyWriteProcessor, TWriteParameterSet>(
-            this TGrannyWriteProcessor grannyWriteProcessor,
-            Ensemble ensemble,
-            Id23neurULizerWriteOptions options,
-            TWriteParameterSet writeParameters
-            )
-            where TGranny : IGranny
-            where TGrannyWriteProcessor : IGrannyWriteProcessor<TGranny, TWriteParameterSet>
-            where TWriteParameterSet : IDeductiveParameterSet
-        => await grannyWriteProcessor.ObtainAsync<TGranny, TGrannyWriteProcessor, TWriteParameterSet>(
-            new ProcessParameters(
-                ensemble,
-                options
-                ),
-            writeParameters
-            );
-
         /// <summary>
         /// Retrieves granny from ensemble if present, otherwise, builds and adds it to the ensemble.
         /// </summary>
         /// <typeparam name="TGranny"></typeparam>
         /// <typeparam name="TParameterSet"></typeparam>
         /// <param name="grannyWriteProcessor"></param>
-        /// <param name="processParameters"></param>
+        /// <param name="ensemble"></param>
+        /// <param name="options"></param>
         /// <param name="writeParameters"></param>
         /// <returns></returns>
-        internal async static Task<TGranny> ObtainAsync<TGranny, TGrannyWriteProcessor, TParameterSet>(
+        public async static Task<TGranny> ObtainAsync<TGranny, TGrannyWriteProcessor, TParameterSet>(
             this TGrannyWriteProcessor grannyWriteProcessor,
-            ProcessParameters processParameters,
+            Ensemble ensemble,
             TParameterSet writeParameters
             )
             where TGranny : IGranny
             where TGrannyWriteProcessor : IGrannyWriteProcessor<TGranny, TParameterSet>
             where TParameterSet : IDeductiveParameterSet
         {
-            AssertionConcern.AssertArgumentNotNull(processParameters, nameof(processParameters));
+            AssertionConcern.AssertArgumentNotNull(ensemble, nameof(ensemble));
             AssertionConcern.AssertArgumentNotNull(writeParameters, nameof(writeParameters));
 
             TGranny result = default;
             // if target is not in specified ensemble
-            if (!grannyWriteProcessor.ReadProcessor.TryParse(processParameters.Ensemble, (Id23neurULizerWriteOptions)processParameters.Options, writeParameters, out result))
+            if (!grannyWriteProcessor.ReadProcessor.TryParse(
+                ensemble,
+                writeParameters, 
+                out result
+                ))
                 // build in ensemble
-                result = await grannyWriteProcessor.BuildAsync(processParameters.Ensemble, (Id23neurULizerWriteOptions)processParameters.Options, writeParameters);
+                result = await grannyWriteProcessor.BuildAsync(
+                    ensemble,
+                    writeParameters
+                );
 
             return result;
         }
@@ -66,7 +53,6 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
             IEnumerable<IGreatGrannyInfo<TResult>> processes,
             IEnumerable<IGreatGrannyProcessAsync<TResult>> targets,
             Ensemble ensemble,
-            Id23neurULizerWriteOptions options,
             Func<Neuron> grannyNeuronCreator = null,
             Func<TResult, IEnumerable<Neuron>> postsynapticsRetriever = null
         )
@@ -80,7 +66,6 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
                 precedingGranny = await ts[i].ExecuteAsync(
                     processes.ElementAt(i),
                     ensemble,
-                    options,
                     precedingGranny,
                     tempResult
                     );

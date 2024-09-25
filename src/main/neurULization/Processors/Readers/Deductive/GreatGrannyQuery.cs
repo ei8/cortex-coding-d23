@@ -23,29 +23,47 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
             bool requiresPrecedingGrannyQueryResult = true
             )
         {
+            AssertionConcern.AssertArgumentNotNull(grannyWriteProcessor, nameof(grannyWriteProcessor));
             AssertionConcern.AssertArgumentNotNull(writeParametersBuilder, nameof(writeParametersBuilder));
 
             this.grannyWriteProcessor = grannyWriteProcessor;
             this.writeParametersBuilder = writeParametersBuilder;
-            RequiresPrecedingGrannyQueryResult = requiresPrecedingGrannyQueryResult;
+            this.RequiresPrecedingGrannyQueryResult = requiresPrecedingGrannyQueryResult;
         }
 
         public bool RequiresPrecedingGrannyQueryResult { get; }
 
-        public async Task<NeuronQuery> GetQuery(ProcessParameters processParameters, IList<IGranny> retrievedGrannies)
+        public async Task<NeuronQuery> GetQuery(IEnsembleRepository ensembleRepository, Ensemble ensemble, IList<IGranny> retrievedGrannies, string userId, string cortexLibraryOutBaseUrl, int queryResultLimit)
         {
-            var gqs = grannyWriteProcessor.GetQueries((Id23neurULizerWriteOptions)processParameters.Options, writeParametersBuilder(retrievedGrannies.AsEnumerable()));
+            var gqs = grannyWriteProcessor.GetQueries(writeParametersBuilder(retrievedGrannies.AsEnumerable()));
             // process granny queries just like in Extensions.ObtainSync
-            var completed = await gqs.Process(processParameters, retrievedGrannies, true);
+            var completed = await gqs.Process(
+                ensembleRepository, 
+                ensemble, 
+                retrievedGrannies, 
+                userId,  
+                cortexLibraryOutBaseUrl,
+                queryResultLimit,
+                true
+            );
             // then call GetQuery on last granny query if completed successfully
-            return completed ? await gqs.Last().GetQuery(processParameters, retrievedGrannies) : null;
+            return completed ? 
+                await gqs.Last().GetQuery(
+                    ensembleRepository, 
+                    ensemble, 
+                    retrievedGrannies, 
+                    userId,
+                    cortexLibraryOutBaseUrl,
+                    queryResultLimit
+                ) : 
+                null;
         }
 
-        public IGranny RetrieveGranny(Ensemble ensemble, Id23neurULizerOptions options, IEnumerable<IGranny> retrievedGrannies)
+        public IGranny RetrieveGranny(Ensemble ensemble, IEnumerable<IGranny> retrievedGrannies)
         {
             IGranny result = null;
 
-            if (grannyWriteProcessor.TryParse(ensemble, (Id23neurULizerWriteOptions)options, writeParametersBuilder(retrievedGrannies), out TGranny granny))
+            if (grannyWriteProcessor.TryParse(ensemble, writeParametersBuilder(retrievedGrannies), out TGranny granny))
                 result = granny;
 
             return result;

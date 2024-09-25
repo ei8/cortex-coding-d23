@@ -10,40 +10,50 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
     {
         private readonly IExpressionProcessor expressionProcessor;
         private readonly Readers.Deductive.IInstantiatesClassProcessor readProcessor;
+        private readonly IPrimitiveSet primitives;
 
         public InstantiatesClassProcessor(
             IExpressionProcessor expressionProcessor,
-            Readers.Deductive.IInstantiatesClassProcessor readProcessor
+            Readers.Deductive.IInstantiatesClassProcessor readProcessor,
+            IPrimitiveSet primitives
             )
         {
             this.expressionProcessor = expressionProcessor;
             this.readProcessor = readProcessor;
+            this.primitives = primitives;
         }
 
-        public async Task<IInstantiatesClass> BuildAsync(Ensemble ensemble, Id23neurULizerWriteOptions options, IInstantiatesClassParameterSet parameters) =>
+        public async Task<IInstantiatesClass> BuildAsync(Ensemble ensemble, IInstantiatesClassParameterSet parameters) =>
             await new InstantiatesClass().AggregateBuildAsync(
-                CreateGreatGrannies(options, parameters),
+                InstantiatesClassProcessor.CreateGreatGrannies(
+                    this.expressionProcessor, 
+                    parameters, 
+                    this.primitives
+                ),
                 new IGreatGrannyProcessAsync<IInstantiatesClass>[]
                 {
                     new GreatGrannyProcessAsync<IExpression, IExpressionProcessor, IExpressionParameterSet, IInstantiatesClass>(
                         ProcessHelper.ObtainWithAggregateParamsAsync
                     )
                 },
-                ensemble,
-                options
+                ensemble
             );
 
-        private IEnumerable<IGreatGrannyInfo<IInstantiatesClass>> CreateGreatGrannies(Id23neurULizerWriteOptions options, IInstantiatesClassParameterSet parameters) =>
+        private static IEnumerable<IGreatGrannyInfo<IInstantiatesClass>> CreateGreatGrannies(
+            IExpressionProcessor expressionProcessor, 
+            IInstantiatesClassParameterSet parameters, 
+            IPrimitiveSet primitives
+        ) =>
            new IGreatGrannyInfo<IInstantiatesClass>[]
            {
                 new IndependentGreatGrannyInfo<IExpression, IExpressionProcessor, IExpressionParameterSet, IInstantiatesClass>(
                     expressionProcessor,
-                    () => CreateSubordinationParameterSet(options.Primitives, parameters),
-                    (g, r) => r.Class = g.Units.GetValueUnitGranniesByTypeId(options.Primitives.DirectObject.Id).Single()
+                    () => CreateSubordinationParameterSet(primitives, parameters),
+                    (g, r) => r.Class = g.Units.GetValueUnitGranniesByTypeId(primitives.DirectObject.Id).Single()
                 )
            };
 
-        private static ExpressionParameterSet CreateSubordinationParameterSet(PrimitiveSet primitives, IInstantiatesClassParameterSet parameters)
+        private static ExpressionParameterSet CreateSubordinationParameterSet(IPrimitiveSet primitives, IInstantiatesClassParameterSet parameters)
         {
             return new ExpressionParameterSet(
                 new[]

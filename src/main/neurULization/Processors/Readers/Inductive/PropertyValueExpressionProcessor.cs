@@ -8,26 +8,28 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
     {
         private readonly IValueExpressionProcessor valueExpressionProcessor;
         private readonly IExpressionProcessor expressionProcessor;
+        private readonly IPrimitiveSet primitives;
 
-        public PropertyValueExpressionProcessor(IValueExpressionProcessor valueExpressionProcessor, IExpressionProcessor expressionProcessor)
+        public PropertyValueExpressionProcessor(IValueExpressionProcessor valueExpressionProcessor, IExpressionProcessor expressionProcessor, IPrimitiveSet primitives)
         {
             this.valueExpressionProcessor = valueExpressionProcessor;
             this.expressionProcessor = expressionProcessor;
+            this.primitives = primitives;
         }
 
         private static IEnumerable<IGreatGrannyInfo<IPropertyValueExpression>> CreateGreatGrannies(
             IValueExpressionProcessor valueExpressionProcessor,
             IExpressionProcessor expressionProcessor,
-            Id23neurULizerReadOptions options,
             IPropertyValueExpressionParameterSet parameters,
-            Ensemble ensemble
+            Ensemble ensemble,
+            IPrimitiveSet primitives
         ) =>
             ProcessHelper.CreateGreatGrannyCandidates(
                 ensemble,
                 parameters.Granny,
                 gc => new IndependentGreatGrannyInfo<IExpression, IExpressionProcessor, IExpressionParameterSet, IPropertyValueExpression>(
                     expressionProcessor,
-                    () => CreateExpressionParameterSet(options.Primitives, parameters, gc),
+                    () => PropertyValueExpressionProcessor.CreateExpressionParameterSet(primitives, parameters, gc),
                     (g, r) => r.Expression = g
                 )
             ).Concat(
@@ -37,7 +39,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                         valueExpressionProcessor,
                         g => CreateValueExpressionParameterSet(
                             parameters,
-                            ((IExpression) g).Units.GetValueUnitGranniesByTypeId(options.Primitives.Unit.Id).Single().Value
+                            ((IExpression) g).Units.GetValueUnitGranniesByTypeId(primitives.Unit.Id).Single().Value
                             ),
                         (g, r) => r.ValueExpression = g
                     )
@@ -45,7 +47,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
             );
 
         private static ExpressionParameterSet CreateExpressionParameterSet(
-            PrimitiveSet primitives,
+            IPrimitiveSet primitives,
             IPropertyValueExpressionParameterSet parameters,
             Neuron unitGranny
         ) =>
@@ -70,15 +72,15 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                 parameters.Class
             );
 
-        public bool TryParse(Ensemble ensemble, Id23neurULizerReadOptions options, IPropertyValueExpressionParameterSet parameters, out IPropertyValueExpression result) =>
+        public bool TryParse(Ensemble ensemble, IPropertyValueExpressionParameterSet parameters, out IPropertyValueExpression result) =>
             new PropertyValueExpression().AggregateTryParse(
                 parameters.Granny,
-                CreateGreatGrannies(
+                PropertyValueExpressionProcessor.CreateGreatGrannies(
                     valueExpressionProcessor,
                     expressionProcessor,
-                    options,
                     parameters,
-                    ensemble
+                    ensemble,
+                    this.primitives
                     ),
                 new IGreatGrannyProcess<IPropertyValueExpression>[]
                 {
@@ -90,7 +92,6 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                         )
                 },
                 ensemble,
-                options,
                 2,
                 out result
             );

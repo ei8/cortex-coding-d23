@@ -9,29 +9,34 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
     public class InstantiatesClassProcessor : IInstantiatesClassProcessor
     {
         private readonly IExpressionProcessor expressionProcessor;
+        private readonly IPrimitiveSet primitives;
 
-        public InstantiatesClassProcessor(IExpressionProcessor expressionProcessor)
+        public InstantiatesClassProcessor(IExpressionProcessor expressionProcessor, IPrimitiveSet primitives)
         {
             this.expressionProcessor = expressionProcessor;
+            this.primitives = primitives;
         }
 
-        private IEnumerable<IGreatGrannyInfo<IInstantiatesClass>> CreateGreatGrannies(Id23neurULizerWriteOptions options, IInstantiatesClassParameterSet parameters) =>
+        private static IEnumerable<IGreatGrannyInfo<IInstantiatesClass>> CreateGreatGrannies(
+            IExpressionProcessor expressionProcessor,
+            IInstantiatesClassParameterSet parameters,
+            IPrimitiveSet primitives
+        ) =>
            new IGreatGrannyInfo<IInstantiatesClass>[]
            {
                 new IndependentGreatGrannyInfo<IExpression, IExpressionProcessor, IExpressionParameterSet, IInstantiatesClass>(
                     expressionProcessor,
-                    () => CreateSubordinationParameterSet(options.Primitives, parameters),
-                    (g, r) => r.Class = g.Units.GetValueUnitGranniesByTypeId(options.Primitives.DirectObject.Id).Single()
+                    () => InstantiatesClassProcessor.CreateSubordinationParameterSet(primitives, parameters),
+                    (g, r) => r.Class = g.Units.GetValueUnitGranniesByTypeId(primitives.DirectObject.Id).Single()
                 )
            };
 
-        public IEnumerable<IGrannyQuery> GetQueries(Id23neurULizerWriteOptions options, IInstantiatesClassParameterSet parameters) =>
-            expressionProcessor.GetQueries(
-                options,
-                CreateSubordinationParameterSet(options.Primitives, parameters)
-                );
+        public IEnumerable<IGrannyQuery> GetQueries(IInstantiatesClassParameterSet parameters) =>
+            this.expressionProcessor.GetQueries(
+                InstantiatesClassProcessor.CreateSubordinationParameterSet(this.primitives, parameters)
+            );
 
-        private static ExpressionParameterSet CreateSubordinationParameterSet(PrimitiveSet primitives, IInstantiatesClassParameterSet parameters)
+        private static ExpressionParameterSet CreateSubordinationParameterSet(IPrimitiveSet primitives, IInstantiatesClassParameterSet parameters)
         {
             return new ExpressionParameterSet(
                 new[]
@@ -48,9 +53,13 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
             );
         }
 
-        public bool TryParse(Ensemble ensemble, Id23neurULizerWriteOptions options, IInstantiatesClassParameterSet parameters, out IInstantiatesClass result) =>
+        public bool TryParse(Ensemble ensemble, IInstantiatesClassParameterSet parameters, out IInstantiatesClass result) =>
             new InstantiatesClass().AggregateTryParse(
-                CreateGreatGrannies(options, parameters),
+                InstantiatesClassProcessor.CreateGreatGrannies(
+                    this.expressionProcessor, 
+                    parameters,
+                    this.primitives
+                ),
                 new IGreatGrannyProcess<IInstantiatesClass>[]
                 {
                     new GreatGrannyProcess<IExpression, IExpressionProcessor, IExpressionParameterSet, IInstantiatesClass>(
@@ -58,7 +67,6 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                     )
                 },
                 ensemble,
-                options,
                 out result
             );
     }

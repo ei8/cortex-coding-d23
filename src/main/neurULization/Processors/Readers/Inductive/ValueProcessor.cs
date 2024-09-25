@@ -37,10 +37,10 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                 parameters.Class
             );
 
-        public bool TryParse(Ensemble ensemble, Id23neurULizerReadOptions options, IValueParameterSet parameters, out IValue result) =>
+        public bool TryParse(Ensemble ensemble, IValueParameterSet parameters, out IValue result) =>
             new Value().AggregateTryParse(
                 parameters.Granny,
-                CreateGreatGrannies(instantiatesClassProcessor, parameters, ensemble),
+                ValueProcessor.CreateGreatGrannies(instantiatesClassProcessor, parameters, ensemble),
                 new IGreatGrannyProcess<IValue>[]
                 {
                     new GreatGrannyProcess<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IValue>(
@@ -48,7 +48,6 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                     )
                 },
                 ensemble,
-                options,
                 1,
                 out result
             );

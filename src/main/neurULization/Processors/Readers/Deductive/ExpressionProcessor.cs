@@ -5,20 +5,21 @@ using ei8.Cortex.Library.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
 {
     public class ExpressionProcessor : IExpressionProcessor
     {
         private readonly IUnitProcessor unitProcessor;
+        private readonly IPrimitiveSet primitives;
 
-        public ExpressionProcessor(IUnitProcessor unitProcessor)
+        public ExpressionProcessor(IUnitProcessor unitProcessor, IPrimitiveSet primitives)
         {
             this.unitProcessor = unitProcessor;
+            this.primitives = primitives;
         }
 
-        private IEnumerable<IGreatGrannyInfo<IExpression>> CreateGreatGrannies(Id23neurULizerWriteOptions options, IExpressionParameterSet parameters) =>
+        private static IEnumerable<IGreatGrannyInfo<IExpression>> CreateGreatGrannies(IUnitProcessor unitProcessor, IExpressionParameterSet parameters) =>
             parameters.UnitsParameters.Select(
                 u => new IndependentGreatGrannyInfo<IUnit, IUnitProcessor, IUnitParameterSet, IExpression>(
                     unitProcessor,
@@ -27,14 +28,14 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                 )
             );
 
-        public IEnumerable<IGrannyQuery> GetQueries(Id23neurULizerWriteOptions options, IExpressionParameterSet parameters) =>
-            GetQueryByType(options.Primitives, parameters, unitProcessor);
+        public IEnumerable<IGrannyQuery> GetQueries(IExpressionParameterSet parameters) =>
+            ExpressionProcessor.GetQueryByType(this.primitives, parameters, this.unitProcessor);
 
-        private static IEnumerable<IGrannyQuery> GetQueryByType(PrimitiveSet primitives, IExpressionParameterSet parameters, IUnitProcessor unitProcessor)
+        private static IEnumerable<IGrannyQuery> GetQueryByType(IPrimitiveSet primitives, IExpressionParameterSet parameters, IUnitProcessor unitProcessor)
         {
             IEnumerable<IGrannyQuery> result = null;
 
-            var types = GetExpressionTypes(
+            var types = ExpressionProcessor.GetExpressionTypes(
                 (id, isEqual) => parameters.UnitsParameters.GetValueUnitParametersByTypeId(id, isEqual).Count(),
                 primitives
                 );
@@ -114,8 +115,8 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
 
         internal static IEnumerable<Neuron> GetExpressionTypes(
             Func<Guid, bool, int> headCountRetriever,
-            PrimitiveSet primitives
-            )
+            IPrimitiveSet primitives
+        )
         {
             var result = new List<Neuron>();
 
@@ -143,19 +144,18 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
             return result.ToArray();
         }
 
-        public bool TryParse(Ensemble ensemble, Id23neurULizerWriteOptions options, IExpressionParameterSet parameters, out IExpression result)
+        public bool TryParse(Ensemble ensemble, IExpressionParameterSet parameters, out IExpression result)
         {
             result = null;
 
             new Expression().AggregateTryParse(
-                CreateGreatGrannies(options, parameters),
+                ExpressionProcessor.CreateGreatGrannies(this.unitProcessor, parameters),
                 parameters.UnitsParameters.Select(
                     u => new GreatGrannyProcess<IUnit, IUnitProcessor, IUnitParameterSet, IExpression>(
                         ProcessHelper.TryParse
                     )
                 ),
                 ensemble,
-                options,
                 out IExpression tempResult,
                 false
             );
@@ -165,17 +165,17 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                 tempResult.TryParseCore(
                     ensemble,
                     // start from the Head units
-                    tempResult.Units.GetValueUnitGranniesByTypeId(options.Primitives.Unit.Id).Select(u => u.Neuron.Id),
+                    tempResult.Units.GetValueUnitGranniesByTypeId(this.primitives.Unit.Id).Select(u => u.Neuron.Id),
                     new[]
                     {
                         // get the presynaptic via the siblings of the head and subordination
                         new LevelParser(new PresynapticByPostsynapticSibling(
-                            tempResult.Units.GetValueUnitGranniesByTypeId(options.Primitives.Unit.Id, false)
+                            tempResult.Units.GetValueUnitGranniesByTypeId(this.primitives.Unit.Id, false)
                                 .Select(i => i.Neuron.Id)
                                 .Concat(
                                     GetExpressionTypes(
                                         (id, isEqual) => parameters.UnitsParameters.GetValueUnitParametersByTypeId(id, isEqual).Count(),
-                                        options.Primitives
+                                        this.primitives
                                     ).Select(t => t.Id)
                                 ).ToArray()
                             )

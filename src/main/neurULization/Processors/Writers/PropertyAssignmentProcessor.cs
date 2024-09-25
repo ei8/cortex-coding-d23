@@ -12,21 +12,29 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
         private readonly IPropertyValueExpressionProcessor propertyValueExpressionProcessor;
         private readonly IExpressionProcessor expressionProcessor;
         private readonly Readers.Deductive.IPropertyAssignmentProcessor readProcessor;
+        private readonly IPrimitiveSet primitives;
 
         public PropertyAssignmentProcessor(
             IPropertyValueExpressionProcessor propertyValueExpressionProcessor, 
             IExpressionProcessor expressionProcessor,
-            Readers.Deductive.IPropertyAssignmentProcessor readProcessor
+            Readers.Deductive.IPropertyAssignmentProcessor readProcessor,
+            IPrimitiveSet primitives
             )
         {
             this.propertyValueExpressionProcessor = propertyValueExpressionProcessor;
             this.expressionProcessor = expressionProcessor;
             this.readProcessor = readProcessor;
+            this.primitives = primitives;
         }
 
-        public async Task<IPropertyAssignment> BuildAsync(Ensemble ensemble, Id23neurULizerWriteOptions options, IPropertyAssignmentParameterSet parameters) =>
+        public async Task<IPropertyAssignment> BuildAsync(Ensemble ensemble, IPropertyAssignmentParameterSet parameters) =>
             await new PropertyAssignment().AggregateBuildAsync(
-                CreateGreatGrannies(options, parameters),
+                PropertyAssignmentProcessor.CreateGreatGrannies(
+                    this.propertyValueExpressionProcessor,
+                    this.expressionProcessor,
+                    parameters,
+                    primitives
+                ),
                 new IGreatGrannyProcessAsync<IPropertyAssignment>[]
                 {
                     new GreatGrannyProcessAsync<IPropertyValueExpression, IPropertyValueExpressionProcessor, IPropertyValueExpressionParameterSet, IPropertyAssignment>(
@@ -36,11 +44,15 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
                         ProcessHelper.ObtainWithAggregateParamsAsync
                     )
                 },
-                ensemble,
-                options
+                ensemble
             );
 
-        private IEnumerable<IGreatGrannyInfo<IPropertyAssignment>> CreateGreatGrannies(Id23neurULizerWriteOptions options, IPropertyAssignmentParameterSet parameters) =>
+        private static IEnumerable<IGreatGrannyInfo<IPropertyAssignment>> CreateGreatGrannies(
+            IPropertyValueExpressionProcessor propertyValueExpressionProcessor,
+            IExpressionProcessor expressionProcessor, 
+            IPropertyAssignmentParameterSet parameters,
+            IPrimitiveSet primitives
+        ) =>
             new IGreatGrannyInfo<IPropertyAssignment>[]
             {
                 new IndependentGreatGrannyInfo<IPropertyValueExpression, IPropertyValueExpressionProcessor, IPropertyValueExpressionParameterSet, IPropertyAssignment>(
@@ -50,7 +62,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
                 ),
                 new DependentGreatGrannyInfo<IExpression, IExpressionProcessor, IExpressionParameterSet, IPropertyAssignment>(
                     expressionProcessor,
-                    (g) => CreateExpressionParameterSet(options.Primitives, parameters, g.Neuron),
+                    (g) => CreateExpressionParameterSet(primitives, parameters, g.Neuron),
                     (g, r) => r.Expression = g
                 )
             };
@@ -62,7 +74,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
               parameters.ValueMatchBy
           );
 
-        private static ExpressionParameterSet CreateExpressionParameterSet(PrimitiveSet primitives, IPropertyAssignmentParameterSet parameters, Neuron neuron) =>
+        private static ExpressionParameterSet CreateExpressionParameterSet(IPrimitiveSet primitives, IPropertyAssignmentParameterSet parameters, Neuron neuron) =>
             new ExpressionParameterSet(
                 new[]
                 {

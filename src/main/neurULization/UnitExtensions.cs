@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace ei8.Cortex.Coding.d23.neurULization
 {
-    internal static class UnitExtensions
+    public static class UnitExtensions
     {
         internal static IEnumerable<Processors.Readers.Deductive.IUnitParameterSet> GetValueUnitParametersByTypeId(this IEnumerable<Processors.Readers.Deductive.IUnitParameterSet> units, Guid id, bool isEqual = true) =>
             units.Where(u => isEqual ? u.Type.Id == id : u.Type.Id != id);
@@ -14,7 +14,7 @@ namespace ei8.Cortex.Coding.d23.neurULization
         internal static IEnumerable<Processors.Readers.Inductive.IUnitParameterSet> GetValueUnitParametersByTypeId(this IEnumerable<Processors.Readers.Inductive.IUnitParameterSet> units, Guid id, bool isEqual = true) =>
             units.Where(u => isEqual ? u.Type.Id == id : u.Type.Id != id);
 
-        internal static IEnumerable<IUnit> GetValueUnitGranniesByTypeId(this IEnumerable<IUnit> units, Guid id, bool isEqual = true) =>
+        public static IEnumerable<IUnit> GetValueUnitGranniesByTypeId(this IEnumerable<IUnit> units, Guid id, bool isEqual = true) =>
             units.Where(u => isEqual ? u.Type.Id == id : u.Type.Id != id);
     }
 }

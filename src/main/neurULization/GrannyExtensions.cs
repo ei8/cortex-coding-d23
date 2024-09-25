@@ -40,25 +40,6 @@ namespace ei8.Cortex.Coding.d23.neurULization
             }
         }
 
-        // TODO: see if useful later
-        // public static IServiceCollection AddGrannies(this IServiceCollection services)
-        //{
-        //    AssertionConcern.AssertArgumentNotNull(services, nameof(services));
-
-        //    services.TryAdd(ServiceDescriptor.Transient<IExpressionProcessor, ExpressionProcessor>());
-        //    services.TryAdd(ServiceDescriptor.Transient<IExpressionProcessor, ExpressionProcessor>());
-        //    services.TryAdd(ServiceDescriptor.Transient<IInstantiatesClassProcessor, InstantiatesClassProcessor>());
-        //    services.TryAdd(ServiceDescriptor.Transient<IPropertyAssignmentProcessor, PropertyAssignmentProcessor>());
-        //    services.TryAdd(ServiceDescriptor.Transient<IPropertyAssociationProcessor, PropertyAssociationProcessor>());
-        //    services.TryAdd(ServiceDescriptor.Transient<IPropertyValueExpressionProcessor, PropertyValueExpressionProcessor>());
-        //    services.TryAdd(ServiceDescriptor.Transient<IUnitProcessor, UnitProcessor>());
-        //    services.TryAdd(ServiceDescriptor.Transient<IValueProcessor, ValueProcessor>());
-        //    services.TryAdd(ServiceDescriptor.Transient<IValueExpressionProcessor, ValueExpressionProcessor>());
-        //    services.TryAdd(ServiceDescriptor.Transient<IInstanceProcessor, InstanceProcessor>());
-
-        //    return services;
-        //}
-
         public static void AddWriteProcessors(this TinyIoCContainer container)
         {
             container.Register<

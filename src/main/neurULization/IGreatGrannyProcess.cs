@@ -9,7 +9,6 @@ namespace ei8.Cortex.Coding.d23.neurULization
         Task<IGranny> ExecuteAsync(
             IGreatGrannyInfo<TResult> greatGrannyProcess,
             Ensemble ensemble,
-            Id23neurULizerOptions options,
             IGranny precedingGranny,
             TResult tempResult
             );
@@ -21,7 +20,6 @@ namespace ei8.Cortex.Coding.d23.neurULization
         IGranny Execute(
             IGreatGrannyInfo<TResult> greatGrannyProcess,
             Ensemble ensemble,
-            Id23neurULizerOptions options,
             IGranny precedingGranny,
             TResult tempResult
             );

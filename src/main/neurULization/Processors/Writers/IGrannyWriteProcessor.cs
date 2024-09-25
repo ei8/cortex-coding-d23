@@ -12,7 +12,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
         where TGranny : IGranny
         where TParameterSet : IDeductiveParameterSet
     {
-        Task<TGranny> BuildAsync(Ensemble ensemble, Id23neurULizerWriteOptions options, TParameterSet parameters);
+        Task<TGranny> BuildAsync(Ensemble ensemble, TParameterSet parameters);
 
         IGrannyReadProcessor<TGranny, TParameterSet> ReadProcessor { get; }
     }

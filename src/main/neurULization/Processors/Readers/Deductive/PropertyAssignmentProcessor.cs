@@ -2,7 +2,6 @@
 using ei8.Cortex.Coding.d23.neurULization.Queries;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
 {
@@ -10,24 +9,35 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
     {
         private readonly IPropertyValueExpressionProcessor propertyValueExpressionProcessor;
         private readonly IExpressionProcessor expressionProcessor;
+        private readonly IPrimitiveSet primitives;
 
-        public PropertyAssignmentProcessor(IPropertyValueExpressionProcessor propertyValueExpressionProcessor, IExpressionProcessor expressionProcessor)
+        public PropertyAssignmentProcessor(
+            IPropertyValueExpressionProcessor propertyValueExpressionProcessor, 
+            IExpressionProcessor expressionProcessor, 
+            IPrimitiveSet primitives
+        )
         {
             this.propertyValueExpressionProcessor = propertyValueExpressionProcessor;
             this.expressionProcessor = expressionProcessor;
+            this.primitives = primitives;
         }
 
-        private IEnumerable<IGreatGrannyInfo<IPropertyAssignment>> CreateGreatGrannies(Id23neurULizerWriteOptions options, IPropertyAssignmentParameterSet parameters) =>
+        private static IEnumerable<IGreatGrannyInfo<IPropertyAssignment>> CreateGreatGrannies(
+            IPropertyValueExpressionProcessor propertyValueExpressionProcessor,
+            IExpressionProcessor expressionProcessor,
+            IPropertyAssignmentParameterSet parameters,
+            IPrimitiveSet primitives
+        ) =>
             new IGreatGrannyInfo<IPropertyAssignment>[]
             {
                 new IndependentGreatGrannyInfo<IPropertyValueExpression, IPropertyValueExpressionProcessor, IPropertyValueExpressionParameterSet, IPropertyAssignment>(
                     propertyValueExpressionProcessor,
-                    () => CreatePropertyValueExpressionParameterSet(parameters),
+                    () => PropertyAssignmentProcessor.CreatePropertyValueExpressionParameterSet(parameters),
                     (g, r) => r.PropertyValueExpression = g
                 ),
                 new DependentGreatGrannyInfo<IExpression, IExpressionProcessor, IExpressionParameterSet, IPropertyAssignment>(
                     expressionProcessor,
-                    (g) => CreateExpressionParameterSet(options.Primitives, parameters, g.Neuron),
+                    (g) => PropertyAssignmentProcessor.CreateExpressionParameterSet(primitives, parameters, g.Neuron),
                     (g, r) => r.Expression = g
                 )
             };
@@ -39,7 +49,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
               parameters.ValueMatchBy
           );
 
-        private static ExpressionParameterSet CreateExpressionParameterSet(PrimitiveSet primitives, IPropertyAssignmentParameterSet parameters, Neuron neuron) =>
+        private static ExpressionParameterSet CreateExpressionParameterSet(IPrimitiveSet primitives, IPropertyAssignmentParameterSet parameters, Neuron neuron) =>
             new ExpressionParameterSet(
                 new[]
                 {
@@ -54,7 +64,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                 }
             );
 
-        public IEnumerable<IGrannyQuery> GetQueries(Id23neurULizerWriteOptions options, IPropertyAssignmentParameterSet parameters) =>
+        public IEnumerable<IGrannyQuery> GetQueries(IPropertyAssignmentParameterSet parameters) =>
             new IGrannyQuery[] {
                 new GreatGrannyQuery<IPropertyValueExpression, IPropertyValueExpressionProcessor, IPropertyValueExpressionParameterSet>(
                     propertyValueExpressionProcessor,
@@ -62,13 +72,18 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                 ),
                 new GreatGrannyQuery<IExpression, IExpressionProcessor, IExpressionParameterSet>(
                     expressionProcessor,
-                    (n) => CreateExpressionParameterSet(options.Primitives, parameters, n.Last().Neuron)
+                    (n) => CreateExpressionParameterSet(this.primitives, parameters, n.Last().Neuron)
                 )
             };
 
-        public bool TryParse(Ensemble ensemble, Id23neurULizerWriteOptions options, IPropertyAssignmentParameterSet parameters, out IPropertyAssignment result) =>
+        public bool TryParse(Ensemble ensemble, IPropertyAssignmentParameterSet parameters, out IPropertyAssignment result) =>
             new PropertyAssignment().AggregateTryParse(
-                CreateGreatGrannies(options, parameters),
+                PropertyAssignmentProcessor.CreateGreatGrannies(
+                    this.propertyValueExpressionProcessor,
+                    this.expressionProcessor,
+                    parameters,
+                    this.primitives
+                ),
                 new IGreatGrannyProcess<IPropertyAssignment>[]
                 {
                     new GreatGrannyProcess<IPropertyValueExpression, IPropertyValueExpressionProcessor, IPropertyValueExpressionParameterSet, IPropertyAssignment>(
@@ -79,7 +94,6 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                         )
                 },
                 ensemble,
-                options,
                 out result
             );
     }
