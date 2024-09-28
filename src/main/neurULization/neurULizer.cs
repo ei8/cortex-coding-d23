@@ -82,6 +82,11 @@ namespace ei8.Cortex.Coding.d23.neurULization
         )
             where TValue : class, new()
         {
+            AssertionConcern.AssertArgumentNotNull(value, nameof(value));
+            AssertionConcern.AssertArgumentNotNull(instanceNeurons, nameof(instanceNeurons));
+            AssertionConcern.AssertArgumentNotNull(typeInfo, nameof(typeInfo));
+            AssertionConcern.AssertArgumentNotNull(externalReferences, nameof(externalReferences));
+
             List<TValue> result = new List<TValue>();
 
             foreach (var instanceNeuron in instanceNeurons)
