@@ -20,7 +20,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
            {
                 new IndependentGreatGrannyInfo<IExpression, IExpressionProcessor, IExpressionParameterSet, IInstantiatesClass>(
                     expressionProcessor,
-                    () => CreateSubordinationParameterSet(primitives, parameters),
+                    () => InstantiatesClassProcessor.CreateSubordinationParameterSet(primitives, parameters),
                     (g, r) => r.Class = g.Units.GetValueUnitGranniesByTypeId(primitives.DirectObject.Id).Single()
                 )
            };

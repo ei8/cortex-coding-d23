@@ -1,10 +1,5 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
 using ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive;
-using ei8.Cortex.Coding.d23.neurULization.Queries;
-using ei8.Cortex.Coding.d23.neurULization.Selectors;
-using ei8.Cortex.Library.Common;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
 {
@@ -17,12 +12,12 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
             this.readProcessor = readProcessor;
         }
 
-        public async Task<IUnit> BuildAsync(Ensemble ensemble, IUnitParameterSet parameters)
+        public IUnit Build(Ensemble ensemble, IUnitParameterSet parameters)
         {
             var result = new Unit();
-            result.Value = ensemble.Obtain(parameters.Value);
-            result.Type = ensemble.Obtain(parameters.Type);
-            result.Neuron = ensemble.Obtain(Neuron.CreateTransient(null, null, null));
+            result.Value = ensemble.AddOrGetIfExists(parameters.Value);
+            result.Type = ensemble.AddOrGetIfExists(parameters.Type);
+            result.Neuron = ensemble.AddOrGetIfExists(Neuron.CreateTransient(null, null, null));
             // add dependency to ensemble
             ensemble.AddReplace(Terminal.CreateTransient(result.Neuron.Id, result.Value.Id));
             ensemble.AddReplace(Terminal.CreateTransient(result.Neuron.Id, result.Type.Id));

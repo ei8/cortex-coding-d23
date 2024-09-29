@@ -3,7 +3,7 @@ using System;
 
 namespace ei8.Cortex.Coding.d23.neurULization
 {
-    internal class IndependentGreatGrannyInfo<TGranny, TProcessor, TParameterSet, TDerivedGranny> : IIndependentGreatGrannyInfo<TGranny, TProcessor, TParameterSet, TDerivedGranny>
+    internal class IndependentGreatGrannyInfo<TGranny, TProcessor, TParameterSet, TAggregate> : IIndependentGreatGrannyInfo<TGranny, TProcessor, TParameterSet, TAggregate>
         where TGranny : IGranny
         where TProcessor : IGrannyProcessor<TGranny, TParameterSet>
         where TParameterSet : IParameterSet
@@ -11,16 +11,16 @@ namespace ei8.Cortex.Coding.d23.neurULization
         public IndependentGreatGrannyInfo(
            TProcessor processor,
            Func<TParameterSet> parametersBuilder,
-           Action<TGranny, TDerivedGranny> derivedGrannyUpdater
+           Action<TGranny, TAggregate> aggregateUpdater
            )
         {
             this.Processor = processor;
             this.ParametersBuilder = parametersBuilder;
-            this.DerivedGrannyUpdater = derivedGrannyUpdater;
+            this.AggregateUpdater = aggregateUpdater;
         }
 
         public TProcessor Processor { get; }
         public Func<TParameterSet> ParametersBuilder { get; }
-        public Action<TGranny, TDerivedGranny> DerivedGrannyUpdater { get; }
+        public Action<TGranny, TAggregate> AggregateUpdater { get; }
     }
 }

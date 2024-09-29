@@ -1,6 +1,5 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
 {
@@ -23,7 +22,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                 parameters.Granny,
                 gc => new IndependentGreatGrannyInfo<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IValue>(
                     instantiatesClassProcessor,
-                    () => CreateInstantiatesClassParameterSet(parameters, gc),
+                    () => ValueProcessor.CreateInstantiatesClassParameterSet(parameters, gc),
                     (g, r) => r.InstantiatesClass = g
                 )
             );

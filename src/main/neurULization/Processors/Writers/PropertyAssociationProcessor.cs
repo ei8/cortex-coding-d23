@@ -25,21 +25,21 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
             this.primitives = primitives;
         }
 
-        public async Task<IPropertyAssociation> BuildAsync(Ensemble ensemble, IPropertyAssociationParameterSet parameters) =>
-            await new PropertyAssociation().AggregateBuildAsync(
+        public IPropertyAssociation Build(Ensemble ensemble, IPropertyAssociationParameterSet parameters) =>
+            new PropertyAssociation().AggregateBuild(
                 PropertyAssociationProcessor.CreateGreatGrannies(
                     this.propertyAssignmentProcessor,
                     this.expressionProcessor,
                     parameters,
                     this.primitives
                 ),
-                new IGreatGrannyProcessAsync<IPropertyAssociation>[]
+                new IGreatGrannyProcess<IPropertyAssociation>[]
                 {
-                    new GreatGrannyProcessAsync<IPropertyAssignment, IPropertyAssignmentProcessor, IPropertyAssignmentParameterSet, IPropertyAssociation>(
-                        ProcessHelper.ObtainWithAggregateParamsAsync
+                    new GreatGrannyProcess<IPropertyAssignment, IPropertyAssignmentProcessor, IPropertyAssignmentParameterSet, IPropertyAssociation>(
+                        ProcessHelper.ParseBuild
                     ),
-                    new GreatGrannyProcessAsync<IExpression, IExpressionProcessor, IExpressionParameterSet, IPropertyAssociation>(
-                        ProcessHelper.ObtainWithAggregateParamsAsync
+                    new GreatGrannyProcess<IExpression, IExpressionProcessor, IExpressionParameterSet, IPropertyAssociation>(
+                        ProcessHelper.ParseBuild
                     )
                 },
                 ensemble
@@ -55,12 +55,12 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
           {
               new IndependentGreatGrannyInfo<IPropertyAssignment, IPropertyAssignmentProcessor, IPropertyAssignmentParameterSet, IPropertyAssociation>(
                     propertyAssignmentProcessor,
-                    () => CreatePropertyAssignmentParameterSet(parameters),
+                    () => PropertyAssociationProcessor.CreatePropertyAssignmentParameterSet(parameters),
                     (g, r) => r.PropertyAssignment = g
                 ),
                 new DependentGreatGrannyInfo<IExpression, IExpressionProcessor, IExpressionParameterSet, IPropertyAssociation>(
                     expressionProcessor,
-                    (g) => CreateExpressionParameterSet(primitives, parameters, g.Neuron),
+                    (g) => PropertyAssociationProcessor.CreateExpressionParameterSet(primitives, parameters, g.Neuron),
                     (g, r) => r.Expression = g
                 )
           };

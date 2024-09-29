@@ -7,12 +7,12 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
 {
     internal static class ProcessHelper
     {
-        public static IGranny TryParse<TGranny, TGrannyProcessor, TParameterSet, TResult>(
+        public static IGranny TryParse<TGranny, TGrannyProcessor, TParameterSet, TAggregate>(
             TGrannyProcessor grannyReadProcessor,
             Ensemble ensemble,
             TParameterSet readParameters,
-            Action<TGranny, TResult> resultUpdater,
-            TResult tempResult
+            Action<TGranny, TAggregate> aggregateUpdater,
+            TAggregate aggregate
         )
             where TGranny : IGranny
             where TGrannyProcessor : IGrannyProcessor<TGranny, TParameterSet>, IGrannyReadProcessor<TGranny, TParameterSet>
@@ -26,7 +26,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                 out TGranny gr)
                 )
             {
-                resultUpdater(gr, tempResult);
+                aggregateUpdater(gr, aggregate);
                 result = gr;
             }
 

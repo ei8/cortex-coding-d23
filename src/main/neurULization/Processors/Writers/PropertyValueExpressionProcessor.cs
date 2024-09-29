@@ -27,24 +27,24 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
             this.primitives = primitives;
         }
 
-        public async Task<IPropertyValueExpression> BuildAsync(
+        public IPropertyValueExpression Build(
             Ensemble ensemble, 
             IPropertyValueExpressionParameterSet parameters
         ) =>
-            await new PropertyValueExpression().AggregateBuildAsync(
+            new PropertyValueExpression().AggregateBuild(
                 PropertyValueExpressionProcessor.CreateGreatGrannies(
                     this.valueExpressionProcessor,
                     this.expressionProcessor, 
                     parameters,
                     primitives
                 ),
-                new IGreatGrannyProcessAsync<IPropertyValueExpression>[]
+                new IGreatGrannyProcess<IPropertyValueExpression>[]
                 {
-                    new GreatGrannyProcessAsync<IValueExpression, IValueExpressionProcessor, IValueExpressionParameterSet, IPropertyValueExpression>(
-                        ProcessHelper.ObtainWithAggregateParamsAsync
+                    new GreatGrannyProcess<IValueExpression, IValueExpressionProcessor, IValueExpressionParameterSet, IPropertyValueExpression>(
+                        ProcessHelper.ParseBuild
                         ),
-                    new GreatGrannyProcessAsync<IExpression, IExpressionProcessor, IExpressionParameterSet, IPropertyValueExpression>(
-                        ProcessHelper.ObtainWithAggregateParamsAsync
+                    new GreatGrannyProcess<IExpression, IExpressionProcessor, IExpressionParameterSet, IPropertyValueExpression>(
+                        ProcessHelper.ParseBuild
                         )
                 },
                 ensemble
@@ -60,7 +60,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
             {
                 new IndependentGreatGrannyInfo<IValueExpression, IValueExpressionProcessor, IValueExpressionParameterSet, IPropertyValueExpression>(
                     valueExpressionProcessor,
-                    () => CreateValueExpressionParameterSet(parameters),
+                    () => PropertyValueExpressionProcessor.CreateValueExpressionParameterSet(parameters),
                     (g, r) => r.ValueExpression = g
                 ),
                 new DependentGreatGrannyInfo<IExpression, IExpressionProcessor, IExpressionParameterSet, IPropertyValueExpression>(

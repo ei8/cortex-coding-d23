@@ -2,7 +2,6 @@
 using ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
 {
@@ -23,17 +22,17 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
             this.primitives = primitives;
         }
 
-        public async Task<IInstantiatesClass> BuildAsync(Ensemble ensemble, IInstantiatesClassParameterSet parameters) =>
-            await new InstantiatesClass().AggregateBuildAsync(
+        public IInstantiatesClass Build(Ensemble ensemble, IInstantiatesClassParameterSet parameters) =>
+            new InstantiatesClass().AggregateBuild(
                 InstantiatesClassProcessor.CreateGreatGrannies(
                     this.expressionProcessor, 
                     parameters, 
                     this.primitives
                 ),
-                new IGreatGrannyProcessAsync<IInstantiatesClass>[]
+                new IGreatGrannyProcess<IInstantiatesClass>[]
                 {
-                    new GreatGrannyProcessAsync<IExpression, IExpressionProcessor, IExpressionParameterSet, IInstantiatesClass>(
-                        ProcessHelper.ObtainWithAggregateParamsAsync
+                    new GreatGrannyProcess<IExpression, IExpressionProcessor, IExpressionParameterSet, IInstantiatesClass>(
+                        ProcessHelper.ParseBuild
                     )
                 },
                 ensemble
@@ -48,7 +47,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
            {
                 new IndependentGreatGrannyInfo<IExpression, IExpressionProcessor, IExpressionParameterSet, IInstantiatesClass>(
                     expressionProcessor,
-                    () => CreateSubordinationParameterSet(primitives, parameters),
+                    () => InstantiatesClassProcessor.CreateSubordinationParameterSet(primitives, parameters),
                     (g, r) => r.Class = g.Units.GetValueUnitGranniesByTypeId(primitives.DirectObject.Id).Single()
                 )
            };

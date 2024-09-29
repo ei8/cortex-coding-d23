@@ -4,7 +4,6 @@ using ei8.Cortex.Coding.d23.neurULization.Selectors;
 using ei8.Cortex.Library.Common;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
 {
@@ -25,7 +24,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
             {
                 new IndependentGreatGrannyInfo<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IValue>(
                     instantiatesClassProcessor,
-                    () => CreateInstantiatesClassParameterSet(parameters),
+                    () => ValueProcessor.CreateInstantiatesClassParameterSet(parameters),
                     (g, r) => r.InstantiatesClass = g
                 )
             };
@@ -34,7 +33,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
             new IGrannyQuery[] {
                 new GreatGrannyQuery<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet>(
                     instantiatesClassProcessor,
-                    (n) => CreateInstantiatesClassParameterSet(parameters)
+                    (n) => ValueProcessor.CreateInstantiatesClassParameterSet(parameters)
                 ),
                 new GrannyQueryBuilder(
                     (n) => new NeuronQuery()

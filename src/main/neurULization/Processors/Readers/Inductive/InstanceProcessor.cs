@@ -26,7 +26,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                 parameters.Granny,
                 gc => new IndependentGreatGrannyInfo<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IInstance>(
                     instantiatesClassProcessor,
-                    () => CreateInstantiatesClassParameterSet(gc, parameters),
+                    () => InstanceProcessor.CreateInstantiatesClassParameterSet(gc, parameters),
                     (g, r) => r.InstantiatesClass = g
                 )
             ).Concat(

@@ -1,11 +1,6 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
 using ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive;
-using ei8.Cortex.Coding.d23.neurULization.Queries;
-using ei8.Cortex.Coding.d23.neurULization.Selectors;
-using ei8.Cortex.Library.Common;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
 {
@@ -23,17 +18,17 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
             this.readerProcessor=readerProcessor;
         }
 
-        public async Task<IValue> BuildAsync(Ensemble ensemble, IValueParameterSet parameters) =>
-            await new Value().AggregateBuildAsync(
+        public IValue Build(Ensemble ensemble, IValueParameterSet parameters) =>
+            new Value().AggregateBuild(
                 ValueProcessor.CreateGreatGrannies(this.instantiatesClassProcessor, parameters),
-                new IGreatGrannyProcessAsync<IValue>[]
+                new IGreatGrannyProcess<IValue>[]
                 {
-                    new GreatGrannyProcessAsync<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IValue>(
-                        ProcessHelper.ObtainWithAggregateParamsAsync
+                    new GreatGrannyProcess<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IValue>(
+                        ProcessHelper.ParseBuild
                     )
                 },
                 ensemble,
-                () => ensemble.Obtain(parameters.Value),
+                () => ensemble.AddOrGetIfExists(parameters.Value),
                 (g) => new[] { g.InstantiatesClass.Neuron }
             );
 
@@ -45,7 +40,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
             {
                 new IndependentGreatGrannyInfo<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IValue>(
                     instantiatesClassProcessor,
-                    () => CreateInstantiatesClassParameterSet(parameters),
+                    () => ValueProcessor.CreateInstantiatesClassParameterSet(parameters),
                     (g, r) => r.InstantiatesClass = g
                 )
             };

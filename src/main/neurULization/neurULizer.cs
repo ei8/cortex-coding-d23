@@ -23,7 +23,7 @@ namespace ei8.Cortex.Coding.d23.neurULization
             this.options = options;
         }
 
-        public async Task<Ensemble> neurULizeAsync<TValue>(
+        public Ensemble neurULize<TValue>(
             TValue value, 
             neurULizerTypeInfo typeInfo,
             IDictionary<string, Coding.Neuron> idPropertyValueNeurons,
@@ -43,7 +43,7 @@ namespace ei8.Cortex.Coding.d23.neurULization
             // Unnecessary to validate null id and tag values since another service can be
             // responsible for pruning grannies containing null or empty values.
             // Null values can also be considered as valid new values.
-            var instance = await this.options.WritersInstanceProcessor.ObtainAsync<
+            var instance = this.options.WritersInstanceProcessor.ParseBuild<
                 IInstance, 
                 IInstanceProcessor, 
                 Processors.Readers.Deductive.IInstanceParameterSet
@@ -74,7 +74,7 @@ namespace ei8.Cortex.Coding.d23.neurULization
             return result;
         }
 
-        public async Task<IEnumerable<TValue>> DeneurULizeAsync<TValue>(
+        public IEnumerable<TValue> DeneurULize<TValue>(
             Ensemble value,
             IEnumerable<Neuron> instanceNeurons,
             neurULizerTypeInfo typeInfo,

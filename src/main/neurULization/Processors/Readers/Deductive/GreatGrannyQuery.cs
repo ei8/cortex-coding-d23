@@ -36,7 +36,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
         public async Task<NeuronQuery> GetQuery(IEnsembleRepository ensembleRepository, Ensemble ensemble, IList<IGranny> retrievedGrannies, string userId, string cortexLibraryOutBaseUrl, int queryResultLimit)
         {
             var gqs = grannyWriteProcessor.GetQueries(writeParametersBuilder(retrievedGrannies.AsEnumerable()));
-            // process granny queries just like in Extensions.ObtainSync
+            // process granny queries
             var completed = await gqs.Process(
                 ensembleRepository, 
                 ensemble, 

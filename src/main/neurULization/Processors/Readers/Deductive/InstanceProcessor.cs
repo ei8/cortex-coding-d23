@@ -3,7 +3,6 @@ using ei8.Cortex.Coding.d23.neurULization.Queries;
 using ei8.Cortex.Library.Common;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
 {
@@ -30,7 +29,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
             {
                 new IndependentGreatGrannyInfo<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IInstance>(
                     instantiatesClassProcessor,
-                    () => CreateInstantiatesClassParameterSet(parameters),
+                    () => InstanceProcessor.CreateInstantiatesClassParameterSet(parameters),
                     (g, r) => r.InstantiatesClass = g
                 )
             }.Concat(

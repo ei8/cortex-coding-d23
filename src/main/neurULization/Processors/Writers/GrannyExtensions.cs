@@ -4,7 +4,6 @@ using neurUL.Common.Domain.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
 {
@@ -20,7 +19,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
         /// <param name="options"></param>
         /// <param name="writeParameters"></param>
         /// <returns></returns>
-        public async static Task<TGranny> ObtainAsync<TGranny, TGrannyWriteProcessor, TParameterSet>(
+        public static TGranny ParseBuild<TGranny, TGrannyWriteProcessor, TParameterSet>(
             this TGrannyWriteProcessor grannyWriteProcessor,
             Ensemble ensemble,
             TParameterSet writeParameters
@@ -40,7 +39,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
                 out result
                 ))
                 // build in ensemble
-                result = await grannyWriteProcessor.BuildAsync(
+                result = grannyWriteProcessor.Build(
                     ensemble,
                     writeParameters
                 );
@@ -48,10 +47,10 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
             return result;
         }
 
-        internal static async Task<TResult> AggregateBuildAsync<TResult>(
+        internal static TResult AggregateBuild<TResult>(
             this TResult tempResult,
             IEnumerable<IGreatGrannyInfo<TResult>> processes,
-            IEnumerable<IGreatGrannyProcessAsync<TResult>> targets,
+            IEnumerable<IGreatGrannyProcess<TResult>> targets,
             Ensemble ensemble,
             Func<Neuron> grannyNeuronCreator = null,
             Func<TResult, IEnumerable<Neuron>> postsynapticsRetriever = null
@@ -63,7 +62,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
             var ts = targets.ToArray();
             for (int i = 0; i < ts.Length; i++)
             {
-                precedingGranny = await ts[i].ExecuteAsync(
+                precedingGranny = ts[i].Execute(
                     processes.ElementAt(i),
                     ensemble,
                     precedingGranny,

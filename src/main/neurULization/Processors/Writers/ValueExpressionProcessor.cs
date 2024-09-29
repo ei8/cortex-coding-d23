@@ -1,9 +1,6 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
 using ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive;
-using ei8.Cortex.Coding.d23.neurULization.Queries;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
 {
@@ -27,21 +24,21 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
             this.primitives = primitives;
         }
 
-        public async Task<IValueExpression> BuildAsync(Ensemble ensemble, IValueExpressionParameterSet parameters) =>
-            await new ValueExpression().AggregateBuildAsync(
+        public IValueExpression Build(Ensemble ensemble, IValueExpressionParameterSet parameters) =>
+            new ValueExpression().AggregateBuild(
                 ValueExpressionProcessor.CreateGreatGrannies(
                     this.valueProcessor,
                     this.expressionProcessor,
                     parameters,
                     this.primitives
                 ),
-                new IGreatGrannyProcessAsync<IValueExpression>[]
+                new IGreatGrannyProcess<IValueExpression>[]
                 {
-                    new GreatGrannyProcessAsync<IValue, IValueProcessor, IValueParameterSet, IValueExpression>(
-                        ProcessHelper.ObtainWithAggregateParamsAsync
+                    new GreatGrannyProcess<IValue, IValueProcessor, IValueParameterSet, IValueExpression>(
+                        ProcessHelper.ParseBuild
                         ),
-                    new GreatGrannyProcessAsync<IExpression, IExpressionProcessor, IExpressionParameterSet, IValueExpression>(
-                        ProcessHelper.ObtainWithAggregateParamsAsync
+                    new GreatGrannyProcess<IExpression, IExpressionProcessor, IExpressionParameterSet, IValueExpression>(
+                        ProcessHelper.ParseBuild
                         )
                 },
                 ensemble

@@ -1,50 +1,29 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
 using ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive;
 using System;
-using System.Threading.Tasks;
 
 namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
 {
     internal static class ProcessHelper
     {
-        public static async Task<IGranny> ObtainWithAggregateParamsAsync<TGranny, TGrannyProcessor, TParameterSet, TResult>(
+        public static IGranny ParseBuild<TGranny, TGrannyProcessor, TParameterSet, TAggregate>(
             TGrannyProcessor grannyProcessor,
             Ensemble ensemble,
             TParameterSet parameters,
-            Action<TGranny, TResult> resultUpdater,
-            TResult tempResult
+            Action<TGranny, TAggregate> aggregateUpdater,
+            TAggregate aggregate
         )
             where TGranny : IGranny
             where TGrannyProcessor : IGrannyProcessor<TGranny, TParameterSet>, IGrannyWriteProcessor<TGranny, TParameterSet>
             where TParameterSet : IParameterSet, IDeductiveParameterSet
-            where TResult : IGranny
+            where TAggregate : IGranny
         {
-            TGranny result = await grannyProcessor.ObtainAsync<TGranny, TGrannyProcessor, TParameterSet>(
+            TGranny result = grannyProcessor.ParseBuild<TGranny, TGrannyProcessor, TParameterSet>(
                 ensemble,
                 parameters
-                );
+            );
 
-            resultUpdater(result, tempResult);
-
-            return result;
-        }
-
-        public static async Task<IGranny> ObtainAsync<TGranny, TGrannyProcessor, TParameterSet, TResult>(
-            TGrannyProcessor grannyProcessor,
-            Ensemble ensemble,
-            TParameterSet parameters, Action<TGranny, TResult> resultUpdater,
-            TResult tempResult
-        )
-            where TGranny : IGranny
-            where TGrannyProcessor : IGrannyProcessor<TGranny, TParameterSet>, IGrannyWriteProcessor<TGranny, TParameterSet>
-            where TParameterSet : IParameterSet, IDeductiveParameterSet
-        {
-            TGranny result = await grannyProcessor.ObtainAsync<TGranny, TGrannyProcessor, TParameterSet>(
-                ensemble,
-                parameters
-                );
-
-            resultUpdater(result, tempResult);
+            aggregateUpdater(result, aggregate);
 
             return result;
         }

@@ -3,7 +3,6 @@ using ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
 {
@@ -24,26 +23,26 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
             this.primitives = primitives;
         }
 
-        public async Task<IExpression> BuildAsync(Ensemble ensemble, IExpressionParameterSet parameters) =>
-            await new Expression().AggregateBuildAsync(
+        public IExpression Build(Ensemble ensemble, IExpressionParameterSet parameters) =>
+            new Expression().AggregateBuild(
                 ExpressionProcessor.CreateGreatGrannies(
                     this.unitProcessor,
                     parameters
                 ),
                 parameters.UnitsParameters.Select(
-                    u => new GreatGrannyProcessAsync<IUnit, IUnitProcessor, IUnitParameterSet, IExpression>(
-                        ProcessHelper.ObtainAsync
+                    u => new GreatGrannyProcess<IUnit, IUnitProcessor, IUnitParameterSet, IExpression>(
+                        ProcessHelper.ParseBuild
                     )
                 ),
                 ensemble,
-                () => ensemble.Obtain(Neuron.CreateTransient(null, null, null)),
+                () => ensemble.AddOrGetIfExists(Neuron.CreateTransient(null, null, null)),
                 (r) =>
                     // concat applicable expression types
                     GetExpressionTypes(
                         (id, isEqual) => parameters.UnitsParameters.GetValueUnitParametersByTypeId(id, isEqual).Count(),
                         this.primitives
                     )
-                    .Select(et => ensemble.Obtain(et))
+                    .Select(et => ensemble.AddOrGetIfExists(et))
                     .Concat(
                         // with Units in result
                         r.Units.Select(u => u.Neuron)

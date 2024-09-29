@@ -1,10 +1,7 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
 using ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive;
-using ei8.Cortex.Coding.d23.neurULization.Queries;
-using ei8.Cortex.Library.Common;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
 {
@@ -25,29 +22,29 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
             this.readProcessor = readProcessor;
         }
 
-        public async Task<IInstance> BuildAsync(Ensemble ensemble, IInstanceParameterSet parameters) =>
-            await new Instance().AggregateBuildAsync(
+        public IInstance Build(Ensemble ensemble, IInstanceParameterSet parameters) =>
+            new Instance().AggregateBuild(
                 InstanceProcessor.CreateGreatGrannies(
                     this.instantiatesClassProcessor,
                     this.propertyAssociationProcessor,
                     parameters
                 ),
-                new IGreatGrannyProcessAsync<IInstance>[]
+                new IGreatGrannyProcess<IInstance>[]
                 {
-                    new GreatGrannyProcessAsync<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IInstance>(
-                        ProcessHelper.ObtainWithAggregateParamsAsync
-                        )
+                    new GreatGrannyProcess<IInstantiatesClass, IInstantiatesClassProcessor, IInstantiatesClassParameterSet, IInstance>(
+                        ProcessHelper.ParseBuild
+                    )
                 }.Concat(
                     parameters.PropertyAssociationsParameters.Select(
-                        u => new GreatGrannyProcessAsync<IPropertyAssociation, IPropertyAssociationProcessor, IPropertyAssociationParameterSet, IInstance>(
-                            ProcessHelper.ObtainWithAggregateParamsAsync
+                        u => new GreatGrannyProcess<IPropertyAssociation, IPropertyAssociationProcessor, IPropertyAssociationParameterSet, IInstance>(
+                            ProcessHelper.ParseBuild
                         )
                     )
                 ),
                 ensemble,
                 () =>
                 {
-                    Neuron result = ensemble.Obtain(
+                    Neuron result = ensemble.AddOrGetIfExists(
                         Neuron.CreateTransient(
                             parameters.Id,
                             parameters.Tag,

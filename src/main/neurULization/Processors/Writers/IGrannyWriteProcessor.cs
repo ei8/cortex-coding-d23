@@ -1,6 +1,5 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
 using ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive;
-using System.Threading.Tasks;
 
 namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
 {
@@ -12,7 +11,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
         where TGranny : IGranny
         where TParameterSet : IDeductiveParameterSet
     {
-        Task<TGranny> BuildAsync(Ensemble ensemble, TParameterSet parameters);
+        TGranny Build(Ensemble ensemble, TParameterSet parameters);
 
         IGrannyReadProcessor<TGranny, TParameterSet> ReadProcessor { get; }
     }
