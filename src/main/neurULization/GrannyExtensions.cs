@@ -40,83 +40,83 @@ namespace ei8.Cortex.Coding.d23.neurULization
             }
         }
 
-        public static void AddWriteProcessors(this TinyIoCContainer container)
+        public static void AddWriters(this TinyIoCContainer container)
         {
             container.Register<
-                Processors.Writers.IExpressionProcessor, 
-                Processors.Writers.ExpressionProcessor
+                Processors.Writers.IExpressionWriter, 
+                Processors.Writers.ExpressionWriter
             >();
             container.Register<
-                Processors.Writers.IInstantiatesClassProcessor, 
-                Processors.Writers.InstantiatesClassProcessor
+                Processors.Writers.IInstantiatesClassWriter, 
+                Processors.Writers.InstantiatesClassWriter
             >();
             container.Register<
-                Processors.Writers.IPropertyAssignmentProcessor, 
-                Processors.Writers.PropertyAssignmentProcessor
+                Processors.Writers.IPropertyAssignmentWriter, 
+                Processors.Writers.PropertyAssignmentWriter
             >();
             container.Register<
-                Processors.Writers.IPropertyAssociationProcessor, 
-                Processors.Writers.PropertyAssociationProcessor
+                Processors.Writers.IPropertyAssociationWriter, 
+                Processors.Writers.PropertyAssociationWriter
             >();
             container.Register<
-                Processors.Writers.IPropertyValueExpressionProcessor, 
-                Processors.Writers.PropertyValueExpressionProcessor
+                Processors.Writers.IPropertyValueExpressionWriter, 
+                Processors.Writers.PropertyValueExpressionWriter
             >();
             container.Register<
-                Processors.Writers.IUnitProcessor, 
-                Processors.Writers.UnitProcessor
+                Processors.Writers.IUnitWriter, 
+                Processors.Writers.UnitWriter
             >();
             container.Register<
-                Processors.Writers.IValueProcessor, 
-                Processors.Writers.ValueProcessor
+                Processors.Writers.IValueWriter, 
+                Processors.Writers.ValueWriter
             >();
             container.Register<
-                Processors.Writers.IValueExpressionProcessor, 
-                Processors.Writers.ValueExpressionProcessor
+                Processors.Writers.IValueExpressionWriter, 
+                Processors.Writers.ValueExpressionWriter
             >();
             container.Register<
-                Processors.Writers.IInstanceProcessor, 
-                Processors.Writers.InstanceProcessor
+                Processors.Writers.IInstanceWriter, 
+                Processors.Writers.InstanceWriter
             >();
         }
 
-        public static void AddReadProcessors(this TinyIoCContainer container)
+        public static void AddReaders(this TinyIoCContainer container)
         {
             container.Register<
-                Processors.Readers.Inductive.IExpressionProcessor,
-                Processors.Readers.Inductive.ExpressionProcessor
+                Processors.Readers.Inductive.IExpressionReader,
+                Processors.Readers.Inductive.ExpressionReader
             >();
             container.Register<
-                Processors.Readers.Inductive.IInstantiatesClassProcessor,
-                Processors.Readers.Inductive.InstantiatesClassProcessor
+                Processors.Readers.Inductive.IInstantiatesClassReader,
+                Processors.Readers.Inductive.InstantiatesClassReader
             >();
             container.Register<
-                Processors.Readers.Inductive.IPropertyAssignmentProcessor,
-                Processors.Readers.Inductive.PropertyAssignmentProcessor
+                Processors.Readers.Inductive.IPropertyAssignmentReader,
+                Processors.Readers.Inductive.PropertyAssignmentReader
                 >();
             container.Register<
-                Processors.Readers.Inductive.IPropertyAssociationProcessor,
-                Processors.Readers.Inductive.PropertyAssociationProcessor
+                Processors.Readers.Inductive.IPropertyAssociationReader,
+                Processors.Readers.Inductive.PropertyAssociationReader
                 >();
             container.Register<
-               Processors.Readers.Inductive.IPropertyValueExpressionProcessor,
-               Processors.Readers.Inductive.PropertyValueExpressionProcessor
+               Processors.Readers.Inductive.IPropertyValueExpressionReader,
+               Processors.Readers.Inductive.PropertyValueExpressionReader
             >();
             container.Register<
-                Processors.Readers.Inductive.IUnitProcessor,
-                Processors.Readers.Inductive.UnitProcessor
+                Processors.Readers.Inductive.IUnitReader,
+                Processors.Readers.Inductive.UnitReader
             >();
             container.Register<
-                Processors.Readers.Inductive.IValueProcessor,
-                Processors.Readers.Inductive.ValueProcessor
+                Processors.Readers.Inductive.IValueReader,
+                Processors.Readers.Inductive.ValueReader
             >();
             container.Register<
-                Processors.Readers.Inductive.IValueExpressionProcessor,
-                Processors.Readers.Inductive.ValueExpressionProcessor
+                Processors.Readers.Inductive.IValueExpressionReader,
+                Processors.Readers.Inductive.ValueExpressionReader
             >();
             container.Register<
-                Processors.Readers.Inductive.IInstanceProcessor,
-                Processors.Readers.Inductive.InstanceProcessor
+                Processors.Readers.Inductive.IInstanceReader,
+                Processors.Readers.Inductive.InstanceReader
             >();
         }
     }

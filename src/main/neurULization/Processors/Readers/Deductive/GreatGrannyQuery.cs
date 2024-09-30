@@ -9,25 +9,25 @@ using System.Threading.Tasks;
 
 namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
 {
-    public class GreatGrannyQuery<TGranny, TGrannyWriteProcessor, TWriteParameterSet> : IRetriever
+    public class GreatGrannyQuery<TGranny, TGrannyReader, TParameterSet> : IRetriever
         where TGranny : IGranny
-        where TGrannyWriteProcessor : IGrannyReadProcessor<TGranny, TWriteParameterSet>
-        where TWriteParameterSet : IDeductiveParameterSet
+        where TGrannyReader : IGrannyReader<TGranny, TParameterSet>
+        where TParameterSet : IDeductiveParameterSet
     {
-        private readonly TGrannyWriteProcessor grannyWriteProcessor;
-        private readonly Func<IEnumerable<IGranny>, TWriteParameterSet> writeParametersBuilder;
+        private readonly TGrannyReader grannyReader;
+        private readonly Func<IEnumerable<IGranny>, TParameterSet> parametersBuilder;
 
         public GreatGrannyQuery(
-            TGrannyWriteProcessor grannyWriteProcessor,
-            Func<IEnumerable<IGranny>, TWriteParameterSet> writeParametersBuilder,
+            TGrannyReader grannyReader,
+            Func<IEnumerable<IGranny>, TParameterSet> parametersBuilder,
             bool requiresPrecedingGrannyQueryResult = true
             )
         {
-            AssertionConcern.AssertArgumentNotNull(grannyWriteProcessor, nameof(grannyWriteProcessor));
-            AssertionConcern.AssertArgumentNotNull(writeParametersBuilder, nameof(writeParametersBuilder));
+            AssertionConcern.AssertArgumentNotNull(grannyReader, nameof(GreatGrannyQuery<TGranny, TGrannyReader, TParameterSet>.grannyReader));
+            AssertionConcern.AssertArgumentNotNull(parametersBuilder, nameof(parametersBuilder));
 
-            this.grannyWriteProcessor = grannyWriteProcessor;
-            this.writeParametersBuilder = writeParametersBuilder;
+            this.grannyReader = grannyReader;
+            this.parametersBuilder = parametersBuilder;
             this.RequiresPrecedingGrannyQueryResult = requiresPrecedingGrannyQueryResult;
         }
 
@@ -35,7 +35,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
 
         public async Task<NeuronQuery> GetQuery(IEnsembleRepository ensembleRepository, Ensemble ensemble, IList<IGranny> retrievedGrannies, string userId, string cortexLibraryOutBaseUrl, int queryResultLimit)
         {
-            var gqs = grannyWriteProcessor.GetQueries(writeParametersBuilder(retrievedGrannies.AsEnumerable()));
+            var gqs = grannyReader.GetQueries(parametersBuilder(retrievedGrannies.AsEnumerable()));
             // process granny queries
             var completed = await gqs.Process(
                 ensembleRepository, 
@@ -63,7 +63,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
         {
             IGranny result = null;
 
-            if (grannyWriteProcessor.TryParse(ensemble, writeParametersBuilder(retrievedGrannies), out TGranny granny))
+            if (grannyReader.TryParse(ensemble, parametersBuilder(retrievedGrannies), out TGranny granny))
                 result = granny;
 
             return result;

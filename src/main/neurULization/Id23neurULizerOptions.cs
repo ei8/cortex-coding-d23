@@ -2,9 +2,9 @@
 {
     public interface Id23neurULizerOptions : IneurULizerOptions
     {
-        Coding.d23.neurULization.Processors.Writers.IInstanceProcessor WritersInstanceProcessor { get; }
+        Coding.d23.neurULization.Processors.Writers.IInstanceWriter InstanceWriter { get; }
 
-        Coding.d23.neurULization.Processors.Readers.Inductive.IInstanceProcessor ReadersInductiveInstanceProcessor { get; }
+        Coding.d23.neurULization.Processors.Readers.Inductive.IInstanceReader InductiveInstanceReader { get; }
 
         IPrimitiveSet Primitives { get; }
     }

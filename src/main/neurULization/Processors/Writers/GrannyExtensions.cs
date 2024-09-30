@@ -14,18 +14,18 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
         /// </summary>
         /// <typeparam name="TGranny"></typeparam>
         /// <typeparam name="TParameterSet"></typeparam>
-        /// <param name="grannyWriteProcessor"></param>
+        /// <param name="grannyWriter"></param>
         /// <param name="ensemble"></param>
         /// <param name="options"></param>
         /// <param name="writeParameters"></param>
         /// <returns></returns>
-        public static TGranny ParseBuild<TGranny, TGrannyWriteProcessor, TParameterSet>(
-            this TGrannyWriteProcessor grannyWriteProcessor,
+        public static TGranny ParseBuild<TGranny, TGrannyWriter, TParameterSet>(
+            this TGrannyWriter grannyWriter,
             Ensemble ensemble,
             TParameterSet writeParameters
             )
             where TGranny : IGranny
-            where TGrannyWriteProcessor : IGrannyWriteProcessor<TGranny, TParameterSet>
+            where TGrannyWriter : IGrannyWriter<TGranny, TParameterSet>
             where TParameterSet : IDeductiveParameterSet
         {
             AssertionConcern.AssertArgumentNotNull(ensemble, nameof(ensemble));
@@ -33,13 +33,13 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
 
             TGranny result = default;
             // if target is not in specified ensemble
-            if (!grannyWriteProcessor.ReadProcessor.TryParse(
+            if (!grannyWriter.Reader.TryParse(
                 ensemble,
                 writeParameters, 
                 out result
                 ))
                 // build in ensemble
-                result = grannyWriteProcessor.Build(
+                result = grannyWriter.Build(
                     ensemble,
                     writeParameters
                 );

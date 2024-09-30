@@ -43,9 +43,9 @@ namespace ei8.Cortex.Coding.d23.neurULization
             // Unnecessary to validate null id and tag values since another service can be
             // responsible for pruning grannies containing null or empty values.
             // Null values can also be considered as valid new values.
-            var instance = this.options.WritersInstanceProcessor.ParseBuild<
+            var instance = this.options.InstanceWriter.ParseBuild<
                 IInstance, 
-                IInstanceProcessor, 
+                IInstanceWriter, 
                 Processors.Readers.Deductive.IInstanceParameterSet
             >(
                 result,
@@ -91,7 +91,7 @@ namespace ei8.Cortex.Coding.d23.neurULization
 
             foreach (var instanceNeuron in instanceNeurons)
             {
-                if (this.options.ReadersInductiveInstanceProcessor.TryParse(
+                if (this.options.InductiveInstanceReader.TryParse(
                     value,
                     new Processors.Readers.Inductive.InstanceParameterSet(
                         instanceNeuron,

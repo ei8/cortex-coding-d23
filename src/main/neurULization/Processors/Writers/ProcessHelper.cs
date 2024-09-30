@@ -6,19 +6,19 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
 {
     internal static class ProcessHelper
     {
-        public static IGranny ParseBuild<TGranny, TGrannyProcessor, TParameterSet, TAggregate>(
-            TGrannyProcessor grannyProcessor,
+        public static IGranny ParseBuild<TGranny, TGrannyWriter, TParameterSet, TAggregate>(
+            TGrannyWriter grannyWriter,
             Ensemble ensemble,
             TParameterSet parameters,
             Action<TGranny, TAggregate> aggregateUpdater,
             TAggregate aggregate
         )
             where TGranny : IGranny
-            where TGrannyProcessor : IGrannyProcessor<TGranny, TParameterSet>, IGrannyWriteProcessor<TGranny, TParameterSet>
+            where TGrannyWriter : IGrannyProcessor<TGranny, TParameterSet>, IGrannyWriter<TGranny, TParameterSet>
             where TParameterSet : IParameterSet, IDeductiveParameterSet
             where TAggregate : IGranny
         {
-            TGranny result = grannyProcessor.ParseBuild<TGranny, TGrannyProcessor, TParameterSet>(
+            TGranny result = grannyWriter.ParseBuild<TGranny, TGrannyWriter, TParameterSet>(
                 ensemble,
                 parameters
             );
