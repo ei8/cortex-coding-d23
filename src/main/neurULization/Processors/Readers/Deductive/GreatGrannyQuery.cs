@@ -33,7 +33,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
 
         public bool RequiresPrecedingGrannyQueryResult { get; }
 
-        public async Task<NeuronQuery> GetQuery(IEnsembleRepository ensembleRepository, Ensemble ensemble, IList<IGranny> retrievedGrannies, string userId, string cortexLibraryOutBaseUrl, int queryResultLimit)
+        public async Task<NeuronQuery> GetQuery(IEnsembleRepository ensembleRepository, Ensemble ensemble, IList<IGranny> retrievedGrannies, string userId)
         {
             var gqs = grannyReader.GetQueries(parametersBuilder(retrievedGrannies.AsEnumerable()));
             // process granny queries
@@ -41,9 +41,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                 ensembleRepository, 
                 ensemble, 
                 retrievedGrannies, 
-                userId,  
-                cortexLibraryOutBaseUrl,
-                queryResultLimit,
+                userId,
                 true
             );
             // then call GetQuery on last granny query if completed successfully
@@ -52,9 +50,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                     ensembleRepository, 
                     ensemble, 
                     retrievedGrannies, 
-                    userId,
-                    cortexLibraryOutBaseUrl,
-                    queryResultLimit
+                    userId
                 ) : 
                 null;
         }

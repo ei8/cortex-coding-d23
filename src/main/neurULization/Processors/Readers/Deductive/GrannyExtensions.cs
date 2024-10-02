@@ -15,8 +15,6 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
             Ensemble ensemble,
             IList<IGranny> retrievedGrannies,
             string userId,
-            string cortexLibraryOutBaseUrl, 
-            int queryResultLimit,
             bool breakBeforeLastGetQuery = false
             )
         {
@@ -44,17 +42,13 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                     ensembleRepository, 
                     ensemble, 
                     retrievedGrannies, 
-                    userId,
-                    cortexLibraryOutBaseUrl,
-                    queryResultLimit
+                    userId
                 )) != null)
                 {
                     // get ensemble based on parameters and previous granny neuron if it's assigned
                     var queryResult = await ensembleRepository.GetByQueryAsync(
                         userId,
-                        query,
-                        cortexLibraryOutBaseUrl,
-                        queryResultLimit
+                        query
                         );
                     // enrich ensemble
                     ensemble.AddReplaceItems(queryResult);

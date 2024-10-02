@@ -13,9 +13,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Queries
             IEnsembleRepository ensembleRepository, 
             Ensemble ensemble, 
             IList<IGranny> retrievedGrannies, 
-            string userId, 
-            string cortexLibraryOutBaseUrl,
-            int queryResultLimit
+            string userId
         );
     }
 }
