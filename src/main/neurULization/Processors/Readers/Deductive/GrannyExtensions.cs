@@ -47,8 +47,8 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                 {
                     // get ensemble based on parameters and previous granny neuron if it's assigned
                     var queryResult = await ensembleRepository.GetByQueryAsync(
-                        userId,
-                        query
+                        query,
+                        userId
                         );
                     // enrich ensemble
                     ensemble.AddReplaceItems(queryResult);
