@@ -51,7 +51,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                         userId
                         );
                     // enrich ensemble
-                    ensemble.AddReplaceItems(queryResult);
+                    ensemble.AddReplaceItems(queryResult.Ensemble);
                     // if granny query is retriever
                     if (grannyQuery is IRetriever gqr)
                     {
