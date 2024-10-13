@@ -23,27 +23,27 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
             IValueExpressionParameterSet parameters,
             Ensemble ensemble,
             IPrimitiveSet primitives
-            ) =>
-                ProcessHelper.CreateGreatGrannyCandidates(
-                    ensemble,
-                    parameters.Granny,
-                    gc => new IndependentGreatGrannyInfo<IExpression, IExpressionReader, IExpressionParameterSet, IValueExpression>(
-                        expressionReader,
-                        () => ValueExpressionReader.CreateExpressionParameterSet(primitives, parameters, gc),
-                        (g, r) => r.Expression = g
+        ) =>
+            ProcessHelper.CreateGreatGrannyCandidates(
+                ensemble,
+                parameters.Granny,
+                gc => new IndependentGreatGrannyInfo<IExpression, IExpressionReader, IExpressionParameterSet, IValueExpression>(
+                    expressionReader,
+                    () => ValueExpressionReader.CreateExpressionParameterSet(primitives, parameters, gc),
+                    (g, r) => r.Expression = g
+                )
+            ).Concat(
+                new IGreatGrannyInfo<IValueExpression>[] {
+                    new DependentGreatGrannyInfo<IValue, IValueReader, IValueParameterSet, IValueExpression>(
+                        valueReader,
+                        g => CreateValueParameterSet(
+                            parameters,
+                            ((IExpression) g).Units.GetValueUnitGranniesByTypeId(primitives.Unit.Id).Single().Value
+                            ),
+                        (g, r) => r.Value = g
                     )
-                ).Concat(
-                    new IGreatGrannyInfo<IValueExpression>[] {
-                        new DependentGreatGrannyInfo<IValue, IValueReader, IValueParameterSet, IValueExpression>(
-                            valueReader,
-                            g => CreateValueParameterSet(
-                                parameters,
-                                ((IExpression) g).Units.GetValueUnitGranniesByTypeId(primitives.Unit.Id).Single().Value
-                                ),
-                            (g, r) => r.Value = g
-                        )
-                    }
-                );
+                }
+            );
 
         private static ExpressionParameterSet CreateExpressionParameterSet(
             IPrimitiveSet primitives,

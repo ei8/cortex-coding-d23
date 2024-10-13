@@ -2,8 +2,6 @@
 {
     public class Value : IValue
     {
-        public IInstantiatesClass InstantiatesClass { get; set; }
-
         public Neuron Neuron { get; set; }
     }
 }

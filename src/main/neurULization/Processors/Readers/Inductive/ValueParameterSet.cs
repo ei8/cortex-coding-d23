@@ -7,13 +7,15 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
         public ValueParameterSet(
             Neuron granny,
             Neuron @class
-            )
+        )
         {
             AssertionConcern.AssertArgumentNotNull(granny, nameof(granny));
-            AssertionConcern.AssertArgumentNotNull(@class, nameof(@class));
+            // TODO: create another class ie. InstanceValueParameterSet
+            // that requires both parameters
+            // AssertionConcern.AssertArgumentNotNull(@class, nameof(@class));
 
-            Granny = granny;
-            Class = @class;
+            this.Granny = granny;
+            this.Class = @class;
         }
 
         public Neuron Granny { get; }

@@ -8,14 +8,16 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
             Neuron value,
             Neuron @class,
             ValueMatchBy valueMatchBy
-            )
+        )
         {
             AssertionConcern.AssertArgumentNotNull(value, nameof(value));
-            AssertionConcern.AssertArgumentNotNull(@class, nameof(@class));
 
-            Value = value;
-            Class = @class;
-            ValueMatchBy = valueMatchBy;
+            // TODO: create another class InstanceValueParameterSet that requires @class parameter
+            // AssertionConcern.AssertArgumentNotNull(@class, nameof(@class));
+
+            this.Value = value;
+            this.Class = @class;
+            this.ValueMatchBy = valueMatchBy;
         }
 
         public Neuron Value { get; }

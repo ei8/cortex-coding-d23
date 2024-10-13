@@ -8,7 +8,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 
 namespace ei8.Cortex.Coding.d23.neurULization
 {
@@ -26,7 +25,7 @@ namespace ei8.Cortex.Coding.d23.neurULization
         public Ensemble neurULize<TValue>(
             TValue value, 
             neurULizerTypeInfo typeInfo,
-            IDictionary<string, Coding.Neuron> idPropertyValueNeurons,
+            IDictionary<Guid, Coding.Neuron> idPropertyValueNeurons,
             IDictionary<string, Coding.Neuron> externalReferences
         )
             where TValue : class
@@ -58,14 +57,21 @@ namespace ei8.Cortex.Coding.d23.neurULization
                     regionId,
                     externalReferences[typeInfo.ValueClassKey],
                     typeInfo.GrannyProperties.Select(gp =>
-                            new Processors.Readers.Deductive.PropertyAssociationParameterSet(
+                        {
+                            var valueNeuron = gp.ValueMatchBy == ValueMatchBy.Id ?
+                                    idPropertyValueNeurons[Guid.Parse(gp.Value)] :
+                                    Neuron.CreateTransient(gp.Value, null, regionId);
+                            var classNeuron = !string.IsNullOrWhiteSpace(gp.ClassKey) ?
+                                    externalReferences[gp.ClassKey] :
+                                    null;
+
+                            return new Processors.Readers.Deductive.PropertyAssociationParameterSet(
                                 externalReferences[gp.Key],
-                                gp.ValueMatchBy == ValueMatchBy.Id ?
-                                    idPropertyValueNeurons[gp.Value] :
-                                    Neuron.CreateTransient(gp.Value, null, regionId),
-                                externalReferences[gp.ClassKey],
+                                valueNeuron,
+                                classNeuron,
                                 gp.ValueMatchBy
-                            )
+                            );
+                        }
                         )
                         .Where(i => i != null)
                 )
@@ -99,7 +105,9 @@ namespace ei8.Cortex.Coding.d23.neurULization
                         typeInfo.GrannyProperties.Select(gp =>
                             Processors.Readers.Inductive.PropertyAssociationParameterSet.CreateWithoutGranny(
                                 externalReferences[gp.Key],
-                                externalReferences[gp.ClassKey]
+                                !string.IsNullOrWhiteSpace(gp.ClassKey) ?
+                                    externalReferences[gp.ClassKey] :
+                                    null
                             )
                         )
                     ),

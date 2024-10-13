@@ -15,30 +15,35 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
         )
         {
             this.instantiatesClassWriter = instantiatesClassWriter;
-            this.reader=reader;
+            this.reader = reader;
         }
 
         public IValue Build(Ensemble ensemble, IValueParameterSet parameters) =>
-            new Value().AggregateBuild(
-                ValueWriter.CreateGreatGrannies(this.instantiatesClassWriter, parameters),
-                new IGreatGrannyProcess<IValue>[]
+            parameters.Class != null ?
+                (IValue) new InstanceValue().AggregateBuild(
+                    ValueWriter.CreateGreatGrannies(this.instantiatesClassWriter, parameters),
+                    new IGreatGrannyProcess<IInstanceValue>[]
+                    {
+                        new GreatGrannyProcess<IInstantiatesClass, IInstantiatesClassWriter, IInstantiatesClassParameterSet, IInstanceValue>(
+                            ProcessHelper.ParseBuild
+                        )
+                    },
+                    ensemble,
+                    () => ensemble.AddOrGetIfExists(parameters.Value),
+                    (g) => new[] { g.InstantiatesClass.Neuron }
+                ) :
+                new Value()
                 {
-                    new GreatGrannyProcess<IInstantiatesClass, IInstantiatesClassWriter, IInstantiatesClassParameterSet, IValue>(
-                        ProcessHelper.ParseBuild
-                    )
-                },
-                ensemble,
-                () => ensemble.AddOrGetIfExists(parameters.Value),
-                (g) => new[] { g.InstantiatesClass.Neuron }
-            );
+                    Neuron = ensemble.AddOrGetIfExists(parameters.Value)
+                };
 
-        private static IEnumerable<IGreatGrannyInfo<IValue>> CreateGreatGrannies(
+        private static IEnumerable<IGreatGrannyInfo<IInstanceValue>> CreateGreatGrannies(
             IInstantiatesClassWriter instantiatesClassWriter,
             IValueParameterSet parameters
         ) =>
-            new IGreatGrannyInfo<IValue>[]
+            new IGreatGrannyInfo<IInstanceValue>[]
             {
-                new IndependentGreatGrannyInfo<IInstantiatesClass, IInstantiatesClassWriter, IInstantiatesClassParameterSet, IValue>(
+                new IndependentGreatGrannyInfo<IInstantiatesClass, IInstantiatesClassWriter, IInstantiatesClassParameterSet, IInstanceValue>(
                     instantiatesClassWriter,
                     () => ValueWriter.CreateInstantiatesClassParameterSet(parameters),
                     (g, r) => r.InstantiatesClass = g

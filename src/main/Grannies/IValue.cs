@@ -2,6 +2,5 @@
 {
     public interface IValue : IGranny
     {
-        IInstantiatesClass InstantiatesClass { get; set; }
     }
 }

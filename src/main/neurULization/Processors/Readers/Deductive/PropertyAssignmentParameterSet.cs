@@ -9,7 +9,7 @@
             ValueMatchBy valueMatchBy
             ) : base(value, @class, valueMatchBy)
         {
-            Property = property;
+            this.Property = property;
         }
 
         public Neuron Property { get; }

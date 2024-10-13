@@ -27,11 +27,12 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
             )
         {
             AssertionConcern.AssertArgumentNotNull(property, nameof(property));
-            AssertionConcern.AssertArgumentNotNull(@class, nameof(@class));
+            // TODO: create constructor overload that does not require the @class parameter
+            // AssertionConcern.AssertArgumentNotNull(@class, nameof(@class));
 
-            Granny = granny;
-            Property = property;
-            Class = @class;
+            this.Granny = granny;
+            this.Property = property;
+            this.Class = @class;
         }
 
         public Neuron Granny { get; }
