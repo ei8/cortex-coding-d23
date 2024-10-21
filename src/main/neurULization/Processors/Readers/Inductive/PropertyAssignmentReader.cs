@@ -1,4 +1,5 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
+using neurUL.Common.Domain.Model;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -9,12 +10,24 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
         private readonly IPropertyValueExpressionReader propertyValueExpressionReader;
         private readonly IExpressionReader expressionReader;
         private readonly IPrimitiveSet primitives;
+        private readonly IAggregateParser aggregateParser;
 
-        public PropertyAssignmentReader(IPropertyValueExpressionReader propertyValueExpressionReader, IExpressionReader expressionReader, IPrimitiveSet primitives)
+        public PropertyAssignmentReader(
+            IPropertyValueExpressionReader propertyValueExpressionReader, 
+            IExpressionReader expressionReader, 
+            IPrimitiveSet primitives,
+            IAggregateParser aggregateParser
+        )
         {
+            AssertionConcern.AssertArgumentNotNull(propertyValueExpressionReader, nameof(propertyValueExpressionReader));
+            AssertionConcern.AssertArgumentNotNull(expressionReader, nameof(expressionReader));
+            AssertionConcern.AssertArgumentNotNull(primitives, nameof(primitives));
+            AssertionConcern.AssertArgumentNotNull(aggregateParser, nameof(aggregateParser));
+
             this.propertyValueExpressionReader = propertyValueExpressionReader;
             this.expressionReader = expressionReader;
             this.primitives = primitives;
+            this.aggregateParser = aggregateParser;
         }
 
         private static IEnumerable<IGreatGrannyInfo<IPropertyAssignment>> CreateGreatGrannies(
@@ -72,9 +85,8 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                 parameters.Class
             );
 
-        public bool TryParse(Ensemble ensemble, 
-            IPropertyAssignmentParameterSet parameters, out IPropertyAssignment result) =>
-            new PropertyAssignment().AggregateTryParse(
+        public bool TryParse(Ensemble ensemble, IPropertyAssignmentParameterSet parameters, out IPropertyAssignment result) =>
+            this.aggregateParser.TryParse<PropertyAssignment, IPropertyAssignment>(
                 parameters.Granny,
                 PropertyAssignmentReader.CreateGreatGrannies(
                     this.propertyValueExpressionReader,

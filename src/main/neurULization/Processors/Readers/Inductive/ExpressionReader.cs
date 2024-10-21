@@ -1,4 +1,5 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
+using neurUL.Common.Domain.Model;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -7,10 +8,15 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
     public class ExpressionReader : IExpressionReader
     {
         private readonly IUnitReader unitReader;
+        private readonly IAggregateParser aggregateParser;
 
-        public ExpressionReader(IUnitReader unitReader)
+        public ExpressionReader(IUnitReader unitReader, IAggregateParser aggregateParser)
         {
+            AssertionConcern.AssertArgumentNotNull(unitReader, nameof(unitReader));
+            AssertionConcern.AssertArgumentNotNull(aggregateParser, nameof(aggregateParser));
+
             this.unitReader = unitReader;
+            this.aggregateParser = aggregateParser;
         }
 
         private static IEnumerable<IGreatGrannyInfo<IExpression>> CreateGreatGrannies(
@@ -46,7 +52,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
             );
 
         public bool TryParse(Ensemble ensemble, IExpressionParameterSet parameters, out IExpression result) =>
-            new Expression().AggregateTryParse(
+            this.aggregateParser.TryParse<Expression, IExpression>(
                 parameters.Granny,
                 ExpressionReader.CreateGreatGrannies(
                     this.unitReader,

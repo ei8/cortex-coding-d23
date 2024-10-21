@@ -1,4 +1,5 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
+using neurUL.Common.Domain.Model;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -9,12 +10,24 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
         private readonly IValueReader valueReader;
         private readonly IExpressionReader expressionReader;
         private readonly IPrimitiveSet primitives;
+        private readonly IAggregateParser aggregateParser;
 
-        public ValueExpressionReader(IValueReader valueReader, IExpressionReader expressionReader, IPrimitiveSet primitives)
+        public ValueExpressionReader(
+            IValueReader valueReader, 
+            IExpressionReader expressionReader, 
+            IPrimitiveSet primitives,
+            IAggregateParser aggregateParser
+        )
         {
+            AssertionConcern.AssertArgumentNotNull(valueReader, nameof(valueReader));
+            AssertionConcern.AssertArgumentNotNull(expressionReader, nameof(expressionReader));
+            AssertionConcern.AssertArgumentNotNull(primitives, nameof(primitives));
+            AssertionConcern.AssertArgumentNotNull(aggregateParser, nameof(aggregateParser));
+
             this.valueReader = valueReader;
             this.expressionReader = expressionReader;
             this.primitives = primitives;
+            this.aggregateParser = aggregateParser;
         }
 
         private static IEnumerable<IGreatGrannyInfo<IValueExpression>> CreateGreatGrannies(
@@ -67,7 +80,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
             );
 
         public bool TryParse(Ensemble ensemble, IValueExpressionParameterSet parameters, out IValueExpression result) =>
-            new ValueExpression().AggregateTryParse(
+            this.aggregateParser.TryParse<ValueExpression, IValueExpression>(
                 parameters.Granny,
                 ValueExpressionReader.CreateGreatGrannies(
                     this.valueReader,

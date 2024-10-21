@@ -1,4 +1,5 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
+using neurUL.Common.Domain.Model;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -8,11 +9,21 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
     {
         private readonly IInstantiatesClassReader instantiatesClassReader;
         private readonly IPropertyAssociationReader propertyAssociationReader;
+        private readonly IAggregateParser aggregateParser;
 
-        public InstanceReader(IInstantiatesClassReader instantiatesClassReader, IPropertyAssociationReader propertyAssociationReader)
+        public InstanceReader(
+            IInstantiatesClassReader instantiatesClassReader, 
+            IPropertyAssociationReader propertyAssociationReader,
+            IAggregateParser aggregateParser
+        )
         {
+            AssertionConcern.AssertArgumentNotNull(instantiatesClassReader, nameof(instantiatesClassReader));
+            AssertionConcern.AssertArgumentNotNull(propertyAssociationReader, nameof(propertyAssociationReader));
+            AssertionConcern.AssertArgumentNotNull(aggregateParser, nameof(aggregateParser));
+
             this.instantiatesClassReader = instantiatesClassReader;
             this.propertyAssociationReader = propertyAssociationReader;
+            this.aggregateParser = aggregateParser;
         }
 
         private static IEnumerable<IGreatGrannyInfo<IInstance>> CreateGreatGrannies(
@@ -54,7 +65,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
             );
 
         public bool TryParse(Ensemble ensemble, IInstanceParameterSet parameters, out IInstance result) =>
-            new Instance().AggregateTryParse(
+            this.aggregateParser.TryParse<Instance, IInstance>(
                 parameters.Granny,
                 InstanceReader.CreateGreatGrannies(
                     this.instantiatesClassReader,

@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace ei8.Cortex.Coding.d23.neurULization
 {
-    internal interface IGreatGrannyProcessAsync<TResult>
+    public interface IGreatGrannyProcessAsync<TResult>
         where TResult : IGranny
     {
         Task<IGranny> ExecuteAsync(
@@ -14,7 +14,7 @@ namespace ei8.Cortex.Coding.d23.neurULization
             );
     }
 
-    internal interface IGreatGrannyProcess<TResult>
+    public interface IGreatGrannyProcess<TResult>
         where TResult : IGranny
     {
         IGranny Execute(

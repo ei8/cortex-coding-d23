@@ -1,4 +1,5 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
+using neurUL.Common.Domain.Model;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -9,12 +10,24 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
         private readonly IValueExpressionReader valueExpressionReader;
         private readonly IExpressionReader expressionReader;
         private readonly IPrimitiveSet primitives;
+        private readonly IAggregateParser aggregateParser;
 
-        public PropertyValueExpressionReader(IValueExpressionReader valueExpressionReader, IExpressionReader expressionReader, IPrimitiveSet primitives)
+        public PropertyValueExpressionReader(
+            IValueExpressionReader valueExpressionReader, 
+            IExpressionReader expressionReader, 
+            IPrimitiveSet primitives,
+            IAggregateParser aggregateParser
+        )
         {
+            AssertionConcern.AssertArgumentNotNull(valueExpressionReader, nameof(valueExpressionReader));
+            AssertionConcern.AssertArgumentNotNull(expressionReader, nameof(expressionReader));
+            AssertionConcern.AssertArgumentNotNull(primitives, nameof(primitives));
+            AssertionConcern.AssertArgumentNotNull(aggregateParser, nameof(aggregateParser));
+
             this.valueExpressionReader = valueExpressionReader;
             this.expressionReader = expressionReader;
             this.primitives = primitives;
+            this.aggregateParser = aggregateParser;
         }
 
         private static IEnumerable<IGreatGrannyInfo<IPropertyValueExpression>> CreateGreatGrannies(
@@ -73,7 +86,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
             );
 
         public bool TryParse(Ensemble ensemble, IPropertyValueExpressionParameterSet parameters, out IPropertyValueExpression result) =>
-            new PropertyValueExpression().AggregateTryParse(
+            this.aggregateParser.TryParse<PropertyValueExpression, IPropertyValueExpression>(
                 parameters.Granny,
                 PropertyValueExpressionReader.CreateGreatGrannies(
                     this.valueExpressionReader,

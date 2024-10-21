@@ -1,4 +1,5 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
+using neurUL.Common.Domain.Model;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -9,12 +10,24 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
         private readonly IPropertyAssignmentReader propertyAssignmentReader;
         private readonly IExpressionReader expressionReader;
         private readonly IPrimitiveSet primitives;
+        private readonly IAggregateParser aggregateParser;
 
-        public PropertyAssociationReader(IPropertyAssignmentReader propertyAssignmentReader, IExpressionReader expressionReader, IPrimitiveSet primitives)
+        public PropertyAssociationReader(
+            IPropertyAssignmentReader propertyAssignmentReader, 
+            IExpressionReader expressionReader, 
+            IPrimitiveSet primitives,
+            IAggregateParser aggregateParser
+        )
         {
+            AssertionConcern.AssertArgumentNotNull(propertyAssignmentReader, nameof(propertyAssignmentReader));
+            AssertionConcern.AssertArgumentNotNull(expressionReader, nameof(expressionReader));
+            AssertionConcern.AssertArgumentNotNull(primitives, nameof(primitives));
+            AssertionConcern.AssertArgumentNotNull(aggregateParser, nameof(aggregateParser));
+
             this.propertyAssignmentReader = propertyAssignmentReader;
             this.expressionReader = expressionReader;
             this.primitives = primitives;
+            this.aggregateParser = aggregateParser;
         }
 
         private static IEnumerable<IGreatGrannyInfo<IPropertyAssociation>> CreateGreatGrannies(
@@ -77,7 +90,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
             );
 
         public bool TryParse(Ensemble ensemble, IPropertyAssociationParameterSet parameters, out IPropertyAssociation result) =>
-            new PropertyAssociation().AggregateTryParse(
+            this.aggregateParser.TryParse<PropertyAssociation, IPropertyAssociation>(
                 parameters.Granny,
                 PropertyAssociationReader.CreateGreatGrannies(
                     this.propertyAssignmentReader,

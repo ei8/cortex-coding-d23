@@ -1,5 +1,6 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
 using ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive;
+using neurUL.Common.Domain.Model;
 using System.Collections.Generic;
 
 namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
@@ -7,10 +8,15 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
     public class ValueReader : IValueReader
     {
         private readonly IInstantiatesClassReader instantiatesClassReader;
+        private readonly IAggregateParser aggregateParser;
 
-        public ValueReader(IInstantiatesClassReader instantiatesClassReader)
+        public ValueReader(IInstantiatesClassReader instantiatesClassReader, IAggregateParser aggregateParser)
         {
+            AssertionConcern.AssertArgumentNotNull(instantiatesClassReader, nameof(instantiatesClassReader));
+            AssertionConcern.AssertArgumentNotNull(aggregateParser, nameof(aggregateParser));
+
             this.instantiatesClassReader = instantiatesClassReader;
+            this.aggregateParser = aggregateParser;
         }
 
         private static IEnumerable<IGreatGrannyInfo<IInstanceValue>> CreateGreatGrannies(
@@ -45,7 +51,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
 
             if (parameters.Class != null)
             {
-                if (new InstanceValue().AggregateTryParse<IInstanceValue>(
+                if (this.aggregateParser.TryParse<InstanceValue, IInstanceValue>(
                         parameters.Granny,
                         ValueReader.CreateGreatGrannies(this.instantiatesClassReader, parameters, ensemble),
                         new IGreatGrannyProcess<IInstanceValue>[]
