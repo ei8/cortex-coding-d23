@@ -35,7 +35,8 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
             ProcessHelper.CreateGreatGrannyCandidates(
                 ensemble,
                 parameters.Granny,
-                gc => new IndependentGreatGrannyInfo<IInstantiatesClass, IInstantiatesClassReader, IInstantiatesClassParameterSet, IInstance>(
+                gc => new InductiveIndependentGreatGrannyInfo<IInstantiatesClass, IInstantiatesClassReader, IInstantiatesClassParameterSet, IInstance>(
+                    gc,
                     instantiatesClassReader,
                     () => InstanceReader.CreateInstantiatesClassParameterSet(gc, parameters),
                     (g, r) => r.InstantiatesClass = g
@@ -45,7 +46,8 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                     ensemble,
                     parameters.Granny,
                     gc => parameters.PropertyAssociationsParameters.Select(
-                        u => new IndependentGreatGrannyInfo<IPropertyAssociation, IPropertyAssociationReader, IPropertyAssociationParameterSet, IInstance>(
+                        u => new InductiveIndependentGreatGrannyInfo<IPropertyAssociation, IPropertyAssociationReader, IPropertyAssociationParameterSet, IInstance>(
+                            gc,
                             propertyAssociationReader,
                             () => PropertyAssociationParameterSet.CreateWithGranny(
                                 gc,

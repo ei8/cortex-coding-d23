@@ -5,41 +5,6 @@ using System.Threading.Tasks;
 
 namespace ei8.Cortex.Coding.d23.neurULization
 {
-    internal class GreatGrannyProcessAsync<TGranny, TGrannyProcessor, TParameterSet, TAggregate> : IGreatGrannyProcessAsync<TAggregate>
-        where TGranny : IGranny
-        where TGrannyProcessor : IGrannyProcessor<TGranny, TParameterSet>
-        where TParameterSet : class, IParameterSet
-        where TAggregate : IGranny
-    {
-        private readonly AsyncGrannyProcessCallback<TGranny, TGrannyProcessor, TParameterSet, TAggregate> asyncProcess;
-
-        public GreatGrannyProcessAsync(AsyncGrannyProcessCallback<TGranny, TGrannyProcessor, TParameterSet, TAggregate> asyncProcess)
-        {
-            this.asyncProcess = asyncProcess;
-        }
-
-        public async Task<IGranny> ExecuteAsync(IGreatGrannyInfo<TAggregate> greatGrannyInfo, Ensemble ensemble, IGranny precedingGranny, TAggregate aggregate)
-        {
-            var result = default(IGranny);
-
-            if (GreatGrannyProcess<TGranny, TGrannyProcessor, TParameterSet, TAggregate>.TryGetParameters(
-                precedingGranny,
-                greatGrannyInfo,
-                out TParameterSet parameters,
-                out ICoreGreatGrannyInfo<TGranny, TGrannyProcessor, TAggregate> coreGreatGrannyInfo
-            ))
-                result = await asyncProcess(
-                        coreGreatGrannyInfo.Processor,
-                        ensemble,
-                        parameters,
-                        coreGreatGrannyInfo.AggregateUpdater,
-                        aggregate
-                    );
-
-            return result;
-        }
-    }
-
     internal class GreatGrannyProcess<TGranny, TGrannyProcessor, TParameterSet, TAggregate> : IGreatGrannyProcess<TAggregate>
         where TGranny : IGranny
         where TGrannyProcessor : IGrannyProcessor<TGranny, TParameterSet>

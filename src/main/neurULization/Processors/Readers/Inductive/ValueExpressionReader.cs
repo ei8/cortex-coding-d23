@@ -40,7 +40,8 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
             ProcessHelper.CreateGreatGrannyCandidates(
                 ensemble,
                 parameters.Granny,
-                gc => new IndependentGreatGrannyInfo<IExpression, IExpressionReader, IExpressionParameterSet, IValueExpression>(
+                gc => new InductiveIndependentGreatGrannyInfo<IExpression, IExpressionReader, IExpressionParameterSet, IValueExpression>(
+                    gc,
                     expressionReader,
                     () => ValueExpressionReader.CreateExpressionParameterSet(primitives, parameters, gc),
                     (g, r) => r.Expression = g

@@ -1,4 +1,5 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -35,23 +36,31 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
             IGranny precedingGranny = null;
             var candidatesList = candidates.ToList();
 
-            foreach (var candidate in candidatesList)
+            string cacheId = AggregateParser.GetReadCacheId(
+                ((IInductiveGreatGrannyInfo<TResult>)candidatesList[0]).Neuron,
+                candidatesList[0].GetType().GenericTypeArguments[0]
+            );
+            AggregateParser.LogCacheRetrievalAttempt(cacheId);
+            
+            // TODO: TryParse granny itself
+            // TODO: create cacheId based on granny type
+            if (this.cache.TryGetValue(cacheId, out IGranny gResult))
             {
-                var index = candidatesList.IndexOf(candidate);
-
-                AggregateParser.LogParseAttempt<TResult>(granny, expectedGreatGrannyCount, index);
-
-                var cacheId = AggregateParser.GetReadCacheId<TResult>(granny, index);
-
-                //AggregateParser.LogCacheRetrievalAttempt(cacheId);
-                //if (this.cache.TryGetValue(cacheId, out IGranny gResult))
-                //{
-                //    AggregateParser.LogPrefixed("Retrieved!");
-                //    result = (TResult)gResult;
-                //}
-                //else
-                //{
-                //    AggregateParser.LogPrefixed("Not found.");
+                AggregateParser.LogPrefixed("Retrieved!");
+                result = (TResult)gResult;
+            }
+            else
+            {
+                AggregateParser.LogPrefixed("Not found.");
+                foreach (var candidate in candidatesList)
+                {
+                    AggregateParser.LogParseAttempt<TResult>(
+                        candidate is IInductiveGreatGrannyInfo<TResult> ic ?
+                            ic.Neuron :
+                            (precedingGranny != null ? precedingGranny.Neuron : null),
+                        expectedGreatGrannyCount,
+                        candidatesList.IndexOf(candidate)
+                    );
 
                     foreach (var target in targets)
                     {
@@ -72,22 +81,22 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                     if (successCount == expectedGreatGrannyCount)
                     {
                         result = tempResult;
-                        //this.cache.Add(
-                        //    cacheId,
-                        //    result
-                        //);
+                        this.cache.Add(
+                            cacheId,
+                            result
+                        );
                         break;
                     }
-                //}
+                }
             }
 
             return result != null;
         }
 
-        private static string GetReadCacheId<TResult>(Neuron granny, int index) where TResult : IGranny
+        private static string GetReadCacheId(Neuron granny, Type grannyType)
         {
             // TODO:1 cannot use index, must use parameters
-            return $"{granny.Id}-{typeof(TResult).FullName}-{index}";
+            return $"{granny.Id}-{grannyType.FullName}";
         }
 
         [Conditional("DEBUG")]
@@ -111,7 +120,8 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
         [Conditional("DEBUG")]
         private static void LogParseAttempt<TResult>(Neuron granny, int expectedGreatGrannyCount, int index) where TResult : IGranny
         {
-            Debug.WriteLine($"{GetPrefix()}Type: {typeof(TResult).Name}; GrannyId: {granny.Id}: Expected: {expectedGreatGrannyCount}; Index: {index}");
+            var grannyId = granny != null ? granny.Id.ToString() : "[UNKNOWN]";
+            Debug.WriteLine($"{GetPrefix()}Type: {typeof(TResult).Name}; GrannyId: {grannyId}: Expected: {expectedGreatGrannyCount}; Index: {index}");
         }
 
         private static string GetPrefix()
