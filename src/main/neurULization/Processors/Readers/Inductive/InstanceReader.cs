@@ -1,6 +1,5 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
 using neurUL.Common.Domain.Model;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
@@ -10,8 +9,16 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
         private readonly IInstantiatesClassReader instantiatesClassReader;
         private readonly IPropertyAssociationReader propertyAssociationReader;
         private readonly IAggregateParser aggregateParser;
-
-        public InstanceReader(
+        private static readonly IGreatGrannyProcess<IInstance>[] targets = new IGreatGrannyProcess<IInstance>[]
+            {
+                new GreatGrannyProcess<IInstantiatesClass, IInstantiatesClassReader, IInstantiatesClassParameterSet, IInstance>(
+                    ProcessHelper.TryParse
+                ),
+                new GreatGrannyProcess<IPropertyAssociation, IPropertyAssociationReader, IPropertyAssociationParameterSet, IInstance>(
+                    ProcessHelper.TryParse
+                )
+            };
+    public InstanceReader(
             IInstantiatesClassReader instantiatesClassReader, 
             IPropertyAssociationReader propertyAssociationReader,
             IAggregateParser aggregateParser
@@ -40,7 +47,8 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                     instantiatesClassReader,
                     () => InstanceReader.CreateInstantiatesClassParameterSet(gc, parameters),
                     (g, r) => r.InstantiatesClass = g
-                )
+                ),
+                targets[0]
             ).AsSuperset().Concat(
                 ProcessHelper.CreateGreatGrannyCandidateSets(
                     ensemble,
@@ -60,7 +68,8 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                             pa.Class
                         ),
                         (g, r) => r.PropertyAssociations.Add(g)
-                    )
+                    ),
+                    targets[1]
                 )
             );
 
@@ -78,16 +87,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                     this.propertyAssociationReader,
                     parameters,
                     ensemble
-                    ),
-                new IGreatGrannyProcess<IInstance>[]
-                {
-                    new GreatGrannyProcess<IInstantiatesClass, IInstantiatesClassReader, IInstantiatesClassParameterSet, IInstance>(
-                        ProcessHelper.TryParse
-                    ),
-                    new GreatGrannyProcess<IPropertyAssociation, IPropertyAssociationReader, IPropertyAssociationParameterSet, IInstance>(
-                        ProcessHelper.TryParse
-                    )
-                },
+                ),
                 ensemble,
                 out result
             );

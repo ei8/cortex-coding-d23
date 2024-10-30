@@ -7,5 +7,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
         where TResult : IGranny
     {
         IEnumerable<IGreatGrannyInfo<TResult>> Items { get; }
+
+        IGreatGrannyProcess<TResult> Target { get; }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
 using neurUL.Common.Domain.Model;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
@@ -11,6 +10,16 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
         private readonly IExpressionReader expressionReader;
         private readonly IPrimitiveSet primitives;
         private readonly IAggregateParser aggregateParser;
+        private static readonly IGreatGrannyProcess<IPropertyAssignment>[] targets = 
+            new IGreatGrannyProcess<IPropertyAssignment>[]
+            {
+                new GreatGrannyProcess<IExpression, IExpressionReader, IExpressionParameterSet, IPropertyAssignment>(
+                    ProcessHelper.TryParse
+                    ),
+                new GreatGrannyProcess<IPropertyValueExpression, IPropertyValueExpressionReader, IPropertyValueExpressionParameterSet, IPropertyAssignment>(
+                    ProcessHelper.TryParse
+                    )
+            };
 
         public PropertyAssignmentReader(
             IPropertyValueExpressionReader propertyValueExpressionReader, 
@@ -47,7 +56,8 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                             expressionReader,
                             () => PropertyAssignmentReader.CreateExpressionParameterSet(primitives, parameters, gc),
                             (g, r) => r.Expression = g
-                        )
+                        ),
+                        targets[0]
                     ),
                     new GreatGrannyInfoSet<IPropertyAssignment>(
                         new IGreatGrannyInfo<IPropertyAssignment>[]
@@ -60,7 +70,8 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                                     ),
                                 (g, r) => r.PropertyValueExpression = g
                             )
-                        }
+                        },
+                        targets[1]
                     )
                 }
             );
@@ -100,16 +111,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                     parameters,
                     ensemble,
                     this.primitives
-                    ),
-                new IGreatGrannyProcess<IPropertyAssignment>[]
-                {
-                    new GreatGrannyProcess<IExpression, IExpressionReader, IExpressionParameterSet, IPropertyAssignment>(
-                        ProcessHelper.TryParse
-                        ),
-                    new GreatGrannyProcess<IPropertyValueExpression, IPropertyValueExpressionReader, IPropertyValueExpressionParameterSet, IPropertyAssignment>(
-                        ProcessHelper.TryParse
-                        )
-                },
+                ),
                 ensemble,
                 out result
             );

@@ -8,7 +8,6 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
         bool TryParse<TConcrete, TResult>(
             Neuron granny,
             IGreatGrannyInfoSuperset<TResult> greatGrannyCandidates,
-            IEnumerable<IGreatGrannyProcess<TResult>> targets,
             Ensemble ensemble,
             out TResult result
         )

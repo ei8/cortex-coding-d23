@@ -19,8 +19,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
 
         public bool TryParse<TConcrete, TResult>(
             Neuron granny, 
-            IGreatGrannyInfoSuperset<TResult> candidateSets, 
-            IEnumerable<IGreatGrannyProcess<TResult>> targets, 
+            IGreatGrannyInfoSuperset<TResult> candidateSets,
             Ensemble ensemble, 
             out TResult result
         )
@@ -38,20 +37,20 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
             foreach (var candidateSet in candidateSetsList)
             {
                 var candidateSetItemsList = candidateSet.Items.ToList();
-                // TODO: string cacheId = AggregateParser.GetReadCacheId(
-                //    ((IInductiveGreatGrannyInfo<TResult>)candidateSetItemsList[0]).Neuron,
-                //    candidateSetItemsList[0].GetType().GenericTypeArguments[0]
-                //);
-                //AggregateParser.LogCacheRetrievalAttempt(cacheId);
+               // TODO: string cacheId = AggregateParser.GetReadCacheId(
+               //    ((IInductiveGreatGrannyInfo<TResult>)candidateSetItemsList[0]).Neuron,
+               //    candidateSetItemsList[0].GetType().GenericTypeArguments[0]
+               //);
+               // AggregateParser.LogCacheRetrievalAttempt(cacheId);
 
-                //if (this.cache.TryGetValue(cacheId, out IGranny gResult))
-                //{
-                //    AggregateParser.LogPrefixed("Retrieved!");
-                //    result = (TResult)gResult;
-                //}
-                //else
-                //{
-                //    AggregateParser.LogPrefixed("Not found.");
+               // if (this.cache.TryGetValue(cacheId, out IGranny gResult))
+               // {
+               //     AggregateParser.LogPrefixed("Retrieved!");
+               //     precedingGranny = gResult;
+               // }
+               // else
+               // {
+               //     AggregateParser.LogPrefixed("Not found.");
                     foreach (var candidate in candidateSetItemsList)
                     {
                         AggregateParser.LogParseAttempt<TResult>(
@@ -66,14 +65,14 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
 
                         if (AggregateParser.TryParse(
                             candidate,
-                            targets, 
+                            candidateSet.Target,
                             ensemble, 
                             tempResult, 
                             ref precedingGranny
                         ))
                         {
                             successCount++;
-                            //this.cache.Add(
+                            // TODO: this.cache.Add(
                             //    cacheId,
                             //    precedingGranny
                             //);
@@ -92,7 +91,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
 
         private static bool TryParse<TConcrete, TResult>(
             IGreatGrannyInfo<TResult> candidate,
-            IEnumerable<IGreatGrannyProcess<TResult>> targets, 
+            IGreatGrannyProcess<TResult> target, 
             Ensemble ensemble, 
             TConcrete tempResult, 
             ref IGranny precedingGranny
@@ -101,22 +100,18 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
             where TResult : IGranny
         {
             bool result = false;
-            foreach (var target in targets)
+            IGranny tempPrecedingGranny;
+            if ((tempPrecedingGranny = target.Execute(
+                candidate,
+                ensemble,
+                precedingGranny,
+                tempResult
+                )) != null)
             {
-                var tempPrecedingGranny = default(IGranny);
-                if ((tempPrecedingGranny = target.Execute(
-                    candidate,
-                    ensemble,
-                    precedingGranny,
-                    tempResult
-                    )) != null)
-                {
-                    precedingGranny = tempPrecedingGranny;
-                    result = true;
-                    break;
-                }
+                precedingGranny = tempPrecedingGranny;
+                result = true;
             }
-
+            
             return result;
         }
 

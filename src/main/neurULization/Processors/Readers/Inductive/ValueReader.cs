@@ -32,6 +32,9 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                     instantiatesClassReader,
                     () => ValueReader.CreateInstantiatesClassParameterSet(parameters, gc),
                     (g, r) => r.InstantiatesClass = g
+                ),
+                new GreatGrannyProcess<IInstantiatesClass, IInstantiatesClassReader, IInstantiatesClassParameterSet, IInstanceValue>(
+                    ProcessHelper.TryParse
                 )
             ).AsSuperset();
 
@@ -48,21 +51,14 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
         {
             var bResult = false;
             result = null;
-            IInstanceValue tempIV = null;
 
             if (parameters.Class != null)
             {
                 if (this.aggregateParser.TryParse<InstanceValue, IInstanceValue>(
                         parameters.Granny,
                         ValueReader.CreateGreatGrannies(this.instantiatesClassReader, parameters, ensemble),
-                        new IGreatGrannyProcess<IInstanceValue>[]
-                        {
-                        new GreatGrannyProcess<IInstantiatesClass, IInstantiatesClassReader, IInstantiatesClassParameterSet, IInstanceValue>(
-                            ProcessHelper.TryParse
-                        )
-                        },
                         ensemble,
-                        out tempIV
+                        out IInstanceValue tempIV
                     )
                 )
                 {

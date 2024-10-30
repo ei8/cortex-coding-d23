@@ -37,14 +37,16 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
             Ensemble ensemble,
             Neuron granny,
             IEnumerable<TParameterSet> parameters,
-            Func<Neuron, TParameterSet, IGreatGrannyInfo<TResult>> selector
+            Func<Neuron, TParameterSet, IGreatGrannyInfo<TResult>> selector,
+            IGreatGrannyProcess<TResult> target
         )
             where TResult : IGranny
             where TParameterSet : IParameterSet
         => GreatGrannyInfoSuperset<TResult>.Create(
             parameters.Select(
                 p => new GreatGrannyInfoSet<TResult>(
-                    ensemble.GetPostsynapticNeurons(granny.Id).Select(gc => selector(gc, p))
+                    ensemble.GetPostsynapticNeurons(granny.Id).Select(gc => selector(gc, p)),
+                    target
                 )
             )
         );
@@ -52,11 +54,13 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
         internal static GreatGrannyInfoSet<TResult> CreateGreatGrannyCandidateSet<TResult>(
             Ensemble ensemble,
             Neuron granny,
-            Func<Neuron, IGreatGrannyInfo<TResult>> selector
+            Func<Neuron, IGreatGrannyInfo<TResult>> selector,
+            IGreatGrannyProcess<TResult> target
         )
             where TResult : IGranny
         => new GreatGrannyInfoSet<TResult>(
-            ensemble.GetPostsynapticNeurons(granny.Id).Select(gc => selector(gc))
+            ensemble.GetPostsynapticNeurons(granny.Id).Select(gc => selector(gc)),
+            target
         );
     }
 }

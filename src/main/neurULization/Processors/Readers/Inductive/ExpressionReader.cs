@@ -9,8 +9,11 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
     {
         private readonly IUnitReader unitReader;
         private readonly IAggregateParser aggregateParser;
+        private static readonly IGreatGrannyProcess<IExpression> target = new GreatGrannyProcess<IUnit, IUnitReader, IUnitParameterSet, IExpression>(
+                ProcessHelper.TryParse
+            );
 
-        public ExpressionReader(IUnitReader unitReader, IAggregateParser aggregateParser)
+    public ExpressionReader(IUnitReader unitReader, IAggregateParser aggregateParser)
         {
             AssertionConcern.AssertArgumentNotNull(unitReader, nameof(unitReader));
             AssertionConcern.AssertArgumentNotNull(aggregateParser, nameof(aggregateParser));
@@ -37,7 +40,8 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                         up.Type
                     ),
                     (g, r) => r.Units.Add(g)
-                )
+                ),
+                ExpressionReader.target
             ).Concat(
                 new GreatGrannyInfoSet<IExpression>(
                     parameters.UnitParameters.Where(up => up.Granny != null).Select(
@@ -50,7 +54,8 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                                 ),
                             (g, r) => r.Units.Add(g)
                         )
-                    )
+                    ),
+                    ExpressionReader.target
                 ).AsSuperset()
             );
 
@@ -62,12 +67,6 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                     parameters,
                     ensemble
                 ),
-                new IGreatGrannyProcess<IExpression>[]
-                {
-                    new GreatGrannyProcess<IUnit, IUnitReader, IUnitParameterSet, IExpression>(
-                        ProcessHelper.TryParse
-                    )
-                },
                 ensemble,
                 out result
             );

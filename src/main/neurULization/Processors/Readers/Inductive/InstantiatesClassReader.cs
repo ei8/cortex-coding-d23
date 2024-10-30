@@ -10,6 +10,9 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
         private readonly IExpressionReader expressionReader;
         private readonly IPrimitiveSet primitives;
         private readonly IAggregateParser aggregateParser;
+        private static readonly IGreatGrannyProcess<IInstantiatesClass> target = new GreatGrannyProcess<IExpression, IExpressionReader, IExpressionParameterSet, IInstantiatesClass>(
+                ProcessHelper.TryParse
+            );
 
         public InstantiatesClassReader(
             IExpressionReader expressionReader, 
@@ -36,7 +39,8 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                         () => InstantiatesClassReader.CreateSubordinationParameterSet(primitives, parameters),
                         (g, r) => r.Class = g.Units.GetValueUnitGranniesByTypeId(primitives.DirectObject.Id).Single()
                     )
-               }
+               },
+               InstantiatesClassReader.target
            ).AsSuperset();
 
         private static ExpressionParameterSet CreateSubordinationParameterSet(IPrimitiveSet primitives, IInstantiatesClassParameterSet parameters) =>
@@ -63,12 +67,6 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                     parameters, 
                     this.primitives
                 ),
-                new IGreatGrannyProcess<IInstantiatesClass>[]
-                {
-                    new GreatGrannyProcess<IExpression, IExpressionReader, IExpressionParameterSet, IInstantiatesClass>(
-                        ProcessHelper.TryParse
-                    )
-                },
                 ensemble,
                 out result
             );
