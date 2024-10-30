@@ -19,12 +19,12 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
             this.aggregateParser = aggregateParser;
         }
 
-        private static IEnumerable<IGreatGrannyInfo<IInstanceValue>> CreateGreatGrannies(
+        private static IGreatGrannyInfoSuperset<IInstanceValue> CreateGreatGrannies(
             IInstantiatesClassReader instantiatesClassReader,
             IValueParameterSet parameters,
             Ensemble ensemble
             ) =>
-            ProcessHelper.CreateGreatGrannyCandidates(
+            ProcessHelper.CreateGreatGrannyCandidateSet(
                 ensemble,
                 parameters.Granny,
                 gc => new InductiveIndependentGreatGrannyInfo<IInstantiatesClass, IInstantiatesClassReader, IInstantiatesClassParameterSet, IInstanceValue>(
@@ -33,7 +33,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                     () => ValueReader.CreateInstantiatesClassParameterSet(parameters, gc),
                     (g, r) => r.InstantiatesClass = g
                 )
-            );
+            ).AsSuperset();
 
         private static IInstantiatesClassParameterSet CreateInstantiatesClassParameterSet(
             IValueParameterSet parameters,
@@ -62,7 +62,6 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                         )
                         },
                         ensemble,
-                        1,
                         out tempIV
                     )
                 )

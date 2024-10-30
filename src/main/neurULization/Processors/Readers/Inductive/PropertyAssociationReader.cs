@@ -30,38 +30,39 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
             this.aggregateParser = aggregateParser;
         }
 
-        private static IEnumerable<IGreatGrannyInfo<IPropertyAssociation>> CreateGreatGrannies(
+        private static IGreatGrannyInfoSuperset<IPropertyAssociation> CreateGreatGrannies(
             IPropertyAssignmentReader propertyAssignmentReader,
             IExpressionReader expressionReader,
             IPropertyAssociationParameterSet parameters,
             Ensemble ensemble,
             IPrimitiveSet primitives
-        )
-        {
-            var ppid = parameters.Property.Tag.ToString();
-            return ProcessHelper.CreateGreatGrannyCandidates(
-                ensemble,
-                parameters.Granny,
-                gc => new InductiveIndependentGreatGrannyInfo<IExpression, IExpressionReader, IExpressionParameterSet, IPropertyAssociation>(
-                    gc,
-                    expressionReader,
-                    () => PropertyAssociationReader.CreateExpressionParameterSet(primitives, parameters, gc),
-                    (g, r) => r.Expression = g
-                )
-            ).Concat(
-                new IGreatGrannyInfo<IPropertyAssociation>[]
-                {
-                    new DependentGreatGrannyInfo<IPropertyAssignment, IPropertyAssignmentReader, IPropertyAssignmentParameterSet, IPropertyAssociation>(
-                        propertyAssignmentReader,
-                        g => CreatePropertyAssignmentParameterSet(
-                            parameters,
-                            ((IExpression) g).Units.GetValueUnitGranniesByTypeId(primitives.DirectObject.Id).Single().Value
-                        ),
-                        (g, r) => r.PropertyAssignment = g
+        ) =>
+            GreatGrannyInfoSuperset<IPropertyAssociation>.Create(
+                new GreatGrannyInfoSet<IPropertyAssociation>[] {
+                    ProcessHelper.CreateGreatGrannyCandidateSet(
+                        ensemble,
+                        parameters.Granny,
+                        gc => new InductiveIndependentGreatGrannyInfo<IExpression, IExpressionReader, IExpressionParameterSet, IPropertyAssociation>(
+                            gc,
+                            expressionReader,
+                            () => PropertyAssociationReader.CreateExpressionParameterSet(primitives, parameters, gc),
+                            (g, r) => r.Expression = g
+                        )
+                    ),
+                    new GreatGrannyInfoSet<IPropertyAssociation>(
+                        new IGreatGrannyInfo<IPropertyAssociation>[] {
+                            new DependentGreatGrannyInfo<IPropertyAssignment, IPropertyAssignmentReader, IPropertyAssignmentParameterSet, IPropertyAssociation>(
+                                propertyAssignmentReader,
+                                g => PropertyAssociationReader.CreatePropertyAssignmentParameterSet(
+                                    parameters,
+                                    ((IExpression) g).Units.GetValueUnitGranniesByTypeId(primitives.DirectObject.Id).Single().Value
+                                ),
+                                (g, r) => r.PropertyAssignment = g
+                            )
+                        }
                     )
                 }
             );
-        }
 
         private static ExpressionParameterSet CreateExpressionParameterSet(
             IPrimitiveSet primitives,
@@ -110,7 +111,6 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                         )
                 },
                 ensemble,
-                2,
                 out result
             );
     }

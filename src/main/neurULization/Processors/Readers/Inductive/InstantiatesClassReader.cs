@@ -26,16 +26,18 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
             this.aggregateParser = aggregateParser;
         }
 
-        private static IEnumerable<IGreatGrannyInfo<IInstantiatesClass>> CreateGreatGrannies(IExpressionReader expressionReader, IInstantiatesClassParameterSet parameters, IPrimitiveSet primitives) =>
-           new IGreatGrannyInfo<IInstantiatesClass>[]
-           {
-                new InductiveIndependentGreatGrannyInfo<IExpression, IExpressionReader, IExpressionParameterSet, IInstantiatesClass>(
-                    parameters.Granny,
-                    expressionReader,
-                    () => InstantiatesClassReader.CreateSubordinationParameterSet(primitives, parameters),
-                    (g, r) => r.Class = g.Units.GetValueUnitGranniesByTypeId(primitives.DirectObject.Id).Single()
-                )
-           };
+        private static IGreatGrannyInfoSuperset<IInstantiatesClass> CreateGreatGrannies(IExpressionReader expressionReader, IInstantiatesClassParameterSet parameters, IPrimitiveSet primitives) =>
+            new GreatGrannyInfoSet<IInstantiatesClass>(
+               new IGreatGrannyInfo<IInstantiatesClass>[]
+               {
+                    new InductiveIndependentGreatGrannyInfo<IExpression, IExpressionReader, IExpressionParameterSet, IInstantiatesClass>(
+                        parameters.Granny,
+                        expressionReader,
+                        () => InstantiatesClassReader.CreateSubordinationParameterSet(primitives, parameters),
+                        (g, r) => r.Class = g.Units.GetValueUnitGranniesByTypeId(primitives.DirectObject.Id).Single()
+                    )
+               }
+           ).AsSuperset();
 
         private static ExpressionParameterSet CreateSubordinationParameterSet(IPrimitiveSet primitives, IInstantiatesClassParameterSet parameters) =>
             new ExpressionParameterSet(
@@ -68,7 +70,6 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                     )
                 },
                 ensemble,
-                1,
                 out result
             );
     }

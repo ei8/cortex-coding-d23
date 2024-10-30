@@ -11,6 +11,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
     public class AggregateParser : IAggregateParser
     {
         private readonly IDictionary<string, IGranny> cache;
+
         public AggregateParser()
         {
             this.cache = new Dictionary<string, IGranny>();
@@ -18,10 +19,9 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
 
         public bool TryParse<TConcrete, TResult>(
             Neuron granny, 
-            IEnumerable<IGreatGrannyInfo<TResult>> candidates, 
+            IGreatGrannyInfoSuperset<TResult> candidateSets, 
             IEnumerable<IGreatGrannyProcess<TResult>> targets, 
             Ensemble ensemble, 
-            int expectedGreatGrannyCount, 
             out TResult result
         )
             where TConcrete : TResult, new()
@@ -29,68 +29,95 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
         { 
             result = default;
 
-            var tempResult = new TConcrete();
-            tempResult.Neuron = granny;
+            var tempResult = new TConcrete { Neuron = granny };
 
             int successCount = 0;
             IGranny precedingGranny = null;
-            var candidatesList = candidates.ToList();
-
-            string cacheId = AggregateParser.GetReadCacheId(
-                ((IInductiveGreatGrannyInfo<TResult>)candidatesList[0]).Neuron,
-                candidatesList[0].GetType().GenericTypeArguments[0]
-            );
-            AggregateParser.LogCacheRetrievalAttempt(cacheId);
+            var candidateSetsList = candidateSets.Items.ToList();
             
-            // TODO: TryParse granny itself
-            // TODO: create cacheId based on granny type
-            if (this.cache.TryGetValue(cacheId, out IGranny gResult))
+            foreach (var candidateSet in candidateSetsList)
             {
-                AggregateParser.LogPrefixed("Retrieved!");
-                result = (TResult)gResult;
-            }
-            else
-            {
-                AggregateParser.LogPrefixed("Not found.");
-                foreach (var candidate in candidatesList)
-                {
-                    AggregateParser.LogParseAttempt<TResult>(
-                        candidate is IInductiveGreatGrannyInfo<TResult> ic ?
-                            ic.Neuron :
-                            (precedingGranny != null ? precedingGranny.Neuron : null),
-                        expectedGreatGrannyCount,
-                        candidatesList.IndexOf(candidate)
-                    );
+                var candidateSetItemsList = candidateSet.Items.ToList();
+                // TODO: string cacheId = AggregateParser.GetReadCacheId(
+                //    ((IInductiveGreatGrannyInfo<TResult>)candidateSetItemsList[0]).Neuron,
+                //    candidateSetItemsList[0].GetType().GenericTypeArguments[0]
+                //);
+                //AggregateParser.LogCacheRetrievalAttempt(cacheId);
 
-                    foreach (var target in targets)
+                //if (this.cache.TryGetValue(cacheId, out IGranny gResult))
+                //{
+                //    AggregateParser.LogPrefixed("Retrieved!");
+                //    result = (TResult)gResult;
+                //}
+                //else
+                //{
+                //    AggregateParser.LogPrefixed("Not found.");
+                    foreach (var candidate in candidateSetItemsList)
                     {
-                        var tempPrecedingGranny = default(IGranny);
-                        if ((tempPrecedingGranny = target.Execute(
+                        AggregateParser.LogParseAttempt<TResult>(
+                            candidate is IInductiveGreatGrannyInfo<TResult> ic ?
+                                ic.Neuron :
+                                (precedingGranny != null ? precedingGranny.Neuron : null),
+                            candidateSetsList.Count(),
+                            candidateSetsList.IndexOf(candidateSet),
+                            candidateSetItemsList.Count(),
+                            candidateSetItemsList.IndexOf(candidate)
+                        );
+
+                        if (AggregateParser.TryParse(
                             candidate,
-                            ensemble,
-                            precedingGranny,
-                            tempResult
-                            )) != null)
+                            targets, 
+                            ensemble, 
+                            tempResult, 
+                            ref precedingGranny
+                        ))
                         {
-                            precedingGranny = tempPrecedingGranny;
                             successCount++;
-                            AggregateParser.LogParseSuccess(expectedGreatGrannyCount, successCount);
+                            //this.cache.Add(
+                            //    cacheId,
+                            //    precedingGranny
+                            //);
+                            AggregateParser.LogParseSuccess(candidateSets.Count, successCount);
                             break;
                         }
                     }
-                    if (successCount == expectedGreatGrannyCount)
-                    {
-                        result = tempResult;
-                        this.cache.Add(
-                            cacheId,
-                            result
-                        );
-                        break;
-                    }
+                //}
+            }
+
+            if (successCount == candidateSets.Count)
+                result = tempResult;
+
+            return result != null;
+        }
+
+        private static bool TryParse<TConcrete, TResult>(
+            IGreatGrannyInfo<TResult> candidate,
+            IEnumerable<IGreatGrannyProcess<TResult>> targets, 
+            Ensemble ensemble, 
+            TConcrete tempResult, 
+            ref IGranny precedingGranny
+        )
+            where TConcrete : TResult, new()
+            where TResult : IGranny
+        {
+            bool result = false;
+            foreach (var target in targets)
+            {
+                var tempPrecedingGranny = default(IGranny);
+                if ((tempPrecedingGranny = target.Execute(
+                    candidate,
+                    ensemble,
+                    precedingGranny,
+                    tempResult
+                    )) != null)
+                {
+                    precedingGranny = tempPrecedingGranny;
+                    result = true;
+                    break;
                 }
             }
 
-            return result != null;
+            return result;
         }
 
         private static string GetReadCacheId(Neuron granny, Type grannyType)
@@ -118,10 +145,17 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
         }
 
         [Conditional("DEBUG")]
-        private static void LogParseAttempt<TResult>(Neuron granny, int expectedGreatGrannyCount, int index) where TResult : IGranny
+        private static void LogParseAttempt<TResult>(
+            Neuron granny, 
+            int setCount, 
+            int setIndex, 
+            int itemCount, 
+            int itemIndex
+        ) where TResult : IGranny
         {
             var grannyId = granny != null ? granny.Id.ToString() : "[UNKNOWN]";
-            Debug.WriteLine($"{GetPrefix()}Type: {typeof(TResult).Name}; GrannyId: {grannyId}: Expected: {expectedGreatGrannyCount}; Index: {index}");
+            var typeName = typeof(TResult).Name;
+            Debug.WriteLine($"{GetPrefix()}Type: {typeof(TResult).Name}; GrannyId: {grannyId}: Expected: {setCount}; SetIndex: {setIndex}; ItemCount: {itemCount}; Index: {itemIndex}");
         }
 
         private static string GetPrefix()

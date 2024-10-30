@@ -19,38 +19,39 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
             this.aggregateParser = aggregateParser;
         }
 
-        private static IEnumerable<IGreatGrannyInfo<IExpression>> CreateGreatGrannies(
+        private static IGreatGrannyInfoSuperset<IExpression> CreateGreatGrannies(
             IUnitReader unitReader,
             IExpressionParameterSet parameters,
             Ensemble ensemble
         ) =>
-            ProcessHelper.CreateGreatGrannyCandidates(
+            ProcessHelper.CreateGreatGrannyCandidateSets(
                 ensemble,
                 parameters.Granny,
-                gc => parameters.UnitParameters.Where(up => up.Granny == null).Select(
-                    up => new InductiveIndependentGreatGrannyInfo<IUnit, IUnitReader, IUnitParameterSet, IExpression>(
+                parameters.UnitParameters.Where(up => up.Granny == null),
+                (gc, up) => new InductiveIndependentGreatGrannyInfo<IUnit, IUnitReader, IUnitParameterSet, IExpression>(
+                    gc,
+                    unitReader,
+                    () => UnitParameterSet.Create(
                         gc,
-                        unitReader,
-                        () => UnitParameterSet.Create(
-                                gc,
-                                up.Value,
-                                up.Type
-                            ),
-                        (g, r) => r.Units.Add(g)
-                    )
+                        up.Value,
+                        up.Type
+                    ),
+                    (g, r) => r.Units.Add(g)
                 )
             ).Concat(
-                parameters.UnitParameters.Where(up => up.Granny != null).Select(
-                    up => new InductiveIndependentGreatGrannyInfo<IUnit, IUnitReader, IUnitParameterSet, IExpression>(
-                        up.Granny,
-                        unitReader,
-                        () => UnitParameterSet.CreateWithGrannyAndType(
-                                up.Granny,
-                                up.Type
-                            ),
-                        (g, r) => r.Units.Add(g)
+                new GreatGrannyInfoSet<IExpression>(
+                    parameters.UnitParameters.Where(up => up.Granny != null).Select(
+                        up => new InductiveIndependentGreatGrannyInfo<IUnit, IUnitReader, IUnitParameterSet, IExpression>(
+                            up.Granny,
+                            unitReader,
+                            () => UnitParameterSet.CreateWithGrannyAndType(
+                                    up.Granny,
+                                    up.Type
+                                ),
+                            (g, r) => r.Units.Add(g)
+                        )
                     )
-                )
+                ).AsSuperset()
             );
 
         public bool TryParse(Ensemble ensemble, IExpressionParameterSet parameters, out IExpression result) =>
@@ -68,7 +69,6 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                     )
                 },
                 ensemble,
-                parameters.UnitParameters.Count(),
                 out result
             );
     }

@@ -33,39 +33,30 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
             return result;
         }
 
-        internal static IEnumerable<IGreatGrannyInfo<TResult>> CreateGreatGrannyCandidates<TResult>(
+        internal static IGreatGrannyInfoSuperset<TResult> CreateGreatGrannyCandidateSets<TParameterSet, TResult>(
             Ensemble ensemble,
             Neuron granny,
-            Func<Neuron, IEnumerable<IGreatGrannyInfo<TResult>>> selector
+            IEnumerable<TParameterSet> parameters,
+            Func<Neuron, TParameterSet, IGreatGrannyInfo<TResult>> selector
         )
             where TResult : IGranny
-        {
-            var result = default(IEnumerable<IGreatGrannyInfo<TResult>>);
-            if (granny != null)
-            {
-                // use each postsynaptic of granny as a granny candidate
-                var posts = ensemble.GetPostsynapticNeurons(granny.Id);
-                result = posts.SelectMany(
-                    gc => selector(gc)
-                );
-            }
-            else
-                result = Array.Empty<IGreatGrannyInfo<TResult>>();
+            where TParameterSet : IParameterSet
+        => GreatGrannyInfoSuperset<TResult>.Create(
+            parameters.Select(
+                p => new GreatGrannyInfoSet<TResult>(
+                    ensemble.GetPostsynapticNeurons(granny.Id).Select(gc => selector(gc, p))
+                )
+            )
+        );
 
-            return result;
-        }
-
-        internal static IEnumerable<IGreatGrannyInfo<TResult>> CreateGreatGrannyCandidates<TResult>(
+        internal static GreatGrannyInfoSet<TResult> CreateGreatGrannyCandidateSet<TResult>(
             Ensemble ensemble,
             Neuron granny,
             Func<Neuron, IGreatGrannyInfo<TResult>> selector
         )
             where TResult : IGranny
-            =>
-            ProcessHelper.CreateGreatGrannyCandidates(
-                ensemble,
-                granny,
-                gc => new IGreatGrannyInfo<TResult>[] { selector(gc) }
-                );
+        => new GreatGrannyInfoSet<TResult>(
+            ensemble.GetPostsynapticNeurons(granny.Id).Select(gc => selector(gc))
+        );
     }
 }
