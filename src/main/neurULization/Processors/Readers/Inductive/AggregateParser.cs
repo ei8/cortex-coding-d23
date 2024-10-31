@@ -1,5 +1,4 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -37,22 +36,25 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
             foreach (var candidateSet in candidateSetsList)
             {
                 var candidateSetItemsList = candidateSet.Items.ToList();
-               // TODO: string cacheId = AggregateParser.GetReadCacheId(
-               //    ((IInductiveGreatGrannyInfo<TResult>)candidateSetItemsList[0]).Neuron,
-               //    candidateSetItemsList[0].GetType().GenericTypeArguments[0]
-               //);
-               // AggregateParser.LogCacheRetrievalAttempt(cacheId);
+                foreach (var candidate in candidateSetItemsList)
+                {
+                    string cacheId = AggregateParser.GetReadCacheId(candidate);
+                    AggregateParser.LogCacheRetrievalAttempt(cacheId);
 
-               // if (this.cache.TryGetValue(cacheId, out IGranny gResult))
-               // {
-               //     AggregateParser.LogPrefixed("Retrieved!");
-               //     precedingGranny = gResult;
-               // }
-               // else
-               // {
-               //     AggregateParser.LogPrefixed("Not found.");
-                    foreach (var candidate in candidateSetItemsList)
+                    if (this.cache.TryGetValue(cacheId, out IGranny gResult))
                     {
+                        precedingGranny = gResult;
+                        // TODO: sequence contains more than one element
+                        // is the aggregate getting over-updated?
+                        // how can we determine whether an update is still necessary?
+                        candidateSet.Target.UpdateAggregate(candidate, precedingGranny, tempResult);
+                        successCount++;
+                        AggregateParser.LogSuccess("retrieved", candidateSets.Count, successCount);
+                        break;
+                    }
+                    else
+                    {
+                        AggregateParser.LogPrefixed("|--Not found.");
                         AggregateParser.LogParseAttempt<TResult>(
                             candidate is IInductiveGreatGrannyInfo<TResult> ic ?
                                 ic.Neuron :
@@ -72,15 +74,16 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                         ))
                         {
                             successCount++;
-                            // TODO: this.cache.Add(
-                            //    cacheId,
-                            //    precedingGranny
-                            //);
-                            AggregateParser.LogParseSuccess(candidateSets.Count, successCount);
+                            if (!string.IsNullOrWhiteSpace(cacheId))
+                                this.cache.Add(
+                                   cacheId,
+                                   precedingGranny
+                                );
+                            AggregateParser.LogSuccess("parsed", candidateSets.Count, successCount);
                             break;
                         }
                     }
-                //}
+                }
             }
 
             if (successCount == candidateSets.Count)
@@ -115,10 +118,21 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
             return result;
         }
 
-        private static string GetReadCacheId(Neuron granny, Type grannyType)
+        private static string GetReadCacheId<TResult>(IGreatGrannyInfo<TResult> candidateSetItem)
         {
-            // TODO:1 cannot use index, must use parameters
-            return $"{granny.Id}-{grannyType.FullName}";
+            string result = string.Empty;
+
+            var granny = candidateSetItem is IInductiveGreatGrannyInfo<TResult> inductive ? 
+                inductive.Neuron : 
+                null;
+            
+            if (granny != null)
+            {
+                var grannyType = candidateSetItem.GetType().GenericTypeArguments[0];
+                result = $"{granny.Id}-{grannyType.FullName}";
+            }
+            
+            return result;
         }
 
         [Conditional("DEBUG")]
@@ -134,9 +148,9 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
         }
 
         [Conditional("DEBUG")]
-        private static void LogParseSuccess(int expectedGreatGrannyCount, int successCount)
+        private static void LogSuccess(string message, int expectedGreatGrannyCount, int successCount)
         {
-            Debug.WriteLine($"{GetPrefix()}|--PARSED! ({successCount}/{expectedGreatGrannyCount})");
+            Debug.WriteLine($"{GetPrefix()}|--{message.ToUpper()}! ({successCount}/{expectedGreatGrannyCount})");
         }
 
         [Conditional("DEBUG")]

@@ -2,14 +2,20 @@
 
 namespace ei8.Cortex.Coding.d23.neurULization
 {
-    public interface IGreatGrannyProcess<TResult>
-        where TResult : IGranny
+    public interface IGreatGrannyProcess<TAggregate>
+        where TAggregate : IGranny
     {
         IGranny Execute(
-            IGreatGrannyInfo<TResult> greatGrannyInfo,
+            IGreatGrannyInfo<TAggregate> greatGrannyInfo,
             Ensemble ensemble,
             IGranny precedingGranny,
-            TResult tempResult
-            );
+            TAggregate aggregate
+        );
+
+        void UpdateAggregate(
+            IGreatGrannyInfo<TAggregate> greatGrannyInfo,
+            IGranny precedingGranny,
+            TAggregate aggregate
+        );
     }
 }

@@ -1,7 +1,5 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
-using ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive;
 using System.Diagnostics;
-using System.Threading.Tasks;
 
 namespace ei8.Cortex.Coding.d23.neurULization
 {
@@ -18,7 +16,7 @@ namespace ei8.Cortex.Coding.d23.neurULization
             this.process = process;
         }
 
-        public IGranny Execute(IGreatGrannyInfo<TAggregate> greatGrannyInfo, Ensemble ensemble, IGranny precedingGranny, TAggregate tempResult)
+        public IGranny Execute(IGreatGrannyInfo<TAggregate> greatGrannyInfo, Ensemble ensemble, IGranny precedingGranny, TAggregate aggregate)
         {
             var result = default(IGranny);
 
@@ -33,10 +31,25 @@ namespace ei8.Cortex.Coding.d23.neurULization
                     ensemble,
                     parameters,
                     coreGreatGrannyInfo.AggregateUpdater,
-                    tempResult
+                    aggregate
                 );
 
             return result;
+        }
+
+        public void UpdateAggregate(
+            IGreatGrannyInfo<TAggregate> greatGrannyInfo, 
+            IGranny precedingGranny, 
+            TAggregate aggregate
+        )
+        {
+            if (GreatGrannyProcess<TGranny, TGrannyProcessor, TParameterSet, TAggregate>.TryGetParameters(
+                precedingGranny,
+                greatGrannyInfo,
+                out TParameterSet parameters,
+                out ICoreGreatGrannyInfo<TGranny, TGrannyProcessor, TAggregate> coreGreatGrannyInfo
+            ))
+                coreGreatGrannyInfo.AggregateUpdater((TGranny) precedingGranny, aggregate);
         }
 
         internal static bool TryGetParameters(
@@ -44,8 +57,7 @@ namespace ei8.Cortex.Coding.d23.neurULization
             IGreatGrannyInfo<TAggregate> greatGrannyInfo, 
             out TParameterSet parameters,
             out ICoreGreatGrannyInfo<TGranny, TGrannyProcessor, TAggregate> resultCoreGreatGrannyInfo
-            )
-
+        )
         {
             parameters = default;
             resultCoreGreatGrannyInfo = null;
@@ -73,7 +85,7 @@ namespace ei8.Cortex.Coding.d23.neurULization
         [Conditional("DEBUG")]
         private static void LogPropertyName(TParameterSet parameters)
         {
-            if (parameters is IPropertyReadParameterSet prop)
+            if (parameters is Processors.Readers.Inductive.IPropertyReadParameterSet prop)
                 Debug.WriteLine($">>> Property Name: {prop.Property.Tag}");
         }
     }
