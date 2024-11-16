@@ -88,15 +88,15 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
             return result;
         }
 
-        internal static bool AggregateTryParse<TResult>(
-            this TResult tempResult,
-            IEnumerable<IGreatGrannyInfo<TResult>> processes,
-            IEnumerable<IGreatGrannyProcess<TResult>> targets,
+        internal static bool AggregateTryParse<TAggregate>(
+            this TAggregate aggregate,
+            IEnumerable<IGreatGrannyInfo<TAggregate>> candidates,
+            IEnumerable<IGreatGrannyProcess<TAggregate>> targets,
             Ensemble ensemble,
-            out TResult result,
+            out TAggregate result,
             bool setGrannyNeuronOnCompletion = true
         )
-            where TResult : IGranny
+            where TAggregate : IGranny
         {
             result = default;
 
@@ -104,18 +104,25 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
             var ts = targets.ToArray();
             for (int i = 0; i < ts.Length; i++)
             {
-                if ((precedingGranny = ts[i].Execute(
-                    processes.ElementAt(i),
-                    ensemble,
-                    precedingGranny,
-                    tempResult
-                    )) == null)
+                var candidate = candidates.ElementAt(i);
+                if (ts[i].TryGetParameters(
+                        precedingGranny,
+                        candidate,
+                        out IParameterSet parameters
+                    ) && (
+                        precedingGranny = ts[i].Execute(
+                            candidate,
+                            ensemble,
+                            aggregate,
+                            parameters
+                        )
+                    ) == null)
                     break;
                 else if (i == ts.Length - 1)
                 {
                     if (setGrannyNeuronOnCompletion)
-                        tempResult.Neuron = precedingGranny.Neuron;
-                    result = tempResult;
+                        aggregate.Neuron = precedingGranny.Neuron;
+                    result = aggregate;
                 }
             }
 

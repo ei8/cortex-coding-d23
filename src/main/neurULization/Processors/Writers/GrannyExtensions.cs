@@ -62,11 +62,18 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
             var ts = targets.ToArray();
             for (int i = 0; i < ts.Length; i++)
             {
-                precedingGranny = ts[i].Execute(
-                    processes.ElementAt(i),
-                    ensemble,
+                var candidate = processes.ElementAt(i);
+
+                if(ts[i].TryGetParameters(
                     precedingGranny,
-                    tempResult
+                    candidate,
+                    out IParameterSet parameters
+                ))
+                    precedingGranny = ts[i].Execute(
+                        candidate,
+                        ensemble,
+                        tempResult,
+                        parameters
                     );
             }
 

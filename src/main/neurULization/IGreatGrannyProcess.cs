@@ -5,11 +5,17 @@ namespace ei8.Cortex.Coding.d23.neurULization
     public interface IGreatGrannyProcess<TAggregate>
         where TAggregate : IGranny
     {
-        IGranny Execute(
-            IGreatGrannyInfo<TAggregate> greatGrannyInfo,
-            Ensemble ensemble,
+        bool TryGetParameters(
             IGranny precedingGranny,
-            TAggregate aggregate
+            IGreatGrannyInfo<TAggregate> greatGrannyInfo,
+            out IParameterSet parameters
+        );
+
+        IGranny Execute(
+            IGreatGrannyInfo<TAggregate> greatGrannyInfo, 
+            Ensemble ensemble, 
+            TAggregate aggregate, 
+            IParameterSet parameters
         );
 
         void UpdateAggregate(

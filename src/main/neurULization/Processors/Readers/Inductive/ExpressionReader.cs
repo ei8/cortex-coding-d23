@@ -1,6 +1,5 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
 using neurUL.Common.Domain.Model;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
@@ -13,7 +12,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                 ProcessHelper.TryParse
             );
 
-    public ExpressionReader(IUnitReader unitReader, IAggregateParser aggregateParser)
+        public ExpressionReader(IUnitReader unitReader, IAggregateParser aggregateParser)
         {
             AssertionConcern.AssertArgumentNotNull(unitReader, nameof(unitReader));
             AssertionConcern.AssertArgumentNotNull(aggregateParser, nameof(aggregateParser));

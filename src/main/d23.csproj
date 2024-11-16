@@ -6,6 +6,10 @@
     <RootNamespace>ei8.Cortex.Coding.d23</RootNamespace>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>$(DefineConstants);PARSELOG</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Nancy" Version="2.0.0-clinteastwood" />
   </ItemGroup>

@@ -1,5 +1,4 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
-using System.Diagnostics;
 
 namespace ei8.Cortex.Coding.d23.neurULization
 {
@@ -16,77 +15,50 @@ namespace ei8.Cortex.Coding.d23.neurULization
             this.process = process;
         }
 
-        public IGranny Execute(IGreatGrannyInfo<TAggregate> greatGrannyInfo, Ensemble ensemble, IGranny precedingGranny, TAggregate aggregate)
+        public bool TryGetParameters(
+            IGranny precedingGranny,
+            IGreatGrannyInfo<TAggregate> greatGrannyInfo,
+            out IParameterSet parameters
+        )
+        {
+            parameters = default;
+
+            if (
+                greatGrannyInfo is IDependentGreatGrannyInfo<TGranny, TGrannyProcessor, TParameterSet, TAggregate> dependentGreatGrannyInfo &&
+                precedingGranny != null
+            )
+                parameters = dependentGreatGrannyInfo.ParametersBuilder(precedingGranny);
+            else if (
+                greatGrannyInfo is IIndependentGreatGrannyInfo<TGranny, TGrannyProcessor, TParameterSet, TAggregate> independentGreatGrannyInfo
+            )
+                parameters = independentGreatGrannyInfo.ParametersBuilder();
+
+            return parameters != default;
+        }
+
+        public IGranny Execute(IGreatGrannyInfo<TAggregate> greatGrannyInfo, Ensemble ensemble, TAggregate aggregate, IParameterSet parameters)
         {
             var result = default(IGranny);
 
-            if (GreatGrannyProcess<TGranny, TGrannyProcessor, TParameterSet, TAggregate>.TryGetParameters(
-                precedingGranny, 
-                greatGrannyInfo, 
-                out TParameterSet parameters,
-                out ICoreGreatGrannyInfo<TGranny, TGrannyProcessor, TAggregate> coreGreatGrannyInfo
-            ))
+            if (greatGrannyInfo is ICoreGreatGrannyInfo<TGranny, TGrannyProcessor, TAggregate> coreGreatGrannyInfo &&
+                parameters is TParameterSet tryParameters)
+            {
                 result = process(
                     coreGreatGrannyInfo.Processor,
                     ensemble,
-                    parameters,
+                    tryParameters,
                     coreGreatGrannyInfo.AggregateUpdater,
                     aggregate
                 );
+            }
 
             return result;
         }
 
-        public void UpdateAggregate(
-            IGreatGrannyInfo<TAggregate> greatGrannyInfo, 
-            IGranny precedingGranny, 
-            TAggregate aggregate
-        )
+        public void UpdateAggregate(IGreatGrannyInfo<TAggregate> greatGrannyInfo, IGranny precedingGranny, TAggregate aggregate)
         {
-            if (GreatGrannyProcess<TGranny, TGrannyProcessor, TParameterSet, TAggregate>.TryGetParameters(
-                precedingGranny,
-                greatGrannyInfo,
-                out TParameterSet parameters,
-                out ICoreGreatGrannyInfo<TGranny, TGrannyProcessor, TAggregate> coreGreatGrannyInfo
-            ))
-                coreGreatGrannyInfo.AggregateUpdater((TGranny) precedingGranny, aggregate);
-        }
-
-        internal static bool TryGetParameters(
-            IGranny precedingGranny, 
-            IGreatGrannyInfo<TAggregate> greatGrannyInfo, 
-            out TParameterSet parameters,
-            out ICoreGreatGrannyInfo<TGranny, TGrannyProcessor, TAggregate> resultCoreGreatGrannyInfo
-        )
-        {
-            parameters = default;
-            resultCoreGreatGrannyInfo = null;
-
             if (greatGrannyInfo is ICoreGreatGrannyInfo<TGranny, TGrannyProcessor, TAggregate> coreGreatGrannyInfo)
-            {
-                resultCoreGreatGrannyInfo = coreGreatGrannyInfo;
-
-                if (
-                    resultCoreGreatGrannyInfo is IDependentGreatGrannyInfo<TGranny, TGrannyProcessor, TParameterSet, TAggregate> dependentGreatGrannyInfo &&
-                    precedingGranny != null
-                )
-                    parameters = dependentGreatGrannyInfo.ParametersBuilder(precedingGranny);
-                else if (
-                    resultCoreGreatGrannyInfo is IIndependentGreatGrannyInfo<TGranny, TGrannyProcessor, TParameterSet, TAggregate> independentGreatGrannyInfo
-                )
-                    parameters = independentGreatGrannyInfo.ParametersBuilder();
-            }
-
-            GreatGrannyProcess<TGranny, TGrannyProcessor, TParameterSet, TAggregate>.LogPropertyName(parameters);
-
-            return parameters != default && resultCoreGreatGrannyInfo != null;
-        }
-
-        [Conditional("DEBUG")]
-        private static void LogPropertyName(TParameterSet parameters)
-        {
-            if (parameters is Processors.Readers.Inductive.IPropertyReadParameterSet prop)
-                Debug.WriteLine($">>> Property Name: {prop.Property.Tag}");
+                coreGreatGrannyInfo.AggregateUpdater((TGranny) precedingGranny, aggregate);
         }
     }
 }
