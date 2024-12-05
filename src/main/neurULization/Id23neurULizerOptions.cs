@@ -6,6 +6,6 @@
 
         Coding.d23.neurULization.Processors.Readers.Inductive.IInstanceReader InductiveInstanceReader { get; }
 
-        IPrimitiveSet Primitives { get; }
+        IExternalReferenceSet ExternalReferences { get; }
     }
 }

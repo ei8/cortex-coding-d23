@@ -1,10 +1,8 @@
-﻿using System.Collections.Generic;
-
-namespace ei8.Cortex.Coding.d23.neurULization
+﻿namespace ei8.Cortex.Coding.d23.neurULization
 {
-    public class PrimitiveSet : IPrimitiveSet
+    public class ExternalReferenceSet : IExternalReferenceSet
     {
-        public PrimitiveSet()
+        public ExternalReferenceSet()
         {
         }
 

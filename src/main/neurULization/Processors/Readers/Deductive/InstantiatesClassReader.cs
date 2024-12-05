@@ -9,45 +9,45 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
     public class InstantiatesClassReader : IInstantiatesClassReader
     {
         private readonly IExpressionReader expressionReader;
-        private readonly IPrimitiveSet primitives;
+        private readonly IExternalReferenceSet externalReferences;
 
-        public InstantiatesClassReader(IExpressionReader expressionReader, IPrimitiveSet primitives)
+        public InstantiatesClassReader(IExpressionReader expressionReader, IExternalReferenceSet externalReferences)
         {
             this.expressionReader = expressionReader;
-            this.primitives = primitives;
+            this.externalReferences = externalReferences;
         }
 
         private static IEnumerable<IGreatGrannyInfo<IInstantiatesClass>> CreateGreatGrannies(
             IExpressionReader expressionReader,
             IInstantiatesClassParameterSet parameters,
-            IPrimitiveSet primitives
+            IExternalReferenceSet externalReferences
         ) =>
            new IGreatGrannyInfo<IInstantiatesClass>[]
            {
                 new IndependentGreatGrannyInfo<IExpression, IExpressionReader, IExpressionParameterSet, IInstantiatesClass>(
                     expressionReader,
-                    () => InstantiatesClassReader.CreateSubordinationParameterSet(primitives, parameters),
-                    (g, r) => r.Class = g.Units.GetValueUnitGranniesByTypeId(primitives.DirectObject.Id).Single()
+                    () => InstantiatesClassReader.CreateSubordinationParameterSet(externalReferences, parameters),
+                    (g, r) => r.Class = g.Units.GetValueUnitGranniesByTypeId(externalReferences.DirectObject.Id).Single()
                 )
            };
 
         public IEnumerable<IGrannyQuery> GetQueries(IInstantiatesClassParameterSet parameters) =>
             this.expressionReader.GetQueries(
-                InstantiatesClassReader.CreateSubordinationParameterSet(this.primitives, parameters)
+                InstantiatesClassReader.CreateSubordinationParameterSet(this.externalReferences, parameters)
             );
 
-        private static ExpressionParameterSet CreateSubordinationParameterSet(IPrimitiveSet primitives, IInstantiatesClassParameterSet parameters)
+        private static ExpressionParameterSet CreateSubordinationParameterSet(IExternalReferenceSet externalReferences, IInstantiatesClassParameterSet parameters)
         {
             return new ExpressionParameterSet(
                 new[]
                 {
                     new UnitParameterSet(
-                        primitives.Instantiates,
-                        primitives.Unit
+                        externalReferences.Instantiates,
+                        externalReferences.Unit
                     ),
                     new UnitParameterSet(
                         parameters.Class,
-                        primitives.DirectObject
+                        externalReferences.DirectObject
                     )
                 }
             );
@@ -58,7 +58,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                 InstantiatesClassReader.CreateGreatGrannies(
                     this.expressionReader, 
                     parameters,
-                    this.primitives
+                    this.externalReferences
                 ),
                 new IGreatGrannyProcess<IInstantiatesClass>[]
                 {

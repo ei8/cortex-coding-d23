@@ -9,19 +9,19 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
         private readonly IValueWriter valueWriter;
         private readonly IExpressionWriter expressionWriter;
         private readonly Readers.Deductive.IValueExpressionReader reader;
-        private readonly IPrimitiveSet primitives;
+        private readonly IExternalReferenceSet externalReferences;
 
         public ValueExpressionWriter(
             IValueWriter valueWriter, 
             IExpressionWriter expressionWriter,
             Readers.Deductive.IValueExpressionReader reader,
-            IPrimitiveSet primitives
+            IExternalReferenceSet externalReferences
             )
         {
             this.valueWriter = valueWriter;
             this.expressionWriter = expressionWriter;
             this.reader = reader;
-            this.primitives = primitives;
+            this.externalReferences = externalReferences;
         }
 
         public IValueExpression Build(Ensemble ensemble, IValueExpressionParameterSet parameters) =>
@@ -30,7 +30,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
                     this.valueWriter,
                     this.expressionWriter,
                     parameters,
-                    this.primitives
+                    this.externalReferences
                 ),
                 new IGreatGrannyProcess<IValueExpression>[]
                 {
@@ -48,7 +48,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
             IValueWriter valueWriter,
             IExpressionWriter expressionWriter, 
             IValueExpressionParameterSet parameters,
-            IPrimitiveSet primitives
+            IExternalReferenceSet externalReferences
         ) =>
             new IGreatGrannyInfo<IValueExpression>[]
             {
@@ -59,7 +59,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
                     ),
                 new DependentGreatGrannyInfo<IExpression, IExpressionWriter, IExpressionParameterSet, IValueExpression>(
                     expressionWriter,
-                    (g) => ValueExpressionWriter.CreateExpressionParameterSet(primitives, parameters, g.Neuron),
+                    (g) => ValueExpressionWriter.CreateExpressionParameterSet(externalReferences, parameters, g.Neuron),
                     (g, r) => r.Expression = g
                     )
             };
@@ -71,12 +71,12 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
                 parameters.ValueMatchBy
             );
 
-        private static ExpressionParameterSet CreateExpressionParameterSet(IPrimitiveSet primitives, IValueExpressionParameterSet parameters, Neuron n) =>
+        private static ExpressionParameterSet CreateExpressionParameterSet(IExternalReferenceSet externalReferences, IValueExpressionParameterSet parameters, Neuron n) =>
             new ExpressionParameterSet(
                 new[] {
                     new UnitParameterSet(
                         n,
-                        primitives.Unit
+                        externalReferences.Unit
                     ),
                 }
             );

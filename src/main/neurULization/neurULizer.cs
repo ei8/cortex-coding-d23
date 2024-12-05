@@ -121,7 +121,7 @@ namespace ei8.Cortex.Coding.d23.neurULization
                         var propAssoc = instance.PropertyAssociations.SingleOrDefault(
                             pa => pa.PropertyAssignment.Expression.Units
                                 .AsEnumerable()
-                                .GetValueUnitGranniesByTypeId(this.options.Primitives.Unit.Id).SingleOrDefault().Value.Id == externalReferences[gp.Key].Id
+                                .GetValueUnitGranniesByTypeId(this.options.ExternalReferences.Unit.Id).SingleOrDefault().Value.Id == externalReferences[gp.Key].Id
                         );
                         object propValue = null;
 

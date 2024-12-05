@@ -8,7 +8,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
     {
         private readonly IPropertyAssignmentReader propertyAssignmentReader;
         private readonly IExpressionReader expressionReader;
-        private readonly IPrimitiveSet primitives;
+        private readonly IExternalReferenceSet externalReferences;
         private readonly IAggregateParser aggregateParser;
         private static readonly IGreatGrannyProcess<IPropertyAssociation>[] targets = new IGreatGrannyProcess<IPropertyAssociation>[]
             {
@@ -23,18 +23,18 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
     public PropertyAssociationReader(
             IPropertyAssignmentReader propertyAssignmentReader, 
             IExpressionReader expressionReader, 
-            IPrimitiveSet primitives,
+            IExternalReferenceSet externalReferences,
             IAggregateParser aggregateParser
         )
         {
             AssertionConcern.AssertArgumentNotNull(propertyAssignmentReader, nameof(propertyAssignmentReader));
             AssertionConcern.AssertArgumentNotNull(expressionReader, nameof(expressionReader));
-            AssertionConcern.AssertArgumentNotNull(primitives, nameof(primitives));
+            AssertionConcern.AssertArgumentNotNull(externalReferences, nameof(externalReferences));
             AssertionConcern.AssertArgumentNotNull(aggregateParser, nameof(aggregateParser));
 
             this.propertyAssignmentReader = propertyAssignmentReader;
             this.expressionReader = expressionReader;
-            this.primitives = primitives;
+            this.externalReferences = externalReferences;
             this.aggregateParser = aggregateParser;
         }
 
@@ -43,7 +43,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
             IExpressionReader expressionReader,
             IPropertyAssociationParameterSet parameters,
             Ensemble ensemble,
-            IPrimitiveSet primitives
+            IExternalReferenceSet externalReferences
         ) =>
             GreatGrannyInfoSuperset<IPropertyAssociation>.Create(
                 new GreatGrannyInfoSet<IPropertyAssociation>[] {
@@ -53,7 +53,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                         gc => new InductiveIndependentGreatGrannyInfo<IExpression, IExpressionReader, IExpressionParameterSet, IPropertyAssociation>(
                             gc,
                             expressionReader,
-                            () => PropertyAssociationReader.CreateExpressionParameterSet(primitives, parameters, gc),
+                            () => PropertyAssociationReader.CreateExpressionParameterSet(externalReferences, parameters, gc),
                             (g, r) => r.Expression = g
                         ),
                         targets[0]
@@ -64,7 +64,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                                 propertyAssignmentReader,
                                 g => PropertyAssociationReader.CreatePropertyAssignmentParameterSet(
                                     parameters,
-                                    ((IExpression) g).Units.GetValueUnitGranniesByTypeId(primitives.DirectObject.Id).Single().Value
+                                    ((IExpression) g).Units.GetValueUnitGranniesByTypeId(externalReferences.DirectObject.Id).Single().Value
                                 ),
                                 (g, r) => r.PropertyAssignment = g
                             )
@@ -75,7 +75,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
             );
 
         private static ExpressionParameterSet CreateExpressionParameterSet(
-            IPrimitiveSet primitives,
+            IExternalReferenceSet externalReferences,
             IPropertyAssociationParameterSet parameters,
             Neuron unitGranny
         ) =>
@@ -84,12 +84,12 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                 new[]
                 {
                     UnitParameterSet.CreateWithValueAndType(
-                        primitives.Has,
-                        primitives.Unit
+                        externalReferences.Has,
+                        externalReferences.Unit
                     ),
                     UnitParameterSet.CreateWithGrannyAndType(
                         unitGranny,
-                        primitives.DirectObject
+                        externalReferences.DirectObject
                     )
                 }
             );
@@ -109,7 +109,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                     this.expressionReader,
                     parameters,
                     ensemble,
-                    this.primitives
+                    this.externalReferences
                 ),
                 ensemble,
                 out result

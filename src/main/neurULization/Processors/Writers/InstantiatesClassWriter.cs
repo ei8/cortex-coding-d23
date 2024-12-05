@@ -9,17 +9,17 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
     {
         private readonly IExpressionWriter expressionWriter;
         private readonly Readers.Deductive.IInstantiatesClassReader reader;
-        private readonly IPrimitiveSet primitives;
+        private readonly IExternalReferenceSet externalReferences;
 
         public InstantiatesClassWriter(
             IExpressionWriter expressionWriter,
             Readers.Deductive.IInstantiatesClassReader reader,
-            IPrimitiveSet primitives
+            IExternalReferenceSet externalReferences
             )
         {
             this.expressionWriter = expressionWriter;
             this.reader = reader;
-            this.primitives = primitives;
+            this.externalReferences = externalReferences;
         }
 
         public IInstantiatesClass Build(Ensemble ensemble, IInstantiatesClassParameterSet parameters) =>
@@ -27,7 +27,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
                 InstantiatesClassWriter.CreateGreatGrannies(
                     this.expressionWriter, 
                     parameters, 
-                    this.primitives
+                    this.externalReferences
                 ),
                 new IGreatGrannyProcess<IInstantiatesClass>[]
                 {
@@ -41,29 +41,29 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
         private static IEnumerable<IGreatGrannyInfo<IInstantiatesClass>> CreateGreatGrannies(
             IExpressionWriter expressionWriter, 
             IInstantiatesClassParameterSet parameters, 
-            IPrimitiveSet primitives
+            IExternalReferenceSet externalReferences
         ) =>
            new IGreatGrannyInfo<IInstantiatesClass>[]
            {
                 new IndependentGreatGrannyInfo<IExpression, IExpressionWriter, IExpressionParameterSet, IInstantiatesClass>(
                     expressionWriter,
-                    () => InstantiatesClassWriter.CreateSubordinationParameterSet(primitives, parameters),
-                    (g, r) => r.Class = g.Units.GetValueUnitGranniesByTypeId(primitives.DirectObject.Id).Single()
+                    () => InstantiatesClassWriter.CreateSubordinationParameterSet(externalReferences, parameters),
+                    (g, r) => r.Class = g.Units.GetValueUnitGranniesByTypeId(externalReferences.DirectObject.Id).Single()
                 )
            };
 
-        private static ExpressionParameterSet CreateSubordinationParameterSet(IPrimitiveSet primitives, IInstantiatesClassParameterSet parameters)
+        private static ExpressionParameterSet CreateSubordinationParameterSet(IExternalReferenceSet externalReferences, IInstantiatesClassParameterSet parameters)
         {
             return new ExpressionParameterSet(
                 new[]
                 {
                     new UnitParameterSet(
-                        primitives.Instantiates,
-                        primitives.Unit
+                        externalReferences.Instantiates,
+                        externalReferences.Unit
                     ),
                     new UnitParameterSet(
                         parameters.Class,
-                        primitives.DirectObject
+                        externalReferences.DirectObject
                     )
                 }
             );

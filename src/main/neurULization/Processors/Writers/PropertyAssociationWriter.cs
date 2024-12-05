@@ -9,19 +9,19 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
         private readonly IPropertyAssignmentWriter propertyAssignmentWriter;
         private readonly IExpressionWriter expressionWriter;
         private readonly Readers.Deductive.IPropertyAssociationReader reader;
-        private readonly IPrimitiveSet primitives;
+        private readonly IExternalReferenceSet externalReferences;
 
         public PropertyAssociationWriter(
             IPropertyAssignmentWriter propertyAssignmentWriter, 
             IExpressionWriter expressionWriter,
             Readers.Deductive.IPropertyAssociationReader reader,
-            IPrimitiveSet primitives
+            IExternalReferenceSet externalReferences
         )
         {
             this.propertyAssignmentWriter = propertyAssignmentWriter;
             this.expressionWriter = expressionWriter;
             this.reader = reader;
-            this.primitives = primitives;
+            this.externalReferences = externalReferences;
         }
 
         public IPropertyAssociation Build(Ensemble ensemble, IPropertyAssociationParameterSet parameters) =>
@@ -30,7 +30,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
                     this.propertyAssignmentWriter,
                     this.expressionWriter,
                     parameters,
-                    this.primitives
+                    this.externalReferences
                 ),
                 new IGreatGrannyProcess<IPropertyAssociation>[]
                 {
@@ -48,7 +48,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
             IPropertyAssignmentWriter propertyAssignmentWriter,
             IExpressionWriter expressionWriter, 
             IPropertyAssociationParameterSet parameters,
-            IPrimitiveSet primitives
+            IExternalReferenceSet externalReferences
         ) =>
           new IGreatGrannyInfo<IPropertyAssociation>[]
           {
@@ -59,7 +59,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
                 ),
                 new DependentGreatGrannyInfo<IExpression, IExpressionWriter, IExpressionParameterSet, IPropertyAssociation>(
                     expressionWriter,
-                    (g) => PropertyAssociationWriter.CreateExpressionParameterSet(primitives, parameters, g.Neuron),
+                    (g) => PropertyAssociationWriter.CreateExpressionParameterSet(externalReferences, parameters, g.Neuron),
                     (g, r) => r.Expression = g
                 )
           };
@@ -72,17 +72,17 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
                 parameters.ValueMatchBy
             );
 
-        private static ExpressionParameterSet CreateExpressionParameterSet(IPrimitiveSet primitives, IPropertyAssociationParameterSet parameters, Neuron neuron) =>
+        private static ExpressionParameterSet CreateExpressionParameterSet(IExternalReferenceSet externalReferences, IPropertyAssociationParameterSet parameters, Neuron neuron) =>
             new ExpressionParameterSet(
                 new[]
                 {
                     new UnitParameterSet(
-                        primitives.Has,
-                        primitives.Unit
+                        externalReferences.Has,
+                        externalReferences.Unit
                     ),
                     new UnitParameterSet(
                         neuron,
-                        primitives.DirectObject
+                        externalReferences.DirectObject
                     )
                 }
             );

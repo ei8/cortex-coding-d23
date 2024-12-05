@@ -8,7 +8,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
     public class InstantiatesClassReader : IInstantiatesClassReader
     {
         private readonly IExpressionReader expressionReader;
-        private readonly IPrimitiveSet primitives;
+        private readonly IExternalReferenceSet externalReferences;
         private readonly IAggregateParser aggregateParser;
         private static readonly IGreatGrannyProcess<IInstantiatesClass> target = new GreatGrannyProcess<IExpression, IExpressionReader, IExpressionParameterSet, IInstantiatesClass>(
                 ProcessHelper.TryParse
@@ -16,45 +16,45 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
 
         public InstantiatesClassReader(
             IExpressionReader expressionReader, 
-            IPrimitiveSet primitives,
+            IExternalReferenceSet externalReferences,
             IAggregateParser aggregateParser
         )
         {
             AssertionConcern.AssertArgumentNotNull(expressionReader, nameof(expressionReader));
-            AssertionConcern.AssertArgumentNotNull(primitives, nameof(primitives));
+            AssertionConcern.AssertArgumentNotNull(externalReferences, nameof(externalReferences));
             AssertionConcern.AssertArgumentNotNull(aggregateParser, nameof(aggregateParser));
 
             this.expressionReader = expressionReader;
-            this.primitives = primitives;
+            this.externalReferences = externalReferences;
             this.aggregateParser = aggregateParser;
         }
 
-        private static IGreatGrannyInfoSuperset<IInstantiatesClass> CreateGreatGrannies(IExpressionReader expressionReader, IInstantiatesClassParameterSet parameters, IPrimitiveSet primitives) =>
+        private static IGreatGrannyInfoSuperset<IInstantiatesClass> CreateGreatGrannies(IExpressionReader expressionReader, IInstantiatesClassParameterSet parameters, IExternalReferenceSet externalReferences) =>
             new GreatGrannyInfoSet<IInstantiatesClass>(
                new IGreatGrannyInfo<IInstantiatesClass>[]
                {
                     new InductiveIndependentGreatGrannyInfo<IExpression, IExpressionReader, IExpressionParameterSet, IInstantiatesClass>(
                         parameters.Granny,
                         expressionReader,
-                        () => InstantiatesClassReader.CreateSubordinationParameterSet(primitives, parameters),
-                        (g, r) => r.Class = g.Units.GetValueUnitGranniesByTypeId(primitives.DirectObject.Id).Single()
+                        () => InstantiatesClassReader.CreateSubordinationParameterSet(externalReferences, parameters),
+                        (g, r) => r.Class = g.Units.GetValueUnitGranniesByTypeId(externalReferences.DirectObject.Id).Single()
                     )
                },
                InstantiatesClassReader.target
            ).AsSuperset();
 
-        private static ExpressionParameterSet CreateSubordinationParameterSet(IPrimitiveSet primitives, IInstantiatesClassParameterSet parameters) =>
+        private static ExpressionParameterSet CreateSubordinationParameterSet(IExternalReferenceSet externalReferences, IInstantiatesClassParameterSet parameters) =>
             new ExpressionParameterSet(
                 parameters.Granny,
                 new[]
                 {
                     UnitParameterSet.CreateWithValueAndType(
-                        primitives.Instantiates,
-                        primitives.Unit
+                        externalReferences.Instantiates,
+                        externalReferences.Unit
                     ),
                     UnitParameterSet.CreateWithValueAndType(
                         parameters.Class,
-                        primitives.DirectObject
+                        externalReferences.DirectObject
                     )
                 }
             );
@@ -65,7 +65,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                 InstantiatesClassReader.CreateGreatGrannies(
                     this.expressionReader, 
                     parameters, 
-                    this.primitives
+                    this.externalReferences
                 ),
                 ensemble,
                 out result

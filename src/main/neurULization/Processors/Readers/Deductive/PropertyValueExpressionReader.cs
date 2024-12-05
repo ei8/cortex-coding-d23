@@ -9,24 +9,24 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
     {
         private readonly IValueExpressionReader valueExpressionReader;
         private readonly IExpressionReader expressionReader;
-        private readonly IPrimitiveSet primitives;
+        private readonly IExternalReferenceSet externalReferences;
 
         public PropertyValueExpressionReader(
             IValueExpressionReader valueExpressionReader, 
             IExpressionReader expressionReader, 
-            IPrimitiveSet primitives
+            IExternalReferenceSet externalReferences
         )
         {
             this.valueExpressionReader = valueExpressionReader;
             this.expressionReader = expressionReader;
-            this.primitives = primitives;
+            this.externalReferences = externalReferences;
         }
 
         private static IEnumerable<IGreatGrannyInfo<IPropertyValueExpression>> CreateGreatGrannies(
             IValueExpressionReader valueExpressionReader,
             IExpressionReader expressionReader,
             IPropertyValueExpressionParameterSet parameters,
-            IPrimitiveSet primitives
+            IExternalReferenceSet externalReferences
         ) =>
             new IGreatGrannyInfo<IPropertyValueExpression>[]
             {
@@ -37,22 +37,22 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                 ),
                 new DependentGreatGrannyInfo<IExpression, IExpressionReader, IExpressionParameterSet, IPropertyValueExpression>(
                     expressionReader,
-                    (g) => PropertyValueExpressionReader.CreateExpressionParameterSet(primitives, parameters, g.Neuron),
+                    (g) => PropertyValueExpressionReader.CreateExpressionParameterSet(externalReferences, parameters, g.Neuron),
                     (g, r) => r.Expression = g
                 )
             };
 
-        private static ExpressionParameterSet CreateExpressionParameterSet(IPrimitiveSet primitives, IPropertyValueExpressionParameterSet parameters, Neuron neuron) =>
+        private static ExpressionParameterSet CreateExpressionParameterSet(IExternalReferenceSet externalReferences, IPropertyValueExpressionParameterSet parameters, Neuron neuron) =>
             new ExpressionParameterSet(
                 new[]
                 {
                     new UnitParameterSet(
                         neuron,
-                        primitives.Unit
+                        externalReferences.Unit
                     ),
                     new UnitParameterSet(
-                        primitives.Of,
-                        primitives.Case
+                        externalReferences.Of,
+                        externalReferences.Case
                     )
                 }
             );
@@ -72,7 +72,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                 ),
                 new GreatGrannyQuery<IExpression, IExpressionReader, IExpressionParameterSet>(
                     this.expressionReader,
-                    (n) => PropertyValueExpressionReader.CreateExpressionParameterSet(this.primitives, parameters, n.Last().Neuron)
+                    (n) => PropertyValueExpressionReader.CreateExpressionParameterSet(this.externalReferences, parameters, n.Last().Neuron)
                 )
             };
 
@@ -82,7 +82,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                     this.valueExpressionReader,
                     this.expressionReader,
                     parameters,
-                    this.primitives
+                    this.externalReferences
                 ),
                 new IGreatGrannyProcess<IPropertyValueExpression>[]
                 {

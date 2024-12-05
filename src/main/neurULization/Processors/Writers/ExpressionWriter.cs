@@ -10,17 +10,17 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
     {
         private readonly IUnitWriter unitWriter;
         private readonly Readers.Deductive.IExpressionReader reader;
-        private readonly IPrimitiveSet primitives;
+        private readonly IExternalReferenceSet externalReferences;
 
         public ExpressionWriter(
             IUnitWriter unitWriter, 
             Readers.Deductive.IExpressionReader reader, 
-            IPrimitiveSet primitives
+            IExternalReferenceSet externalReferences
         )
         {
             this.unitWriter = unitWriter;
             this.reader = reader;
-            this.primitives = primitives;
+            this.externalReferences = externalReferences;
         }
 
         public IExpression Build(Ensemble ensemble, IExpressionParameterSet parameters) =>
@@ -40,7 +40,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
                     // concat applicable expression types
                     GetExpressionTypes(
                         (id, isEqual) => parameters.UnitsParameters.GetValueUnitParametersByTypeId(id, isEqual).Count(),
-                        this.primitives
+                        this.externalReferences
                     )
                     .Select(et => ensemble.AddOrGetIfExists(et))
                     .Concat(
@@ -63,27 +63,27 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
 
         internal static IEnumerable<Neuron> GetExpressionTypes(
             Func<Guid, bool, int> headCountRetriever,
-            IPrimitiveSet primitives
+            IExternalReferenceSet externalReferences
             )
         {
             var result = new List<Neuron>();
 
-            var headCount = headCountRetriever(primitives.Unit.Id, true);
-            var dependentCount = headCountRetriever(primitives.Unit.Id, false);
+            var headCount = headCountRetriever(externalReferences.Unit.Id, true);
+            var dependentCount = headCountRetriever(externalReferences.Unit.Id, false);
 
             if (headCount > 0)
             {
                 if (headCount > 1)
                 {
-                    result.Add(primitives.Coordination);
+                    result.Add(externalReferences.Coordination);
                 }
                 else if (headCount == 1 && dependentCount == 0)
                 {
-                    result.Add(primitives.Simple);
+                    result.Add(externalReferences.Simple);
                 }
                 if (dependentCount > 0)
                 {
-                    result.Add(primitives.Subordination);
+                    result.Add(externalReferences.Subordination);
                 }
             }
             else

@@ -9,24 +9,24 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
     {
         private readonly IPropertyAssignmentReader propertyAssignmentReader;
         private readonly IExpressionReader expressionReader;
-        private readonly IPrimitiveSet primitives;
+        private readonly IExternalReferenceSet externalReferences;
 
         public PropertyAssociationReader(
             IPropertyAssignmentReader propertyAssignmentReader, 
             IExpressionReader expressionReader, 
-            IPrimitiveSet primitives
+            IExternalReferenceSet externalReferences
         )
         {
             this.propertyAssignmentReader = propertyAssignmentReader;
             this.expressionReader = expressionReader;
-            this.primitives = primitives;
+            this.externalReferences = externalReferences;
         }
 
         private static IEnumerable<IGreatGrannyInfo<IPropertyAssociation>> CreateGreatGrannies(
             IPropertyAssignmentReader propertyAssignmentReader,
             IExpressionReader expressionReader,
             IPropertyAssociationParameterSet parameters,
-            IPrimitiveSet primitives
+            IExternalReferenceSet externalReferences
         ) =>
           new IGreatGrannyInfo<IPropertyAssociation>[]
           {
@@ -37,7 +37,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                 ),
                 new DependentGreatGrannyInfo<IExpression, IExpressionReader, IExpressionParameterSet, IPropertyAssociation>(
                     expressionReader,
-                    (g) => PropertyAssociationReader.CreateExpressionParameterSet(primitives, parameters, g.Neuron),
+                    (g) => PropertyAssociationReader.CreateExpressionParameterSet(externalReferences, parameters, g.Neuron),
                     (g, r) => r.Expression = g
                 )
           };
@@ -50,17 +50,17 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                 parameters.ValueMatchBy
             );
 
-        private static ExpressionParameterSet CreateExpressionParameterSet(IPrimitiveSet primitives, IPropertyAssociationParameterSet parameters, Neuron neuron) =>
+        private static ExpressionParameterSet CreateExpressionParameterSet(IExternalReferenceSet externalReferences, IPropertyAssociationParameterSet parameters, Neuron neuron) =>
             new ExpressionParameterSet(
                 new[]
                 {
                     new UnitParameterSet(
-                        primitives.Has,
-                        primitives.Unit
+                        externalReferences.Has,
+                        externalReferences.Unit
                     ),
                     new UnitParameterSet(
                         neuron,
-                        primitives.DirectObject
+                        externalReferences.DirectObject
                     )
                 }
             );
@@ -73,7 +73,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                 ),
                 new GreatGrannyQuery<IExpression, IExpressionReader, IExpressionParameterSet>(
                     this.expressionReader,
-                    (n) => CreateExpressionParameterSet(this.primitives, parameters, n.Last().Neuron)
+                    (n) => CreateExpressionParameterSet(this.externalReferences, parameters, n.Last().Neuron)
                 )
             };
 
@@ -83,7 +83,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                     this.propertyAssignmentReader,
                     this.expressionReader,
                     parameters,
-                    this.primitives
+                    this.externalReferences
                 ),
                 new IGreatGrannyProcess<IPropertyAssociation>[]
                 {

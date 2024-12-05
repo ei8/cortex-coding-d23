@@ -9,19 +9,19 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
         private readonly IValueExpressionWriter valueExpressionWriter;
         private readonly IExpressionWriter expressionWriter;
         private readonly Readers.Deductive.IPropertyValueExpressionReader reader;
-        private readonly IPrimitiveSet primitives;
+        private readonly IExternalReferenceSet externalReferences;
 
         public PropertyValueExpressionWriter(
             IValueExpressionWriter valueExpressionWriter, 
             IExpressionWriter expressionWriter,
             Readers.Deductive.IPropertyValueExpressionReader reader,
-            IPrimitiveSet primitives
+            IExternalReferenceSet externalReferences
             )
         {
             this.valueExpressionWriter = valueExpressionWriter;
             this.expressionWriter = expressionWriter;
             this.reader = reader;
-            this.primitives = primitives;
+            this.externalReferences = externalReferences;
         }
 
         public IPropertyValueExpression Build(
@@ -33,7 +33,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
                     this.valueExpressionWriter,
                     this.expressionWriter, 
                     parameters,
-                    primitives
+                    externalReferences
                 ),
                 new IGreatGrannyProcess<IPropertyValueExpression>[]
                 {
@@ -51,7 +51,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
             IValueExpressionWriter valueExpressionWriter,
             IExpressionWriter expressionWriter,
             IPropertyValueExpressionParameterSet parameters,
-            IPrimitiveSet primitives
+            IExternalReferenceSet externalReferences
         ) =>
             new IGreatGrannyInfo<IPropertyValueExpression>[]
             {
@@ -62,22 +62,22 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
                 ),
                 new DependentGreatGrannyInfo<IExpression, IExpressionWriter, IExpressionParameterSet, IPropertyValueExpression>(
                     expressionWriter,
-                    (g) => CreateExpressionParameterSet(primitives, parameters, g.Neuron),
+                    (g) => CreateExpressionParameterSet(externalReferences, parameters, g.Neuron),
                     (g, r) => r.Expression = g
                 )
             };
 
-        private static ExpressionParameterSet CreateExpressionParameterSet(IPrimitiveSet primitives, IPropertyValueExpressionParameterSet parameters, Neuron neuron) =>
+        private static ExpressionParameterSet CreateExpressionParameterSet(IExternalReferenceSet externalReferences, IPropertyValueExpressionParameterSet parameters, Neuron neuron) =>
             new ExpressionParameterSet(
                 new[]
                 {
                     new UnitParameterSet(
                         neuron,
-                        primitives.Unit
+                        externalReferences.Unit
                     ),
                     new UnitParameterSet(
-                        primitives.Of,
-                        primitives.Case
+                        externalReferences.Of,
+                        externalReferences.Case
                     )
                 }
             );

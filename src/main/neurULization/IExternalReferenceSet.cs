@@ -1,6 +1,6 @@
 ﻿namespace ei8.Cortex.Coding.d23.neurULization
 {
-    public interface IPrimitiveSet
+    public interface IExternalReferenceSet
     {
         Neuron DirectObject { get; set; }
 
