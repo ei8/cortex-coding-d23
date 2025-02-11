@@ -6,6 +6,6 @@ namespace ei8.Cortex.Coding.d23.neurULization.Selectors
 {
     public interface ISelector
     {
-        IEnumerable<Guid> Evaluate(Ensemble ensemble, IEnumerable<Guid> selection);
+        IEnumerable<Guid> Evaluate(Network network, IEnumerable<Guid> selection);
     }
 }

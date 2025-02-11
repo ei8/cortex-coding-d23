@@ -13,7 +13,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Selectors
             this.siblingNeuronIds = siblingNeuronIds;
         }
 
-        public IEnumerable<Guid> Evaluate(Ensemble ensemble, IEnumerable<Guid> selection)
+        public IEnumerable<Guid> Evaluate(Network network, IEnumerable<Guid> selection)
         {
             var result = new List<Guid>();
 
@@ -21,7 +21,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Selectors
             foreach (var neuronId in selection)
             {
                 // get postsynaptics of current neuron
-                var posts = ensemble.GetPostsynapticNeurons(neuronId);
+                var posts = network.GetPostsynapticNeurons(neuronId);
 
                 // if current neuron has postsynaptics equal in number to 1 + specified postsynaptic siblings 
                 if (posts.Count() == siblingNeuronIds.Count() + 1)

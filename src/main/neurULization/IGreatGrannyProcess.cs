@@ -13,7 +13,7 @@ namespace ei8.Cortex.Coding.d23.neurULization
 
         IGranny Execute(
             IGreatGrannyInfo<TAggregate> greatGrannyInfo, 
-            Ensemble ensemble, 
+            Network network, 
             TAggregate aggregate, 
             IParameterSet parameters
         );

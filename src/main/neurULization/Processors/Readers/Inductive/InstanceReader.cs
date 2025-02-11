@@ -37,10 +37,10 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
             IInstantiatesClassReader instantiatesClassReader,
             IPropertyAssociationReader propertyAssociationReader,
             IInstanceParameterSet parameters,
-            Ensemble ensemble
+            Network network
         ) =>
             ProcessHelper.CreateGreatGrannyCandidateSet(
-                ensemble,
+                network,
                 parameters.Granny,
                 gc => new InductiveIndependentGreatGrannyInfo<IInstantiatesClass, IInstantiatesClassReader, IInstantiatesClassParameterSet, IInstance>(
                     gc,
@@ -51,7 +51,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                 targets[0]
             ).AsSuperset().Concat(
                 ProcessHelper.CreateGreatGrannyCandidateSets(
-                    ensemble,
+                    network,
                     parameters.Granny,
                     parameters.PropertyAssociationsParameters,
                     (gc, pa) => new InductiveIndependentGreatGrannyInfo<
@@ -79,16 +79,16 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                 parameters.Class
             );
 
-        public bool TryParse(Ensemble ensemble, IInstanceParameterSet parameters, out IInstance result) =>
+        public bool TryParse(Network network, IInstanceParameterSet parameters, out IInstance result) =>
             this.aggregateParser.TryParse<Instance, IInstance>(
                 parameters.Granny,
                 InstanceReader.CreateGreatGrannies(
                     this.instantiatesClassReader,
                     this.propertyAssociationReader,
                     parameters,
-                    ensemble
+                    network
                 ),
-                ensemble,
+                network,
                 out result
             );
     }

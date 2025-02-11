@@ -74,7 +74,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                 parameters.Class
             );
 
-        public bool TryParse(Ensemble ensemble, IValueParameterSet parameters, out IValue result)
+        public bool TryParse(Network network, IValueParameterSet parameters, out IValue result)
         {
             result = null;
 
@@ -91,14 +91,14 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                         ProcessHelper.TryParse
                     )
                     },
-                    ensemble,
+                    network,
                     out IInstanceValue tempResult,
                     false
                 );
 
                 if (tempResult != null)
                     tempResult.TryParseCore(
-                        ensemble,
+                        network,
                         // start from InstantiatesClass neuron
                         new[] { tempResult.InstantiatesClass.Neuron.Id },
                         new[] { new LevelParser(

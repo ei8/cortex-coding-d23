@@ -59,7 +59,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                 }
             );
 
-        public bool TryParse(Ensemble ensemble, IInstantiatesClassParameterSet parameters, out IInstantiatesClass result) =>
+        public bool TryParse(Network network, IInstantiatesClassParameterSet parameters, out IInstantiatesClass result) =>
             this.aggregateParser.TryParse<InstantiatesClass, IInstantiatesClass>(
                 parameters.Granny,
                 InstantiatesClassReader.CreateGreatGrannies(
@@ -67,7 +67,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                     parameters, 
                     this.externalReferences
                 ),
-                ensemble,
+                network,
                 out result
             );
     }

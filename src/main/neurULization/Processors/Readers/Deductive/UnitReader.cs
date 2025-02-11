@@ -23,7 +23,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                 )
             };
 
-        public bool TryParse(Ensemble ensemble, IUnitParameterSet parameters, out IUnit result)
+        public bool TryParse(Network network, IUnitParameterSet parameters, out IUnit result)
         {
             result = null;
 
@@ -32,7 +32,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
             tempResult.Type = parameters.Type;
 
             tempResult.TryParseCore(
-                ensemble,
+                network,
                 new[] { tempResult.Value.Id },
                 new[] { new LevelParser(new PresynapticByPostsynapticSibling(tempResult.Type.Id)) },
                 (n) => tempResult.Neuron = n,

@@ -144,7 +144,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
             return result.ToArray();
         }
 
-        public bool TryParse(Ensemble ensemble, IExpressionParameterSet parameters, out IExpression result)
+        public bool TryParse(Network network, IExpressionParameterSet parameters, out IExpression result)
         {
             result = null;
 
@@ -155,7 +155,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                         ProcessHelper.TryParse
                     )
                 ),
-                ensemble,
+                network,
                 out IExpression tempResult,
                 false
             );
@@ -163,7 +163,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
             if (tempResult != null && tempResult.Units.Count() == parameters.UnitsParameters.Count())
             {
                 tempResult.TryParseCore(
-                    ensemble,
+                    network,
                     // start from the Head units
                     tempResult.Units.GetValueUnitGranniesByTypeId(this.externalReferences.Unit.Id).Select(u => u.Neuron.Id),
                     new[]

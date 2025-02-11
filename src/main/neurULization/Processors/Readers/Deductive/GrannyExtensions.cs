@@ -11,8 +11,8 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
     {
         public static async Task<bool> Process(
             this IEnumerable<IGrannyQuery> grannyQueries,
-            IEnsembleRepository ensembleRepository,
-            Ensemble ensemble,
+            INetworkRepository networkRepository,
+            Network network,
             IList<IGranny> retrievedGrannies,
             string userId,
             bool breakBeforeLastGetQuery = false
@@ -39,24 +39,24 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
 
                 // if query is obtained successfully
                 if ((query = await grannyQuery.GetQuery(
-                    ensembleRepository, 
-                    ensemble, 
+                    networkRepository, 
+                    network, 
                     retrievedGrannies, 
                     userId
                 )) != null)
                 {
-                    // get ensemble based on parameters and previous granny neuron if it's assigned
-                    var queryResult = await ensembleRepository.GetByQueryAsync(
+                    // get network based on parameters and previous granny neuron if it's assigned
+                    var queryResult = await networkRepository.GetByQueryAsync(
                         query,
                         userId
                         );
-                    // enrich ensemble
-                    ensemble.AddReplaceItems(queryResult.Ensemble);
+                    // enrich network
+                    network.AddReplaceItems(queryResult.Network);
                     // if granny query is retriever
                     if (grannyQuery is IRetriever gqr)
                     {
                         var retrievalResult = gqr.RetrieveGranny(
-                            ensemble,
+                            network,
                             retrievedGrannies.AsEnumerable()
                             );
                         retrievedGrannies.Add(retrievalResult);
@@ -92,7 +92,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
             this TAggregate aggregate,
             IEnumerable<IGreatGrannyInfo<TAggregate>> candidates,
             IEnumerable<IGreatGrannyProcess<TAggregate>> targets,
-            Ensemble ensemble,
+            Network network,
             out TAggregate result,
             bool setGrannyNeuronOnCompletion = true
         )
@@ -112,7 +112,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                     ) && (
                         precedingGranny = ts[i].Execute(
                             candidate,
-                            ensemble,
+                            network,
                             aggregate,
                             parameters
                         )

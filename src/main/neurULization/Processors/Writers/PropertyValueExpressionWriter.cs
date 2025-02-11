@@ -25,7 +25,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
         }
 
         public IPropertyValueExpression Build(
-            Ensemble ensemble, 
+            Network network, 
             IPropertyValueExpressionParameterSet parameters
         ) =>
             new PropertyValueExpression().AggregateBuild(
@@ -44,7 +44,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
                         ProcessHelper.ParseBuild
                         )
                 },
-                ensemble
+                network
             );
 
         private static IEnumerable<IGreatGrannyInfo<IPropertyValueExpression>> CreateGreatGrannies(

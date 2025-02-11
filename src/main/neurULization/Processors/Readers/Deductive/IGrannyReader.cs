@@ -12,7 +12,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
         where TGranny : IGranny
         where TParameterSet : IDeductiveParameterSet
     {
-        bool TryParse(Ensemble ensemble, TParameterSet parameters, out TGranny result);
+        bool TryParse(Network network, TParameterSet parameters, out TGranny result);
 
         // TODO: transfer to separate processor (eg. IGrannyQueryProcessor)
         IEnumerable<IGrannyQuery> GetQueries(TParameterSet parameters);

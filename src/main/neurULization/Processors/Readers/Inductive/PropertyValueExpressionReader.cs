@@ -42,13 +42,13 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
             IValueExpressionReader valueExpressionReader,
             IExpressionReader expressionReader,
             IPropertyValueExpressionParameterSet parameters,
-            Ensemble ensemble,
+            Network network,
             IExternalReferenceSet externalReferences
         ) =>
             GreatGrannyInfoSuperset<IPropertyValueExpression>.Create(
                 new GreatGrannyInfoSet<IPropertyValueExpression>[] {
                     ProcessHelper.CreateGreatGrannyCandidateSet(
-                        ensemble,
+                        network,
                         parameters.Granny,
                         gc => new InductiveIndependentGreatGrannyInfo<IExpression, IExpressionReader, IExpressionParameterSet, IPropertyValueExpression>(
                             gc,
@@ -101,17 +101,17 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                 parameters.Class
             );
 
-        public bool TryParse(Ensemble ensemble, IPropertyValueExpressionParameterSet parameters, out IPropertyValueExpression result) =>
+        public bool TryParse(Network network, IPropertyValueExpressionParameterSet parameters, out IPropertyValueExpression result) =>
             this.aggregateParser.TryParse<PropertyValueExpression, IPropertyValueExpression>(
                 parameters.Granny,
                 PropertyValueExpressionReader.CreateGreatGrannies(
                     this.valueExpressionReader,
                     this.expressionReader,
                     parameters,
-                    ensemble,
+                    network,
                     this.externalReferences
                 ),
-                ensemble,
+                network,
                 out result
             );
     }

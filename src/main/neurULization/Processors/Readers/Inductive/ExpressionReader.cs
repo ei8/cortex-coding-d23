@@ -24,10 +24,10 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
         private static IGreatGrannyInfoSuperset<IExpression> CreateGreatGrannies(
             IUnitReader unitReader,
             IExpressionParameterSet parameters,
-            Ensemble ensemble
+            Network network
         ) =>
             ProcessHelper.CreateGreatGrannyCandidateSets(
-                ensemble,
+                network,
                 parameters.Granny,
                 parameters.UnitParameters.Where(up => up.Granny == null),
                 (gc, up) => new InductiveIndependentGreatGrannyInfo<IUnit, IUnitReader, IUnitParameterSet, IExpression>(
@@ -58,15 +58,15 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                 ).AsSuperset()
             );
 
-        public bool TryParse(Ensemble ensemble, IExpressionParameterSet parameters, out IExpression result) =>
+        public bool TryParse(Network network, IExpressionParameterSet parameters, out IExpression result) =>
             this.aggregateParser.TryParse<Expression, IExpression>(
                 parameters.Granny,
                 ExpressionReader.CreateGreatGrannies(
                     this.unitReader,
                     parameters,
-                    ensemble
+                    network
                 ),
-                ensemble,
+                network,
                 out result
             );
     }

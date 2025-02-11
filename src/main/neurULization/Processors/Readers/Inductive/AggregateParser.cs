@@ -25,7 +25,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
         public bool TryParse<TConcrete, TAggregate>(
             Neuron granny,
             IGreatGrannyInfoSuperset<TAggregate> candidateSets,
-            Ensemble ensemble,
+            Network network,
             out TAggregate aggregate
         )
             where TConcrete : TAggregate, new()
@@ -119,7 +119,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                         {
                             var parseResult = (tempPrecedingGranny = candidateSet.Target.Execute(
                                 candidate,
-                                ensemble,
+                                network,
                                 tempAggregate,
                                 parameters
                             )) != null;

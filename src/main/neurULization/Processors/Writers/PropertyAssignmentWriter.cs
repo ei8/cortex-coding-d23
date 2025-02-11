@@ -24,7 +24,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
             this.externalReferences = externalReferences;
         }
 
-        public IPropertyAssignment Build(Ensemble ensemble, IPropertyAssignmentParameterSet parameters) =>
+        public IPropertyAssignment Build(Network network, IPropertyAssignmentParameterSet parameters) =>
             new PropertyAssignment().AggregateBuild(
                 PropertyAssignmentWriter.CreateGreatGrannies(
                     this.propertyValueExpressionWriter,
@@ -41,7 +41,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
                         ProcessHelper.ParseBuild
                     )
                 },
-                ensemble
+                network
             );
 
         private static IEnumerable<IGreatGrannyInfo<IPropertyAssignment>> CreateGreatGrannies(

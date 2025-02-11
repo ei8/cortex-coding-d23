@@ -36,7 +36,7 @@ namespace ei8.Cortex.Coding.d23.neurULization
             return parameters != default;
         }
 
-        public IGranny Execute(IGreatGrannyInfo<TAggregate> greatGrannyInfo, Ensemble ensemble, TAggregate aggregate, IParameterSet parameters)
+        public IGranny Execute(IGreatGrannyInfo<TAggregate> greatGrannyInfo, Network network, TAggregate aggregate, IParameterSet parameters)
         {
             var result = default(IGranny);
 
@@ -45,7 +45,7 @@ namespace ei8.Cortex.Coding.d23.neurULization
             {
                 result = process(
                     coreGreatGrannyInfo.Processor,
-                    ensemble,
+                    network,
                     tryParameters,
                     coreGreatGrannyInfo.AggregateUpdater,
                     aggregate

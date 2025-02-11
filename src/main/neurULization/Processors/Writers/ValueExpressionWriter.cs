@@ -24,7 +24,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
             this.externalReferences = externalReferences;
         }
 
-        public IValueExpression Build(Ensemble ensemble, IValueExpressionParameterSet parameters) =>
+        public IValueExpression Build(Network network, IValueExpressionParameterSet parameters) =>
             new ValueExpression().AggregateBuild(
                 ValueExpressionWriter.CreateGreatGrannies(
                     this.valueWriter,
@@ -41,7 +41,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
                         ProcessHelper.ParseBuild
                         )
                 },
-                ensemble
+                network
             );
 
         private static IEnumerable<IGreatGrannyInfo<IValueExpression>> CreateGreatGrannies(

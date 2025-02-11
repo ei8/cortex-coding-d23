@@ -71,7 +71,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                 }
             );
 
-        public bool TryParse(Ensemble ensemble, IValueExpressionParameterSet parameters, out IValueExpression result) =>
+        public bool TryParse(Network network, IValueExpressionParameterSet parameters, out IValueExpression result) =>
             new ValueExpression().AggregateTryParse(
                 ValueExpressionReader.CreateGreatGrannies(
                     this.valueReader,
@@ -88,7 +88,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                         ProcessHelper.TryParse
                         )
                 },
-                ensemble,
+                network,
                 out result
             );
     }

@@ -33,13 +33,13 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
 
         public bool RequiresPrecedingGrannyQueryResult { get; }
 
-        public async Task<NeuronQuery> GetQuery(IEnsembleRepository ensembleRepository, Ensemble ensemble, IList<IGranny> retrievedGrannies, string userId)
+        public async Task<NeuronQuery> GetQuery(INetworkRepository networkRepository, Network network, IList<IGranny> retrievedGrannies, string userId)
         {
             var gqs = grannyReader.GetQueries(parametersBuilder(retrievedGrannies.AsEnumerable()));
             // process granny queries
             var completed = await gqs.Process(
-                ensembleRepository, 
-                ensemble, 
+                networkRepository, 
+                network, 
                 retrievedGrannies, 
                 userId,
                 true
@@ -47,19 +47,19 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
             // then call GetQuery on last granny query if completed successfully
             return completed ? 
                 await gqs.Last().GetQuery(
-                    ensembleRepository, 
-                    ensemble, 
+                    networkRepository, 
+                    network, 
                     retrievedGrannies, 
                     userId
                 ) : 
                 null;
         }
 
-        public IGranny RetrieveGranny(Ensemble ensemble, IEnumerable<IGranny> retrievedGrannies)
+        public IGranny RetrieveGranny(Network network, IEnumerable<IGranny> retrievedGrannies)
         {
             IGranny result = null;
 
-            if (grannyReader.TryParse(ensemble, parametersBuilder(retrievedGrannies), out TGranny granny))
+            if (grannyReader.TryParse(network, parametersBuilder(retrievedGrannies), out TGranny granny))
                 result = granny;
 
             return result;

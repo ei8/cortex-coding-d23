@@ -13,7 +13,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Selectors
             this.neuronIds = neuronIds;
         }
 
-        public IEnumerable<Guid> Evaluate(Ensemble ensemble, IEnumerable<Guid> selection)
+        public IEnumerable<Guid> Evaluate(Network network, IEnumerable<Guid> selection)
         {
             throw new NotImplementedException();
         }

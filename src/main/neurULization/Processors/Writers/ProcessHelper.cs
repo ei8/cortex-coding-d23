@@ -8,7 +8,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
     {
         public static IGranny ParseBuild<TGranny, TGrannyWriter, TParameterSet, TAggregate>(
             TGrannyWriter grannyWriter,
-            Ensemble ensemble,
+            Network network,
             TParameterSet parameters,
             Action<TGranny, TAggregate> aggregateUpdater,
             TAggregate aggregate
@@ -19,7 +19,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
             where TAggregate : IGranny
         {
             TGranny result = grannyWriter.ParseBuild<TGranny, TGrannyWriter, TParameterSet>(
-                ensemble,
+                network,
                 parameters
             );
 

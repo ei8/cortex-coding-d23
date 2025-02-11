@@ -13,7 +13,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Selectors
             this.siblingNeuronIds = siblingNeuronIds;
         }
 
-        public IEnumerable<Guid> Evaluate(Ensemble ensemble, IEnumerable<Guid> selection)
+        public IEnumerable<Guid> Evaluate(Network network, IEnumerable<Guid> selection)
         {
             var result = new List<Guid>();
 
@@ -21,9 +21,9 @@ namespace ei8.Cortex.Coding.d23.neurULization.Selectors
             foreach (var neuronId in selection)
             {
                 // loop through each presynaptic
-                foreach (var pre in ensemble.GetPresynapticNeurons(neuronId))
+                foreach (var pre in network.GetPresynapticNeurons(neuronId))
                 {
-                    var preTerminals = ensemble.GetTerminals(pre.Id);
+                    var preTerminals = network.GetTerminals(pre.Id);
                     // if presynaptic has only current neuron + siblings as postsynaptic 
                     if (preTerminals.Count() == siblingNeuronIds.Count() + 1 &&
                         // and postsynaptics of presynaptic match the current neuron and the siblings

@@ -5,7 +5,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
 {
     public class UnitReader : IUnitReader
     {
-        public bool TryParse(Ensemble ensemble, IUnitParameterSet parameters, out IUnit result)
+        public bool TryParse(Network network, IUnitParameterSet parameters, out IUnit result)
         {
             result = null;
 
@@ -19,7 +19,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                     tempResult.Type = parameters.Type;
 
                     tempResult.TryParseCore(
-                        ensemble,
+                        network,
                         new[] { tempResult.Neuron.Id },
                         new[] { new LevelParser(new PostsynapticByPostsynapticSibling(tempResult.Type.Id)) },
                         (n) => tempResult.Value = n,
@@ -40,7 +40,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                     tempResult.Type = parameters.Type;
 
                     tempResult.TryParseCore(
-                        ensemble,
+                        network,
                         new[] { tempResult.Value.Id },
                         new[] { new LevelParser(new PresynapticByPostsynapticSibling(tempResult.Type.Id)) },
                         (n) => tempResult.Neuron = n,

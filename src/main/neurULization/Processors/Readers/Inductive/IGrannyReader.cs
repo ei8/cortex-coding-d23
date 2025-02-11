@@ -10,6 +10,6 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
         where TGranny : IGranny
         where TParameterSet : IParameterSet
     {
-        bool TryParse(Ensemble ensemble, TParameterSet parameters, out TGranny result);
+        bool TryParse(Network network, TParameterSet parameters, out TGranny result);
     }
 }

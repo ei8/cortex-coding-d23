@@ -22,7 +22,7 @@ namespace ei8.Cortex.Coding.d23.neurULization
             this.options = options;
         }
 
-        public Ensemble neurULize<TValue>(
+        public Network neurULize<TValue>(
             TValue value, 
             neurULizerTypeInfo typeInfo,
             IDictionary<Guid, Coding.Neuron> idPropertyValueNeurons,
@@ -35,7 +35,7 @@ namespace ei8.Cortex.Coding.d23.neurULization
             AssertionConcern.AssertArgumentNotNull(idPropertyValueNeurons, nameof(idPropertyValueNeurons));
             AssertionConcern.AssertArgumentNotNull(externalReferences, nameof(externalReferences));
 
-            var result = new Ensemble();
+            var result = new Network();
             Guid? regionId = typeInfo.NeuronProperties.OfType<RegionIdProperty>().SingleOrDefault()?.Value;
             IdProperty idp = null;
 
@@ -81,7 +81,7 @@ namespace ei8.Cortex.Coding.d23.neurULization
         }
 
         public IEnumerable<TValue> DeneurULize<TValue>(
-            Ensemble value,
+            Network value,
             IEnumerable<Neuron> instanceNeurons,
             neurULizerTypeInfo typeInfo,
             IDictionary<string, Coding.Neuron> externalReferences

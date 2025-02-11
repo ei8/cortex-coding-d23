@@ -10,37 +10,37 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
     public static class GrannyExtensions
     {
         /// <summary>
-        /// Retrieves granny from ensemble if present, otherwise, builds and adds it to the ensemble.
+        /// Retrieves granny from network if present, otherwise, builds and adds it to the network.
         /// </summary>
         /// <typeparam name="TGranny"></typeparam>
         /// <typeparam name="TParameterSet"></typeparam>
         /// <param name="grannyWriter"></param>
-        /// <param name="ensemble"></param>
+        /// <param name="network"></param>
         /// <param name="options"></param>
         /// <param name="writeParameters"></param>
         /// <returns></returns>
         public static TGranny ParseBuild<TGranny, TGrannyWriter, TParameterSet>(
             this TGrannyWriter grannyWriter,
-            Ensemble ensemble,
+            Network network,
             TParameterSet writeParameters
             )
             where TGranny : IGranny
             where TGrannyWriter : IGrannyWriter<TGranny, TParameterSet>
             where TParameterSet : IDeductiveParameterSet
         {
-            AssertionConcern.AssertArgumentNotNull(ensemble, nameof(ensemble));
+            AssertionConcern.AssertArgumentNotNull(network, nameof(network));
             AssertionConcern.AssertArgumentNotNull(writeParameters, nameof(writeParameters));
 
             TGranny result = default;
-            // if target is not in specified ensemble
+            // if target is not in specified network
             if (!grannyWriter.Reader.TryParse(
-                ensemble,
+                network,
                 writeParameters, 
                 out result
                 ))
-                // build in ensemble
+                // build in network
                 result = grannyWriter.Build(
-                    ensemble,
+                    network,
                     writeParameters
                 );
 
@@ -51,7 +51,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
             this TResult tempResult,
             IEnumerable<IGreatGrannyInfo<TResult>> processes,
             IEnumerable<IGreatGrannyProcess<TResult>> targets,
-            Ensemble ensemble,
+            Network network,
             Func<Neuron> grannyNeuronCreator = null,
             Func<TResult, IEnumerable<Neuron>> postsynapticsRetriever = null
         )
@@ -71,7 +71,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
                 ))
                     precedingGranny = ts[i].Execute(
                         candidate,
-                        ensemble,
+                        network,
                         tempResult,
                         parameters
                     );
@@ -88,7 +88,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
                 postsynaptics.Any()
                 )
                 postsynaptics.ToList().ForEach(n =>
-                    ensemble.AddReplace(
+                    network.AddReplace(
                         Terminal.CreateTransient(
                             tempResult.Neuron.Id, n.Id
                         )

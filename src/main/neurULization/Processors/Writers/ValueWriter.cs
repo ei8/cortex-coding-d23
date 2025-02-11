@@ -18,7 +18,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
             this.reader = reader;
         }
 
-        public IValue Build(Ensemble ensemble, IValueParameterSet parameters) =>
+        public IValue Build(Network network, IValueParameterSet parameters) =>
             parameters.Class != null ?
                 (IValue) new InstanceValue().AggregateBuild(
                     ValueWriter.CreateGreatGrannies(this.instantiatesClassWriter, parameters),
@@ -28,13 +28,13 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
                             ProcessHelper.ParseBuild
                         )
                     },
-                    ensemble,
-                    () => ensemble.AddOrGetIfExists(parameters.Value),
+                    network,
+                    () => network.AddOrGetIfExists(parameters.Value),
                     (g) => new[] { g.InstantiatesClass.Neuron }
                 ) :
                 new Value()
                 {
-                    Neuron = ensemble.AddOrGetIfExists(parameters.Value)
+                    Neuron = network.AddOrGetIfExists(parameters.Value)
                 };
 
         private static IEnumerable<IGreatGrannyInfo<IInstanceValue>> CreateGreatGrannies(

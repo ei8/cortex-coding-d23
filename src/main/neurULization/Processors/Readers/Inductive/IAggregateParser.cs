@@ -8,7 +8,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
         bool TryParse<TConcrete, TResult>(
             Neuron granny,
             IGreatGrannyInfoSuperset<TResult> greatGrannyCandidates,
-            Ensemble ensemble,
+            Network network,
             out TResult result
         )
             where TConcrete : TResult, new()

@@ -5,6 +5,6 @@ namespace ei8.Cortex.Coding.d23.neurULization.Queries
 {
     public interface IRetriever : IGrannyQuery
     {
-        IGranny RetrieveGranny(Ensemble ensemble, IEnumerable<IGranny> retrievedGrannies);
+        IGranny RetrieveGranny(Network network, IEnumerable<IGranny> retrievedGrannies);
     }
 }

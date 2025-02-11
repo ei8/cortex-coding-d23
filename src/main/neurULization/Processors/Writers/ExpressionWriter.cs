@@ -23,7 +23,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
             this.externalReferences = externalReferences;
         }
 
-        public IExpression Build(Ensemble ensemble, IExpressionParameterSet parameters) =>
+        public IExpression Build(Network network, IExpressionParameterSet parameters) =>
             new Expression().AggregateBuild(
                 ExpressionWriter.CreateGreatGrannies(
                     this.unitWriter,
@@ -34,15 +34,15 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
                         ProcessHelper.ParseBuild
                     )
                 ),
-                ensemble,
-                () => ensemble.AddOrGetIfExists(Neuron.CreateTransient(null, null, null)),
+                network,
+                () => network.AddOrGetIfExists(Neuron.CreateTransient(null, null, null)),
                 (r) =>
                     // concat applicable expression types
                     GetExpressionTypes(
                         (id, isEqual) => parameters.UnitsParameters.GetValueUnitParametersByTypeId(id, isEqual).Count(),
                         this.externalReferences
                     )
-                    .Select(et => ensemble.AddOrGetIfExists(et))
+                    .Select(et => network.AddOrGetIfExists(et))
                     .Concat(
                         // with Units in result
                         r.Units.Select(u => u.Neuron)

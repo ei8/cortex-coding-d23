@@ -77,7 +77,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                 )
             };
 
-        public bool TryParse(Ensemble ensemble, IPropertyAssociationParameterSet parameters, out IPropertyAssociation result) =>
+        public bool TryParse(Network network, IPropertyAssociationParameterSet parameters, out IPropertyAssociation result) =>
             new PropertyAssociation().AggregateTryParse(
                 PropertyAssociationReader.CreateGreatGrannies(
                     this.propertyAssignmentReader,
@@ -94,7 +94,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                         ProcessHelper.TryParse
                         )
                 },
-                ensemble,
+                network,
                 out result
             );
     }

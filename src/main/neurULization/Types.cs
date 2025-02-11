@@ -6,7 +6,7 @@ namespace ei8.Cortex.Coding.d23.neurULization
 {
     public delegate IGranny GrannyProcessCallback<TGranny, TGrannyProcessor, TParameterSet, TAggregate>(
         TGrannyProcessor grannyProcessor,
-        Ensemble ensemble,
+        Network network,
         TParameterSet parameters,
         Action<TGranny, TAggregate> aggregateUpdater,
         TAggregate aggregate
@@ -18,7 +18,7 @@ namespace ei8.Cortex.Coding.d23.neurULization
 
     public delegate Task<IGranny> AsyncGrannyProcessCallback<TGranny, TGrannyProcessor, TParameterSet, TAggregate>(
         TGrannyProcessor grannyProcessor,
-        Ensemble ensemble,
+        Network network,
         TParameterSet parameters,
         Action<TGranny, TAggregate> aggregateUpdater,
         TAggregate aggregate

@@ -22,7 +22,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
             this.reader = reader;
         }
 
-        public IInstance Build(Ensemble ensemble, IInstanceParameterSet parameters) =>
+        public IInstance Build(Network network, IInstanceParameterSet parameters) =>
             new Instance().AggregateBuild(
                 InstanceWriter.CreateGreatGrannies(
                     this.instantiatesClassWriter,
@@ -41,10 +41,10 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
                         )
                     )
                 ),
-                ensemble,
+                network,
                 () =>
                 {
-                    Neuron result = ensemble.AddOrGetIfExists(
+                    Neuron result = network.AddOrGetIfExists(
                         Neuron.CreateTransient(
                             parameters.Id,
                             parameters.Tag,

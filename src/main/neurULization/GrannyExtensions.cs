@@ -1,6 +1,5 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
 using ei8.Cortex.Coding.d23.neurULization.Selectors;
-using Nancy.TinyIoc;
 using neurUL.Common.Domain.Model;
 using System;
 using System.Collections.Generic;
@@ -12,7 +11,7 @@ namespace ei8.Cortex.Coding.d23.neurULization
     {
         internal static void TryParseCore<TGranny>(
             this TGranny granny,
-            Ensemble ensemble,
+            Network network,
             IEnumerable<Guid> selection,
             LevelParser[] levelParsers,
             Action<Neuron> resultProcessor,
@@ -22,19 +21,19 @@ namespace ei8.Cortex.Coding.d23.neurULization
             where TGranny : IGranny
         {
             foreach (var levelParser in levelParsers)
-                selection = levelParser.Evaluate(ensemble, selection);
+                selection = levelParser.Evaluate(network, selection);
 
             if (selection.Any())
             {
                 if (throwExceptionOnRedundantData)
                     AssertionConcern.AssertStateTrue(
                         selection.Count() == 1,
-                        $"Redundant items encountered while parsing ensemble: {string.Join(", ", selection)}"
+                        $"Redundant items encountered while parsing network: {string.Join(", ", selection)}"
                         );
 
-                if (ensemble.TryGetById(selection.Single(), out Neuron ensembleResult))
+                if (network.TryGetById(selection.Single(), out Neuron networkResult))
                 {
-                    resultProcessor(ensembleResult);
+                    resultProcessor(networkResult);
                     result = granny;
                 }
             }

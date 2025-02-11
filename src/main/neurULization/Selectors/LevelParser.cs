@@ -12,10 +12,10 @@ namespace ei8.Cortex.Coding.d23.neurULization.Selectors
 
         public IEnumerable<ISelector> Selectors { get; private set; }
 
-        public IEnumerable<Guid> Evaluate(Ensemble ensemble, IEnumerable<Guid> selection)
+        public IEnumerable<Guid> Evaluate(Network network, IEnumerable<Guid> selection)
         {
             foreach (var selector in this.Selectors)
-                selection = selector.Evaluate(ensemble, selection);
+                selection = selector.Evaluate(network, selection);
 
             return selection;
         }

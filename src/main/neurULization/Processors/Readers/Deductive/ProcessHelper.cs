@@ -7,7 +7,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
     {
         public static IGranny TryParse<TGranny, TGrannyReader, TParameterSet, TAggregate>(
             TGrannyReader grannyReader,
-            Ensemble ensemble,
+            Network network,
             TParameterSet parameters,
             Action<TGranny, TAggregate> aggregateUpdater,
             TAggregate aggregate
@@ -19,7 +19,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
             IGranny result = null;
 
             if (grannyReader.TryParse(
-                ensemble,
+                network,
                 parameters,
                 out TGranny gr)
                 )

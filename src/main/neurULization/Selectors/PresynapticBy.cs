@@ -12,7 +12,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Selectors
             this.comparer = comparer;
         }
 
-        public IEnumerable<Guid> Evaluate(Ensemble ensemble, IEnumerable<Guid> selection)
+        public IEnumerable<Guid> Evaluate(Network network, IEnumerable<Guid> selection)
         {
             var result = new List<Guid>();
 
@@ -20,7 +20,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Selectors
             foreach (var neuronId in selection)
             {
                 // loop through each presynaptic
-                foreach (var pre in ensemble.GetPresynapticNeurons(neuronId))
+                foreach (var pre in network.GetPresynapticNeurons(neuronId))
                 {
                     // if exhaustive
                     if (comparer(pre))

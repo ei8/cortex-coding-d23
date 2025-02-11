@@ -24,8 +24,8 @@ namespace ei8.Cortex.Coding.d23.neurULization.Queries
 
         public bool RequiresPrecedingGrannyQueryResult { get; }
         public Task<NeuronQuery> GetQuery(
-            IEnsembleRepository ensembleRepository, 
-            Ensemble ensemble, 
+            INetworkRepository networkRepository, 
+            Network network, 
             IList<IGranny> retrievedGrannies, 
             string userId
         )

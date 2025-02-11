@@ -12,15 +12,15 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
             this.reader = reader;
         }
 
-        public IUnit Build(Ensemble ensemble, IUnitParameterSet parameters)
+        public IUnit Build(Network network, IUnitParameterSet parameters)
         {
             var result = new Unit();
-            result.Value = ensemble.AddOrGetIfExists(parameters.Value);
-            result.Type = ensemble.AddOrGetIfExists(parameters.Type);
-            result.Neuron = ensemble.AddOrGetIfExists(Neuron.CreateTransient(null, null, null));
-            // add dependency to ensemble
-            ensemble.AddReplace(Terminal.CreateTransient(result.Neuron.Id, result.Value.Id));
-            ensemble.AddReplace(Terminal.CreateTransient(result.Neuron.Id, result.Type.Id));
+            result.Value = network.AddOrGetIfExists(parameters.Value);
+            result.Type = network.AddOrGetIfExists(parameters.Type);
+            result.Neuron = network.AddOrGetIfExists(Neuron.CreateTransient(null, null, null));
+            // add dependency to network
+            network.AddReplace(Terminal.CreateTransient(result.Neuron.Id, result.Value.Id));
+            network.AddReplace(Terminal.CreateTransient(result.Neuron.Id, result.Type.Id));
             return result;
         }
 
