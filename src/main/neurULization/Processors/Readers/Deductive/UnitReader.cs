@@ -8,7 +8,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
 {
     public class UnitReader : IUnitReader
     {
-        public IEnumerable<IGrannyQuery> GetQueries(IUnitParameterSet parameters) =>
+        public IEnumerable<IGrannyQuery> GetQueries(Network network, IUnitParameterSet parameters) =>
             new[] {
                 new GrannyQuery(
                     new NeuronQuery()

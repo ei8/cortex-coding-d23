@@ -38,7 +38,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
             this.aggregateParser = aggregateParser;
         }
 
-        private static GreatGrannyInfoSuperset<IPropertyValueExpression> CreateGreatGrannies(
+        private static IGreatGrannyInfoSuperset<IPropertyValueExpression> CreateGreatGrannies(
             IValueExpressionReader valueExpressionReader,
             IExpressionReader expressionReader,
             IPropertyValueExpressionParameterSet parameters,

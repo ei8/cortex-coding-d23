@@ -49,7 +49,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                 parameters.ValueMatchBy
             );
 
-        public IEnumerable<IGrannyQuery> GetQueries(IValueExpressionParameterSet parameters) =>
+        public IEnumerable<IGrannyQuery> GetQueries(Network network, IValueExpressionParameterSet parameters) =>
             new IGrannyQuery[] {
                 new GreatGrannyQuery<IValue, IValueReader, IValueParameterSet>(
                     this.valueReader,

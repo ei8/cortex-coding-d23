@@ -23,5 +23,7 @@
         Neuron NominalModifier { get; set; }
 
         Neuron Has { get; set; }
+
+        Neuron NominalSubject { get; set; }
     }
 }

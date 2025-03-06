@@ -35,7 +35,10 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
 
         public async Task<NeuronQuery> GetQuery(INetworkRepository networkRepository, Network network, IList<IGranny> retrievedGrannies, string userId)
         {
-            var gqs = grannyReader.GetQueries(parametersBuilder(retrievedGrannies.AsEnumerable()));
+            var gqs = grannyReader.GetQueries(
+                network,
+                parametersBuilder(retrievedGrannies.AsEnumerable())
+            );
             // process granny queries
             var completed = await gqs.Process(
                 networkRepository, 

@@ -28,7 +28,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                 )
             );
 
-        public IEnumerable<IGrannyQuery> GetQueries(IExpressionParameterSet parameters) =>
+        public IEnumerable<IGrannyQuery> GetQueries(Network network, IExpressionParameterSet parameters) =>
             ExpressionReader.GetQueryByType(this.externalReferences, parameters, this.unitReader);
 
         private static IEnumerable<IGrannyQuery> GetQueryByType(IExternalReferenceSet externalReferences, IExpressionParameterSet parameters, IUnitReader unitReader)

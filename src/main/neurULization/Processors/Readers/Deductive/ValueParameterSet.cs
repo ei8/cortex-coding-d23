@@ -12,8 +12,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
         {
             AssertionConcern.AssertArgumentNotNull(value, nameof(value));
 
-            // TODO: create another class InstanceValueParameterSet that requires @class parameter
-            // AssertionConcern.AssertArgumentNotNull(@class, nameof(@class));
+            // TODO: create IInstanceValueParameterSet which accepts @class parameter
 
             this.Value = value;
             this.Class = @class;
@@ -21,9 +20,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
         }
 
         public Neuron Value { get; }
-
         public Neuron Class { get; }
-
         public ValueMatchBy ValueMatchBy { get; }
     }
 }

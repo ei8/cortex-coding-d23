@@ -48,7 +48,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                 parameters.Class
             );
 
-        public IEnumerable<IGrannyQuery> GetQueries(IInstanceParameterSet parameters) =>
+        public IEnumerable<IGrannyQuery> GetQueries(Network network, IInstanceParameterSet parameters) =>
             new IGrannyQuery[] {
                 new GreatGrannyQuery<IInstantiatesClass, IInstantiatesClassReader, IInstantiatesClassParameterSet>(
                     this.instantiatesClassReader,

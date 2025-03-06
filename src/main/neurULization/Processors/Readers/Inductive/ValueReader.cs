@@ -1,42 +1,94 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
-using ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive;
 using neurUL.Common.Domain.Model;
-using System.Collections.Generic;
+using System.Linq;
 
 namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
 {
     public class ValueReader : IValueReader
     {
         private readonly IInstantiatesClassReader instantiatesClassReader;
+        private readonly IExpressionReader expressionReader;
+        private readonly IExternalReferenceSet externalReferences;
         private readonly IAggregateParser aggregateParser;
 
-        public ValueReader(IInstantiatesClassReader instantiatesClassReader, IAggregateParser aggregateParser)
+        public ValueReader(
+            IInstantiatesClassReader instantiatesClassReader, 
+            IExpressionReader expressionReader,
+            IExternalReferenceSet externalReferences,
+            IAggregateParser aggregateParser
+        )
         {
             AssertionConcern.AssertArgumentNotNull(instantiatesClassReader, nameof(instantiatesClassReader));
+            AssertionConcern.AssertArgumentNotNull(expressionReader, nameof(expressionReader));
+            AssertionConcern.AssertArgumentNotNull(externalReferences, nameof(externalReferences));
             AssertionConcern.AssertArgumentNotNull(aggregateParser, nameof(aggregateParser));
 
             this.instantiatesClassReader = instantiatesClassReader;
+            this.expressionReader = expressionReader;
+            this.externalReferences = externalReferences;
             this.aggregateParser = aggregateParser;
         }
 
         private static IGreatGrannyInfoSuperset<IInstanceValue> CreateGreatGrannies(
             IInstantiatesClassReader instantiatesClassReader,
+            IExpressionReader expressionReader,
             IValueParameterSet parameters,
-            Network network
-            ) =>
-            ProcessHelper.CreateGreatGrannyCandidateSet(
-                network,
+            Network network,
+            IExternalReferenceSet externalReferences
+        ) =>
+            GreatGrannyInfoSuperset<IInstanceValue>.Create(
+                new GreatGrannyInfoSet<IInstanceValue>[] {
+                    ProcessHelper.CreateGreatGrannyCandidateSet(
+                        network,
+                        parameters.Granny,
+                        gc => new InductiveIndependentGreatGrannyInfo<IExpression, IExpressionReader, IExpressionParameterSet, IInstanceValue>(
+                            gc,
+                            expressionReader,
+                            () => ValueReader.CreateExpressionParameterSet(externalReferences, parameters, gc),
+                            (g, r) => r.Expression = g
+                        ),
+                        new GreatGrannyProcess<IExpression, IExpressionReader, IExpressionParameterSet, IInstanceValue>(
+                            ProcessHelper.TryParse
+                        )
+                    ),
+                    new GreatGrannyInfoSet<IInstanceValue>(
+                        new IGreatGrannyInfo<IInstanceValue>[]
+                        {
+                            new DependentGreatGrannyInfo<IInstantiatesClass, IInstantiatesClassReader, IInstantiatesClassParameterSet, IInstanceValue>(
+                                instantiatesClassReader,
+                                g => ValueReader.CreateInstantiatesClassParameterSet(
+                                    parameters,
+                                    ((IExpression) g).Units.GetValueUnitGranniesByTypeId(externalReferences.Unit.Id).Single().Value
+                                    ),
+                                (g, r) => r.InstantiatesClass = g
+                            )
+                        },
+                        new GreatGrannyProcess<IInstantiatesClass, IInstantiatesClassReader, IInstantiatesClassParameterSet, IInstanceValue>(
+                            ProcessHelper.TryParse
+                        )
+                    )
+                }
+            );
+
+        private static ExpressionParameterSet CreateExpressionParameterSet(
+            IExternalReferenceSet externalReferences,
+            IValueParameterSet parameters,
+            Neuron unitGranny
+        ) =>
+            new ExpressionParameterSet(
                 parameters.Granny,
-                gc => new InductiveIndependentGreatGrannyInfo<IInstantiatesClass, IInstantiatesClassReader, IInstantiatesClassParameterSet, IInstanceValue>(
-                    gc,
-                    instantiatesClassReader,
-                    () => ValueReader.CreateInstantiatesClassParameterSet(parameters, gc),
-                    (g, r) => r.InstantiatesClass = g
-                ),
-                new GreatGrannyProcess<IInstantiatesClass, IInstantiatesClassReader, IInstantiatesClassParameterSet, IInstanceValue>(
-                    ProcessHelper.TryParse
-                )
-            ).AsSuperset();
+                new[]
+                {
+                    UnitParameterSet.CreateWithGrannyAndType(
+                        unitGranny,
+                        externalReferences.Unit
+                    ),
+                    UnitParameterSet.CreateWithGrannyAndType(
+                        unitGranny,
+                        externalReferences.NominalSubject
+                    )
+                }
+            );
 
         private static IInstantiatesClassParameterSet CreateInstantiatesClassParameterSet(
             IValueParameterSet parameters,
@@ -56,7 +108,13 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
             {
                 if (this.aggregateParser.TryParse<InstanceValue, IInstanceValue>(
                         parameters.Granny,
-                        ValueReader.CreateGreatGrannies(this.instantiatesClassReader, parameters, network),
+                        ValueReader.CreateGreatGrannies(
+                            this.instantiatesClassReader, 
+                            this.expressionReader,
+                            parameters, 
+                            network,
+                            this.externalReferences
+                        ),
                         network,
                         out IInstanceValue tempIV
                     )

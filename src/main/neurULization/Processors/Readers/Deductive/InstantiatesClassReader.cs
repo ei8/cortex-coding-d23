@@ -31,8 +31,8 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                 )
            };
 
-        public IEnumerable<IGrannyQuery> GetQueries(IInstantiatesClassParameterSet parameters) =>
-            this.expressionReader.GetQueries(
+        public IEnumerable<IGrannyQuery> GetQueries(Network network, IInstantiatesClassParameterSet parameters) =>
+            this.expressionReader.GetQueries(network,
                 InstantiatesClassReader.CreateSubordinationParameterSet(this.externalReferences, parameters)
             );
 

@@ -64,15 +64,15 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                 }
             );
 
-        public IEnumerable<IGrannyQuery> GetQueries(IPropertyAssignmentParameterSet parameters) =>
+        public IEnumerable<IGrannyQuery> GetQueries(Network network, IPropertyAssignmentParameterSet parameters) =>
             new IGrannyQuery[] {
                 new GreatGrannyQuery<IPropertyValueExpression, IPropertyValueExpressionReader, IPropertyValueExpressionParameterSet>(
                     this.propertyValueExpressionReader,
-                    (n) => CreatePropertyValueExpressionParameterSet(parameters)
+                    (n) => PropertyAssignmentReader.CreatePropertyValueExpressionParameterSet(parameters)
                 ),
                 new GreatGrannyQuery<IExpression, IExpressionReader, IExpressionParameterSet>(
                     this.expressionReader,
-                    (n) => CreateExpressionParameterSet(this.externalReferences, parameters, n.Last().Neuron)
+                    (n) => PropertyAssignmentReader.CreateExpressionParameterSet(this.externalReferences, parameters, n.Last().Neuron)
                 )
             };
 

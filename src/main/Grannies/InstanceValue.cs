@@ -2,7 +2,11 @@
 {
     public class InstanceValue : IInstanceValue
     {
+        public IUnit Value { get; set; }
+
         public IInstantiatesClass InstantiatesClass { get; set; }
+
+        public IExpression Expression { get; set; }
 
         public Neuron Neuron { get; set; }
     }

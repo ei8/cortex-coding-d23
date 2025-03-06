@@ -50,7 +50,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                 parameters.ValueMatchBy
             );
 
-        private static ExpressionParameterSet CreateExpressionParameterSet(IExternalReferenceSet externalReferences, IPropertyAssociationParameterSet parameters, Neuron neuron) =>
+        private static IExpressionParameterSet CreateExpressionParameterSet(IExternalReferenceSet externalReferences, IPropertyAssociationParameterSet parameters, Neuron neuron) =>
             new ExpressionParameterSet(
                 new[]
                 {
@@ -65,7 +65,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                 }
             );
 
-        public IEnumerable<IGrannyQuery> GetQueries(IPropertyAssociationParameterSet parameters) =>
+        public IEnumerable<IGrannyQuery> GetQueries(Network network, IPropertyAssociationParameterSet parameters) =>
             new IGrannyQuery[] {
                 new GreatGrannyQuery<IPropertyAssignment, IPropertyAssignmentReader, IPropertyAssignmentParameterSet>(
                     this.propertyAssignmentReader,

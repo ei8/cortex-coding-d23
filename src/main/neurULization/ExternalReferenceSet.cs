@@ -27,5 +27,7 @@
         public Neuron NominalModifier { get; set; }
 
         public Neuron Has { get; set; }
+
+        public Neuron NominalSubject { get; set; }
     }
 }

@@ -57,12 +57,12 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
                     return result;
                 },
                 (r) => new[]
-                    {
-                        r.InstantiatesClass.Neuron
-                    }.Concat(
-                        // with PropertyAssociations in result
-                        r.PropertyAssociations.Select(pa => pa.Neuron)
-                    )
+                {
+                    r.ToPostsynapticInfo(r.InstantiatesClass, g => g.InstantiatesClass)
+                }.Concat(
+                    // with PropertyAssociations in result
+                    r.ToPostsynapticInfos(r.PropertyAssociations, g => g.PropertyAssociations)
+                )
             );
 
         private static IEnumerable<IGreatGrannyInfo<IInstance>> CreateGreatGrannies(

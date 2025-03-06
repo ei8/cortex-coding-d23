@@ -8,6 +8,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
 {
     public class ExpressionWriter : IExpressionWriter
     {
+        private const string ExpressionTypePostsynapticInfoName = "ExpressionType";
         private readonly IUnitWriter unitWriter;
         private readonly Readers.Deductive.IExpressionReader reader;
         private readonly IExternalReferenceSet externalReferences;
@@ -42,10 +43,13 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
                         (id, isEqual) => parameters.UnitsParameters.GetValueUnitParametersByTypeId(id, isEqual).Count(),
                         this.externalReferences
                     )
-                    .Select(et => network.AddOrGetIfExists(et))
+                    .Select(et => new PostsynapticInfo() {
+                        Name = ExpressionWriter.ExpressionTypePostsynapticInfoName,
+                        Neuron = network.AddOrGetIfExists(et)
+                    })
                     .Concat(
                         // with Units in result
-                        r.Units.Select(u => u.Neuron)
+                        r.ToPostsynapticInfos(r.Units, g => r.Units)
                     )
             );
 

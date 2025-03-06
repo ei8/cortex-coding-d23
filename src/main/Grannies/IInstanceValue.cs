@@ -2,6 +2,10 @@
 {
     public interface IInstanceValue : IValue
     {
+        IUnit Value { get; set; }
+
         IInstantiatesClass InstantiatesClass { get; set; }
+
+        IExpression Expression { get; set; }
     }
 }

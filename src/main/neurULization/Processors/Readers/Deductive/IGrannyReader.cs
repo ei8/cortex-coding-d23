@@ -15,6 +15,6 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
         bool TryParse(Network network, TParameterSet parameters, out TGranny result);
 
         // TODO: transfer to separate processor (eg. IGrannyQueryProcessor)
-        IEnumerable<IGrannyQuery> GetQueries(TParameterSet parameters);
+        IEnumerable<IGrannyQuery> GetQueries(Network network, TParameterSet parameters);
     }
 }

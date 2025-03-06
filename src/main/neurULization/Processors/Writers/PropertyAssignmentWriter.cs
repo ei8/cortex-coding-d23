@@ -59,7 +59,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
                 ),
                 new DependentGreatGrannyInfo<IExpression, IExpressionWriter, IExpressionParameterSet, IPropertyAssignment>(
                     expressionWriter,
-                    (g) => CreateExpressionParameterSet(externalReferences, parameters, g.Neuron),
+                    (g) => PropertyAssignmentWriter.CreateExpressionParameterSet(externalReferences, parameters, g.Neuron),
                     (g, r) => r.Expression = g
                 )
             };

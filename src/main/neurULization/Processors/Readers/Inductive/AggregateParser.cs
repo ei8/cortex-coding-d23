@@ -11,6 +11,8 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
 {
     public class AggregateParser : IAggregateParser
     {
+        private const string prefixPattern = "Reader.TryParse";
+
         private readonly IDictionary<string, IGranny> cache;
         private readonly IList<Tuple<IGranny, IGranny>> updatedGrannyCandidates;
         private readonly List<string> skipIds;
@@ -209,7 +211,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
         [Conditional("PARSELOG")]
         private static void LogProcessStart(string processName, int indent = 0, bool writeLine = false)
         {
-            var logMessage = $"{AggregateParser.GetPrefix(indent)}{processName}";
+            var logMessage = $"{AggregateParser.GetPrefix(AggregateParser.Counter, indent)}{processName}";
             
             if (writeLine)
                 Debug.WriteLine(logMessage);
@@ -220,7 +222,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
         [Conditional("PARSELOG")]
         private static void LogDetails(string value, StringBuilder stringBuilder, int indent = 1)
         {
-            value = $"{AggregateParser.GetPrefix(indent)}{value}";
+            value = $"{AggregateParser.GetPrefix(AggregateParser.Counter, indent)}{value}";
             stringBuilder.AppendLine(value);
         }
 
@@ -244,7 +246,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                 Debug.Write(details.ToString());
 
             Debug.WriteLine(
-                $"{AggregateParser.GetPrefix(indent)}" +
+                $"{AggregateParser.GetPrefix(AggregateParser.Counter, indent)}" +
                 $"SUCCESS: {successCount} ({(success ? "+1, " : string.Empty)}" +
                 $"{100 * successCount/expectedGreatGrannyCount}%)"
             );
@@ -256,7 +258,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
         ) where TResult : IGranny
         {
             Debug.WriteLine(
-                $"{AggregateParser.GetPrefix()}Parsing Granny... Type: {typeof(TResult).Name}; " +
+                $"{AggregateParser.GetPrefix(AggregateParser.Counter)}Parsing Granny... Type: {typeof(TResult).Name}; " +
                 $"Id: {granny.Id}"
             );
         }
@@ -281,7 +283,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
             var itemCount = candidateSetItemsList.Count();
 
             Debug.WriteLine(
-                $"{AggregateParser.GetPrefix(2)}Analyzing candidate... ({itemIndex + 1}/{itemCount}) - Type: {candidate.GetType().GenericTypeArguments[0].FullName}; " +
+                $"{AggregateParser.GetPrefix(AggregateParser.Counter, 2)}Analyzing candidate... ({itemIndex + 1}/{itemCount}) - Type: {candidate.GetType().GenericTypeArguments[0].FullName}; " +
                 $"CandidateId: {candidateId}; " +
                 $"PrecedingType: {precedingGrannyType}; " +
                 $"PrecedingId: {precedingGrannyId} "
@@ -298,18 +300,22 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
         [Conditional("PARSELOG")]
         private static void LogCandidateLine(string value)
         {
-            Debug.WriteLine($"{AggregateParser.GetPrefix(3)}{value}");
+            Debug.WriteLine($"{AggregateParser.GetPrefix(AggregateParser.Counter, 3)}{value}");
         }
 
-        private static string GetPrefix(int indent = 0)
+        internal static string GetPrefix(Func<int, int> counter, int indent = 0)
+        {
+            var prefix = $"{new StringBuilder().Insert(0, "|--", counter(indent))}";
+            return prefix;
+        }
+
+        private static int Counter(int indent)
         {
             var st = new StackTrace().ToString();
             var rootIndentation = 1;
-            var tryParseCount = Regex.Matches(st, "Reader.TryParse").Count;
+            var tryParseCount = Regex.Matches(st, AggregateParser.prefixPattern).Count;
             tryParseCount += tryParseCount > 1 ? ((tryParseCount -  1) *  2) : 0;
-            var count = tryParseCount + indent - rootIndentation;
-            var prefix = $"{new StringBuilder().Insert(0, "|--", count)}";
-            return prefix;
+            return tryParseCount + indent - rootIndentation;
         }
     }
 }
