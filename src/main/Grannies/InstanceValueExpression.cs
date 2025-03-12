@@ -1,8 +1,8 @@
 ﻿namespace ei8.Cortex.Coding.d23.Grannies
 {
-    public class PropertyAssignment : IPropertyAssignment
+    public class InstanceValueExpression : IInstanceValueExpression
     {
-        public IPropertyValueExpression PropertyValueExpression { get; set; }
+        public IInstanceValue GreatGranny { get; set; }
 
         public IExpression Expression { get; set; }
 

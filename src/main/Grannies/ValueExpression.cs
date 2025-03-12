@@ -2,7 +2,7 @@
 {
     public class ValueExpression : IValueExpression
     {
-        public IValue Value { get; set; }
+        public IValue GreatGranny { get; set; }
 
         public IExpression Expression { get; set; }
 

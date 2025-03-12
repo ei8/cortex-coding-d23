@@ -14,7 +14,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                 new GreatGrannyProcess<IInstantiatesClass, IInstantiatesClassReader, IInstantiatesClassParameterSet, IInstance>(
                     ProcessHelper.TryParse
                 ),
-                new GreatGrannyProcess<IPropertyAssociation, IPropertyAssociationReader, IPropertyAssociationParameterSet, IInstance>(
+                new GreatGrannyProcess<IPropertyValueAssociation, IPropertyAssociationReader, IPropertyAssociationParameterSet, IInstance>(
                     ProcessHelper.TryParse
                 )
             };
@@ -55,7 +55,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                     parameters.Granny,
                     parameters.PropertyAssociationsParameters,
                     (gc, pa) => new InductiveIndependentGreatGrannyInfo<
-                        IPropertyAssociation, 
+                        IPropertyValueAssociation, 
                         IPropertyAssociationReader, 
                         IPropertyAssociationParameterSet, 
                         IInstance
@@ -67,7 +67,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                             pa.Property,
                             pa.Class
                         ),
-                        (g, r) => r.PropertyAssociations.Add(g)
+                        (g, r) => r.PropertyValueAssociations.Add(g)
                     ),
                     targets[1]
                 )

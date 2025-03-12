@@ -3,9 +3,5 @@
     public interface IValueExpressionParameterSet : IDeductiveParameterSet
     {
         Neuron Value { get; }
-
-        Neuron Class { get; }
-
-        ValueMatchBy ValueMatchBy { get; }
     }
 }

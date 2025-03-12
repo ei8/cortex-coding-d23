@@ -1,9 +1,6 @@
 ﻿namespace ei8.Cortex.Coding.d23.Grannies
 {
-    public interface IPropertyValueExpression : IGranny
+    public interface IPropertyValueExpression : IExpressionGranny, ILesserGranny<IValueExpression>
     {
-        IValueExpression ValueExpression { get; set; }
-
-        IExpression Expression { get; set; }
     }
 }

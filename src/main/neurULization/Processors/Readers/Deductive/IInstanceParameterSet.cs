@@ -15,6 +15,8 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
 
         Neuron Class { get; }
 
-        IEnumerable<IPropertyAssociationParameterSet> PropertyAssociationsParameters { get; }
+        IEnumerable<IPropertyValueAssociationParameterSet> PropertyValueAssociationsParameters { get; }
+
+        IEnumerable<IPropertyInstanceValueAssociationParameterSet> PropertyInstanceValueAssociationsParameters { get; }
     }
 }

@@ -10,12 +10,12 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
         private readonly IExpressionReader expressionReader;
         private readonly IExternalReferenceSet externalReferences;
         private readonly IAggregateParser aggregateParser;
-        private static readonly IGreatGrannyProcess<IPropertyAssociation>[] targets = new IGreatGrannyProcess<IPropertyAssociation>[]
+        private static readonly IGreatGrannyProcess<IPropertyValueAssociation>[] targets = new IGreatGrannyProcess<IPropertyValueAssociation>[]
             {
-                new GreatGrannyProcess<IExpression, IExpressionReader, IExpressionParameterSet, IPropertyAssociation>(
+                new GreatGrannyProcess<IExpression, IExpressionReader, IExpressionParameterSet, IPropertyValueAssociation>(
                     ProcessHelper.TryParse
                 ),
-                new GreatGrannyProcess<IPropertyAssignment, IPropertyAssignmentReader, IPropertyAssignmentParameterSet, IPropertyAssociation>(
+                new GreatGrannyProcess<IPropertyValueAssignment, IPropertyAssignmentReader, IPropertyAssignmentParameterSet, IPropertyValueAssociation>(
                     ProcessHelper.TryParse
                 )
             };
@@ -38,19 +38,19 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
             this.aggregateParser = aggregateParser;
         }
 
-        private static IGreatGrannyInfoSuperset<IPropertyAssociation> CreateGreatGrannies(
+        private static IGreatGrannyInfoSuperset<IPropertyValueAssociation> CreateGreatGrannies(
             IPropertyAssignmentReader propertyAssignmentReader,
             IExpressionReader expressionReader,
             IPropertyAssociationParameterSet parameters,
             Network network,
             IExternalReferenceSet externalReferences
         ) =>
-            GreatGrannyInfoSuperset<IPropertyAssociation>.Create(
-                new GreatGrannyInfoSet<IPropertyAssociation>[] {
+            GreatGrannyInfoSuperset<IPropertyValueAssociation>.Create(
+                new GreatGrannyInfoSet<IPropertyValueAssociation>[] {
                     ProcessHelper.CreateGreatGrannyCandidateSet(
                         network,
                         parameters.Granny,
-                        gc => new InductiveIndependentGreatGrannyInfo<IExpression, IExpressionReader, IExpressionParameterSet, IPropertyAssociation>(
+                        gc => new InductiveIndependentGreatGrannyInfo<IExpression, IExpressionReader, IExpressionParameterSet, IPropertyValueAssociation>(
                             gc,
                             expressionReader,
                             () => PropertyAssociationReader.CreateExpressionParameterSet(externalReferences, parameters, gc),
@@ -58,9 +58,9 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                         ),
                         targets[0]
                     ),
-                    new GreatGrannyInfoSet<IPropertyAssociation>(
-                        new IGreatGrannyInfo<IPropertyAssociation>[] {
-                            new DependentGreatGrannyInfo<IPropertyAssignment, IPropertyAssignmentReader, IPropertyAssignmentParameterSet, IPropertyAssociation>(
+                    new GreatGrannyInfoSet<IPropertyValueAssociation>(
+                        new IGreatGrannyInfo<IPropertyValueAssociation>[] {
+                            new DependentGreatGrannyInfo<IPropertyValueAssignment, IPropertyAssignmentReader, IPropertyAssignmentParameterSet, IPropertyValueAssociation>(
                                 propertyAssignmentReader,
                                 g => PropertyAssociationReader.CreatePropertyAssignmentParameterSet(
                                     parameters,
@@ -101,8 +101,8 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                 parameters.Class
             );
 
-        public bool TryParse(Network network, IPropertyAssociationParameterSet parameters, out IPropertyAssociation result) =>
-            this.aggregateParser.TryParse<PropertyAssociation, IPropertyAssociation>(
+        public bool TryParse(Network network, IPropertyAssociationParameterSet parameters, out IPropertyValueAssociation result) =>
+            this.aggregateParser.TryParse<PropertyValueAssociation, IPropertyValueAssociation>(
                 parameters.Granny,
                 PropertyAssociationReader.CreateGreatGrannies(
                     this.propertyAssignmentReader,

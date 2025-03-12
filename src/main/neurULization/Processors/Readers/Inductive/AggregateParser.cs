@@ -293,7 +293,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
         [Conditional("PARSELOG")]
         private static void LogPropertyName(IParameterSet parameters)
         {
-            if (parameters is Processors.Readers.Inductive.IPropertyReadParameterSet prop)
+            if (parameters is Processors.Readers.IPropertyParameterSet prop)
                 LogCandidateLine($"Property Name: {prop.Property.Tag}");
         }
 

@@ -65,7 +65,7 @@ namespace ei8.Cortex.Coding.d23.neurULization
                                     externalReferences[gp.ClassKey] :
                                     null;
 
-                            return new Processors.Readers.Deductive.PropertyAssociationParameterSet(
+                            return new Processors.Readers.Deductive.PropertyValueAssociationParameterSet(
                                 externalReferences[gp.Key],
                                 valueNeuron,
                                 classNeuron,
@@ -118,7 +118,7 @@ namespace ei8.Cortex.Coding.d23.neurULization
 
                     foreach (var gp in typeInfo.GrannyProperties)
                     {
-                        var propAssoc = instance.PropertyAssociations.SingleOrDefault(
+                        var propAssoc = instance.PropertyValueAssociations.SingleOrDefault(
                             pa => pa.PropertyAssignment.Expression.Units
                                 .AsEnumerable()
                                 .GetValueUnitGranniesByTypeId(this.options.ExternalReferences.Unit.Id).SingleOrDefault().Value.Id == externalReferences[gp.Key].Id
@@ -137,13 +137,13 @@ namespace ei8.Cortex.Coding.d23.neurULization
                                 nameof(TValue)
                                 );
 
-                            propValue = propAssoc.PropertyAssignment.PropertyValueExpression.ValueExpression.Value.Neuron.Id;
+                            propValue = propAssoc.PropertyAssignment.PropertyValueExpression.ValueExpression.GreatGranny.Neuron.Id;
                         }
                         else
                         {
                             AssertionConcern.Equals(gp.ClassKey, ExternalReference.ToKeyString(property.PropertyType));
 
-                            var propValueString = propAssoc.PropertyAssignment.PropertyValueExpression.ValueExpression.Value.Neuron.Tag;
+                            var propValueString = propAssoc.PropertyAssignment.PropertyValueExpression.ValueExpression.GreatGranny.Neuron.Tag;
                             if (property.PropertyType == typeof(string))
                             {
                                 propValue = propValueString;

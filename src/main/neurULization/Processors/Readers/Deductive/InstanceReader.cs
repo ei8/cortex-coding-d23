@@ -9,11 +9,11 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
     public class InstanceReader : IInstanceReader
     {
         private readonly IInstantiatesClassReader instantiatesClassReader;
-        private readonly IPropertyAssociationReader propertyAssociationReader;
+        private readonly IPropertyValueAssociationReader propertyAssociationReader;
 
         public InstanceReader(
             IInstantiatesClassReader instantiatesClassReader, 
-            IPropertyAssociationReader propertyAssociationReader
+            IPropertyValueAssociationReader propertyAssociationReader
         )
         {
             this.instantiatesClassReader = instantiatesClassReader;
@@ -22,7 +22,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
 
         private static IEnumerable<IGreatGrannyInfo<IInstance>> CreateGreatGrannies(
             IInstantiatesClassReader instantiatesClassReader,
-            IPropertyAssociationReader propertyAssociationReader,
+            IPropertyValueAssociationReader propertyAssociationReader,
             IInstanceParameterSet parameters
         ) =>
             new IGreatGrannyInfo<IInstance>[]
@@ -33,11 +33,11 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                     (g, r) => r.InstantiatesClass = g
                 )
             }.Concat(
-                parameters.PropertyAssociationsParameters.Select(
-                    u => new IndependentGreatGrannyInfo<IPropertyAssociation, IPropertyAssociationReader, IPropertyAssociationParameterSet, IInstance>(
+                parameters.PropertyValueAssociationsParameters.Select(
+                    u => new IndependentGreatGrannyInfo<IPropertyValueAssociation, IPropertyValueAssociationReader, IPropertyValueAssociationParameterSet, IInstance>(
                     propertyAssociationReader,
                     () => u,
-                    (g, r) => r.PropertyAssociations.Add(g)
+                    (g, r) => r.PropertyValueAssociations.Add(g)
                     )
                 )
             );
@@ -56,8 +56,8 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                 )
             }.Concat(
                 // create GrannyQueryInner for each PropertyAssociation in parameters
-                parameters.PropertyAssociationsParameters.Select(
-                    pa => new GreatGrannyQuery<IPropertyAssociation, IPropertyAssociationReader, IPropertyAssociationParameterSet>(
+                parameters.PropertyValueAssociationsParameters.Select(
+                    pa => new GreatGrannyQuery<IPropertyValueAssociation, IPropertyValueAssociationReader, IPropertyValueAssociationParameterSet>(
                         this.propertyAssociationReader,
                         (n) => pa
                     )
@@ -89,8 +89,8 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                         ProcessHelper.TryParse
                     )
                 }.Concat(
-                    parameters.PropertyAssociationsParameters.Select(
-                        u => new GreatGrannyProcess<IPropertyAssociation, IPropertyAssociationReader, IPropertyAssociationParameterSet, IInstance>(
+                    parameters.PropertyValueAssociationsParameters.Select(
+                        u => new GreatGrannyProcess<IPropertyValueAssociation, IPropertyValueAssociationReader, IPropertyValueAssociationParameterSet, IInstance>(
                             ProcessHelper.TryParse
                         )
                     )

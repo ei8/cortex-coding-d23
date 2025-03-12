@@ -35,8 +35,8 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
                         ProcessHelper.ParseBuild
                     )
                 }.Concat(
-                    parameters.PropertyAssociationsParameters.Select(
-                        u => new GreatGrannyProcess<IPropertyAssociation, IPropertyAssociationWriter, IPropertyAssociationParameterSet, IInstance>(
+                    parameters.PropertyValueAssociationsParameters.Select(
+                        u => new GreatGrannyProcess<IPropertyValueAssociation, IPropertyAssociationWriter, IPropertyValueAssociationParameterSet, IInstance>(
                             ProcessHelper.ParseBuild
                         )
                     )
@@ -61,7 +61,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
                     r.ToPostsynapticInfo(r.InstantiatesClass, g => g.InstantiatesClass)
                 }.Concat(
                     // with PropertyAssociations in result
-                    r.ToPostsynapticInfos(r.PropertyAssociations, g => g.PropertyAssociations)
+                    r.ToPostsynapticInfos(r.PropertyValueAssociations, g => g.PropertyValueAssociations)
                 )
             );
 
@@ -78,11 +78,11 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
                     (g, r) => r.InstantiatesClass = g
                 )
             }.Concat(
-                parameters.PropertyAssociationsParameters.Select(
-                    u => new IndependentGreatGrannyInfo<IPropertyAssociation, IPropertyAssociationWriter, IPropertyAssociationParameterSet, IInstance>(
+                parameters.PropertyValueAssociationsParameters.Select(
+                    u => new IndependentGreatGrannyInfo<IPropertyValueAssociation, IPropertyAssociationWriter, IPropertyValueAssociationParameterSet, IInstance>(
                     propertyAssociationWriter,
                     () => u,
-                    (g, r) => r.PropertyAssociations.Add(g)
+                    (g, r) => r.PropertyValueAssociations.Add(g)
                     )
                 )
             );

@@ -55,7 +55,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
                 new IndependentGreatGrannyInfo<IValue, IValueWriter, IValueParameterSet, IValueExpression>(
                     valueWriter,
                     () => ValueExpressionWriter.CreateValueParameterSet(parameters),
-                    (g, r) => r.Value = g
+                    (g, r) => r.GreatGranny = g
                     ),
                 new DependentGreatGrannyInfo<IExpression, IExpressionWriter, IExpressionParameterSet, IValueExpression>(
                     expressionWriter,
