@@ -2,10 +2,16 @@
 {
     public class PropertyValueAssociation : IPropertyValueAssociation
     {
-        public IPropertyValueAssignment GreatGranny { get; set; }
+        public IPropertyValueAssignment TypedGreatGranny { get; set; }
 
         public IExpression Expression { get; set; }
 
         public Neuron Neuron { get; set; }
+
+        public IGranny GreatGranny
+        {
+            get => this.TypedGreatGranny;
+            set => this.TypedGreatGranny = (IPropertyValueAssignment) value;
+        }
     }
 }

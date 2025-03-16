@@ -67,7 +67,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                                     parameters,
                                     ((IExpression) g).Units.GetValueUnitGranniesByTypeId(externalReferences.Unit.Id).Single().Value
                                     ),
-                                (g, r) => r.ValueExpression = g
+                                (g, r) => r.TypedGreatGranny = g
                             )
                         },
                         targets[1]

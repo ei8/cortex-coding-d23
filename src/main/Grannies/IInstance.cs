@@ -6,6 +6,6 @@ namespace ei8.Cortex.Coding.d23.Grannies
     {
         IInstantiatesClass InstantiatesClass { get; set; }
 
-        IList<IPropertyValueAssociation> PropertyValueAssociations { get; }
+        IList<IPropertyAssociation> PropertyAssociations { get; }
     }
 }

@@ -6,7 +6,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
     {
         public IInstantiatesClass InstantiatesClass { get; set; }
 
-        public IList<IPropertyValueAssociation> PropertyValueAssociations { get; set; } = new List<IPropertyValueAssociation>();
+        public IList<IPropertyAssociation> PropertyAssociations { get; set; } = new List<IPropertyAssociation>();
 
         public Neuron Neuron { get; set; }
     }

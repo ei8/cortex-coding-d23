@@ -2,7 +2,8 @@
 {
     public interface IPropertyValueAssociation : 
         IExpressionGranny, 
-        ILesserGranny<IPropertyValueAssignment>
+        ILesserGranny<IPropertyValueAssignment>,
+        IPropertyAssociation
     {
     }
 }

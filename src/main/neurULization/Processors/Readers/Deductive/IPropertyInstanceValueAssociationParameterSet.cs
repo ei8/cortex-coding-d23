@@ -1,6 +1,9 @@
 ﻿namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
 {
-    public interface IPropertyInstanceValueAssociationParameterSet : IPropertyParameterSet, IDeductiveParameterSet
+    public interface IPropertyInstanceValueAssociationParameterSet : 
+        IPropertyParameterSet, 
+        IDeductiveParameterSet,  
+        IPropertyAssociationParameterSet
     {
         Neuron Value { get; }
 

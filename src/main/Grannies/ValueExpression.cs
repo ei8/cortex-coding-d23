@@ -2,10 +2,16 @@
 {
     public class ValueExpression : IValueExpression
     {
-        public IValue GreatGranny { get; set; }
+        public IValue TypedGreatGranny { get; set; }
 
         public IExpression Expression { get; set; }
 
         public Neuron Neuron { get; set; }
+
+        public IGranny GreatGranny
+        {
+            get => this.TypedGreatGranny;
+            set => this.TypedGreatGranny = (IValue) value;
+        }
     }
 }

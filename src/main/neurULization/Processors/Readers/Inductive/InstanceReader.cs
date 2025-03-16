@@ -18,7 +18,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                     ProcessHelper.TryParse
                 )
             };
-    public InstanceReader(
+        public InstanceReader(
             IInstantiatesClassReader instantiatesClassReader, 
             IPropertyAssociationReader propertyAssociationReader,
             IAggregateParser aggregateParser
@@ -67,7 +67,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                             pa.Property,
                             pa.Class
                         ),
-                        (g, r) => r.PropertyValueAssociations.Add(g)
+                        (g, r) => r.PropertyAssociations.Add(g)
                     ),
                     targets[1]
                 )

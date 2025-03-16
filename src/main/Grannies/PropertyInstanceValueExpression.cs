@@ -2,10 +2,16 @@
 {
     public class PropertyInstanceValueExpression : IPropertyInstanceValueExpression
     {
-        public IInstanceValueExpression GreatGranny { get; set; }
+        public IInstanceValueExpression TypedGreatGranny { get; set; }
 
         public IExpression Expression { get; set; }
 
         public Neuron Neuron { get; set; }
+
+        public IGranny GreatGranny
+        {
+            get => this.TypedGreatGranny;
+            set => this.TypedGreatGranny = (IInstanceValueExpression)value;
+        }
     }
 }

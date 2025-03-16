@@ -1,7 +1,12 @@
 ﻿namespace ei8.Cortex.Coding.d23.Grannies
 {
-    public interface ILesserGranny<TGreatGranny> : IGranny
+    public interface ILesserGranny : IGranny
     {
-        TGreatGranny GreatGranny { get; set; }
+        IGranny GreatGranny { get; set; }
+    }
+
+    public interface ILesserGranny<TGreatGranny> : ILesserGranny
+    {
+        TGreatGranny TypedGreatGranny { get; set; }
     }
 }

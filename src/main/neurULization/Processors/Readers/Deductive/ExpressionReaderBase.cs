@@ -46,7 +46,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                 new IndependentGreatGrannyInfo<TGreatGranny, TGreatGrannyReader, TGreatGrannyParameterSet, TResult>(
                     reader,
                     () => this.CreateGreatGrannyParameterSet(parameters),
-                    (g, r) => r.GreatGranny = g
+                    (g, r) => r.TypedGreatGranny = g
                     ),
                 new DependentGreatGrannyInfo<IExpression, IExpressionReader, IExpressionParameterSet, TResult>(
                     expressionReader,

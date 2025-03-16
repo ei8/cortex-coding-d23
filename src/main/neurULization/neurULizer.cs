@@ -1,4 +1,5 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
+using ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive;
 using ei8.Cortex.Coding.d23.neurULization.Processors.Writers;
 using ei8.Cortex.Coding.Properties;
 using ei8.Cortex.Coding.Properties.Neuron;
@@ -58,19 +59,30 @@ namespace ei8.Cortex.Coding.d23.neurULization
                     externalReferences[typeInfo.ValueClassKey],
                     typeInfo.GrannyProperties.Select(gp =>
                         {
-                            var valueNeuron = gp.ValueMatchBy == ValueMatchBy.Id ?
-                                    idPropertyValueNeurons[Guid.Parse(gp.Value)] :
-                                    Neuron.CreateTransient(gp.Value, null, regionId);
-                            var classNeuron = !string.IsNullOrWhiteSpace(gp.ClassKey) ?
-                                    externalReferences[gp.ClassKey] :
-                                    null;
+                            IPropertyAssociationParameterSet paps = null;
 
-                            return new Processors.Readers.Deductive.PropertyValueAssociationParameterSet(
-                                externalReferences[gp.Key],
-                                valueNeuron,
-                                classNeuron,
-                                gp.ValueMatchBy
-                            );
+                            var valueNeuron = gp.ValueMatchBy == ValueMatchBy.Id ?
+                                idPropertyValueNeurons[Guid.Parse(gp.Value)] :
+                                Neuron.CreateTransient(gp.Value, null, regionId);
+
+                            if (!string.IsNullOrWhiteSpace(gp.ClassKey))
+                            {
+                                paps = new PropertyInstanceValueAssociationParameterSet(
+                                    externalReferences[gp.Key],
+                                    valueNeuron,
+                                    externalReferences[gp.ClassKey],
+                                    gp.ValueMatchBy
+                                );
+                            }
+                            else
+                            {
+                                paps = new PropertyValueAssociationParameterSet(
+                                    externalReferences[gp.Key],
+                                    valueNeuron
+                                );
+                            }
+
+                            return paps;
                         }
                         )
                         .Where(i => i != null)
@@ -118,15 +130,22 @@ namespace ei8.Cortex.Coding.d23.neurULization
 
                     foreach (var gp in typeInfo.GrannyProperties)
                     {
-                        var propAssoc = instance.PropertyValueAssociations.SingleOrDefault(
-                            pa => pa.PropertyAssignment.Expression.Units
-                                .AsEnumerable()
-                                .GetValueUnitGranniesByTypeId(this.options.ExternalReferences.Unit.Id).SingleOrDefault().Value.Id == externalReferences[gp.Key].Id
+                        var propAssoc = instance.PropertyAssociations.SingleOrDefault(
+                            pa => pa.HasPropertyAssignment(
+                                this.options.ExternalReferences.Unit, 
+                                // property neuron
+                                externalReferences[gp.Key]
+                            )
                         );
                         object propValue = null;
 
                         var property = tempResult.GetType().GetProperty(gp.PropertyName);
                         var classAttribute = property.GetCustomAttributes<neurULClassAttribute>().SingleOrDefault();
+
+                        AssertionConcern.AssertStateTrue(
+                            propAssoc.TryGetPropertyValue(out Neuron propValueNeuron),
+                            "Property Association does not contain expected Value."
+                        );
 
                         if (classAttribute != null)
                         {
@@ -136,14 +155,14 @@ namespace ei8.Cortex.Coding.d23.neurULization
                                 $"Property '{property.Name}' has '{nameof(neurULClassAttribute)}' but its Type is not equal to 'Guid'.",
                                 nameof(TValue)
                                 );
-
-                            propValue = propAssoc.PropertyAssignment.PropertyValueExpression.ValueExpression.GreatGranny.Neuron.Id;
+                        
+                            propValue = propValueNeuron.Id;
                         }
                         else
                         {
                             AssertionConcern.Equals(gp.ClassKey, ExternalReference.ToKeyString(property.PropertyType));
 
-                            var propValueString = propAssoc.PropertyAssignment.PropertyValueExpression.ValueExpression.GreatGranny.Neuron.Tag;
+                            var propValueString = propValueNeuron.Tag;
                             if (property.PropertyType == typeof(string))
                             {
                                 propValue = propValueString;

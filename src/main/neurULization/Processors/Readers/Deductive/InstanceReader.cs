@@ -9,20 +9,24 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
     public class InstanceReader : IInstanceReader
     {
         private readonly IInstantiatesClassReader instantiatesClassReader;
-        private readonly IPropertyValueAssociationReader propertyAssociationReader;
+        private readonly IPropertyValueAssociationReader propertyValueAssociationReader;
+        private readonly IPropertyInstanceValueAssociationReader propertyInstanceValueAssociationReader;
 
         public InstanceReader(
-            IInstantiatesClassReader instantiatesClassReader, 
-            IPropertyValueAssociationReader propertyAssociationReader
+            IInstantiatesClassReader instantiatesClassReader,
+            IPropertyValueAssociationReader propertyValueAssociationReader,
+            IPropertyInstanceValueAssociationReader propertyInstanceValueAssociationReader
         )
         {
             this.instantiatesClassReader = instantiatesClassReader;
-            this.propertyAssociationReader = propertyAssociationReader;
+            this.propertyValueAssociationReader = propertyValueAssociationReader;
+            this.propertyInstanceValueAssociationReader=propertyInstanceValueAssociationReader;
         }
 
         private static IEnumerable<IGreatGrannyInfo<IInstance>> CreateGreatGrannies(
             IInstantiatesClassReader instantiatesClassReader,
-            IPropertyValueAssociationReader propertyAssociationReader,
+            IPropertyValueAssociationReader propertyValueAssociationReader,
+            IPropertyInstanceValueAssociationReader propertyInstanceValueAssociationReader,
             IInstanceParameterSet parameters
         ) =>
             new IGreatGrannyInfo<IInstance>[]
@@ -33,15 +37,22 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                     (g, r) => r.InstantiatesClass = g
                 )
             }.Concat(
-                parameters.PropertyValueAssociationsParameters.Select(
+                parameters.PropertyAssociationsParameters.OfType<IPropertyValueAssociationParameterSet>().Select(
                     u => new IndependentGreatGrannyInfo<IPropertyValueAssociation, IPropertyValueAssociationReader, IPropertyValueAssociationParameterSet, IInstance>(
-                    propertyAssociationReader,
+                    propertyValueAssociationReader,
                     () => u,
-                    (g, r) => r.PropertyValueAssociations.Add(g)
+                    (g, r) => r.PropertyAssociations.Add(g)
+                    )
+                )
+            ).Concat(
+                parameters.PropertyAssociationsParameters.OfType<IPropertyInstanceValueAssociationParameterSet>().Select(
+                    u => new IndependentGreatGrannyInfo<IPropertyInstanceValueAssociation, IPropertyInstanceValueAssociationReader, IPropertyInstanceValueAssociationParameterSet, IInstance>(
+                    propertyInstanceValueAssociationReader,
+                    () => u,
+                    (g, r) => r.PropertyAssociations.Add(g)
                     )
                 )
             );
-
 
         private static IInstantiatesClassParameterSet CreateInstantiatesClassParameterSet(IInstanceParameterSet parameters) =>
             new InstantiatesClassParameterSet(
@@ -56,9 +67,17 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                 )
             }.Concat(
                 // create GrannyQueryInner for each PropertyAssociation in parameters
-                parameters.PropertyValueAssociationsParameters.Select(
+                parameters.PropertyAssociationsParameters.OfType<IPropertyValueAssociationParameterSet>().Select(
                     pa => new GreatGrannyQuery<IPropertyValueAssociation, IPropertyValueAssociationReader, IPropertyValueAssociationParameterSet>(
-                        this.propertyAssociationReader,
+                        this.propertyValueAssociationReader,
+                        (n) => pa
+                    )
+                )
+            ).Concat(
+                // create GrannyQueryInner for each PropertyAssociation in parameters
+                parameters.PropertyAssociationsParameters.OfType<IPropertyInstanceValueAssociationParameterSet>().Select(
+                    pa => new GreatGrannyQuery<IPropertyInstanceValueAssociation, IPropertyInstanceValueAssociationReader, IPropertyInstanceValueAssociationParameterSet>(
+                        this.propertyInstanceValueAssociationReader,
                         (n) => pa
                     )
                 )
@@ -80,7 +99,8 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
             new Instance().AggregateTryParse(
                 InstanceReader.CreateGreatGrannies(
                     this.instantiatesClassReader,
-                    this.propertyAssociationReader,
+                    this.propertyValueAssociationReader,
+                    this.propertyInstanceValueAssociationReader,
                     parameters
                 ),
                 new IGreatGrannyProcess<IInstance>[]
@@ -89,8 +109,14 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                         ProcessHelper.TryParse
                     )
                 }.Concat(
-                    parameters.PropertyValueAssociationsParameters.Select(
+                    parameters.PropertyAssociationsParameters.OfType<IPropertyValueAssociationParameterSet>().Select(
                         u => new GreatGrannyProcess<IPropertyValueAssociation, IPropertyValueAssociationReader, IPropertyValueAssociationParameterSet, IInstance>(
+                            ProcessHelper.TryParse
+                        )
+                    )
+                ).Concat(
+                    parameters.PropertyAssociationsParameters.OfType<IPropertyInstanceValueAssociationParameterSet>().Select(
+                        u => new GreatGrannyProcess<IPropertyInstanceValueAssociation, IPropertyInstanceValueAssociationReader, IPropertyInstanceValueAssociationParameterSet, IInstance>(
                             ProcessHelper.TryParse
                         )
                     )

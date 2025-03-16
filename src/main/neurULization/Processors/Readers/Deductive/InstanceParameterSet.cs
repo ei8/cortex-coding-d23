@@ -12,7 +12,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
             string externalReferenceUrl,
             Guid? regionId,
             Neuron @class,
-            IEnumerable<IPropertyValueAssociationParameterSet> propertyAssociationsParameters
+            IEnumerable<IPropertyAssociationParameterSet> propertyAssociationsParameters
             )
         {
             AssertionConcern.AssertArgumentValid(i => i != Guid.Empty, id, $"Id cannot be equal to '{Guid.Empty}'.", nameof(id));
@@ -24,7 +24,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
             ExternalReferenceUrl = externalReferenceUrl;
             RegionId = regionId;
             Class = @class;
-            PropertyValueAssociationsParameters = propertyAssociationsParameters;
+            PropertyAssociationsParameters = propertyAssociationsParameters;
         }
 
         public Guid Id { get; }
@@ -37,6 +37,6 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
 
         public Neuron Class { get; }
 
-        public IEnumerable<IPropertyValueAssociationParameterSet> PropertyValueAssociationsParameters { get; }
+        public IEnumerable<IPropertyAssociationParameterSet> PropertyAssociationsParameters { get; }
     }
 }
