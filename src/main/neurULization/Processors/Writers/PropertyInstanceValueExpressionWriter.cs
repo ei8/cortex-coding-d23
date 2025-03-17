@@ -1,0 +1,42 @@
+﻿using ei8.Cortex.Coding.d23.Grannies;
+using ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive;
+
+namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
+{
+    public class PropertyInstanceValueExpressionWriter : 
+        ExpressionWriterBase<
+            IInstanceValueExpression,
+            IInstanceValueExpressionParameterSet,
+            IInstanceValueExpressionWriter,
+            IPropertyInstanceValueExpression,
+            IPropertyInstanceValueExpressionReader,
+            IPropertyInstanceValueExpressionParameterSet,
+            PropertyInstanceValueExpression
+        >, 
+        IPropertyInstanceValueExpressionWriter
+    {
+        public PropertyInstanceValueExpressionWriter(
+            IInstanceValueExpressionWriter greatGrannyWriter, 
+            IExpressionWriter expressionWriter,
+            Readers.Deductive.IPropertyInstanceValueExpressionReader reader,
+            IExternalReferenceSet externalReferences
+        ) : base(
+            greatGrannyWriter,
+            expressionWriter,
+            reader,
+            externalReferences
+        )
+        {
+        }
+
+        protected override IInstanceValueExpressionParameterSet CreateGreatGrannyParameterSet(IPropertyInstanceValueExpressionParameterSet parameters) =>
+            new InstanceValueExpressionParameterSet(
+                parameters.Value,
+                parameters.Class,
+                parameters.ValueMatchBy
+            );
+
+        protected override ExpressionParameterSet CreateExpressionParameterSet(IExternalReferenceSet externalReferences, IPropertyInstanceValueExpressionParameterSet parameters, Neuron greatGranny) =>
+            ProcessorExtensions.CreatePropertyValueExpressionParameterSet(externalReferences, greatGranny);
+    }
+}

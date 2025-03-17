@@ -5,7 +5,7 @@ namespace ei8.Cortex.Coding.d23.neurULization
     internal class GreatGrannyProcess<TGranny, TGrannyProcessor, TParameterSet, TAggregate> : IGreatGrannyProcess<TAggregate>
         where TGranny : IGranny
         where TGrannyProcessor : IGrannyProcessor<TGranny, TParameterSet>
-        where TParameterSet : class, IParameterSet
+        where TParameterSet : IParameterSet
         where TAggregate : IGranny
     {
         private readonly GrannyProcessCallback<TGranny, TGrannyProcessor, TParameterSet, TAggregate> process;

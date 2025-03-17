@@ -29,7 +29,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
             IExternalReferenceSet externalReferences,
             IInstanceValueExpressionParameterSet parameters,
             Neuron greatGranny
-        ) => this.CreateExpressionParameterSet(
+        ) => ProcessorExtensions.CreateValueExpressionParameterSet(
             externalReferences,
             greatGranny
         );

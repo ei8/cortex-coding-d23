@@ -3,7 +3,7 @@ using ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive;
 
 namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
 {
-    public interface IPropertyAssignmentWriter : IGrannyWriter<IPropertyValueAssignment, IPropertyValueAssignmentParameterSet>
+    public interface IPropertyInstanceValueAssociationWriter : IGrannyWriter<IPropertyInstanceValueAssociation, IPropertyInstanceValueAssociationParameterSet>
     {
     }
 }
