@@ -49,7 +49,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                 ),
                 new GreatGrannyQuery<IExpression, IExpressionReader, IExpressionParameterSet>(
                     this.expressionReader,
-                    (n) => this.CreateExpressionParameterSet(this.externalReferences, parameters, n.Last().Neuron)
+                    (n) => this.CreateExpressionParameterSet(this.externalReferences, parameters, n.Last().Neuron, network)
                 )
             };
 
@@ -59,7 +59,8 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                     this.greatGrannyReader,
                     this.expressionReader,
                     parameters,
-                    this.externalReferences
+                    this.externalReferences,
+                    network
                 ),
                 new IGreatGrannyProcess<TResult>[]
                 {

@@ -18,17 +18,19 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
     {
         protected abstract TGreatGrannyParameterSet CreateGreatGrannyParameterSet(TParameterSet parameters);
 
-        protected abstract ExpressionParameterSet CreateExpressionParameterSet(
+        protected abstract IExpressionParameterSet CreateExpressionParameterSet(
             IExternalReferenceSet externalReferences,
             TParameterSet parameters,
-            Neuron greatGranny
+            Neuron greatGranny,
+            Network network
         );
 
         protected IEnumerable<IGreatGrannyInfo<TResult>> CreateGreatGrannies(
             TGreatGrannyProcessor greatGrannyProcessor,
             IGrannyProcessor<IExpression, IExpressionParameterSet> expressionProcessor,
             TParameterSet parameters,
-            IExternalReferenceSet externalReferences
+            IExternalReferenceSet externalReferences,
+            Network network
         ) =>
             new IGreatGrannyInfo<TResult>[]
             {
@@ -39,7 +41,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                     ),
                 new DependentGreatGrannyInfo<IExpression, IGrannyProcessor<IExpression, IExpressionParameterSet>, IExpressionParameterSet, TResult>(
                     expressionProcessor,
-                    (g) => this.CreateExpressionParameterSet(externalReferences, parameters, g.Neuron),
+                    (g) => this.CreateExpressionParameterSet(externalReferences, parameters, g.Neuron, network),
                     (g, r) => r.Expression = g
                     )
             };

@@ -4,7 +4,7 @@
     {
         public IUnit Value { get; set; }
 
-        public IInstantiatesClass InstantiatesClass { get; set; }
+        public IInstantiatesClass TypedGreatGranny { get; set; }
 
         public IExpression Expression { get; set; }
 

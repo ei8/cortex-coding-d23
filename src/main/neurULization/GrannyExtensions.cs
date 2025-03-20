@@ -40,6 +40,7 @@ namespace ei8.Cortex.Coding.d23.neurULization
         }
 
         internal static bool TryGetGreatGranny<TGreatGranny>(this ILesserGranny lesserGranny, out TGreatGranny result, int depth = 0)
+            where TGreatGranny : IGranny
         {
             result = default;
             var bResult = false;
@@ -51,11 +52,22 @@ namespace ei8.Cortex.Coding.d23.neurULization
                     bResult = true;
                     result = lg.TypedGreatGranny;
                 }
-                else if (lesserGranny is ILesserGranny && lesserGranny.GreatGranny is ILesserGranny lg2)
+                else if (lesserGranny is ILesserGranny && lesserGranny.GetGreatGranny<TGreatGranny>() is ILesserGranny lg2)
                     bResult = lg2.TryGetGreatGranny(out result, depth - 1);
             }
 
             return bResult;
+        }
+
+        private static IGranny GetGreatGranny<TGreatGranny>(this ILesserGranny lesserGranny)
+            where TGreatGranny : IGranny
+        {
+            IGranny result = null;
+
+            if (lesserGranny is ILesserGranny<TGreatGranny> lggg)
+                result = lggg.TypedGreatGranny;
+
+            return result;
         }
 
         internal static bool TryGetPropertyValue(this IPropertyAssociation propertyAssociation, out Neuron result)

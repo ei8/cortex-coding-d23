@@ -4,86 +4,38 @@ using System.Collections.Generic;
 
 namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
 {
-    public class InstanceValueWriter : IInstanceValueWriter
+    public class InstanceValueWriter :
+        ExpressionWriterBase<
+            IInstantiatesClass,
+            IInstantiatesClassParameterSet,
+            IInstantiatesClassWriter,
+            IInstanceValue,
+            IInstanceValueReader,
+            IInstanceValueParameterSet,
+            InstanceValue
+        >,
+        IInstanceValueWriter
     {
-        private readonly IInstantiatesClassWriter instantiatesClassWriter;
-        private readonly IExpressionWriter expressionWriter;
-        private readonly Readers.Deductive.IInstanceValueReader reader;
-        private readonly IExternalReferenceSet externalReferences;
-
         public InstanceValueWriter(
-            IInstantiatesClassWriter instantiatesClassWriter,
+            IInstantiatesClassWriter greatGrannyWriter,
             IExpressionWriter expressionWriter,
             Readers.Deductive.IInstanceValueReader reader,
             IExternalReferenceSet externalReferences
+        ) : base(
+            greatGrannyWriter,
+            expressionWriter,
+            reader,
+            externalReferences
         )
         {
-            this.instantiatesClassWriter = instantiatesClassWriter;
-            this.expressionWriter = expressionWriter;
-            this.reader = reader;
-            this.externalReferences = externalReferences;
         }
 
-        public IInstanceValue Build(Network network, IInstanceValueParameterSet parameters) =>
-            new InstanceValue().AggregateBuild(
-                InstanceValueWriter.CreateGreatGrannies(
-                    this.instantiatesClassWriter,
-                    this.expressionWriter,
-                    parameters,
-                    this.externalReferences
-                ),
-                new IGreatGrannyProcess<IInstanceValue>[]
-                {
-                    new GreatGrannyProcess<IInstantiatesClass, IInstantiatesClassWriter, IInstantiatesClassParameterSet, IInstanceValue>(
-                        ProcessHelper.ParseBuild
-                    ),
-                    new GreatGrannyProcess<IExpression, IExpressionWriter, IExpressionParameterSet, IInstanceValue>(
-                        ProcessHelper.ParseBuild
-                    )
-                },
-                network
-            );
+        protected override IExpressionParameterSet CreateExpressionParameterSet(IExternalReferenceSet externalReferences, IInstanceValueParameterSet parameters, Neuron greatGranny, Network network) =>
+            ProcessorExtensions.CreateInstanceValueParameterSet(externalReferences, parameters.Value, greatGranny);
 
-        private static IEnumerable<IGreatGrannyInfo<IInstanceValue>> CreateGreatGrannies(
-                IInstantiatesClassWriter instantiatesClassWriter,
-                IExpressionWriter expressionWriter,
-                IInstanceValueParameterSet parameters,
-                IExternalReferenceSet externalReferences
-            ) =>
-                new IGreatGrannyInfo<IInstanceValue>[]
-                {
-                    new IndependentGreatGrannyInfo<IInstantiatesClass, IInstantiatesClassWriter, IInstantiatesClassParameterSet, IInstanceValue>(
-                        instantiatesClassWriter,
-                        () => InstanceValueWriter.CreateInstantiatesClassParameterSet(parameters),
-                        (g, r) => r.InstantiatesClass = g
-                    ),
-                    new DependentGreatGrannyInfo<IExpression, IExpressionWriter, IExpressionParameterSet, IInstanceValue>(
-                        expressionWriter,
-                        (g) => InstanceValueWriter.CreateExpressionParameterSet(externalReferences, parameters, g.Neuron),
-                        (g, r) => r.Expression = g
-                    )
-                };
-
-        private static IInstantiatesClassParameterSet CreateInstantiatesClassParameterSet(IInstanceValueParameterSet parameters) =>
+        protected override IInstantiatesClassParameterSet CreateGreatGrannyParameterSet(IInstanceValueParameterSet parameters) =>
             new InstantiatesClassParameterSet(
                 parameters.Class
             );
-
-        private static ExpressionParameterSet CreateExpressionParameterSet(IExternalReferenceSet externalReferences, IInstanceValueParameterSet parameters, Neuron instantiatesClassNeuron) =>
-            new ExpressionParameterSet(
-                new[]
-                {
-                    new UnitParameterSet(
-                        instantiatesClassNeuron,
-                        externalReferences.Unit
-                    ),
-                    new UnitParameterSet(
-                        parameters.Value,
-                        externalReferences.NominalSubject
-                    )
-                }
-            );
-
-        public IGrannyReader<IInstanceValue, IInstanceValueParameterSet> Reader => this.reader;
     }
 }

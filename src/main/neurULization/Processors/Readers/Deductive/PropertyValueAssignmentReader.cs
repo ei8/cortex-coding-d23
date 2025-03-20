@@ -21,10 +21,11 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
         {
         }
 
-        protected override ExpressionParameterSet CreateExpressionParameterSet(
+        protected override IExpressionParameterSet CreateExpressionParameterSet(
             IExternalReferenceSet externalReferences, 
             IPropertyValueAssignmentParameterSet parameters, 
-            Neuron greatGranny
+            Neuron greatGranny,
+            Network network
         ) => ProcessorExtensions.CreatePropertyValueAssignmentParameterSet(
             externalReferences,
             parameters,

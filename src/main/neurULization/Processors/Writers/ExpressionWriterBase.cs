@@ -50,7 +50,8 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
                     this.greatGrannyWriter,
                     this.expressionWriter,
                     parameters,
-                    this.externalReferences
+                    this.externalReferences,
+                    network
                 ),
                 new IGreatGrannyProcess<TResult>[]
                 {

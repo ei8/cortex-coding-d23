@@ -7,11 +7,5 @@
         public IExpression Expression { get; set; }
 
         public Neuron Neuron { get; set; }
-
-        public IGranny GreatGranny
-        {
-            get => this.TypedGreatGranny;
-            set => this.TypedGreatGranny = (IValueExpression) value;
-        }
     }
 }

@@ -26,8 +26,10 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
 
         public bool TryParse(Network network, IValueParameterSet parameters, out IValue result)
         {
-            result = new Value();
-            result.Neuron = parameters.Value;
+            result = new Value
+            {
+                Neuron = parameters.Value
+            };
 
             return result != null;
         }

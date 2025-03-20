@@ -34,7 +34,12 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
                 parameters.Value
             );
 
-        protected override ExpressionParameterSet CreateExpressionParameterSet(IExternalReferenceSet externalReferences, IValueExpressionParameterSet parameters, Neuron greatGranny) =>
+        protected override IExpressionParameterSet CreateExpressionParameterSet(
+            IExternalReferenceSet externalReferences, 
+            IValueExpressionParameterSet parameters, 
+            Neuron greatGranny,
+            Network network
+        ) =>
             ProcessorExtensions.CreateValueExpressionParameterSet(externalReferences, greatGranny);
     }
 }

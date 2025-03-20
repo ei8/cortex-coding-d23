@@ -1,9 +1,34 @@
-﻿namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
+﻿using System;
+
+namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
 {
     internal static class ProcessorExtensions
     {
+        #region ValueReader
+        internal static IExpressionParameterSet CreateInstanceValueParameterSet(
+            IExternalReferenceSet externalReferences,
+            Neuron value,
+            Neuron greatGranny
+        )
+        {
+            return new ExpressionParameterSet(
+                new[]
+                {
+                    new UnitParameterSet(
+                        greatGranny,
+                        externalReferences.Unit
+                    ),
+                    new UnitParameterSet(
+                        value,
+                        externalReferences.NominalSubject
+                    )
+                }
+            );
+        }
+        #endregion
+
         #region ValueExpressionReader
-        internal static ExpressionParameterSet CreateValueExpressionParameterSet(
+        internal static IExpressionParameterSet CreateValueExpressionParameterSet(
             IExternalReferenceSet externalReferences,
             Neuron greatGranny
         ) => new ExpressionParameterSet(
@@ -17,7 +42,7 @@
         #endregion
 
         #region PropertyValueExpressionReader
-        internal static ExpressionParameterSet CreatePropertyValueExpressionParameterSet(
+        internal static IExpressionParameterSet CreatePropertyValueExpressionParameterSet(
             IExternalReferenceSet externalReferences,
             Neuron greatGranny
         ) => new ExpressionParameterSet(
@@ -36,9 +61,9 @@
         #endregion
 
         #region PropertyValueAssignmentReader
-        internal static ExpressionParameterSet CreatePropertyValueAssignmentParameterSet(
+        internal static IExpressionParameterSet CreatePropertyValueAssignmentParameterSet(
             IExternalReferenceSet externalReferences,
-            IPropertyParameterSet propertyParameters,
+            IPropertyParameterSetCore propertyParameters,
             Neuron greatGranny
         ) => new ExpressionParameterSet(
             new[]
@@ -56,9 +81,9 @@
         #endregion
 
         #region PropertyValueAssociationReader
-        internal static ExpressionParameterSet CreatePropertyValueAssociationParameterSet(
+        internal static IExpressionParameterSet CreatePropertyValueAssociationParameterSet(
             IExternalReferenceSet externalReferences,
-            IPropertyParameterSet propertyParameters,
+            IPropertyParameterSetCore propertyParameters,
             Neuron greatGranny
         ) => new ExpressionParameterSet(
             new[]

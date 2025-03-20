@@ -1,7 +1,7 @@
 ﻿namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers
 {
-    public interface IPropertyParameterSet
+    public interface IValueParameterSetCore
     {
-        Neuron Property { get; }
+        Neuron Value { get; }
     }
 }
