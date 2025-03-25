@@ -116,12 +116,23 @@ namespace ei8.Cortex.Coding.d23.neurULization
                         instanceNeuron,
                         externalReferences[typeInfo.ValueClassKey],
                         typeInfo.GrannyProperties.Select(gp =>
-                            Processors.Readers.Inductive.PropertyValueAssociationParameterSet.CreateWithoutGranny(
-                                externalReferences[gp.Key],
-                                !string.IsNullOrWhiteSpace(gp.ClassKey) ?
-                                    externalReferences[gp.ClassKey] :
-                                    null
-                            )
+                            {
+                                IPropertyAssociationParameterSet paps = null;
+                                if (!string.IsNullOrWhiteSpace(gp.ClassKey))
+                                {
+                                    paps = Processors.Readers.Inductive.PropertyInstanceValueAssociationParameterSet.CreateWithoutGranny(
+                                        externalReferences[gp.Key],
+                                        externalReferences[gp.ClassKey]
+                                    );
+                                }
+                                else
+                                {
+                                    paps = Processors.Readers.Inductive.PropertyValueAssociationParameterSet.CreateWithoutGranny(
+                                        externalReferences[gp.Key]
+                                    );
+                                }
+                                return paps;
+                            }
                         )
                     ),
                     out IInstance instance
