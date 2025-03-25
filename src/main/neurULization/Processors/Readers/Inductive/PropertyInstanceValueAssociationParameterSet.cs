@@ -2,14 +2,14 @@
 
 namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
 {
-    public class PropertyAssociationParameterSet : IPropertyAssociationParameterSet
+    public class PropertyInstanceValueAssociationParameterSet : IPropertyInstanceValueAssociationParameterSet
     {
-        public static PropertyAssociationParameterSet CreateWithoutGranny(
+        public static PropertyInstanceValueAssociationParameterSet CreateWithoutGranny(
             Neuron property,
             Neuron @class
-        ) => new PropertyAssociationParameterSet(null, property, @class);
+        ) => new PropertyInstanceValueAssociationParameterSet(null, property, @class);
 
-        public static PropertyAssociationParameterSet CreateWithGranny(
+        public static PropertyInstanceValueAssociationParameterSet CreateWithGranny(
             Neuron granny,
             Neuron property,
             Neuron @class
@@ -17,18 +17,17 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
         {
             AssertionConcern.AssertArgumentNotNull(granny, nameof(granny));
 
-            return new PropertyAssociationParameterSet(granny, property, @class);
+            return new PropertyInstanceValueAssociationParameterSet(granny, property, @class);
         }
 
-        private PropertyAssociationParameterSet(
+        private PropertyInstanceValueAssociationParameterSet(
             Neuron granny,
             Neuron property,
             Neuron @class
             )
         {
             AssertionConcern.AssertArgumentNotNull(property, nameof(property));
-            // TODO: create constructor overload that does not require the @class parameter
-            // AssertionConcern.AssertArgumentNotNull(@class, nameof(@class));
+            AssertionConcern.AssertArgumentNotNull(@class, nameof(@class));
 
             this.Granny = granny;
             this.Property = property;

@@ -30,7 +30,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
                     this.unitWriter,
                     parameters
                 ),
-                parameters.UnitsParameters.Select(
+                parameters.UnitParameters.Select(
                     u => new GreatGrannyProcess<IUnit, IUnitWriter, IUnitParameterSet, IExpression>(
                         ProcessHelper.ParseBuild
                     )
@@ -40,7 +40,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
                 (r) =>
                     // concat applicable expression types
                     GetExpressionTypes(
-                        (id, isEqual) => parameters.UnitsParameters.GetValueUnitParametersByTypeId(id, isEqual).Count(),
+                        (id, isEqual) => parameters.UnitParameters.GetValueUnitParametersByTypeId(id, isEqual).Count(),
                         this.externalReferences
                     )
                     .Select(et => new PostsynapticInfo() {
@@ -57,7 +57,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
             IUnitWriter unitWriter,
             IExpressionParameterSet parameters
         ) =>
-            parameters.UnitsParameters.Select(
+            parameters.UnitParameters.Select(
                 u => new IndependentGreatGrannyInfo<IUnit, IUnitWriter, IUnitParameterSet, IExpression>(
                     unitWriter,
                     () => u,

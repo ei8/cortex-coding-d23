@@ -20,7 +20,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
         }
 
         private static IEnumerable<IGreatGrannyInfo<IExpression>> CreateGreatGrannies(IUnitReader unitReader, IExpressionParameterSet parameters) =>
-            parameters.UnitsParameters.Select(
+            parameters.UnitParameters.Select(
                 u => new IndependentGreatGrannyInfo<IUnit, IUnitReader, IUnitParameterSet, IExpression>(
                     unitReader,
                     () => u,
@@ -36,7 +36,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
             IEnumerable<IGrannyQuery> result = null;
 
             var types = ExpressionReader.GetExpressionTypes(
-                (id, isEqual) => parameters.UnitsParameters.GetValueUnitParametersByTypeId(id, isEqual).Count(),
+                (id, isEqual) => parameters.UnitParameters.GetValueUnitParametersByTypeId(id, isEqual).Count(),
                 externalReferences
                 );
 
@@ -49,7 +49,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                             new NeuronQuery()
                             {
                                 // set Id to values of Dependents (non-Head units)
-                                Id = parameters.UnitsParameters.GetValueUnitParametersByTypeId(externalReferences.Unit.Id, false)
+                                Id = parameters.UnitParameters.GetValueUnitParametersByTypeId(externalReferences.Unit.Id, false)
                                         .Select(dp => dp.Value.Id.ToString()),
                                 DirectionValues = DirectionValues.Any,
                                 Depth = 4,
@@ -57,7 +57,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                                     // 4 edges away and should have postsynaptic of unit or values of Head units
                                     new DepthIdsPair {
                                         Depth = 4,
-                                        Ids = parameters.UnitsParameters.GetValueUnitParametersByTypeId(externalReferences.Unit.Id)
+                                        Ids = parameters.UnitParameters.GetValueUnitParametersByTypeId(externalReferences.Unit.Id)
                                             .Select(up => up.Value.Id)
                                             .Concat(
                                                 new[] {
@@ -73,7 +73,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                                     // 2 edges away and should have postsynaptic of non-head unit (eg. direct object)
                                     new DepthIdsPair {
                                         Depth = 2,
-                                        Ids = parameters.UnitsParameters.GetValueUnitParametersByTypeId(externalReferences.Unit.Id, false)
+                                        Ids = parameters.UnitParameters.GetValueUnitParametersByTypeId(externalReferences.Unit.Id, false)
                                                 .Select(up => up.Type.Id)
                                     }
                                 }
@@ -86,7 +86,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                     result = new IGrannyQuery[] {
                         new GreatGrannyQuery<IUnit, IUnitReader, IUnitParameterSet>(
                             unitReader,
-                            (n) => parameters.UnitsParameters.Single(u => u.Type.Id == externalReferences.Unit.Id)
+                            (n) => parameters.UnitParameters.Single(u => u.Type.Id == externalReferences.Unit.Id)
                         ),
                         new GrannyQueryBuilder(
                             (n) => new NeuronQuery()
@@ -150,7 +150,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
 
             new Expression().AggregateTryParse(
                 ExpressionReader.CreateGreatGrannies(this.unitReader, parameters),
-                parameters.UnitsParameters.Select(
+                parameters.UnitParameters.Select(
                     u => new GreatGrannyProcess<IUnit, IUnitReader, IUnitParameterSet, IExpression>(
                         ProcessHelper.TryParse
                     )
@@ -160,7 +160,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                 false
             );
 
-            if (tempResult != null && tempResult.Units.Count() == parameters.UnitsParameters.Count())
+            if (tempResult != null && tempResult.Units.Count() == parameters.UnitParameters.Count())
             {
                 tempResult.TryParseCore(
                     network,
@@ -174,7 +174,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                                 .Select(i => i.Neuron.Id)
                                 .Concat(
                                     GetExpressionTypes(
-                                        (id, isEqual) => parameters.UnitsParameters.GetValueUnitParametersByTypeId(id, isEqual).Count(),
+                                        (id, isEqual) => parameters.UnitParameters.GetValueUnitParametersByTypeId(id, isEqual).Count(),
                                         this.externalReferences
                                     ).Select(t => t.Id)
                                 ).ToArray()

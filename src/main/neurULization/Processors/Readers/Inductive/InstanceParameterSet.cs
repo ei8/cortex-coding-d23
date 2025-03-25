@@ -8,22 +8,22 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
         public InstanceParameterSet(
             Neuron granny,
             Neuron @class,
-            IEnumerable<IPropertyAssociationParameterSet> propertyAssociationsParameters
+            IEnumerable<IPropertyAssociationParameterSet> propertyAssociationParameters
             )
         {
             AssertionConcern.AssertArgumentNotNull(granny, nameof(granny));
             AssertionConcern.AssertArgumentNotNull(@class, nameof(@class));
-            AssertionConcern.AssertArgumentNotNull(propertyAssociationsParameters, nameof(propertyAssociationsParameters));
+            AssertionConcern.AssertArgumentNotNull(propertyAssociationParameters, nameof(propertyAssociationParameters));
 
-            Granny = granny;
-            Class = @class;
-            PropertyAssociationsParameters = propertyAssociationsParameters;
+            this.Granny = granny;
+            this.Class = @class;
+            this.PropertyAssociationParameters = propertyAssociationParameters;
         }
 
         public Neuron Granny { get; }
 
         public Neuron Class { get; }
 
-        public IEnumerable<IPropertyAssociationParameterSet> PropertyAssociationsParameters { get; }
+        public IEnumerable<IPropertyAssociationParameterSet> PropertyAssociationParameters { get; }
     }
 }

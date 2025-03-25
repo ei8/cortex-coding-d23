@@ -6,14 +6,14 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
     public class ExpressionParameterSet : IExpressionParameterSet
     {
         public ExpressionParameterSet(
-            IEnumerable<IUnitParameterSet> unitsParameters
+            IEnumerable<IUnitParameterSet> unitParameters
             )
         {
-            AssertionConcern.AssertArgumentNotNull(unitsParameters, nameof(unitsParameters));
+            AssertionConcern.AssertArgumentNotNull(unitParameters, nameof(unitParameters));
 
-            UnitsParameters = unitsParameters;
+            this.UnitParameters = unitParameters;
         }
 
-        public IEnumerable<IUnitParameterSet> UnitsParameters { get; }
+        public IEnumerable<IUnitParameterSet> UnitParameters { get; }
     }
 }

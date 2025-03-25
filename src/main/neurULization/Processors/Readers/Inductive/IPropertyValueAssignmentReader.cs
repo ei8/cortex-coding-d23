@@ -2,7 +2,7 @@
 
 namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
 {
-    public interface IPropertyAssociationReader : IGrannyReader<IPropertyValueAssociation, IPropertyAssociationParameterSet>
+    public interface IPropertyValueAssignmentReader : IGrannyReader<IPropertyValueAssignment, IPropertyValueAssignmentParameterSet>
     {
     }
 }

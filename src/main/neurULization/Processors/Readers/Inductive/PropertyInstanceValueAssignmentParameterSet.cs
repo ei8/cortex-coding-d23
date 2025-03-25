@@ -1,8 +1,8 @@
 ﻿namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
 {
-    public class PropertyAssignmentParameterSet : PropertyValueExpressionParameterSet, IPropertyAssignmentParameterSet
+    public class PropertyInstanceValueAssignmentParameterSet : PropertyInstanceValueExpressionParameterSet, IPropertyInstanceValueAssignmentParameterSet
     {
-        public PropertyAssignmentParameterSet(
+        public PropertyInstanceValueAssignmentParameterSet(
             Neuron granny,
             Neuron property,
             Neuron @class

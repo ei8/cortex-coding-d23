@@ -1,8 +1,6 @@
 ﻿namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
 {
-    public interface IUnitParameterSet : IInductiveParameterSet
+    public interface IUnitParameterSet : IUnitParameterSetCore, IInductiveParameterSet
     {
-        Neuron Value { get; }
-        Neuron Type { get; }
     }
 }

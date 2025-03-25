@@ -13,8 +13,8 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
             AssertionConcern.AssertArgumentNotNull(granny, nameof(granny));
             AssertionConcern.AssertArgumentNotNull(unitParameters, nameof(unitParameters));
 
-            Granny = granny;
-            UnitParameters = unitParameters;
+            this.Granny = granny;
+            this.UnitParameters = unitParameters;
         }
 
         public Neuron Granny { get; }

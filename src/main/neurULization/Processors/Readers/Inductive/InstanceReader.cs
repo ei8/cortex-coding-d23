@@ -1,26 +1,25 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
 using neurUL.Common.Domain.Model;
-using System.Linq;
 
 namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
 {
     public class InstanceReader : IInstanceReader
     {
         private readonly IInstantiatesClassReader instantiatesClassReader;
-        private readonly IPropertyAssociationReader propertyAssociationReader;
+        private readonly IPropertyValueAssociationReader propertyAssociationReader;
         private readonly IAggregateParser aggregateParser;
         private static readonly IGreatGrannyProcess<IInstance>[] targets = new IGreatGrannyProcess<IInstance>[]
             {
                 new GreatGrannyProcess<IInstantiatesClass, IInstantiatesClassReader, IInstantiatesClassParameterSet, IInstance>(
                     ProcessHelper.TryParse
                 ),
-                new GreatGrannyProcess<IPropertyValueAssociation, IPropertyAssociationReader, IPropertyAssociationParameterSet, IInstance>(
+                new GreatGrannyProcess<IPropertyValueAssociation, IPropertyValueAssociationReader, IPropertyValueAssociationParameterSet, IInstance>(
                     ProcessHelper.TryParse
                 )
             };
         public InstanceReader(
             IInstantiatesClassReader instantiatesClassReader, 
-            IPropertyAssociationReader propertyAssociationReader,
+            IPropertyValueAssociationReader propertyAssociationReader,
             IAggregateParser aggregateParser
         )
         {
@@ -35,7 +34,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
 
         private static IGreatGrannyInfoSuperset<IInstance> CreateGreatGrannies(
             IInstantiatesClassReader instantiatesClassReader,
-            IPropertyAssociationReader propertyAssociationReader,
+            IPropertyValueAssociationReader propertyAssociationReader,
             IInstanceParameterSet parameters,
             Network network
         ) =>
@@ -53,16 +52,16 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                 ProcessHelper.CreateGreatGrannyCandidateSets(
                     network,
                     parameters.Granny,
-                    parameters.PropertyAssociationsParameters,
+                    parameters.PropertyAssociationParameters,
                     (gc, pa) => new InductiveIndependentGreatGrannyInfo<
                         IPropertyValueAssociation, 
-                        IPropertyAssociationReader, 
-                        IPropertyAssociationParameterSet, 
+                        IPropertyValueAssociationReader, 
+                        IPropertyValueAssociationParameterSet, 
                         IInstance
                     >(
                         gc,
                         propertyAssociationReader,
-                        () => PropertyAssociationParameterSet.CreateWithGranny(
+                        () => PropertyValueAssociationParameterSet.CreateWithGranny(
                             gc,
                             pa.Property,
                             pa.Class

@@ -1,5 +1,6 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
 using ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive;
+using neurUL.Common.Domain.Model;
 
 namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
 {
@@ -16,7 +17,9 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
         TGreatGrannyParameterSet,
         TGreatGrannyWriter,
         TResult,
-        TParameterSet
+        TParameterSet,
+        IExpressionParameterSet,
+        IUnitParameterSet
     >
         where TGreatGranny : IGranny
         where TGreatGrannyParameterSet : class, IDeductiveParameterSet
@@ -38,6 +41,11 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
             IExternalReferenceSet externalReferences
         )
         {
+            AssertionConcern.AssertArgumentNotNull(greatGrannyWriter, nameof(greatGrannyWriter));
+            AssertionConcern.AssertArgumentNotNull(expressionWriter, nameof(expressionWriter));
+            AssertionConcern.AssertArgumentNotNull(reader, nameof(reader));
+            AssertionConcern.AssertArgumentNotNull(externalReferences, nameof(externalReferences));
+
             this.greatGrannyWriter = greatGrannyWriter;
             this.expressionWriter = expressionWriter;
             this.reader = reader;

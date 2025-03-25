@@ -2,19 +2,19 @@
 
 namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
 {
-    public class PropertyValueExpressionReader : 
+    public class PropertyInstanceValueExpressionReader : 
         ExpressionReaderBase<
-            IValueExpression,
-            IValueExpressionParameterSet,
-            IValueExpressionReader,
-            IPropertyValueExpression,
-            IPropertyValueExpressionParameterSet,
-            PropertyValueExpression
+            IInstanceValueExpression,
+            IInstanceValueExpressionParameterSet,
+            IInstanceValueExpressionReader,
+            IPropertyInstanceValueExpression,
+            IPropertyInstanceValueExpressionParameterSet,
+            PropertyInstanceValueExpression
         >,
-        IPropertyValueExpressionReader
+        IPropertyInstanceValueExpressionReader
     {
-        public PropertyValueExpressionReader(
-            IValueExpressionReader greatGrannyReader, 
+        public PropertyInstanceValueExpressionReader(
+            IInstanceValueExpressionReader greatGrannyReader, 
             IExpressionReader expressionReader, 
             IExternalReferenceSet externalReferences, 
             IAggregateParser aggregateParser
@@ -29,7 +29,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
 
         protected override IExpressionParameterSet CreateExpressionParameterSet(
             IExternalReferenceSet externalReferences, 
-            IPropertyValueExpressionParameterSet parameters, 
+            IPropertyInstanceValueExpressionParameterSet parameters, 
             Neuron grannyCandidate, 
             Network network
         ) => ProcessorExtensions.CreatePropertyValueExpressionParameterSet(
@@ -38,11 +38,12 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
             grannyCandidate
         );
 
-        protected override IValueExpressionParameterSet CreateGreatGrannyParameterSet(
-            IPropertyValueExpressionParameterSet parameters, 
+        protected override IInstanceValueExpressionParameterSet CreateGreatGrannyParameterSet(
+            IPropertyInstanceValueExpressionParameterSet parameters, 
             Neuron grannyCandidate
-        ) => new ValueExpressionParameterSet(
-            grannyCandidate
+        ) => new InstanceValueExpressionParameterSet(
+            grannyCandidate,
+            parameters.Class
         );
     }
 }

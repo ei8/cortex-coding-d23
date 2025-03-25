@@ -1,4 +1,5 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
+using ei8.Cortex.Coding.d23.neurULization.Processors.Readers;
 using ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive;
 using ei8.Cortex.Coding.d23.neurULization.Processors.Writers;
 using ei8.Cortex.Coding.Properties;
@@ -115,7 +116,7 @@ namespace ei8.Cortex.Coding.d23.neurULization
                         instanceNeuron,
                         externalReferences[typeInfo.ValueClassKey],
                         typeInfo.GrannyProperties.Select(gp =>
-                            Processors.Readers.Inductive.PropertyAssociationParameterSet.CreateWithoutGranny(
+                            Processors.Readers.Inductive.PropertyValueAssociationParameterSet.CreateWithoutGranny(
                                 externalReferences[gp.Key],
                                 !string.IsNullOrWhiteSpace(gp.ClassKey) ?
                                     externalReferences[gp.ClassKey] :

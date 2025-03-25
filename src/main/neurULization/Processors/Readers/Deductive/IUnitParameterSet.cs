@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
+﻿namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
 {
-    public interface IUnitParameterSet : IDeductiveParameterSet
+    public interface IUnitParameterSet : IUnitParameterSetCore, IDeductiveParameterSet
     {
-        Neuron Value { get; }
-
-        Neuron Type { get; }
     }
 }
