@@ -83,7 +83,6 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
         #region PropertyValueAssociationReader
         internal static IExpressionParameterSet CreatePropertyValueAssociationParameterSet(
             IExternalReferenceSet externalReferences,
-            IPropertyParameterSetCore propertyParameters,
             Neuron greatGranny
         ) => new ExpressionParameterSet(
             new[]

@@ -32,7 +32,6 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
             Network network
         ) => ProcessorExtensions.CreatePropertyValueAssociationParameterSet(
             externalReferences,
-            parameters,
             greatGranny
         );
 

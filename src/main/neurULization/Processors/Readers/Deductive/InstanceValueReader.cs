@@ -37,7 +37,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
         {
             Neuron valueNeuron;
             if (parameters.ValueMatchBy == ValueMatchBy.Id)
-                network.TryGetById<Neuron>(parameters.Value.Id, out valueNeuron);
+                valueNeuron = parameters.Value;
             else
             {
                 network.TryGetByTag(parameters.Value.Tag, out IEnumerable<Neuron> results);
