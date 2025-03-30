@@ -19,8 +19,10 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
         TResult,
         TParameterSet,
         IExpressionParameterSet,
+        IExpressionWriter,
         IUnitParameterSet
-    >
+    >,
+        IGrannyWriter<TResult, TParameterSet>
         where TGreatGranny : IGranny
         where TGreatGrannyParameterSet : class, IDeductiveParameterSet
         where TGreatGrannyWriter : IGrannyWriter<TGreatGranny, TGreatGrannyParameterSet>
@@ -52,8 +54,10 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
             this.externalReferences = externalReferences;
         }
 
-        public TResult Build(Network network, TParameterSet parameters) =>
-            new TResultDerived().AggregateBuild(
+        public bool TryBuild(Network network, TParameterSet parameters, out TResult result) =>
+            this.TryBuildAggregate(
+                () => new TResultDerived(),
+                parameters,
                 this.CreateGreatGrannies(
                     this.greatGrannyWriter,
                     this.expressionWriter,
@@ -64,13 +68,14 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
                 new IGreatGrannyProcess<TResult>[]
                 {
                     new GreatGrannyProcess<TGreatGranny, TGreatGrannyWriter, TGreatGrannyParameterSet, TResult>(
-                        ProcessHelper.ParseBuild
+                        ProcessHelper.TryParseBuild
                         ),
                     new GreatGrannyProcess<IExpression, IExpressionWriter, IExpressionParameterSet, TResult>(
-                        ProcessHelper.ParseBuild
+                        ProcessHelper.TryParseBuild
                         )
                 },
-                network
+                network,
+                out result
             );
 
         public IGrannyReader<TResult, TParameterSet> Reader => this.reader;

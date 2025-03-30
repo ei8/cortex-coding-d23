@@ -53,7 +53,9 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
         }
 
         public bool TryParse(Network network, IInstantiatesClassParameterSet parameters, out IInstantiatesClass result) =>
-            new InstantiatesClass().AggregateTryParse(
+            this.TryParseAggregate(
+                () => new InstantiatesClass(),
+                parameters,
                 InstantiatesClassReader.CreateGreatGrannies(
                     this.expressionReader, 
                     parameters,

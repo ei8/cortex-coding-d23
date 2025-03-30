@@ -11,7 +11,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
         where TGranny : IGranny
         where TParameterSet : IDeductiveParameterSet
     {
-        TGranny Build(Network network, TParameterSet parameters);
+        bool TryBuild(Network network, TParameterSet parameters, out TGranny result);
 
         IGrannyReader<TGranny, TParameterSet> Reader { get; }
     }

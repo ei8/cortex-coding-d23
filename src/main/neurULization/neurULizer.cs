@@ -37,19 +37,19 @@ namespace ei8.Cortex.Coding.d23.neurULization
             AssertionConcern.AssertArgumentNotNull(idPropertyValueNeurons, nameof(idPropertyValueNeurons));
             AssertionConcern.AssertArgumentNotNull(externalReferences, nameof(externalReferences));
 
-            var result = new Network();
+            var network = new Network();
             Guid? regionId = typeInfo.NeuronProperties.OfType<RegionIdProperty>().SingleOrDefault()?.Value;
             IdProperty idp = null;
 
             // Unnecessary to validate null id and tag values since another service can be
             // responsible for pruning grannies containing null or empty values.
             // Null values can also be considered as valid new values.
-            var instance = this.options.InstanceWriter.ParseBuild<
+            this.options.InstanceWriter.TryParseBuild<
                 IInstance, 
                 IInstanceWriter, 
                 Processors.Readers.Deductive.IInstanceParameterSet
             >(
-                result,
+                network,
                 new Processors.Readers.Deductive.InstanceParameterSet(
                     (idp = typeInfo.NeuronProperties.OfType<IdProperty>().SingleOrDefault()) != null ?
                         idp.Value :
@@ -87,10 +87,11 @@ namespace ei8.Cortex.Coding.d23.neurULization
                         }
                         )
                         .Where(i => i != null)
-                )
+                ),
+                out IInstance instance
             );
 
-            return result;
+            return network;
         }
 
         public IEnumerable<TValue> DeneurULize<TValue>(

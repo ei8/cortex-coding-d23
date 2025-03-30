@@ -148,7 +148,9 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
         {
             result = null;
 
-            new Expression().AggregateTryParse(
+            this.TryParseAggregate(
+                () => new Expression(),
+                parameters,
                 ExpressionReader.CreateGreatGrannies(this.unitReader, parameters),
                 parameters.UnitParameters.Select(
                     u => new GreatGrannyProcess<IUnit, IUnitReader, IUnitParameterSet, IExpression>(

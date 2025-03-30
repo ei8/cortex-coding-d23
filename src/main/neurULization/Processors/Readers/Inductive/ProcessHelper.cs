@@ -7,18 +7,20 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
 {
     internal static class ProcessHelper
     {
-        public static IGranny TryParse<TGranny, TGrannyReader, TParameterSet, TAggregate>(
+        public static bool TryParse<TGranny, TGrannyReader, TParameterSet, TAggregate>(
             TGrannyReader grannyReader,
             Network network,
             TParameterSet readParameters,
             Action<TGranny, TAggregate> aggregateUpdater,
-            TAggregate aggregate
+            TAggregate aggregate,
+            out TGranny result
         )
             where TGranny : IGranny
             where TGrannyReader : IGrannyProcessor<TGranny, TParameterSet>, IGrannyReader<TGranny, TParameterSet>
             where TParameterSet : IParameterSet, IInductiveParameterSet
         {
-            IGranny result = null;
+            result = default;
+            var bResult = false;
 
             if (grannyReader.TryParse(
                 network,
@@ -28,9 +30,10 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
             {
                 aggregateUpdater(gr, aggregate);
                 result = gr;
+                bResult = true;
             }
 
-            return result;
+            return bResult;
         }
 
         internal static IGreatGrannyInfoSuperset<TResult> CreateGreatGrannyCandidateSets<TParameterSet, TResult>(

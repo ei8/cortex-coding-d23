@@ -6,6 +6,6 @@
 
     public interface ILesserGranny<TGreatGranny> : ILesserGranny
     {
-        TGreatGranny TypedGreatGranny { get; set; }
+        TGreatGranny GreatGranny { get; set; }
     }
 }

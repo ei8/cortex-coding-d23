@@ -24,24 +24,24 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
             this.skipIds = new List<string>();
         }
 
-        public bool TryParse<TConcrete, TAggregate>(
+        public bool TryParse<TResultDerived, TResult>(
             Neuron granny,
-            IGreatGrannyInfoSuperset<TAggregate> candidateSets,
+            IGreatGrannyInfoSuperset<TResult> candidateSets,
             Network network,
-            out TAggregate aggregate
+            out TResult aggregate
         )
-            where TConcrete : TAggregate, new()
-            where TAggregate : IGranny
+            where TResultDerived : TResult, new()
+            where TResult : IGranny
         {
             aggregate = default;
 
-            var tempAggregate = new TConcrete { Neuron = granny };
+            var tempAggregate = new TResultDerived { Neuron = granny };
 
             int successCount = 0;
             IGranny precedingGranny = null;
             var candidateSetsList = candidateSets.Items.ToList();
 
-            AggregateParser.LogParse<TAggregate>(granny);
+            AggregateParser.LogParse<TResult>(granny);
 
             foreach (var candidateSet in candidateSetsList)
             {
@@ -54,7 +54,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                 var candidateSetItemsList = candidateSet.Items.ToList();
                 foreach (var candidate in candidateSetItemsList)
                 {
-                    AggregateParser.LogCandidateDetails<TAggregate>(
+                    AggregateParser.LogCandidateDetails<TResult>(
                         candidate,
                         precedingGranny,
                         candidateSetItemsList
@@ -119,12 +119,13 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                         }
                         else
                         {
-                            var parseResult = (tempPrecedingGranny = candidateSet.Target.Execute(
+                            var parseResult = candidateSet.Target.TryExecute(
                                 candidate,
                                 network,
                                 tempAggregate,
-                                parameters
-                            )) != null;
+                                parameters,
+                                out tempPrecedingGranny
+                            );
                             var parseDetails = new StringBuilder();
 
                             if (parseResult)

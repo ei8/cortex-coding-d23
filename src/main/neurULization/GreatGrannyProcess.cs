@@ -36,23 +36,29 @@ namespace ei8.Cortex.Coding.d23.neurULization
             return parameters != default;
         }
 
-        public IGranny Execute(IGreatGrannyInfo<TAggregate> greatGrannyInfo, Network network, TAggregate aggregate, IParameterSet parameters)
+        public bool TryExecute(IGreatGrannyInfo<TAggregate> greatGrannyInfo, Network network, TAggregate aggregate, IParameterSet parameters, out IGranny result)
         {
-            var result = default(IGranny);
+            result = default;
+            bool bResult = false;
 
-            if (greatGrannyInfo is ICoreGreatGrannyInfo<TGranny, TGrannyProcessor, TAggregate> coreGreatGrannyInfo &&
-                parameters is TParameterSet tryParameters)
-            {
-                result = process(
+            if (
+                greatGrannyInfo is ICoreGreatGrannyInfo<TGranny, TGrannyProcessor, TAggregate> coreGreatGrannyInfo &&
+                parameters is TParameterSet tryParameters &&
+                process(
                     coreGreatGrannyInfo.Processor,
                     network,
                     tryParameters,
                     coreGreatGrannyInfo.AggregateUpdater,
-                    aggregate
-                );
+                    aggregate,
+                    out TGranny tempResult
+                )
+            )
+            {
+                result = tempResult;
+                bResult = true;
             }
-
-            return result;
+            
+            return bResult;
         }
 
         public void UpdateAggregate(IGreatGrannyInfo<TAggregate> greatGrannyInfo, IGranny precedingGranny, TAggregate aggregate)

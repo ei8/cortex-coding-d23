@@ -2,7 +2,7 @@
 {
     public class PropertyValueAssignment : IPropertyValueAssignment
     {
-        public IPropertyValueExpression TypedGreatGranny { get; set; }
+        public IPropertyValueExpression GreatGranny { get; set; }
 
         public IExpression Expression { get; set; }
 

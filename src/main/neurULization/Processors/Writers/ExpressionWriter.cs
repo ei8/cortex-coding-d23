@@ -24,18 +24,21 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
             this.externalReferences = externalReferences;
         }
 
-        public IExpression Build(Network network, IExpressionParameterSet parameters) =>
-            new Expression().AggregateBuild(
+        public bool TryBuild(Network network, IExpressionParameterSet parameters, out IExpression result) =>
+            this.TryBuildAggregate(
+                () => new Expression(),
+                parameters,
                 ExpressionWriter.CreateGreatGrannies(
                     this.unitWriter,
                     parameters
                 ),
                 parameters.UnitParameters.Select(
                     u => new GreatGrannyProcess<IUnit, IUnitWriter, IUnitParameterSet, IExpression>(
-                        ProcessHelper.ParseBuild
+                        ProcessHelper.TryParseBuild
                     )
                 ),
                 network,
+                out result,
                 () => network.AddOrGetIfExists(Neuron.CreateTransient(null, null, null)),
                 (r) =>
                     // concat applicable expression types

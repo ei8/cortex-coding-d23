@@ -9,8 +9,8 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
         private readonly IUnitReader unitReader;
         private readonly IAggregateParser aggregateParser;
         private static readonly IGreatGrannyProcess<IExpression> target = new GreatGrannyProcess<IUnit, IUnitReader, IUnitParameterSet, IExpression>(
-                ProcessHelper.TryParse
-            );
+            ProcessHelper.TryParse
+        );
 
         public ExpressionReader(IUnitReader unitReader, IAggregateParser aggregateParser)
         {

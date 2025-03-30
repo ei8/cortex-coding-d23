@@ -3,7 +3,7 @@ namespace ei8.Cortex.Coding.d23.Grannies
 {
     public class PropertyInstanceValueAssociation : IPropertyInstanceValueAssociation
     {
-        public IPropertyInstanceValueAssignment TypedGreatGranny { get; set; }
+        public IPropertyInstanceValueAssignment GreatGranny { get; set; }
 
         public IExpression Expression { get; set; }
 

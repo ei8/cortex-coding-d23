@@ -6,26 +6,42 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
 {
     internal static class ProcessHelper
     {
-        public static IGranny ParseBuild<TGranny, TGrannyWriter, TParameterSet, TAggregate>(
+        public static bool TryParseBuild<TGranny, TGrannyWriter, TParameterSet, TAggregate>(
             TGrannyWriter grannyWriter,
             Network network,
             TParameterSet parameters,
             Action<TGranny, TAggregate> aggregateUpdater,
-            TAggregate aggregate
+            TAggregate aggregate,
+            out TGranny result
         )
             where TGranny : IGranny
             where TGrannyWriter : IGrannyProcessor<TGranny, TParameterSet>, IGrannyWriter<TGranny, TParameterSet>
             where TParameterSet : IParameterSet, IDeductiveParameterSet
             where TAggregate : IGranny
         {
-            TGranny result = grannyWriter.ParseBuild<TGranny, TGrannyWriter, TParameterSet>(
-                network,
-                parameters
-            );
+            result = default;
+            var bResult = false;
 
-            aggregateUpdater(result, aggregate);
+            try
+            {
+                TGranny tempResult = default;
+                if (grannyWriter.TryParseBuild(
+                    network,
+                    parameters,
+                    out tempResult
+                ))
+                {
+                    result = tempResult;
+                    aggregateUpdater(result, aggregate);
+                    bResult = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                GrannyExtensions.Log($"Error: {ex}");
+            }
 
-            return result;
+            return bResult;
         }
     }
 }

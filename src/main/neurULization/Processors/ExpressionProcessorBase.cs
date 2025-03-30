@@ -10,6 +10,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors
         TResult,
         TParameterSet,
         TExpressionParameterSet,
+        TExpressionProcessor,
         TUnitParameterSet
     >
         where TGreatGranny : IGranny
@@ -18,6 +19,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors
         where TResult : IExpressionGranny, ILesserGranny<TGreatGranny>
         where TParameterSet : IParameterSet
         where TExpressionParameterSet : IExpressionParameterSetCore<TUnitParameterSet>
+        where TExpressionProcessor : IGrannyProcessor<IExpression, TExpressionParameterSet>
         where TUnitParameterSet : IUnitParameterSetCore
     {
         protected abstract TGreatGrannyParameterSet CreateGreatGrannyParameterSet(TParameterSet parameters);
@@ -31,7 +33,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors
 
         protected IEnumerable<IGreatGrannyInfo<TResult>> CreateGreatGrannies(
             TGreatGrannyProcessor greatGrannyProcessor,
-            IGrannyProcessor<IExpression, TExpressionParameterSet> expressionProcessor,
+            TExpressionProcessor expressionProcessor,
             TParameterSet parameters,
             IExternalReferenceSet externalReferences,
             Network network
@@ -41,9 +43,9 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors
                 new IndependentGreatGrannyInfo<TGreatGranny, TGreatGrannyProcessor, TGreatGrannyParameterSet, TResult>(
                     greatGrannyProcessor,
                     () => CreateGreatGrannyParameterSet(parameters),
-                    (g, r) => r.TypedGreatGranny = g
+                    (g, r) => r.GreatGranny = g
                     ),
-                new DependentGreatGrannyInfo<IExpression, IGrannyProcessor<IExpression, TExpressionParameterSet>, TExpressionParameterSet, TResult>(
+                new DependentGreatGrannyInfo<IExpression, TExpressionProcessor, TExpressionParameterSet, TResult>(
                     expressionProcessor,
                     (g) => CreateExpressionParameterSet(externalReferences, parameters, g.Neuron, network),
                     (g, r) => r.Expression = g

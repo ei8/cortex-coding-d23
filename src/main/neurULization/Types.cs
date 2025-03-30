@@ -4,24 +4,13 @@ using System.Threading.Tasks;
 
 namespace ei8.Cortex.Coding.d23.neurULization
 {
-    public delegate IGranny GrannyProcessCallback<TGranny, TGrannyProcessor, TParameterSet, TAggregate>(
+    public delegate bool GrannyProcessCallback<TGranny, TGrannyProcessor, TParameterSet, TAggregate>(
         TGrannyProcessor grannyProcessor,
         Network network,
         TParameterSet parameters,
         Action<TGranny, TAggregate> aggregateUpdater,
-        TAggregate aggregate
-    )
-        where TGranny : IGranny
-        where TGrannyProcessor : IGrannyProcessor<TGranny, TParameterSet>
-        where TParameterSet : IParameterSet
-        where TAggregate : IGranny;
-
-    public delegate Task<IGranny> AsyncGrannyProcessCallback<TGranny, TGrannyProcessor, TParameterSet, TAggregate>(
-        TGrannyProcessor grannyProcessor,
-        Network network,
-        TParameterSet parameters,
-        Action<TGranny, TAggregate> aggregateUpdater,
-        TAggregate aggregate
+        TAggregate aggregate,
+        out TGranny result
     )
         where TGranny : IGranny
         where TGrannyProcessor : IGrannyProcessor<TGranny, TParameterSet>

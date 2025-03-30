@@ -96,7 +96,9 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
             );
 
         public bool TryParse(Network network, IInstanceParameterSet parameters, out IInstance result) =>
-            new Instance().AggregateTryParse(
+            this.TryParseAggregate(
+                () => new Instance(),
+                parameters,
                 InstanceReader.CreateGreatGrannies(
                     this.instantiatesClassReader,
                     this.propertyValueAssociationReader,

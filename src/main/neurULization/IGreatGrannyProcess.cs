@@ -11,11 +11,12 @@ namespace ei8.Cortex.Coding.d23.neurULization
             out IParameterSet parameters
         );
 
-        IGranny Execute(
+        bool TryExecute(
             IGreatGrannyInfo<TAggregate> greatGrannyInfo, 
             Network network, 
             TAggregate aggregate, 
-            IParameterSet parameters
+            IParameterSet parameters,
+            out IGranny result
         );
 
         void UpdateAggregate(

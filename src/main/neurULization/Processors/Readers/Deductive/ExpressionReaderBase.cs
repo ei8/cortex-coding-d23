@@ -20,8 +20,10 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
         TResult,
         TParameterSet,
         IExpressionParameterSet,
+        IExpressionReader,
         IUnitParameterSet
-    >
+    >,
+        IGrannyReader<TResult, TParameterSet>
         where TGreatGranny : IGranny
         where TGreatGrannyParameterSet : IDeductiveParameterSet
         where TGreatGrannyReader : IGrannyReader<TGreatGranny, TGreatGrannyParameterSet>
@@ -61,7 +63,9 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
             };
 
         public bool TryParse(Network network, TParameterSet parameters, out TResult result) =>
-            new TResultDerived().AggregateTryParse(
+            this.TryParseAggregate(
+                () => new TResultDerived(),
+                parameters,
                 this.CreateGreatGrannies(
                     this.greatGrannyReader,
                     this.expressionReader,

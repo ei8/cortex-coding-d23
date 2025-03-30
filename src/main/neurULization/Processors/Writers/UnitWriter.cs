@@ -14,31 +14,45 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
             this.reader = reader;
         }
 
-        public IUnit Build(Network network, IUnitParameterSet parameters)
+        public bool TryBuild(Network network, IUnitParameterSet parameters, out IUnit result)
         {
-            var result = new Unit();
+            result = null;
+            var bResult = false;
 
-            GrannyExtensions.Log($"Building '{typeof(IUnit).Name}'...", 1);
-
-            result.Value = network.AddOrGetIfExists(parameters.Value);
-            result.Type = network.AddOrGetIfExists(parameters.Type);
-            result.Neuron = network.AddOrGetIfExists(Neuron.CreateTransient(null, null, null));
-
-            new[]
+            try
             {
-                Tuple.Create(nameof(Unit.Value), result.Value),
-                Tuple.Create(nameof(Unit.Type), result.Type)
-            }.ToList().ForEach(n =>
+                GrannyExtensions.Log($"Building '{typeof(IUnit).Name}'...", 1);
+
+                var tempResult = new Unit()
+                {
+                    Value = network.AddOrGetIfExists(parameters.Value),
+                    Type = network.AddOrGetIfExists(parameters.Type),
+                    Neuron = network.AddOrGetIfExists(Neuron.CreateTransient(null, null, null))
+                };
+
+                new[]
+                {
+                    Tuple.Create(nameof(Unit.Value), tempResult.Value),
+                    Tuple.Create(nameof(Unit.Type), tempResult.Type)
+                }.ToList().ForEach(n =>
+                {
+                    var terminal = Terminal.CreateTransient(tempResult.Neuron.Id, n.Item2.Id);
+                    GrannyExtensions.Log($"Linking postsynaptic: {terminal.PostsynapticNeuronId} - '{n.Item2.Tag}' ({n.Item1})", 2);
+                    // add dependency to network
+                    network.AddReplace(terminal);
+                });
+
+                GrannyExtensions.Log($"DONE... Id: {tempResult.Neuron.Id}", 1);
+
+                result = tempResult;
+                bResult = true;
+            }
+            catch (Exception ex)
             {
-                var terminal = Terminal.CreateTransient(result.Neuron.Id, n.Item2.Id);
-                GrannyExtensions.Log($"Linking postsynaptic: {terminal.PostsynapticNeuronId} - '{n.Item2.Tag}' ({n.Item1})", 2);
-                // add dependency to network
-                network.AddReplace(terminal);
-            });
+                GrannyExtensions.Log($"Error: {ex}");
+            }
 
-            GrannyExtensions.Log($"DONE... Id: {result.Neuron.Id}", 1);
-
-            return result;
+            return bResult;
         }
 
         public IGrannyReader<IUnit, IUnitParameterSet> Reader => this.reader;

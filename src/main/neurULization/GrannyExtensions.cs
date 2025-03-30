@@ -50,7 +50,7 @@ namespace ei8.Cortex.Coding.d23.neurULization
                 if (depth == 0 && lesserGranny is ILesserGranny<TGreatGranny> lg)
                 {
                     bResult = true;
-                    result = lg.TypedGreatGranny;
+                    result = lg.GreatGranny;
                 }
                 else if (lesserGranny is ILesserGranny && lesserGranny.GetGreatGranny<TGreatGranny>() is ILesserGranny lg2)
                     bResult = lg2.TryGetGreatGranny(out result, depth - 1);
@@ -65,7 +65,7 @@ namespace ei8.Cortex.Coding.d23.neurULization
             IGranny result = null;
 
             if (lesserGranny is ILesserGranny<TGreatGranny> lggg)
-                result = lggg.TypedGreatGranny;
+                result = lggg.GreatGranny;
 
             return result;
         }

@@ -25,8 +25,10 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
             this.reader = reader;
         }
 
-        public IInstance Build(Network network, IInstanceParameterSet parameters) =>
-            new Instance().AggregateBuild(
+        public bool TryBuild(Network network, IInstanceParameterSet parameters, out IInstance result) =>
+            this.TryBuildAggregate(
+                () => new Instance(),
+                parameters,
                 InstanceWriter.CreateGreatGrannies(
                     this.instantiatesClassWriter,
                     this.propertyValueAssociationWriter,
@@ -36,25 +38,26 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
                 new IGreatGrannyProcess<IInstance>[]
                 {
                     new GreatGrannyProcess<IInstantiatesClass, IInstantiatesClassWriter, IInstantiatesClassParameterSet, IInstance>(
-                        ProcessHelper.ParseBuild
+                        ProcessHelper.TryParseBuild
                     )
                 }.Concat(
                     parameters.PropertyAssociationsParameters.OfType<IPropertyValueAssociationParameterSet>().Select(
                         u => new GreatGrannyProcess<IPropertyValueAssociation, IPropertyValueAssociationWriter, IPropertyValueAssociationParameterSet, IInstance>(
-                            ProcessHelper.ParseBuild
+                            ProcessHelper.TryParseBuild
                         )
                     )
                 ).Concat(
                     parameters.PropertyAssociationsParameters.OfType<IPropertyInstanceValueAssociationParameterSet>().Select(
                         u => new GreatGrannyProcess<IPropertyInstanceValueAssociation, IPropertyInstanceValueAssociationWriter, IPropertyInstanceValueAssociationParameterSet, IInstance>(
-                            ProcessHelper.ParseBuild
+                            ProcessHelper.TryParseBuild
                         )
                     )
                 ),
                 network,
+                out result,
                 () =>
                 {
-                    Neuron result = network.AddOrGetIfExists(
+                    Neuron netResult = network.AddOrGetIfExists(
                         Neuron.CreateTransient(
                             parameters.Id,
                             parameters.Tag,
@@ -64,7 +67,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
                         // TODO: no longer necessary?
                         // writeOptions.OperationOptions.Mode == WriteMode.Update
                     );
-                    return result;
+                    return netResult;
                 },
                 (r) => new[]
                 {

@@ -1,6 +1,7 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
 using ei8.Cortex.Coding.d23.neurULization.Queries;
 using ei8.Cortex.Library.Common;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -88,8 +89,10 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
             return result;
         }
 
-        internal static bool AggregateTryParse<TAggregate>(
-            this TAggregate aggregate,
+        internal static bool TryParseAggregate<TReader, TParameterSet, TAggregate>(
+            this TReader reader,
+            Func<TAggregate> resultConstructor,
+            TParameterSet parameters,
             IEnumerable<IGreatGrannyInfo<TAggregate>> candidates,
             IEnumerable<IGreatGrannyProcess<TAggregate>> targets,
             Network network,
@@ -97,36 +100,45 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
             bool setGrannyNeuronOnCompletion = true
         )
             where TAggregate : IGranny
+            where TParameterSet : IDeductiveParameterSet
+            where TReader : IGrannyReader<TAggregate, TParameterSet>
         {
             result = default;
+            bool bResult = false;
 
+            var tempResult = resultConstructor();
             IGranny precedingGranny = null;
             var ts = targets.ToArray();
             for (int i = 0; i < ts.Length; i++)
             {
                 var candidate = candidates.ElementAt(i);
-                if (ts[i].TryGetParameters(
-                        precedingGranny,
-                        candidate,
-                        out IParameterSet parameters
-                    ) && (
-                        precedingGranny = ts[i].Execute(
+                if (
+                    !(
+                        ts[i].TryGetParameters(
+                            precedingGranny,
+                            candidate,
+                            out IParameterSet executionParameters
+                        ) &&
+                        ts[i].TryExecute(
                             candidate,
                             network,
-                            aggregate,
-                            parameters
+                            tempResult,
+                            executionParameters,
+                            out precedingGranny
                         )
-                    ) == null)
+                    )
+                )
                     break;
                 else if (i == ts.Length - 1)
                 {
                     if (setGrannyNeuronOnCompletion)
-                        aggregate.Neuron = precedingGranny.Neuron;
-                    result = aggregate;
+                        tempResult.Neuron = precedingGranny.Neuron;
+                    result = tempResult;
+                    bResult = true;
                 }
             }
 
-            return result != null;
+            return bResult;
         }
     }
 }

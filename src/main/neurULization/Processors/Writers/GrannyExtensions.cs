@@ -7,10 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Runtime.CompilerServices;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Xml.Linq;
 
 namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
 {
@@ -26,11 +23,12 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
         /// <param name="options"></param>
         /// <param name="writeParameters"></param>
         /// <returns></returns>
-        public static TGranny ParseBuild<TGranny, TGrannyWriter, TParameterSet>(
+        public static bool TryParseBuild<TGranny, TGrannyWriter, TParameterSet>(
             this TGrannyWriter grannyWriter,
             Network network,
-            TParameterSet writeParameters
-            )
+            TParameterSet writeParameters,
+            out TGranny result
+        )
             where TGranny : IGranny
             where TGrannyWriter : IGrannyWriter<TGranny, TParameterSet>
             where TParameterSet : IDeductiveParameterSet
@@ -38,83 +36,114 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
             AssertionConcern.AssertArgumentNotNull(network, nameof(network));
             AssertionConcern.AssertArgumentNotNull(writeParameters, nameof(writeParameters));
 
-            TGranny result = default;
-            // if target is not in specified network
-            if (!grannyWriter.Reader.TryParse(
+            result = default;
+            var bResult = grannyWriter.Reader.TryParse(
                 network,
-                writeParameters, 
+                writeParameters,
                 out result
-                ))
+            );
+            // if target is not in specified network
+            if (!bResult)
                 // build in network
-                result = grannyWriter.Build(
+                bResult = grannyWriter.TryBuild(
                     network,
-                    writeParameters
+                    writeParameters,
+                    out result
                 );
 
-            return result;
+            return bResult;
         }
 
-        internal static TResult AggregateBuild<TResult>(
-            this TResult tempResult,
+        internal static bool TryBuildAggregate<TWriter, TParameterSet, TResult>(
+            this TWriter writer,
+            Func<TResult> resultConstructor,
+            TParameterSet parameters,
             IEnumerable<IGreatGrannyInfo<TResult>> processes,
             IEnumerable<IGreatGrannyProcess<TResult>> targets,
             Network network,
+            out TResult result,
             Func<Neuron> grannyNeuronCreator = null,
             Func<TResult, IEnumerable<PostsynapticInfo>> postsynapticsRetriever = null
         )
             where TResult : IGranny
+            where TParameterSet : IDeductiveParameterSet
+            where TWriter : IGrannyWriter<TResult, TParameterSet>
         {
-            GrannyExtensions.Log($"Building aggregate '{typeof(TResult).Name}'...");
+            var bResult = false;
+            result = default;
 
-            IGranny precedingGranny = null;
-
-            var ts = targets.ToArray();
-            for (int i = 0; i < ts.Length; i++)
+            try
             {
-                var candidate = processes.ElementAt(i);
+                GrannyExtensions.Log($"Building aggregate '{typeof(TResult).Name}'...");
 
-                if(ts[i].TryGetParameters(
-                    precedingGranny,
-                    candidate,
-                    out IParameterSet parameters
-                ))
-                    precedingGranny = ts[i].Execute(
-                        candidate,
-                        network,
-                        tempResult,
-                        parameters
-                    );
-            }
+                var tempResult = resultConstructor();
+                IGranny precedingGranny = null;
+                var ts = targets.ToArray();
 
-            tempResult.Neuron = grannyNeuronCreator != null ?
-                grannyNeuronCreator() :
-                precedingGranny.Neuron;
-
-            IEnumerable<PostsynapticInfo> postsynaptics = null;
-            if (
-                postsynapticsRetriever != null &&
-                (postsynaptics = postsynapticsRetriever(tempResult)) != null &&
-                postsynaptics.Any()
-                )
-            {
-                postsynaptics.ToList().ForEach(ps =>
+                for (int i = 0; i < ts.Length; i++)
                 {
-                    GrannyExtensions.Log(
-                        $"Linking postsynaptic: {ps.Neuron.Id} - '{ps.Neuron.Tag}'" +
-                        $"{(!string.IsNullOrEmpty(ps.Name) ? $" ({ps.Name})" : string.Empty)}");
+                    var candidate = processes.ElementAt(i);
 
-                    network.AddReplace(
-                        Terminal.CreateTransient(
-                            tempResult.Neuron.Id, ps.Neuron.Id
+                    if (
+                        ts[i].TryGetParameters(
+                            precedingGranny,
+                            candidate,
+                            out IParameterSet executionParameters
+                        ) &&
+                        ts[i].TryExecute(
+                            candidate,
+                            network,
+                            tempResult,
+                            executionParameters,
+                            out precedingGranny
                         )
-                    );
+                    )
+                        GrannyExtensions.Log(
+                            $"Target {(i + 1)}/{ts.Length} execution successful."
+                        );
                 }
-                );
+
+                if (precedingGranny != null)
+                {
+                    tempResult.Neuron = grannyNeuronCreator != null ?
+                        grannyNeuronCreator() :
+                        precedingGranny.Neuron;
+
+                    IEnumerable<PostsynapticInfo> postsynaptics = null;
+                    if (
+                        postsynapticsRetriever != null &&
+                        (postsynaptics = postsynapticsRetriever(tempResult)) != null &&
+                        postsynaptics.Any()
+                        )
+                    {
+                        postsynaptics.ToList().ForEach(ps =>
+                        {
+                            GrannyExtensions.Log(
+                                $"Linking postsynaptic: {ps.Neuron.Id} - '{ps.Neuron.Tag}'" +
+                                $"{(!string.IsNullOrEmpty(ps.Name) ? $" ({ps.Name})" : string.Empty)}"
+                            );
+
+                            network.AddReplace(
+                                Terminal.CreateTransient(
+                                    tempResult.Neuron.Id, ps.Neuron.Id
+                                )
+                            );
+                        }
+                        );
+                    }
+
+                    GrannyExtensions.Log($"DONE... Id: {tempResult.Neuron.Id}");
+
+                    result = tempResult;
+                    bResult = true;
+                }
+            }
+            catch(Exception ex)
+            {
+                GrannyExtensions.Log($"Error: {ex}");
             }
 
-            GrannyExtensions.Log($"DONE... Id: {tempResult.Neuron.Id}");
-
-            return tempResult;
+            return bResult;
         }
 
         [Conditional("BUILDLOG")]
@@ -132,7 +161,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
         {
             var st = new StackTrace().ToString();
             var rootIndentation = 1;
-            var patternCount = Regex.Matches(st, nameof(AggregateBuild)).Count;
+            var patternCount = Regex.Matches(st, nameof(TryBuildAggregate)).Count;
             return patternCount + indent - rootIndentation;
         }
 

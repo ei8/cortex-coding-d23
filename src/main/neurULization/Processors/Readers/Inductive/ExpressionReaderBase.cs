@@ -90,7 +90,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                                     parameters,
                                     ((IExpression) g).Units.GetValueUnitGranniesByTypeId(this.GetValueUnitTypeId(externalReferences)).Single().Value
                                     ),
-                                (g, r) => r.TypedGreatGranny = g
+                                (g, r) => r.GreatGranny = g
                             )
                         },
                         new GreatGrannyProcess<TGreatGranny, TGreatGrannyReader , TGreatGrannyParameterSet, TResult>(

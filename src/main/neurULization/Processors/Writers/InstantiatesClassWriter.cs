@@ -22,8 +22,10 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
             this.externalReferences = externalReferences;
         }
 
-        public IInstantiatesClass Build(Network network, IInstantiatesClassParameterSet parameters) =>
-            new InstantiatesClass().AggregateBuild(
+        public bool TryBuild(Network network, IInstantiatesClassParameterSet parameters, out IInstantiatesClass result) =>
+            this.TryBuildAggregate(
+                () => new InstantiatesClass(),
+                parameters,
                 InstantiatesClassWriter.CreateGreatGrannies(
                     this.expressionWriter, 
                     parameters, 
@@ -32,10 +34,11 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
                 new IGreatGrannyProcess<IInstantiatesClass>[]
                 {
                     new GreatGrannyProcess<IExpression, IExpressionWriter, IExpressionParameterSet, IInstantiatesClass>(
-                        ProcessHelper.ParseBuild
+                        ProcessHelper.TryParseBuild
                     )
                 },
-                network
+                network,
+                out result
             );
 
         private static IEnumerable<IGreatGrannyInfo<IInstantiatesClass>> CreateGreatGrannies(

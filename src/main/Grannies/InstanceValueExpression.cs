@@ -2,7 +2,7 @@
 {
     public class InstanceValueExpression : IInstanceValueExpression
     {
-        public IInstanceValue TypedGreatGranny { get; set; }
+        public IInstanceValue GreatGranny { get; set; }
 
         public IExpression Expression { get; set; }
 
