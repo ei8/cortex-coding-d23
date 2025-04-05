@@ -28,16 +28,13 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
             this.TryBuildAggregate(
                 () => new Expression(),
                 parameters,
-                ExpressionWriter.CreateGreatGrannies(
-                    this.unitWriter,
-                    parameters
-                ),
                 parameters.UnitParameters.Select(
                     u => new GreatGrannyProcess<IUnit, IUnitWriter, IUnitParameterSet, IExpression>(
                         ProcessHelper.TryParseBuild
                     )
                 ),
                 network,
+                this.externalReferences,
                 out result,
                 () => network.AddOrGetIfExists(Neuron.CreateTransient(null, null, null)),
                 (r) =>
@@ -56,17 +53,27 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
                     )
             );
 
-        private static IEnumerable<IGreatGrannyInfo<IExpression>> CreateGreatGrannies(
-            IUnitWriter unitWriter,
-            IExpressionParameterSet parameters
-        ) =>
-            parameters.UnitParameters.Select(
-                u => new IndependentGreatGrannyInfo<IUnit, IUnitWriter, IUnitParameterSet, IExpression>(
-                    unitWriter,
-                    () => u,
-                    (g, r) => r.Units.Add(g)
-                )
-            );
+        public bool TryCreateGreatGrannies(
+            IExpressionParameterSet parameters,
+            Network network,
+            IExternalReferenceSet externalReferences,
+            out IEnumerable<IGreatGrannyInfo<IExpression>> result
+        ) => this.TryCreateGreatGranniesCore(
+            delegate (out bool bResult) {
+                bResult = true;
+                var coreBResult = true;
+                var coreResult = parameters.UnitParameters.Select(
+                    u => new IndependentGreatGrannyInfo<IUnit, IUnitWriter, IUnitParameterSet, IExpression>(
+                        this.unitWriter,
+                        () => u,
+                        (g, r) => r.Units.Add(g)
+                    )
+                );
+                bResult = coreBResult;
+                return coreResult;
+            },
+            out result
+        );
 
         internal static IEnumerable<Neuron> GetExpressionTypes(
             Func<Guid, bool, int> headCountRetriever,

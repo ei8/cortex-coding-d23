@@ -2,7 +2,7 @@
 
 namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
 {
-    public interface IInstanceReader : IGrannyReader<IInstance, IInstanceParameterSet>
+    public interface IInstanceReader : ILesserGrannyReader<IInstance, IInstanceParameterSet>
     {
     }
 }

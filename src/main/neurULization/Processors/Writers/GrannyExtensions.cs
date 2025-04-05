@@ -55,19 +55,19 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
         }
 
         internal static bool TryBuildAggregate<TWriter, TParameterSet, TResult>(
-            this TWriter writer,
+            this TWriter grannyWriter,
             Func<TResult> resultConstructor,
             TParameterSet parameters,
-            IEnumerable<IGreatGrannyInfo<TResult>> processes,
             IEnumerable<IGreatGrannyProcess<TResult>> targets,
             Network network,
+            IExternalReferenceSet externalReferences,
             out TResult result,
             Func<Neuron> grannyNeuronCreator = null,
             Func<TResult, IEnumerable<PostsynapticInfo>> postsynapticsRetriever = null
         )
             where TResult : IGranny
             where TParameterSet : IDeductiveParameterSet
-            where TWriter : IGrannyWriter<TResult, TParameterSet>
+            where TWriter : ILesserGrannyWriter<TResult, TParameterSet>
         {
             var bResult = false;
             result = default;
@@ -80,62 +80,70 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
                 IGranny precedingGranny = null;
                 var ts = targets.ToArray();
 
-                for (int i = 0; i < ts.Length; i++)
+                if (grannyWriter.TryCreateGreatGrannies(
+                    parameters,
+                    network,
+                    externalReferences, 
+                    out IEnumerable<IGreatGrannyInfo<TResult>> processes
+                ))
                 {
-                    var candidate = processes.ElementAt(i);
-
-                    if (
-                        ts[i].TryGetParameters(
-                            precedingGranny,
-                            candidate,
-                            out IParameterSet executionParameters
-                        ) &&
-                        ts[i].TryExecute(
-                            candidate,
-                            network,
-                            tempResult,
-                            executionParameters,
-                            out precedingGranny
-                        )
-                    )
-                        GrannyExtensions.Log(
-                            $"Target {(i + 1)}/{ts.Length} execution successful."
-                        );
-                }
-
-                if (precedingGranny != null)
-                {
-                    tempResult.Neuron = grannyNeuronCreator != null ?
-                        grannyNeuronCreator() :
-                        precedingGranny.Neuron;
-
-                    IEnumerable<PostsynapticInfo> postsynaptics = null;
-                    if (
-                        postsynapticsRetriever != null &&
-                        (postsynaptics = postsynapticsRetriever(tempResult)) != null &&
-                        postsynaptics.Any()
-                        )
+                    for (int i = 0; i < ts.Length; i++)
                     {
-                        postsynaptics.ToList().ForEach(ps =>
-                        {
-                            GrannyExtensions.Log(
-                                $"Linking postsynaptic: {ps.Neuron.Id} - '{ps.Neuron.Tag}'" +
-                                $"{(!string.IsNullOrEmpty(ps.Name) ? $" ({ps.Name})" : string.Empty)}"
-                            );
+                        var candidate = processes.ElementAt(i);
 
-                            network.AddReplace(
-                                Terminal.CreateTransient(
-                                    tempResult.Neuron.Id, ps.Neuron.Id
-                                )
+                        if (
+                            ts[i].TryGetParameters(
+                                precedingGranny,
+                                candidate,
+                                out IParameterSet executionParameters
+                            ) &&
+                            ts[i].TryExecute(
+                                candidate,
+                                network,
+                                tempResult,
+                                executionParameters,
+                                out precedingGranny
+                            )
+                        )
+                            GrannyExtensions.Log(
+                                $"Target {(i + 1)}/{ts.Length} execution successful."
                             );
-                        }
-                        );
                     }
 
-                    GrannyExtensions.Log($"DONE... Id: {tempResult.Neuron.Id}");
+                    if (precedingGranny != null)
+                    {
+                        tempResult.Neuron = grannyNeuronCreator != null ?
+                            grannyNeuronCreator() :
+                            precedingGranny.Neuron;
 
-                    result = tempResult;
-                    bResult = true;
+                        IEnumerable<PostsynapticInfo> postsynaptics = null;
+                        if (
+                            postsynapticsRetriever != null &&
+                            (postsynaptics = postsynapticsRetriever(tempResult)) != null &&
+                            postsynaptics.Any()
+                            )
+                        {
+                            postsynaptics.ToList().ForEach(ps =>
+                            {
+                                GrannyExtensions.Log(
+                                    $"Linking postsynaptic: {ps.Neuron.Id} - '{ps.Neuron.Tag}'" +
+                                    $"{(!string.IsNullOrEmpty(ps.Name) ? $" ({ps.Name})" : string.Empty)}"
+                                );
+
+                                network.AddReplace(
+                                    Terminal.CreateTransient(
+                                        tempResult.Neuron.Id, ps.Neuron.Id
+                                    )
+                                );
+                            }
+                            );
+                        }
+
+                        GrannyExtensions.Log($"DONE... Id: {tempResult.Neuron.Id}");
+
+                        result = tempResult;
+                        bResult = true;
+                    }
                 }
             }
             catch(Exception ex)

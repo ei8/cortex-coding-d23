@@ -89,19 +89,19 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
             return result;
         }
 
-        internal static bool TryParseAggregate<TReader, TParameterSet, TAggregate>(
-            this TReader reader,
-            Func<TAggregate> resultConstructor,
+        internal static bool TryParseAggregate<TReader, TParameterSet, TResult>(
+            this TReader grannyReader,
+            Func<TResult> resultConstructor,
             TParameterSet parameters,
-            IEnumerable<IGreatGrannyInfo<TAggregate>> candidates,
-            IEnumerable<IGreatGrannyProcess<TAggregate>> targets,
+            IEnumerable<IGreatGrannyProcess<TResult>> targets,
             Network network,
-            out TAggregate result,
+            IExternalReferenceSet externalReferences,
+            out TResult result,
             bool setGrannyNeuronOnCompletion = true
         )
-            where TAggregate : IGranny
+            where TResult : IGranny
             where TParameterSet : IDeductiveParameterSet
-            where TReader : IGrannyReader<TAggregate, TParameterSet>
+            where TReader : ILesserGrannyReader<TResult, TParameterSet>
         {
             result = default;
             bool bResult = false;
@@ -109,32 +109,41 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
             var tempResult = resultConstructor();
             IGranny precedingGranny = null;
             var ts = targets.ToArray();
-            for (int i = 0; i < ts.Length; i++)
+
+            if (grannyReader.TryCreateGreatGrannies(
+                parameters,
+                network,
+                externalReferences,
+                out IEnumerable<IGreatGrannyInfo<TResult>> candidates
+            ))
             {
-                var candidate = candidates.ElementAt(i);
-                if (
-                    !(
-                        ts[i].TryGetParameters(
-                            precedingGranny,
-                            candidate,
-                            out IParameterSet executionParameters
-                        ) &&
-                        ts[i].TryExecute(
-                            candidate,
-                            network,
-                            tempResult,
-                            executionParameters,
-                            out precedingGranny
+                for (int i = 0; i < ts.Length; i++)
+                {
+                    var candidate = candidates.ElementAt(i);
+                    if (
+                        !(
+                            ts[i].TryGetParameters(
+                                precedingGranny,
+                                candidate,
+                                out IParameterSet executionParameters
+                            ) &&
+                            ts[i].TryExecute(
+                                candidate,
+                                network,
+                                tempResult,
+                                executionParameters,
+                                out precedingGranny
+                            )
                         )
                     )
-                )
-                    break;
-                else if (i == ts.Length - 1)
-                {
-                    if (setGrannyNeuronOnCompletion)
-                        tempResult.Neuron = precedingGranny.Neuron;
-                    result = tempResult;
-                    bResult = true;
+                        break;
+                    else if (i == ts.Length - 1)
+                    {
+                        if (setGrannyNeuronOnCompletion)
+                            tempResult.Neuron = precedingGranny.Neuron;
+                        result = tempResult;
+                        bResult = true;
+                    }
                 }
             }
 

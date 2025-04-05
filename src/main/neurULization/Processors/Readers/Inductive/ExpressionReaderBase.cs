@@ -1,7 +1,6 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
 using neurUL.Common.Domain.Model;
 using System;
-using System.Linq;
 
 namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
 {
@@ -12,7 +11,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
         TResult,
         TParameterSet,
         TResultDerived
-    >
+    > : ILesserGrannyReader<TResult, TParameterSet>
         where TGreatGranny : IGranny
         where TGreatGrannyParameterSet : IInductiveParameterSet
         where TGreatGrannyReader : IGrannyReader<TGreatGranny, TGreatGrannyParameterSet>
@@ -59,58 +58,71 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
             IExternalReferenceSet externalReferences
         ) => externalReferences.Unit.Id;
 
-        protected IGreatGrannyInfoSuperset<TResult> CreateGreatGrannies(
-            TGreatGrannyReader greatGrannyReader,
-            IExpressionReader expressionReader,
+        public bool TryCreateGreatGrannies(
             TParameterSet parameters,
             Network network,
-            IExternalReferenceSet externalReferences
-        ) =>
-            GreatGrannyInfoSuperset<TResult>.Create(
-                new GreatGrannyInfoSet<TResult>[] {
-                    ProcessHelper.CreateGreatGrannyCandidateSet(
-                        network,
-                        parameters.Granny,
-                        gc => new InductiveIndependentGreatGrannyInfo<IExpression, IExpressionReader, IExpressionParameterSet, TResult>(
-                            gc,
-                            expressionReader,
-                            () => this.CreateExpressionParameterSet(externalReferences, parameters, gc, network),
-                            (g, r) => r.Expression = g
-                        ),
-                        new GreatGrannyProcess<IExpression, IExpressionReader, IExpressionParameterSet, TResult>(
-                            ProcessHelper.TryParse
-                        )
-                    ),
-                    new GreatGrannyInfoSet<TResult>(
-                        new IGreatGrannyInfo<TResult>[]
-                        {
-                            new DependentGreatGrannyInfo<TGreatGranny, TGreatGrannyReader, TGreatGrannyParameterSet, TResult>(
-                                greatGrannyReader,
-                                g => this.CreateGreatGrannyParameterSet(
-                                    parameters,
-                                    ((IExpression) g).Units.GetValueUnitGranniesByTypeId(this.GetValueUnitTypeId(externalReferences)).Single().Value
-                                    ),
-                                (g, r) => r.GreatGranny = g
+            IExternalReferenceSet externalReferences,
+            out IGreatGrannyInfoSuperset<TResult> result
+        ) => this.TryCreateGreatGranniesCore(
+            delegate (out bool bResult) {
+                bResult = true;
+                var coreBResult = true;
+                var coreResult = GreatGrannyInfoSuperset<TResult>.Create(
+                    new GreatGrannyInfoSet<TResult>[] {
+                        ProcessHelper.CreateGreatGrannyCandidateSet(
+                            network,
+                            parameters.Granny,
+                            gc => new InductiveIndependentGreatGrannyInfo<IExpression, IExpressionReader, IExpressionParameterSet, TResult>(
+                                gc,
+                                this.expressionReader,
+                                () => this.CreateExpressionParameterSet(externalReferences, parameters, gc, network),
+                                (g, r) => r.Expression = g
+                            ),
+                            new GreatGrannyProcess<IExpression, IExpressionReader, IExpressionParameterSet, TResult>(
+                                ProcessHelper.TryParse
                             )
-                        },
-                        new GreatGrannyProcess<TGreatGranny, TGreatGrannyReader , TGreatGrannyParameterSet, TResult>(
-                            ProcessHelper.TryParse
+                        ),
+                        new GreatGrannyInfoSet<TResult>(
+                            new IGreatGrannyInfo<TResult>[]
+                            {
+                                new DependentGreatGrannyInfo<TGreatGranny, TGreatGrannyReader, TGreatGrannyParameterSet, TResult>(
+                                    this.greatGrannyReader,
+                                    g => {
+                                        if (
+                                            coreBResult = ((IExpression) g).TryGetValueUnitGrannyByTypeId(
+                                                this.GetValueUnitTypeId(externalReferences), 
+                                                out IUnit vuResult
+                                            )
+                                        )
+                                            return this.CreateGreatGrannyParameterSet(
+                                                parameters,
+                                                vuResult.Value
+                                            );
+                                        else
+                                            return default;
+                                    },
+                                    (g, r) => r.GreatGranny = g
+                                )
+                            },
+                            new GreatGrannyProcess<TGreatGranny, TGreatGrannyReader, TGreatGrannyParameterSet, TResult>(
+                                ProcessHelper.TryParse
+                            )
                         )
-                    )
-                }
-            );
+                    }
+                );
+                bResult = coreBResult;
+                return coreResult;
+            },
+            out result
+        );
 
         public bool TryParse(Network network, TParameterSet parameters, out TResult result) =>
-            this.aggregateParser.TryParse<TResultDerived, TResult>(
+            this.aggregateParser.TryParse<TResultDerived, TResult, TParameterSet>(
                 parameters.Granny,
-                this.CreateGreatGrannies(
-                    this.greatGrannyReader,
-                    this.expressionReader,
-                    parameters,
-                    network,
-                    this.externalReferences
-                ),
+                this,
+                parameters,
                 network,
+                this.externalReferences,
                 out result
             );
     }

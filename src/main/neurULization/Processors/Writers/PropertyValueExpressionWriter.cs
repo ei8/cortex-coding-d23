@@ -40,6 +40,6 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
             Neuron greatGranny,
             Network network
         ) =>
-            ProcessorExtensions.CreatePropertyValueExpressionParameterSet(externalReferences, greatGranny);
+            Readers.Deductive.ProcessorExtensions.CreatePropertyValueExpressionParameterSet(externalReferences, greatGranny);
     }
 }

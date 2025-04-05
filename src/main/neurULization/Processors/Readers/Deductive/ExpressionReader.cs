@@ -19,14 +19,27 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
             this.externalReferences = externalReferences;
         }
 
-        private static IEnumerable<IGreatGrannyInfo<IExpression>> CreateGreatGrannies(IUnitReader unitReader, IExpressionParameterSet parameters) =>
-            parameters.UnitParameters.Select(
-                u => new IndependentGreatGrannyInfo<IUnit, IUnitReader, IUnitParameterSet, IExpression>(
-                    unitReader,
-                    () => u,
-                    (g, r) => r.Units.Add(g)
-                )
-            );
+        public bool TryCreateGreatGrannies(
+            IExpressionParameterSet parameters,
+            Network network,
+            IExternalReferenceSet externalReferences,
+            out IEnumerable<IGreatGrannyInfo<IExpression>> result
+        ) => this.TryCreateGreatGranniesCore(
+            delegate (out bool bResult) {
+                bResult = true;
+                var coreBResult = true;
+                var coreResult = parameters.UnitParameters.Select(
+                    u => new IndependentGreatGrannyInfo<IUnit, IUnitReader, IUnitParameterSet, IExpression>(
+                        unitReader,
+                        () => u,
+                        (g, r) => r.Units.Add(g)
+                    )
+                );
+                bResult = coreBResult;
+                return coreResult;
+            },
+            out result
+        );
 
         public IEnumerable<IGrannyQuery> GetQueries(Network network, IExpressionParameterSet parameters) =>
             ExpressionReader.GetQueryByType(this.externalReferences, parameters, this.unitReader);
@@ -151,13 +164,13 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
             this.TryParseAggregate(
                 () => new Expression(),
                 parameters,
-                ExpressionReader.CreateGreatGrannies(this.unitReader, parameters),
                 parameters.UnitParameters.Select(
                     u => new GreatGrannyProcess<IUnit, IUnitReader, IUnitParameterSet, IExpression>(
                         ProcessHelper.TryParse
                     )
                 ),
                 network,
+                this.externalReferences,
                 out IExpression tempResult,
                 false
             );
@@ -167,12 +180,12 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                 tempResult.TryParseCore(
                     network,
                     // start from the Head units
-                    tempResult.Units.GetValueUnitGranniesByTypeId(this.externalReferences.Unit.Id).Select(u => u.Neuron.Id),
+                    tempResult.GetValueUnitGranniesByTypeId(this.externalReferences.Unit.Id).Select(u => u.Neuron.Id),
                     new[]
                     {
                         // get the presynaptic via the siblings of the head and subordination
                         new LevelParser(new PresynapticByPostsynapticSibling(
-                            tempResult.Units.GetValueUnitGranniesByTypeId(this.externalReferences.Unit.Id, false)
+                            tempResult.GetValueUnitGranniesByTypeId(this.externalReferences.Unit.Id, false)
                                 .Select(i => i.Neuron.Id)
                                 .Concat(
                                     GetExpressionTypes(

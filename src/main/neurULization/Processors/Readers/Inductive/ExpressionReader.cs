@@ -7,66 +7,80 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
     public class ExpressionReader : IExpressionReader
     {
         private readonly IUnitReader unitReader;
+        private readonly IExternalReferenceSet externalReferences;
         private readonly IAggregateParser aggregateParser;
         private static readonly IGreatGrannyProcess<IExpression> target = new GreatGrannyProcess<IUnit, IUnitReader, IUnitParameterSet, IExpression>(
             ProcessHelper.TryParse
         );
 
-        public ExpressionReader(IUnitReader unitReader, IAggregateParser aggregateParser)
+        public ExpressionReader(
+            IUnitReader unitReader,
+            IExternalReferenceSet externalReferences,
+            IAggregateParser aggregateParser
+        )
         {
             AssertionConcern.AssertArgumentNotNull(unitReader, nameof(unitReader));
+            AssertionConcern.AssertArgumentNotNull(externalReferences, nameof(externalReferences));
             AssertionConcern.AssertArgumentNotNull(aggregateParser, nameof(aggregateParser));
 
             this.unitReader = unitReader;
+            this.externalReferences = externalReferences;
             this.aggregateParser = aggregateParser;
         }
 
-        private static IGreatGrannyInfoSuperset<IExpression> CreateGreatGrannies(
-            IUnitReader unitReader,
-            IExpressionParameterSet parameters,
-            Network network
-        ) =>
-            ProcessHelper.CreateGreatGrannyCandidateSets(
-                network,
-                parameters.Granny,
-                parameters.UnitParameters.Where(up => up.Granny == null),
-                (gc, up) => new InductiveIndependentGreatGrannyInfo<IUnit, IUnitReader, IUnitParameterSet, IExpression>(
-                    gc,
-                    unitReader,
-                    () => UnitParameterSet.Create(
+        public bool TryCreateGreatGrannies(
+            IExpressionParameterSet parameters, 
+            Network network, 
+            IExternalReferenceSet externalReferences, 
+            out IGreatGrannyInfoSuperset<IExpression> result
+        ) => this.TryCreateGreatGranniesCore(
+            delegate (out bool bResult) {
+                bResult = true;
+                var coreBResult = true;
+                var coreResult = ProcessHelper.CreateGreatGrannyCandidateSets(
+                    network,
+                    parameters.Granny,
+                    parameters.UnitParameters.Where(up => up.Granny == null),
+                    (gc, up) => new InductiveIndependentGreatGrannyInfo<IUnit, IUnitReader, IUnitParameterSet, IExpression>(
                         gc,
-                        up.Value,
-                        up.Type
-                    ),
-                    (g, r) => r.Units.Add(g)
-                ),
-                ExpressionReader.target
-            ).Concat(
-                new GreatGrannyInfoSet<IExpression>(
-                    parameters.UnitParameters.Where(up => up.Granny != null).Select(
-                        up => new InductiveIndependentGreatGrannyInfo<IUnit, IUnitReader, IUnitParameterSet, IExpression>(
-                            up.Granny,
-                            unitReader,
-                            () => UnitParameterSet.CreateWithGrannyAndType(
-                                    up.Granny,
-                                    up.Type
-                                ),
-                            (g, r) => r.Units.Add(g)
-                        )
+                        unitReader,
+                        () => UnitParameterSet.Create(
+                            gc,
+                            up.Value,
+                            up.Type
+                        ),
+                        (g, r) => r.Units.Add(g)
                     ),
                     ExpressionReader.target
-                ).AsSuperset()
-            );
+                ).Concat(
+                    new GreatGrannyInfoSet<IExpression>(
+                        parameters.UnitParameters.Where(up => up.Granny != null).Select(
+                            up => new InductiveIndependentGreatGrannyInfo<IUnit, IUnitReader, IUnitParameterSet, IExpression>(
+                                up.Granny,
+                                unitReader,
+                                () => UnitParameterSet.CreateWithGrannyAndType(
+                                        up.Granny,
+                                        up.Type
+                                    ),
+                                (g, r) => r.Units.Add(g)
+                            )
+                        ),
+                        ExpressionReader.target
+                    ).AsSuperset()
+                );
+                bResult = coreBResult;
+                return coreResult;
+            },
+            out result
+        );
 
         public bool TryParse(Network network, IExpressionParameterSet parameters, out IExpression result) =>
-            this.aggregateParser.TryParse<Expression, IExpression>(
+            this.aggregateParser.TryParse<Expression, IExpression, IExpressionParameterSet>(
                 parameters.Granny,
-                ExpressionReader.CreateGreatGrannies(
-                    this.unitReader,
-                    parameters,
-                    network
-                ),
+                this,
+                parameters,
                 network,
+                this.externalReferences,
                 out result
             );
     }

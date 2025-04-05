@@ -3,7 +3,7 @@ using ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive;
 
 namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
 {
-    public interface IExpressionWriter : IGrannyWriter<IExpression, IExpressionParameterSet>
+    public interface IExpressionWriter : ILesserGrannyWriter<IExpression, IExpressionParameterSet>
     {
     }
 }

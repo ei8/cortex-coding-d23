@@ -1,7 +1,6 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
 using ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
 {
@@ -26,11 +25,6 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
             this.TryBuildAggregate(
                 () => new InstantiatesClass(),
                 parameters,
-                InstantiatesClassWriter.CreateGreatGrannies(
-                    this.expressionWriter, 
-                    parameters, 
-                    this.externalReferences
-                ),
                 new IGreatGrannyProcess<IInstantiatesClass>[]
                 {
                     new GreatGrannyProcess<IExpression, IExpressionWriter, IExpressionParameterSet, IInstantiatesClass>(
@@ -38,22 +32,35 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
                     )
                 },
                 network,
+                this.externalReferences,
                 out result
             );
 
-        private static IEnumerable<IGreatGrannyInfo<IInstantiatesClass>> CreateGreatGrannies(
-            IExpressionWriter expressionWriter, 
-            IInstantiatesClassParameterSet parameters, 
-            IExternalReferenceSet externalReferences
-        ) =>
-           new IGreatGrannyInfo<IInstantiatesClass>[]
-           {
-                new IndependentGreatGrannyInfo<IExpression, IExpressionWriter, IExpressionParameterSet, IInstantiatesClass>(
-                    expressionWriter,
-                    () => InstantiatesClassWriter.CreateSubordinationParameterSet(externalReferences, parameters),
-                    (g, r) => r.Class = g.Units.GetValueUnitGranniesByTypeId(externalReferences.DirectObject.Id).Single()
-                )
-           };
+        public bool TryCreateGreatGrannies(
+            IInstantiatesClassParameterSet parameters,
+            Network network,
+            IExternalReferenceSet externalReferences,
+            out IEnumerable<IGreatGrannyInfo<IInstantiatesClass>> result
+        ) => this.TryCreateGreatGranniesCore(
+            delegate (out bool bResult) {
+                bResult = true;
+                var coreBResult = true;
+                var coreResult = new IGreatGrannyInfo<IInstantiatesClass>[]
+                {
+                    new IndependentGreatGrannyInfo<IExpression, IExpressionWriter, IExpressionParameterSet, IInstantiatesClass>(
+                        expressionWriter,
+                        () => InstantiatesClassWriter.CreateSubordinationParameterSet(externalReferences, parameters),
+                        (g, r) => {
+                            if (coreBResult = g.TryGetValueUnitGrannyByTypeId(externalReferences.DirectObject.Id, out IUnit vuResult))
+                                r.Class = vuResult;
+                        }
+                    )
+                };
+                bResult = coreBResult;
+                return coreResult;
+            },
+            out result
+        );
 
         private static ExpressionParameterSet CreateSubordinationParameterSet(IExternalReferenceSet externalReferences, IInstantiatesClassParameterSet parameters)
         {

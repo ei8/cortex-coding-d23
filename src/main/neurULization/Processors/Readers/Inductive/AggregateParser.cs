@@ -24,14 +24,17 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
             this.skipIds = new List<string>();
         }
 
-        public bool TryParse<TResultDerived, TResult>(
+        public bool TryParse<TResultDerived, TResult, TParameterSet>(
             Neuron granny,
-            IGreatGrannyInfoSuperset<TResult> candidateSets,
+            ILesserGrannyReader<TResult, TParameterSet> grannyReader,
+            TParameterSet parameters,
             Network network,
+            IExternalReferenceSet externalReferences,
             out TResult aggregate
         )
             where TResultDerived : TResult, new()
             where TResult : IGranny
+            where TParameterSet : IParameterSet
         {
             aggregate = default;
 
@@ -39,141 +42,144 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
 
             int successCount = 0;
             IGranny precedingGranny = null;
-            var candidateSetsList = candidateSets.Items.ToList();
-
-            AggregateParser.LogParse<TResult>(granny);
-
-            foreach (var candidateSet in candidateSetsList)
+            if (grannyReader.TryCreateGreatGrannies(parameters, network, externalReferences, out IGreatGrannyInfoSuperset<TResult> candidateSets))
             {
-                AggregateParser.LogProcessStart(
-                    $"Analyzing candidate set... " +
-                    $"({candidateSetsList.IndexOf(candidateSet) + 1}/{candidateSetsList.Count()})", 
-                    1, 
-                    true
-                );
-                var candidateSetItemsList = candidateSet.Items.ToList();
-                foreach (var candidate in candidateSetItemsList)
+                var candidateSetsList = candidateSets.Items.ToList();
+
+                AggregateParser.LogParse<TResult>(granny);
+
+                foreach (var candidateSet in candidateSetsList)
                 {
-                    AggregateParser.LogCandidateDetails<TResult>(
-                        candidate,
-                        precedingGranny,
-                        candidateSetItemsList
+                    AggregateParser.LogProcessStart(
+                        $"Analyzing candidate set... " +
+                        $"({candidateSetsList.IndexOf(candidateSet) + 1}/{candidateSetsList.Count()})",
+                        1,
+                        true
                     );
-
-                    IGranny tempPrecedingGranny = null;
-
-                    // GetParameters before calling TryParse
-                    if (candidateSet.Target.TryGetParameters(
-                        precedingGranny,
-                        candidate,
-                        out IParameterSet parameters
-                    ))
+                    var candidateSetItemsList = candidateSet.Items.ToList();
+                    foreach (var candidate in candidateSetItemsList)
                     {
-                        AggregateParser.LogCandidateLine($"Obtaining parameters... SUCCESS");
-                        AggregateParser.LogPropertyName(parameters);
+                        AggregateParser.LogCandidateDetails<TResult>(
+                            candidate,
+                            precedingGranny,
+                            candidateSetItemsList
+                        );
 
-                        // ...formulate cacheId
-                        bool createCacheIdResult = AggregateParser.TryCreateCacheId(candidate, precedingGranny, parameters, out string cacheId);
+                        IGranny tempPrecedingGranny = null;
 
-                        var createCacheIdResultString = createCacheIdResult ? $" SUCCESS - {cacheId}" : "FAIL";
-
-                        AggregateParser.LogCandidateLine($"Creating cacheId...{createCacheIdResultString}");
-
-                        var retrievalResult = false;
-                        var retrievalDetails = new StringBuilder();
-                        var skipping = this.skipIds.Contains(cacheId);
-                        if (!skipping)
+                        // GetParameters before calling TryParse
+                        if (candidateSet.Target.TryGetParameters(
+                            precedingGranny,
+                            candidate,
+                            out IParameterSet candidateParameters
+                        ))
                         {
-                            if (createCacheIdResult)
-                                AggregateParser.LogProcessStart("Retrieving from cache...", 3);
+                            AggregateParser.LogCandidateLine($"Obtaining parameters... SUCCESS");
+                            AggregateParser.LogPropertyName(candidateParameters);
 
-                            // ... check cache
-                            if (retrievalResult = createCacheIdResult && this.cache.TryGetValue(cacheId, out tempPrecedingGranny))
+                            // ...formulate cacheId
+                            bool createCacheIdResult = AggregateParser.TryCreateCacheId(candidate, precedingGranny, candidateParameters, out string cacheId);
+
+                            var createCacheIdResultString = createCacheIdResult ? $" SUCCESS - {cacheId}" : "FAIL";
+
+                            AggregateParser.LogCandidateLine($"Creating cacheId...{createCacheIdResultString}");
+
+                            var retrievalResult = false;
+                            var retrievalDetails = new StringBuilder();
+                            var skipping = this.skipIds.Contains(cacheId);
+                            if (!skipping)
                             {
-                                if (!this.updatedGrannyCandidates.Any(ugc => ugc.Item1 == tempPrecedingGranny && ugc.Item2 == (IGranny)tempAggregate))
-                                {
-                                    AggregateParser.LogDetails("Updating aggregate...", retrievalDetails, 4);
-                                    candidateSet.Target.UpdateAggregate(candidate, tempPrecedingGranny, tempAggregate);
-                                    this.updatedGrannyCandidates.Add(Tuple.Create(tempPrecedingGranny,
-                                        (IGranny)tempAggregate));
-                                }
-                                precedingGranny = tempPrecedingGranny;
-                                successCount++;
-                            }
-                        }
-                        else
-                            AggregateParser.LogProcessStart("Skipped...", 3);
-
-                        if (createCacheIdResult)
-                            AggregateParser.LogResultInline(retrievalResult, candidateSets.Count, successCount, retrievalDetails);
-
-                        if (retrievalResult)
-                        {
-                            AggregateParser.LogCandidateSetProgress(retrievalResult, candidateSets.Count, successCount, null);
-                            break;
-                        }
-                        else if (skipping)
-                        {
-                            AggregateParser.LogCandidateSetProgress(retrievalResult, candidateSets.Count, successCount, null);
-                            continue;
-                        }
-                        else
-                        {
-                            var parseResult = candidateSet.Target.TryExecute(
-                                candidate,
-                                network,
-                                tempAggregate,
-                                parameters,
-                                out tempPrecedingGranny
-                            );
-                            var parseDetails = new StringBuilder();
-
-                            if (parseResult)
-                            {
-                                AggregateParser.LogDetails($"Parse... SUCCESS", parseDetails, 3);
-                                this.updatedGrannyCandidates.Add(Tuple.Create(tempPrecedingGranny,
-                                    (IGranny)tempAggregate));
-                                precedingGranny = tempPrecedingGranny;
-                                successCount++;
-
                                 if (createCacheIdResult)
+                                    AggregateParser.LogProcessStart("Retrieving from cache...", 3);
+
+                                // ... check cache
+                                if (retrievalResult = createCacheIdResult && this.cache.TryGetValue(cacheId, out tempPrecedingGranny))
                                 {
-                                    this.cache.Add(
-                                       cacheId,
-                                       precedingGranny
-                                    );
-                                    AggregateParser.LogDetails($"Added to cache.", parseDetails, 4);
+                                    if (!this.updatedGrannyCandidates.Any(ugc => ugc.Item1 == tempPrecedingGranny && ugc.Item2 == (IGranny)tempAggregate))
+                                    {
+                                        AggregateParser.LogDetails("Updating aggregate...", retrievalDetails, 4);
+                                        candidateSet.Target.UpdateAggregate(candidate, tempPrecedingGranny, tempAggregate);
+                                        this.updatedGrannyCandidates.Add(Tuple.Create(tempPrecedingGranny,
+                                            (IGranny)tempAggregate));
+                                    }
+                                    precedingGranny = tempPrecedingGranny;
+                                    successCount++;
                                 }
-                                else
-                                    AggregateParser.LogDetails($"No cacheId, unable to cache.", parseDetails, 4);
+                            }
+                            else
+                                AggregateParser.LogProcessStart("Skipped...", 3);
+
+                            if (createCacheIdResult)
+                                AggregateParser.LogResultInline(retrievalResult, candidateSets.Count, successCount, retrievalDetails);
+
+                            if (retrievalResult)
+                            {
+                                AggregateParser.LogCandidateSetProgress(retrievalResult, candidateSets.Count, successCount, null);
+                                break;
+                            }
+                            else if (skipping)
+                            {
+                                AggregateParser.LogCandidateSetProgress(retrievalResult, candidateSets.Count, successCount, null);
+                                continue;
                             }
                             else
                             {
-                                AggregateParser.LogDetails($"Parse... FAIL", parseDetails, 3);
-                                if (createCacheIdResult)
+                                var parseResult = candidateSet.Target.TryExecute(
+                                    candidate,
+                                    network,
+                                    tempAggregate,
+                                    candidateParameters,
+                                    out tempPrecedingGranny
+                                );
+                                var parseDetails = new StringBuilder();
+
+                                if (parseResult)
                                 {
-                                    skipIds.Add(cacheId);
-                                    AggregateParser.LogDetails($"Added to skip list.", parseDetails, 4);
+                                    AggregateParser.LogDetails($"Parse... SUCCESS", parseDetails, 3);
+                                    this.updatedGrannyCandidates.Add(Tuple.Create(tempPrecedingGranny,
+                                        (IGranny)tempAggregate));
+                                    precedingGranny = tempPrecedingGranny;
+                                    successCount++;
+
+                                    if (createCacheIdResult)
+                                    {
+                                        this.cache.Add(
+                                           cacheId,
+                                           precedingGranny
+                                        );
+                                        AggregateParser.LogDetails($"Added to cache.", parseDetails, 4);
+                                    }
+                                    else
+                                        AggregateParser.LogDetails($"No cacheId, unable to cache.", parseDetails, 4);
                                 }
                                 else
-                                    AggregateParser.LogDetails($"No cacheId, unable to add to skip list.", parseDetails, 4);
+                                {
+                                    AggregateParser.LogDetails($"Parse... FAIL", parseDetails, 3);
+                                    if (createCacheIdResult)
+                                    {
+                                        skipIds.Add(cacheId);
+                                        AggregateParser.LogDetails($"Added to skip list.", parseDetails, 4);
+                                    }
+                                    else
+                                        AggregateParser.LogDetails($"No cacheId, unable to add to skip list.", parseDetails, 4);
+                                }
+
+                                AggregateParser.LogCandidateSetProgress(parseResult, candidateSets.Count, successCount, parseDetails);
+
+                                if (parseResult)
+                                    break;
                             }
-
-                            AggregateParser.LogCandidateSetProgress(parseResult, candidateSets.Count, successCount, parseDetails);
-
-                            if (parseResult)
-                                break;
+                        }
+                        else
+                        {
+                            AggregateParser.LogCandidateLine($"Obtaining parameters... FAIL");
+                            AggregateParser.LogCandidateSetProgress(false, candidateSets.Count, successCount, null);
                         }
                     }
-                    else
-                    {
-                        AggregateParser.LogCandidateLine($"Obtaining parameters... FAIL");
-                        AggregateParser.LogCandidateSetProgress(false, candidateSets.Count, successCount, null);
-                    }
-                }
 
-                if (successCount == candidateSets.Count)
-                    aggregate = tempAggregate;
+                    if (successCount == candidateSets.Count)
+                        aggregate = tempAggregate;
+                }
             }
 
             return aggregate != null;

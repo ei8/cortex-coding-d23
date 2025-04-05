@@ -31,7 +31,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
         }
 
         protected override IExpressionParameterSet CreateExpressionParameterSet(IExternalReferenceSet externalReferences, IInstanceValueParameterSet parameters, Neuron greatGranny, Network network) =>
-            ProcessorExtensions.CreateInstanceValueParameterSet(externalReferences, parameters.Value, greatGranny);
+            Readers.Deductive.ProcessorExtensions.CreateInstanceValueParameterSet(externalReferences, parameters.Value, greatGranny);
 
         protected override IInstantiatesClassParameterSet CreateGreatGrannyParameterSet(IInstanceValueParameterSet parameters) =>
             new InstantiatesClassParameterSet(

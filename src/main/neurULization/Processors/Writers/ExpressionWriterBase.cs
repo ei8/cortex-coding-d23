@@ -22,7 +22,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
         IExpressionWriter,
         IUnitParameterSet
     >,
-        IGrannyWriter<TResult, TParameterSet>
+        ILesserGrannyWriter<TResult, TParameterSet>
         where TGreatGranny : IGranny
         where TGreatGrannyParameterSet : class, IDeductiveParameterSet
         where TGreatGrannyWriter : IGrannyWriter<TGreatGranny, TGreatGrannyParameterSet>
@@ -31,8 +31,6 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
         where TParameterSet : IDeductiveParameterSet
         where TResultDerived : TResult, new()
     {
-        private readonly TGreatGrannyWriter greatGrannyWriter;
-        private readonly IExpressionWriter expressionWriter;
         private readonly TReader reader;
         private readonly IExternalReferenceSet externalReferences;
 
@@ -41,15 +39,11 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
             IExpressionWriter expressionWriter,
             TReader reader,
             IExternalReferenceSet externalReferences
-        )
+        ) : base(greatGrannyWriter, expressionWriter)
         {
-            AssertionConcern.AssertArgumentNotNull(greatGrannyWriter, nameof(greatGrannyWriter));
-            AssertionConcern.AssertArgumentNotNull(expressionWriter, nameof(expressionWriter));
             AssertionConcern.AssertArgumentNotNull(reader, nameof(reader));
             AssertionConcern.AssertArgumentNotNull(externalReferences, nameof(externalReferences));
 
-            this.greatGrannyWriter = greatGrannyWriter;
-            this.expressionWriter = expressionWriter;
             this.reader = reader;
             this.externalReferences = externalReferences;
         }
@@ -58,13 +52,6 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
             this.TryBuildAggregate(
                 () => new TResultDerived(),
                 parameters,
-                this.CreateGreatGrannies(
-                    this.greatGrannyWriter,
-                    this.expressionWriter,
-                    parameters,
-                    this.externalReferences,
-                    network
-                ),
                 new IGreatGrannyProcess<TResult>[]
                 {
                     new GreatGrannyProcess<TGreatGranny, TGreatGrannyWriter, TGreatGrannyParameterSet, TResult>(
@@ -75,6 +62,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
                         )
                 },
                 network,
+                this.externalReferences,
                 out result
             );
 

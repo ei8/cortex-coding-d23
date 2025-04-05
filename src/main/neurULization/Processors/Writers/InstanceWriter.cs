@@ -1,5 +1,6 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
 using ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive;
+using neurUL.Common.Domain.Model;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -11,30 +12,33 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
         private readonly IPropertyValueAssociationWriter propertyValueAssociationWriter;
         private readonly IPropertyInstanceValueAssociationWriter propertyInstanceValueAssociationWriter;
         private readonly Readers.Deductive.IInstanceReader reader;
+        private readonly IExternalReferenceSet externalReferences;
 
         public InstanceWriter(
             IInstantiatesClassWriter instantiatesClassWriter, 
             IPropertyValueAssociationWriter propertyValueAssociationWriter,
             IPropertyInstanceValueAssociationWriter propertyInstanceValueAssociationWriter,
-            Readers.Deductive.IInstanceReader reader            
+            Readers.Deductive.IInstanceReader reader,
+            IExternalReferenceSet externalReferences
         )
         {
+            AssertionConcern.AssertArgumentNotNull(instantiatesClassWriter, nameof(instantiatesClassWriter));
+            AssertionConcern.AssertArgumentNotNull(propertyValueAssociationWriter, nameof(propertyValueAssociationWriter));
+            AssertionConcern.AssertArgumentNotNull(propertyInstanceValueAssociationWriter, nameof(propertyInstanceValueAssociationWriter));
+            AssertionConcern.AssertArgumentNotNull(reader, nameof(reader));
+            AssertionConcern.AssertArgumentNotNull(externalReferences, nameof(externalReferences));
+
             this.instantiatesClassWriter = instantiatesClassWriter;
             this.propertyValueAssociationWriter = propertyValueAssociationWriter;
             this.propertyInstanceValueAssociationWriter = propertyInstanceValueAssociationWriter;
             this.reader = reader;
+            this.externalReferences = externalReferences;
         }
 
         public bool TryBuild(Network network, IInstanceParameterSet parameters, out IInstance result) =>
             this.TryBuildAggregate(
                 () => new Instance(),
                 parameters,
-                InstanceWriter.CreateGreatGrannies(
-                    this.instantiatesClassWriter,
-                    this.propertyValueAssociationWriter,
-                    this.propertyInstanceValueAssociationWriter,
-                    parameters
-                ),
                 new IGreatGrannyProcess<IInstance>[]
                 {
                     new GreatGrannyProcess<IInstantiatesClass, IInstantiatesClassWriter, IInstantiatesClassParameterSet, IInstance>(
@@ -54,6 +58,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
                     )
                 ),
                 network,
+                this.externalReferences,
                 out result,
                 () =>
                 {
@@ -78,37 +83,44 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
                 )
             );
 
-        private static IEnumerable<IGreatGrannyInfo<IInstance>> CreateGreatGrannies(
-            IInstantiatesClassWriter instantiatesClassWriter,
-            IPropertyValueAssociationWriter propertyValueAssociationWriter, 
-            IPropertyInstanceValueAssociationWriter propertyInstanceValueAssociationWriter,
-            IInstanceParameterSet parameters
-        ) =>
-            new IGreatGrannyInfo<IInstance>[]
-            {
-                new IndependentGreatGrannyInfo<IInstantiatesClass, IInstantiatesClassWriter, IInstantiatesClassParameterSet, IInstance>(
-                    instantiatesClassWriter,
-                    () => InstanceWriter.CreateInstantiatesClassParameterSet(parameters),
-                    (g, r) => r.InstantiatesClass = g
-                )
-            }.Concat(
-                parameters.PropertyAssociationsParameters.OfType<IPropertyValueAssociationParameterSet>().Select(
-                    u => new IndependentGreatGrannyInfo<IPropertyValueAssociation, IPropertyValueAssociationWriter, IPropertyValueAssociationParameterSet, IInstance>(
-                    propertyValueAssociationWriter,
-                    () => u,
-                    (g, r) => r.PropertyAssociations.Add(g)
+        public bool TryCreateGreatGrannies(
+            IInstanceParameterSet parameters,
+            Network network,
+            IExternalReferenceSet externalReferences,
+            out IEnumerable<IGreatGrannyInfo<IInstance>> result
+        ) => this.TryCreateGreatGranniesCore(
+            delegate (out bool bResult) {
+                bResult = true;
+                var coreBResult = true;
+                var coreResult = new IGreatGrannyInfo<IInstance>[]
+                {
+                    new IndependentGreatGrannyInfo<IInstantiatesClass, IInstantiatesClassWriter, IInstantiatesClassParameterSet, IInstance>(
+                        instantiatesClassWriter,
+                        () => InstanceWriter.CreateInstantiatesClassParameterSet(parameters),
+                        (g, r) => r.InstantiatesClass = g
                     )
-                )
-            ).Concat(
-                parameters.PropertyAssociationsParameters.OfType<IPropertyInstanceValueAssociationParameterSet>().Select(
-                    u => new IndependentGreatGrannyInfo<IPropertyInstanceValueAssociation, IPropertyInstanceValueAssociationWriter, IPropertyInstanceValueAssociationParameterSet, IInstance>(
-                    propertyInstanceValueAssociationWriter,
-                    () => u,
-                    (g, r) => r.PropertyAssociations.Add(g)
+                }.Concat(
+                    parameters.PropertyAssociationsParameters.OfType<IPropertyValueAssociationParameterSet>().Select(
+                        u => new IndependentGreatGrannyInfo<IPropertyValueAssociation, IPropertyValueAssociationWriter, IPropertyValueAssociationParameterSet, IInstance>(
+                        propertyValueAssociationWriter,
+                        () => u,
+                        (g, r) => r.PropertyAssociations.Add(g)
+                        )
                     )
-                )
-            );
-
+                ).Concat(
+                    parameters.PropertyAssociationsParameters.OfType<IPropertyInstanceValueAssociationParameterSet>().Select(
+                        u => new IndependentGreatGrannyInfo<IPropertyInstanceValueAssociation, IPropertyInstanceValueAssociationWriter, IPropertyInstanceValueAssociationParameterSet, IInstance>(
+                        propertyInstanceValueAssociationWriter,
+                        () => u,
+                        (g, r) => r.PropertyAssociations.Add(g)
+                        )
+                    )
+                );
+                bResult = coreBResult;
+                return coreResult;
+            },
+            out result
+        );
 
         private static IInstantiatesClassParameterSet CreateInstantiatesClassParameterSet(IInstanceParameterSet parameters) =>
             new InstantiatesClassParameterSet(

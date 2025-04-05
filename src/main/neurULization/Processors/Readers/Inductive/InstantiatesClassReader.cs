@@ -1,6 +1,5 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
 using neurUL.Common.Domain.Model;
-using System.Linq;
 
 namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
 {
@@ -28,19 +27,36 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
             this.aggregateParser = aggregateParser;
         }
 
-        private static IGreatGrannyInfoSuperset<IInstantiatesClass> CreateGreatGrannies(IExpressionReader expressionReader, IInstantiatesClassParameterSet parameters, IExternalReferenceSet externalReferences) =>
-            new GreatGrannyInfoSet<IInstantiatesClass>(
-               new IGreatGrannyInfo<IInstantiatesClass>[]
-               {
-                    new InductiveIndependentGreatGrannyInfo<IExpression, IExpressionReader, IExpressionParameterSet, IInstantiatesClass>(
-                        parameters.Granny,
-                        expressionReader,
-                        () => InstantiatesClassReader.CreateSubordinationParameterSet(externalReferences, parameters),
-                        (g, r) => r.Class = g.Units.GetValueUnitGranniesByTypeId(externalReferences.DirectObject.Id).Single()
-                    )
-               },
-               InstantiatesClassReader.target
-           ).AsSuperset();
+        public bool TryCreateGreatGrannies(
+            IInstantiatesClassParameterSet parameters, 
+            Network network, 
+            IExternalReferenceSet externalReferences, 
+            out IGreatGrannyInfoSuperset<IInstantiatesClass> result
+        ) => this.TryCreateGreatGranniesCore(
+            delegate (out bool bResult) {
+                bResult = true;
+                var coreBResult = true;
+                var coreResult = new GreatGrannyInfoSet<IInstantiatesClass>(
+                   new IGreatGrannyInfo<IInstantiatesClass>[]
+                   {
+                        new InductiveIndependentGreatGrannyInfo<IExpression, IExpressionReader, IExpressionParameterSet, IInstantiatesClass>(
+                            parameters.Granny,
+                            expressionReader,
+                            () => InstantiatesClassReader.CreateSubordinationParameterSet(externalReferences, parameters),
+                            (g, r) => {
+                                if (coreBResult = g.TryGetValueUnitGrannyByTypeId(externalReferences.DirectObject.Id, out IUnit vuResult))
+                                    r.Class = vuResult;
+                            }
+                        )
+                   },
+                   InstantiatesClassReader.target
+                ).AsSuperset();
+                bResult = coreBResult;
+                return coreResult;
+            },
+            out result
+        );
+
 
         private static ExpressionParameterSet CreateSubordinationParameterSet(IExternalReferenceSet externalReferences, IInstantiatesClassParameterSet parameters) =>
             new ExpressionParameterSet(
@@ -59,14 +75,12 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
             );
 
         public bool TryParse(Network network, IInstantiatesClassParameterSet parameters, out IInstantiatesClass result) =>
-            this.aggregateParser.TryParse<InstantiatesClass, IInstantiatesClass>(
+            this.aggregateParser.TryParse<InstantiatesClass, IInstantiatesClass, IInstantiatesClassParameterSet>(
                 parameters.Granny,
-                InstantiatesClassReader.CreateGreatGrannies(
-                    this.expressionReader, 
-                    parameters, 
-                    this.externalReferences
-                ),
+                this,
+                parameters,
                 network,
+                this.externalReferences,
                 out result
             );
     }

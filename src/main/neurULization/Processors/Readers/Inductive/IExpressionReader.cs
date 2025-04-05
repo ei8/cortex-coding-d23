@@ -2,7 +2,7 @@
 
 namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
 {
-    public interface IExpressionReader : IGrannyReader<IExpression, IExpressionParameterSet>
+    public interface IExpressionReader : ILesserGrannyReader<IExpression, IExpressionParameterSet>
     {
     }
 }

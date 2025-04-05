@@ -1,6 +1,7 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
 using ei8.Cortex.Coding.d23.neurULization.Queries;
 using ei8.Cortex.Library.Common;
+using neurUL.Common.Domain.Model;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -11,48 +12,64 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
         private readonly IInstantiatesClassReader instantiatesClassReader;
         private readonly IPropertyValueAssociationReader propertyValueAssociationReader;
         private readonly IPropertyInstanceValueAssociationReader propertyInstanceValueAssociationReader;
+        private readonly IExternalReferenceSet externalReferences;
 
         public InstanceReader(
             IInstantiatesClassReader instantiatesClassReader,
             IPropertyValueAssociationReader propertyValueAssociationReader,
-            IPropertyInstanceValueAssociationReader propertyInstanceValueAssociationReader
+            IPropertyInstanceValueAssociationReader propertyInstanceValueAssociationReader,
+            IExternalReferenceSet externalReferences
         )
         {
+            AssertionConcern.AssertArgumentNotNull(instantiatesClassReader, nameof(instantiatesClassReader));
+            AssertionConcern.AssertArgumentNotNull(propertyValueAssociationReader, nameof(propertyValueAssociationReader));
+            AssertionConcern.AssertArgumentNotNull(propertyInstanceValueAssociationReader, nameof(propertyInstanceValueAssociationReader));
+            AssertionConcern.AssertArgumentNotNull(externalReferences, nameof(externalReferences));
+
             this.instantiatesClassReader = instantiatesClassReader;
             this.propertyValueAssociationReader = propertyValueAssociationReader;
-            this.propertyInstanceValueAssociationReader=propertyInstanceValueAssociationReader;
+            this.propertyInstanceValueAssociationReader = propertyInstanceValueAssociationReader;
+            this.externalReferences = externalReferences;
         }
 
-        private static IEnumerable<IGreatGrannyInfo<IInstance>> CreateGreatGrannies(
-            IInstantiatesClassReader instantiatesClassReader,
-            IPropertyValueAssociationReader propertyValueAssociationReader,
-            IPropertyInstanceValueAssociationReader propertyInstanceValueAssociationReader,
-            IInstanceParameterSet parameters
-        ) =>
-            new IGreatGrannyInfo<IInstance>[]
-            {
-                new IndependentGreatGrannyInfo<IInstantiatesClass, IInstantiatesClassReader, IInstantiatesClassParameterSet, IInstance>(
-                    instantiatesClassReader,
-                    () => InstanceReader.CreateInstantiatesClassParameterSet(parameters),
-                    (g, r) => r.InstantiatesClass = g
-                )
-            }.Concat(
-                parameters.PropertyAssociationsParameters.OfType<IPropertyValueAssociationParameterSet>().Select(
-                    u => new IndependentGreatGrannyInfo<IPropertyValueAssociation, IPropertyValueAssociationReader, IPropertyValueAssociationParameterSet, IInstance>(
-                    propertyValueAssociationReader,
-                    () => u,
-                    (g, r) => r.PropertyAssociations.Add(g)
+        public bool TryCreateGreatGrannies(
+            IInstanceParameterSet parameters,
+            Network network,
+            IExternalReferenceSet externalReferences,
+            out IEnumerable<IGreatGrannyInfo<IInstance>> result
+        ) => this.TryCreateGreatGranniesCore(
+            delegate (out bool bResult) {
+                bResult = true;
+                var coreBResult = true;
+                var coreResult = new IGreatGrannyInfo<IInstance>[]
+                {
+                    new IndependentGreatGrannyInfo<IInstantiatesClass, IInstantiatesClassReader, IInstantiatesClassParameterSet, IInstance>(
+                        instantiatesClassReader,
+                        () => InstanceReader.CreateInstantiatesClassParameterSet(parameters),
+                        (g, r) => r.InstantiatesClass = g
                     )
-                )
-            ).Concat(
-                parameters.PropertyAssociationsParameters.OfType<IPropertyInstanceValueAssociationParameterSet>().Select(
-                    u => new IndependentGreatGrannyInfo<IPropertyInstanceValueAssociation, IPropertyInstanceValueAssociationReader, IPropertyInstanceValueAssociationParameterSet, IInstance>(
-                    propertyInstanceValueAssociationReader,
-                    () => u,
-                    (g, r) => r.PropertyAssociations.Add(g)
+                }.Concat(
+                    parameters.PropertyAssociationsParameters.OfType<IPropertyValueAssociationParameterSet>().Select(
+                        u => new IndependentGreatGrannyInfo<IPropertyValueAssociation, IPropertyValueAssociationReader, IPropertyValueAssociationParameterSet, IInstance>(
+                        propertyValueAssociationReader,
+                        () => u,
+                        (g, r) => r.PropertyAssociations.Add(g)
+                        )
                     )
-                )
-            );
+                ).Concat(
+                    parameters.PropertyAssociationsParameters.OfType<IPropertyInstanceValueAssociationParameterSet>().Select(
+                        u => new IndependentGreatGrannyInfo<IPropertyInstanceValueAssociation, IPropertyInstanceValueAssociationReader, IPropertyInstanceValueAssociationParameterSet, IInstance>(
+                        propertyInstanceValueAssociationReader,
+                        () => u,
+                        (g, r) => r.PropertyAssociations.Add(g)
+                        )
+                    )
+                );
+                bResult = coreBResult;
+                return coreResult;
+            },
+            out result
+        );
 
         private static IInstantiatesClassParameterSet CreateInstantiatesClassParameterSet(IInstanceParameterSet parameters) =>
             new InstantiatesClassParameterSet(
@@ -99,12 +116,6 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
             this.TryParseAggregate(
                 () => new Instance(),
                 parameters,
-                InstanceReader.CreateGreatGrannies(
-                    this.instantiatesClassReader,
-                    this.propertyValueAssociationReader,
-                    this.propertyInstanceValueAssociationReader,
-                    parameters
-                ),
                 new IGreatGrannyProcess<IInstance>[]
                 {
                     new GreatGrannyProcess<IInstantiatesClass, IInstantiatesClassReader, IInstantiatesClassParameterSet, IInstance>(
@@ -124,6 +135,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                     )
                 ),
                 network,
+                this.externalReferences,
                 out result
             );
     }

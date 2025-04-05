@@ -87,6 +87,6 @@ namespace ei8.Cortex.Coding.d23.neurULization
             propertyAssociation.TryGetGreatGranny(out IPropertyInstanceValueAssignment piva) && piva.Expression.HasUnitValue(unit, property);
 
         internal static bool HasUnitValue(this IExpression expression, Neuron unit, Neuron value) =>
-            expression.Units.AsEnumerable().GetValueUnitGranniesByTypeId(unit.Id).SingleOrDefault().Value.Id == value.Id;
+            expression.TryGetValueUnitGrannyByTypeId(unit.Id, out IUnit result) && result.Value.Id == value.Id;
     }
 }
