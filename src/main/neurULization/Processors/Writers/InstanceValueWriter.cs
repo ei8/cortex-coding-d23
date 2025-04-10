@@ -1,6 +1,5 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
 using ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive;
-using System.Collections.Generic;
 
 namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
 {
@@ -30,8 +29,17 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
         {
         }
 
-        protected override IExpressionParameterSet CreateExpressionParameterSet(IExternalReferenceSet externalReferences, IInstanceValueParameterSet parameters, Neuron greatGranny, Network network) =>
-            Readers.Deductive.ProcessorExtensions.CreateInstanceValueParameterSet(externalReferences, parameters.Value, greatGranny);
+        protected override IExpressionParameterSet CreateExpressionParameterSet(
+            IExternalReferenceSet externalReferences, 
+            IInstanceValueParameterSet parameters, 
+            Neuron greatGranny, 
+            Network network
+        ) =>
+            Readers.Deductive.ProcessorExtensions.CreateInstanceValueParameterSet(
+                externalReferences, 
+                parameters.Value, 
+                greatGranny
+            );
 
         protected override IInstantiatesClassParameterSet CreateGreatGrannyParameterSet(IInstanceValueParameterSet parameters) =>
             new InstantiatesClassParameterSet(
