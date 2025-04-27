@@ -2,20 +2,20 @@
 
 namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
 {
-    public class InstanceValueWriter :
+    public class IdInstanceValueWriter :
         InstanceValueWriterBase
         <
-            IInstanceValueParameterSet,
-            IInstanceValueReader,
-            IExpressionParameterSet,
-            IExpressionWriter
+            IIdInstanceValueParameterSet,
+            IIdInstanceValueReader,
+            IIdExpressionParameterSet,
+            IIdExpressionWriter
         >,
-        IInstanceValueWriter
+        IIdInstanceValueWriter
     {
-        public InstanceValueWriter(
+        public IdInstanceValueWriter(
             IInstantiatesClassWriter greatGrannyWriter,
-            IExpressionWriter expressionWriter,
-            Readers.Deductive.IInstanceValueReader reader,
+            IIdExpressionWriter expressionWriter,
+            Readers.Deductive.IIdInstanceValueReader reader,
             IExternalReferenceSet externalReferences
         ) : base(
             greatGrannyWriter,
@@ -26,16 +26,17 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
         {
         }
 
-        protected override IExpressionParameterSet CreateExpressionParameterSet(
+        protected override IIdExpressionParameterSet CreateExpressionParameterSet(
             IExternalReferenceSet externalReferences, 
-            IInstanceValueParameterSet parameters, 
+            IIdInstanceValueParameterSet parameters, 
             Neuron greatGranny, 
             Network network
         ) =>
-            Readers.Deductive.ProcessorExtensions.CreateInstanceValueParameterSet(
+            Readers.Deductive.ProcessorExtensions.CreateIdInstanceValueParameterSet(
                 externalReferences, 
                 parameters.Value, 
-                greatGranny
+                greatGranny,
+                parameters.Id
             );
     }
 }

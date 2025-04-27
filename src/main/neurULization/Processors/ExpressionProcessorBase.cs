@@ -4,7 +4,8 @@ using System.Collections.Generic;
 
 namespace ei8.Cortex.Coding.d23.neurULization.Processors
 {
-    public abstract class ExpressionProcessorBase<
+    public abstract class ExpressionProcessorBase
+    <
         TGreatGranny,
         TGreatGrannyParameterSet,
         TGreatGrannyProcessor,
@@ -13,7 +14,8 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors
         TExpressionParameterSet,
         TExpressionProcessor,
         TUnitParameterSet
-    > : IGrannyProcessor<TGranny, TParameterSet>
+    > : 
+        IGrannyProcessor<TGranny, TParameterSet>
         where TGreatGranny : IGranny
         where TGreatGrannyParameterSet : IParameterSet
         where TGreatGrannyProcessor : IGrannyProcessor<TGreatGranny, TGreatGrannyParameterSet>

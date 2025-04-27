@@ -6,6 +6,10 @@
 
         Coding.d23.neurULization.Processors.Readers.Inductive.IInstanceReader InductiveInstanceReader { get; }
 
+        Coding.d23.neurULization.Processors.Writers.IIdInstanceValueWriter IdInstanceValueWriter { get; }
+
+        Coding.d23.neurULization.Processors.Readers.Inductive.IInstanceValueReader InductiveInstanceValueReader { get; }
+
         IExternalReferenceSet ExternalReferences { get; }
     }
 }

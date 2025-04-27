@@ -3,7 +3,7 @@
 namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
 {
     public class PropertyValueAssociationReader : 
-        ExpressionReaderBase<
+        LesserExpressionReaderBase<
             IPropertyValueAssignment,
             IPropertyValueAssignmentParameterSet,
             IPropertyValueAssignmentReader,

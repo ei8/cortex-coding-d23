@@ -1,4 +1,6 @@
-﻿namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
+﻿using neurUL.Common.Domain.Model;
+
+namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
 {
     public class InstanceValueExpressionParameterSet : InstanceValueParameterSet, IInstanceValueExpressionParameterSet
     {
@@ -6,8 +8,8 @@
             Neuron value,
             Neuron @class,
             ValueMatchBy valueMatchBy
-            ) : base(value, @class, valueMatchBy)
-        {            
+        ) : base(value, @class, valueMatchBy)
+        {
         }
     }
 }

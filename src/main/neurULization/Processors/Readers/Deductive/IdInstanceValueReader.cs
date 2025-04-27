@@ -1,16 +1,16 @@
 ﻿namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
 {
-    public class InstanceValueReader : 
-        InstanceValueReaderBase<IInstanceValueParameterSet>,
-        IInstanceValueReader
+    public class IdInstanceValueReader : 
+        InstanceValueReaderBase<IIdInstanceValueParameterSet>,
+        IIdInstanceValueReader
     {
-        public InstanceValueReader(
+        public IdInstanceValueReader(
             IInstantiatesClassReader greatGrannyReader,
             IExpressionReader expressionReader,
             IExternalReferenceSet externalReferences
-        ) : base(
-            greatGrannyReader,
-            expressionReader,
+        ) : base (
+            greatGrannyReader, 
+            expressionReader, 
             externalReferences
         )
         {

@@ -4,14 +4,17 @@ using ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive;
 namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
 {
     public class ValueExpressionWriter : 
-        ExpressionWriterBase<
+        LesserExpressionWriterBase
+        <
             IValue,
             IValueParameterSet,
             IValueWriter,
             IValueExpression,
-            IValueExpressionReader,
             IValueExpressionParameterSet,
-            ValueExpression
+            IValueExpressionReader,
+            ValueExpression,
+            IExpressionParameterSet,
+            IExpressionWriter
         >,
         IValueExpressionWriter
     {

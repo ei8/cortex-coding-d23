@@ -5,26 +5,43 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
     internal static class ProcessorExtensions
     {
         #region ValueReader
+        internal static IIdExpressionParameterSet CreateIdInstanceValueParameterSet(
+            IExternalReferenceSet externalReferences,
+            Neuron value,
+            Neuron greatGranny,
+            Guid id
+        ) => new IdExpressionParameterSet(
+            new[]
+            {
+                new UnitParameterSet(
+                    greatGranny,
+                    externalReferences.Unit
+                ),
+                new UnitParameterSet(
+                    value,
+                    externalReferences.NominalSubject
+                )
+            },
+            id
+        );
+
         internal static IExpressionParameterSet CreateInstanceValueParameterSet(
             IExternalReferenceSet externalReferences,
             Neuron value,
             Neuron greatGranny
-        )
-        {
-            return new ExpressionParameterSet(
-                new[]
-                {
-                    new UnitParameterSet(
-                        greatGranny,
-                        externalReferences.Unit
-                    ),
-                    new UnitParameterSet(
-                        value,
-                        externalReferences.NominalSubject
-                    )
-                }
-            );
-        }
+        ) => new ExpressionParameterSet(
+            new[]
+            {
+                new UnitParameterSet(
+                    greatGranny,
+                    externalReferences.Unit
+                ),
+                new UnitParameterSet(
+                    value,
+                    externalReferences.NominalSubject
+                )
+            }
+        );
         #endregion
 
         #region ValueExpressionReader

@@ -3,7 +3,7 @@
 namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
 {
     public class InstanceValueExpressionReader : 
-        ExpressionReaderBase<
+        LesserExpressionReaderBase<
             IInstanceValue,
             IInstanceValueParameterSet,
             IInstanceValueReader,

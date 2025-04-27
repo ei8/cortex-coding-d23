@@ -4,14 +4,17 @@ using ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive;
 namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
 {
     public class PropertyInstanceValueAssociationWriter :
-        ExpressionWriterBase<
+        LesserExpressionWriterBase
+        <
             IPropertyInstanceValueAssignment,
             IPropertyInstanceValueAssignmentParameterSet,
             IPropertyInstanceValueAssignmentWriter,
             IPropertyInstanceValueAssociation,
-            IPropertyInstanceValueAssociationReader,
             IPropertyInstanceValueAssociationParameterSet,
-            PropertyInstanceValueAssociation
+            IPropertyInstanceValueAssociationReader,
+            PropertyInstanceValueAssociation,
+            IExpressionParameterSet,
+            IExpressionWriter
         >, 
         IPropertyInstanceValueAssociationWriter
     {

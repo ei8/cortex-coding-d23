@@ -1,77 +1,209 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
 using ei8.Cortex.Coding.d23.neurULization.Queries;
-using neurUL.Common.Domain.Model;
+using ei8.Cortex.Coding.d23.neurULization.Selectors;
 using System.Collections.Generic;
 using System.Linq;
+using System;
+using ei8.Cortex.Library.Common;
 
 namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
 {
-    public abstract class ExpressionReaderBase<
-        TGreatGranny, 
-        TGreatGrannyParameterSet, 
-        TGreatGrannyReader, 
-        TGranny,
-        TParameterSet,
-        TGrannyDerived
-    > : ExpressionProcessorBase<
-        TGreatGranny,
-        TGreatGrannyParameterSet, 
-        TGreatGrannyReader,
-        TGranny,
-        TParameterSet,
-        IExpressionParameterSet,
-        IExpressionReader,
-        IUnitParameterSet
-    >,
-        ILesserGrannyReader<TGranny, TParameterSet>
-        where TGreatGranny : IGranny
-        where TGreatGrannyParameterSet : IDeductiveParameterSet
-        where TGreatGrannyReader : IGrannyReader<TGreatGranny, TGreatGrannyParameterSet>
-        where TGranny : IExpressionGranny, ILesserGranny<TGreatGranny>
-        where TParameterSet : IDeductiveParameterSet
-        where TGrannyDerived : TGranny, new()
+    public abstract class ExpressionReaderBase<TExpressionParameterSet> :
+        ILesserGrannyReader<IExpression, TExpressionParameterSet>
+        where TExpressionParameterSet : IExpressionParameterSet
     {
+        private readonly IUnitReader unitReader;
         private readonly IExternalReferenceSet externalReferences;
 
-        protected ExpressionReaderBase(
-            TGreatGrannyReader greatGrannyReader,
-            IExpressionReader expressionReader,
-            IExternalReferenceSet externalReferences
-        ) : base (greatGrannyReader, expressionReader)
+        public ExpressionReaderBase(IUnitReader unitReader, IExternalReferenceSet externalReferences)
         {
-            AssertionConcern.AssertArgumentNotNull(externalReferences, nameof(externalReferences));
-
+            this.unitReader = unitReader;
             this.externalReferences = externalReferences;
         }
 
-        public IEnumerable<IGrannyQuery> GetQueries(Network network, TParameterSet parameters) =>
-            new IGrannyQuery[] {
-                new GreatGrannyQuery<TGreatGranny, TGreatGrannyReader, TGreatGrannyParameterSet>(
-                    this.greatGrannyProcessor,
-                    (n) => this.CreateGreatGrannyParameterSet(parameters)
-                ),
-                new GreatGrannyQuery<IExpression, IExpressionReader, IExpressionParameterSet>(
-                    this.expressionProcessor,
-                    (n) => this.CreateExpressionParameterSet(this.externalReferences, parameters, n.Last().Neuron, network)
+        public bool TryCreateGreatGrannies(
+            TExpressionParameterSet parameters,
+            Network network,
+            IExternalReferenceSet externalReferences,
+            out IEnumerable<IGreatGrannyInfo<IExpression>> result
+        ) => this.TryCreateGreatGranniesCore(
+            delegate (out bool bResult) {
+                bResult = true;
+                var coreBResult = true;
+                var coreResult = parameters.UnitParameters.Select(
+                    u => new IndependentGreatGrannyInfo<IUnit, IUnitReader, IUnitParameterSet, IExpression>(
+                        unitReader,
+                        () => u,
+                        (g, r) => r.Units.Add(g)
+                    )
+                );
+                bResult = coreBResult;
+                return coreResult;
+            },
+            out result
+        );
+
+        public IEnumerable<IGrannyQuery> GetQueries(Network network, TExpressionParameterSet parameters) =>
+            GetQueryByType(this.externalReferences, parameters, this.unitReader);
+
+        private static IEnumerable<IGrannyQuery> GetQueryByType(IExternalReferenceSet externalReferences, TExpressionParameterSet parameters, IUnitReader unitReader)
+        {
+            IEnumerable<IGrannyQuery> result = null;
+
+            var types = ExpressionReader.GetExpressionTypes(
+                (id, isEqual) => parameters.UnitParameters.GetValueUnitParametersByTypeId(id, isEqual).Count(),
+                externalReferences
+                );
+
+            if (types.Count() == 1)
+            {
+                if (types.Single().Id == externalReferences.Subordination.Id)
+                {
+                    result = new[] {
+                new GrannyQuery(
+                    new NeuronQuery()
+                    {
+                        // set Id to values of Dependents (non-Head units)
+                        Id = parameters.UnitParameters.GetValueUnitParametersByTypeId(externalReferences.Unit.Id, false)
+                                .Select(dp => dp.Value.Id.ToString()),
+                        DirectionValues = DirectionValues.Any,
+                        Depth = 4,
+                        TraversalDepthPostsynaptic = new[] {
+                            // 4 edges away and should have postsynaptic of unit or values of Head units
+                            new DepthIdsPair {
+                                Depth = 4,
+                                Ids = parameters.UnitParameters.GetValueUnitParametersByTypeId(externalReferences.Unit.Id)
+                                    .Select(up => up.Value.Id)
+                                    .Concat(
+                                        new[] {
+                                            externalReferences.Unit.Id
+                                        }
+                                    )
+                            },
+                            // 3 edges away and should have postsynaptic of subordination
+                            new DepthIdsPair {
+                                Depth = 3,
+                                Ids = new[] { externalReferences.Subordination.Id }
+                            },
+                            // 2 edges away and should have postsynaptic of non-head unit (eg. direct object)
+                            new DepthIdsPair {
+                                Depth = 2,
+                                Ids = parameters.UnitParameters.GetValueUnitParametersByTypeId(externalReferences.Unit.Id, false)
+                                        .Select(up => up.Type.Id)
+                            }
+                        }
+                    }
                 )
             };
-
-        public bool TryParse(Network network, TParameterSet parameters, out TGranny result) =>
-            this.TryParseAggregate(
-                () => new TGrannyDerived(),
-                parameters,
-                new IGreatGrannyProcess<TGranny>[]
+                }
+                else if (types.Single().Id == externalReferences.Simple.Id)
                 {
-                    new GreatGrannyProcess<TGreatGranny, TGreatGrannyReader, TGreatGrannyParameterSet, TGranny>(
+                    result = new IGrannyQuery[] {
+                new GreatGrannyQuery<IUnit, IUnitReader, IUnitParameterSet>(
+                    unitReader,
+                    (n) => parameters.UnitParameters.Single(u => u.Type.Id == externalReferences.Unit.Id)
+                ),
+                new GrannyQueryBuilder(
+                    (n) => new NeuronQuery()
+                    {
+                        Postsynaptic = new []{
+                            n.Last().Neuron.Id.ToString(),
+                            externalReferences.Simple.Id.ToString()
+                        },
+                        DirectionValues = DirectionValues.Outbound,
+                        Depth = 1
+                    }
+                )
+            };
+                }
+                else if (types.Single().Id == externalReferences.Coordination.Id)
+                {
+                    throw new NotImplementedException();
+                }
+            }
+            else
+                // TODO: Coordination-Subscription
+                throw new NotImplementedException();
+
+            return result;
+        }
+
+        internal static IEnumerable<Neuron> GetExpressionTypes(
+            Func<Guid, bool, int> headCountRetriever,
+            IExternalReferenceSet externalReferences
+        )
+        {
+            var result = new List<Neuron>();
+
+            var headCount = headCountRetriever(externalReferences.Unit.Id, true);
+            var dependentCount = headCountRetriever(externalReferences.Unit.Id, false);
+
+            if (headCount > 0)
+            {
+                if (headCount > 1)
+                {
+                    result.Add(externalReferences.Coordination);
+                }
+                else if (headCount == 1 && dependentCount == 0)
+                {
+                    result.Add(externalReferences.Simple);
+                }
+                if (dependentCount > 0)
+                {
+                    result.Add(externalReferences.Subordination);
+                }
+            }
+            else
+                throw new InvalidOperationException("Expression must have at least one 'Head' unit.");
+
+            return result.ToArray();
+        }
+
+        public bool TryParse(Network network, TExpressionParameterSet parameters, out IExpression result)
+        {
+            result = null;
+
+            this.TryParseAggregate(
+                () => new Expression(),
+                parameters,
+                parameters.UnitParameters.Select(
+                    u => new GreatGrannyProcess<IUnit, IUnitReader, IUnitParameterSet, IExpression>(
                         ProcessHelper.TryParse
-                        ),
-                    new GreatGrannyProcess<IExpression, IExpressionReader, IExpressionParameterSet, TGranny>(
-                        ProcessHelper.TryParse
-                        )
-                },
+                    )
+                ),
                 network,
                 this.externalReferences,
-                out result
+                out IExpression tempResult,
+                false
             );
+
+            if (tempResult != null && tempResult.Units.Count() == parameters.UnitParameters.Count())
+            {
+                tempResult.TryParseCore(
+                    network,
+                    // start from the Head units
+                    tempResult.GetValueUnitGranniesByTypeId(this.externalReferences.Unit.Id).Select(u => u.Neuron.Id),
+                    new[]
+                    {
+                // get the presynaptic via the siblings of the head and subordination
+                new LevelParser(new PresynapticByPostsynapticSibling(
+                    tempResult.GetValueUnitGranniesByTypeId(this.externalReferences.Unit.Id, false)
+                        .Select(i => i.Neuron.Id)
+                        .Concat(
+                            GetExpressionTypes(
+                                (id, isEqual) => parameters.UnitParameters.GetValueUnitParametersByTypeId(id, isEqual).Count(),
+                                this.externalReferences
+                            ).Select(t => t.Id)
+                        ).ToArray()
+                    )
+                )
+                    },
+                    (n) => tempResult.Neuron = n,
+                    ref result
+                    );
+            }
+
+            return result != null;
+        }
     }
 }
