@@ -36,21 +36,22 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
             delegate (out bool bResult) {
                 bResult = true;
                 var coreBResult = true;
-                var coreResult = new GreatGrannyInfoSet<IInstantiatesClass>(
-                   new IGreatGrannyInfo<IInstantiatesClass>[]
-                   {
-                        new InductiveIndependentGreatGrannyInfo<IExpression, IExpressionReader, IExpressionParameterSet, IInstantiatesClass>(
-                            parameters.Granny,
-                            expressionReader,
-                            () => InstantiatesClassReader.CreateSubordinationParameterSet(externalReferences, parameters),
-                            (g, r) => {
-                                if (coreBResult = g.TryGetValueUnitGrannyByTypeId(externalReferences.DirectObject.Id, out IUnit vuResult))
-                                    r.Class = vuResult;
-                            }
-                        )
-                   },
-                   InstantiatesClassReader.target
-                ).AsSuperset();
+                var coreResult = GreatGrannyInfoSuperset<IInstantiatesClass>.Create(
+                    new GreatGrannyInfoSet<IInstantiatesClass>(
+                       new IGreatGrannyInfo<IInstantiatesClass>[]
+                       {
+                            new InductiveIndependentGreatGrannyInfo<IExpression, IExpressionReader, IExpressionParameterSet, IInstantiatesClass>(
+                                parameters.Granny,
+                                expressionReader,
+                                () => InstantiatesClassReader.CreateSubordinationParameterSet(externalReferences, parameters),
+                                (g, r) => {
+                                    if (coreBResult = g.TryGetValueUnitGrannyByTypeId(externalReferences.DirectObject.Id, out IUnit vuResult))
+                                        r.Class = vuResult;
+                                }
+                            )
+                       },
+                    InstantiatesClassReader.target
+                ));
                 bResult = coreBResult;
                 return coreResult;
             },

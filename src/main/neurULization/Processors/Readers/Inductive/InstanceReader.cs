@@ -54,7 +54,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
             delegate (out bool bResult) {
                 bResult = true;
                 var coreBResult = true;
-                var coreResult = ProcessHelper.CreateGreatGrannyCandidateSet(
+                var coreResult = ProcessHelper.CreateGreatGrannyInfoSuperset(
                     network,
                     parameters.Granny,
                     gc => new InductiveIndependentGreatGrannyInfo<IInstantiatesClass, IInstantiatesClassReader, IInstantiatesClassParameterSet, IInstance>(
@@ -63,17 +63,16 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                         () => InstanceReader.CreateInstantiatesClassParameterSet(gc, parameters),
                         (g, r) => r.InstantiatesClass = g
                     ),
-                    targets[0]
-                ).AsSuperset()
-                .Concat(
-                    ProcessHelper.CreateGreatGrannyCandidateSets(
+                    InstanceReader.targets[0]
+                ).Concat(
+                    ProcessHelper.CreateGreatGrannyInfoSuperset(
                         network,
                         parameters.Granny,
                         parameters.PropertyAssociationParameters.OfType<IPropertyValueAssociationParameterSet>(),
                         (gc, pa) => new InductiveIndependentGreatGrannyInfo<
-                            IPropertyValueAssociation, 
-                            IPropertyValueAssociationReader, 
-                            IPropertyValueAssociationParameterSet, 
+                            IPropertyValueAssociation,
+                            IPropertyValueAssociationReader,
+                            IPropertyValueAssociationParameterSet,
                             IInstance
                         >(
                             gc,
@@ -84,11 +83,10 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                             ),
                             (g, r) => r.PropertyAssociations.Add(g)
                         ),
-                        targets[1]
+                        InstanceReader.targets[1]
                     )
-                )
-                .Concat(
-                    ProcessHelper.CreateGreatGrannyCandidateSets(
+                ).Concat(
+                    ProcessHelper.CreateGreatGrannyInfoSuperset(
                         network,
                         parameters.Granny,
                         parameters.PropertyAssociationParameters.OfType<IPropertyInstanceValueAssociationParameterSet>(),
@@ -107,7 +105,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                             ),
                             (g, r) => r.PropertyAssociations.Add(g)
                         ),
-                        targets[2]
+                        InstanceReader.targets[2]
                     )
                 );
                 bResult = coreBResult;
@@ -116,7 +114,10 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
             out result
         );
 
-        private static IInstantiatesClassParameterSet CreateInstantiatesClassParameterSet(Neuron grannyCandidate, IInstanceParameterSet parameters) =>
+        private static IInstantiatesClassParameterSet CreateInstantiatesClassParameterSet(
+            Neuron grannyCandidate, 
+            IInstanceParameterSet parameters
+        ) =>
             new InstantiatesClassParameterSet(
                 grannyCandidate,
                 parameters.Class

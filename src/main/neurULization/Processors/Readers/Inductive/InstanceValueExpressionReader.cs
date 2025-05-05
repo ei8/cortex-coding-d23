@@ -1,4 +1,6 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
 {
@@ -30,12 +32,12 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
         protected override IExpressionParameterSet CreateExpressionParameterSet(
             IExternalReferenceSet externalReferences,
             IInstanceValueExpressionParameterSet parameters,
-            Neuron grannyCandidate,
+            IEnumerable<Neuron> grannyCandidates,
             Network network
         ) => ProcessorExtensions.CreateValueExpressionParameterSet(
             externalReferences,
             parameters,
-            grannyCandidate
+            grannyCandidates.First()
         );
 
         protected override IInstanceValueParameterSet CreateGreatGrannyParameterSet(

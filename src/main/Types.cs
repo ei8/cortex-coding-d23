@@ -2,7 +2,7 @@
 {
     public struct Constants
     {
-        public const int ValueToInstantiatesClassDepth = 3;
-        public const int InstanceToValueInstantiatesClassDepth = 12;
+        public const int ValueToInstantiatesClassDepth = 4;
+        public const int InstanceToValueInstantiatesClassDepth = 13;
     }
 }

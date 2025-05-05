@@ -2,6 +2,7 @@
 {
     public interface ILesserGranny : IGranny
     {
+        object GetGreatGranny();
     }
 
     public interface ILesserGranny<TGreatGranny> : ILesserGranny

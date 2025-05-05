@@ -177,7 +177,7 @@ namespace ei8.Cortex.Coding.d23.neurULization
                         var classAttribute = property.GetCustomAttributes<neurULClassAttribute>().SingleOrDefault();
 
                         AssertionConcern.AssertStateTrue(
-                            propAssoc.TryGetPropertyValue(out Neuron propValueNeuron),
+                            propAssoc.TryGetPropertyValue(out IGranny propValueGranny),
                             "Property Association does not contain expected Value."
                         );
 
@@ -190,13 +190,14 @@ namespace ei8.Cortex.Coding.d23.neurULization
                                 nameof(TValue)
                                 );
                         
-                            propValue = propValueNeuron.Id;
+                            propValue = propValueGranny.Neuron.Id;
                         }
                         else
                         {
                             AssertionConcern.Equals(gp.ClassKey, ExternalReference.ToKeyString(property.PropertyType));
 
-                            var propValueString = propValueNeuron.Tag;
+                            string propValueString = propValueGranny.GetValueTag(this.options.ExternalReferences.NominalSubject.Id);
+
                             if (property.PropertyType == typeof(string))
                             {
                                 propValue = propValueString;

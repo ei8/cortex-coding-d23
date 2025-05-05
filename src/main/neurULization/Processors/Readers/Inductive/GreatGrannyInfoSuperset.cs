@@ -11,6 +11,14 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
         private readonly bool excludeEmptySets;
 
         public static GreatGrannyInfoSuperset<TResult> Create(
+            IGreatGrannyInfoSet<TResult> value,
+            bool excludeEmptySets = true
+        ) => GreatGrannyInfoSuperset<TResult>.Create(
+            new List<IGreatGrannyInfoSet<TResult>>() { value }, 
+            excludeEmptySets
+        );
+
+        public static GreatGrannyInfoSuperset<TResult> Create(
             IEnumerable<IGreatGrannyInfoSet<TResult>> values, 
             bool excludeEmptySets = true
         )
@@ -19,6 +27,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
             result.AddRange(values);
             return result;
         }
+
         private GreatGrannyInfoSuperset(bool excludeEmptySets)
         {
             this.list = new List<IGreatGrannyInfoSet<TResult>>();

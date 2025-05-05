@@ -5,14 +5,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 
 namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
 {
     public class AggregateParser : IAggregateParser
     {
-        private const string prefixPattern = "Reader.TryParse";
-
         private readonly IDictionary<string, IGranny> cache;
         private readonly IList<Tuple<IGranny, IGranny>> updatedGrannyCandidates;
         private readonly List<string> skipIds;
@@ -192,17 +189,17 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
             out string result
         )
         {
-            var candidateId = candidate is IInductiveGreatGrannyInfo<T> ic ?
-               ic.Neuron.Id.ToString() :
+            var candidateIds = candidate is IInductiveGreatGrannyInfo<T> ic ?
+               string.Join(",", ic.Neurons.Select(n => n.Id.ToString())) :
                null;
 
             result = string.Empty;
 
-            if (!string.IsNullOrWhiteSpace(candidateId))
+            if (!string.IsNullOrWhiteSpace(candidateIds))
             {
                 var resultAnon = new
                 {
-                    CandidateId = candidateId,
+                    CandidateIds = candidateIds,
                     CandidateType = candidate.GetType().GenericTypeArguments[0].FullName,
                     Parameters = parameters != null ? JsonConvert.SerializeObject(parameters, Formatting.None) : null,
                     PrecedingId = precedingGranny != null ? precedingGranny.Neuron.Id.ToString() : null,
@@ -277,8 +274,8 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
             IList<IGreatGrannyInfo<TResult>> candidateSetItemsList
         ) where TResult : IGranny
         {
-            var candidateId = candidate is IInductiveGreatGrannyInfo<TResult> ic ?
-                ic.Neuron.Id.ToString() :
+            var candidateIds = candidate is IInductiveGreatGrannyInfo<TResult> ic ?
+                string.Join(",", ic.Neurons.Select(n => n.Id.ToString())) :
                 "N/A";
             var precedingGrannyType = precedingGranny != null ?
                 precedingGranny.GetType().FullName :
@@ -291,7 +288,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
 
             Debug.WriteLine(
                 $"{AggregateParser.GetPrefix(AggregateParser.Counter, 2)}Analyzing candidate... ({itemIndex + 1}/{itemCount}) - Type: {candidate.GetType().GenericTypeArguments[0].FullName}; " +
-                $"CandidateId: {candidateId}; " +
+                $"CandidateIds: {candidateIds}; " +
                 $"PrecedingType: {precedingGrannyType}; " +
                 $"PrecedingId: {precedingGrannyId} "
             );
@@ -318,10 +315,11 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
 
         private static int Counter(int indent)
         {
-            var st = new StackTrace().ToString();
-            var rootIndentation = 1;
-            var tryParseCount = Regex.Matches(st, AggregateParser.prefixPattern).Count;
+            var st = new StackTrace();
+            var fra = st.GetFrames().Where(f => f.GetMethod().Name == "TryParse" && f.GetMethod().DeclaringType.Name.Contains("Reader"));
+            var tryParseCount = fra.Count();
             tryParseCount += tryParseCount > 1 ? ((tryParseCount -  1) *  2) : 0;
+            var rootIndentation = 1;
             return tryParseCount + indent - rootIndentation;
         }
     }

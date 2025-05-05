@@ -7,5 +7,7 @@
         public IExpression Expression { get; set; }
 
         public Neuron Neuron { get; set; }
+
+        public object GetGreatGranny() => this.GreatGranny;
     }
 }

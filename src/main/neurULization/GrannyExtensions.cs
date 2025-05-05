@@ -52,34 +52,37 @@ namespace ei8.Cortex.Coding.d23.neurULization
                     bResult = true;
                     result = lg.GreatGranny;
                 }
-                else if (lesserGranny is ILesserGranny && lesserGranny.GetGreatGranny<TGreatGranny>() is ILesserGranny lg2)
-                    bResult = lg2.TryGetGreatGranny(out result, depth - 1);
+                else if (lesserGranny is ILesserGranny lg2 && lg2.GetGreatGranny() is ILesserGranny lg3)
+                    bResult = lg3.TryGetGreatGranny(out result, depth - 1);
             }
 
             return bResult;
         }
 
-        private static IGranny GetGreatGranny<TGreatGranny>(this ILesserGranny lesserGranny)
-            where TGreatGranny : IGranny
-        {
-            IGranny result = null;
-
-            if (lesserGranny is ILesserGranny<TGreatGranny> lggg)
-                result = lggg.GreatGranny;
-
-            return result;
-        }
-
-        internal static bool TryGetPropertyValue(this IPropertyAssociation propertyAssociation, out Neuron result)
+        internal static bool TryGetPropertyValue(this IPropertyAssociation propertyAssociation, out IGranny result)
         {
             result = default;
 
-            if (propertyAssociation.TryGetGreatGranny(out IValue pva, 4))
-                result = pva.Neuron; 
-            else if (propertyAssociation.TryGetGreatGranny(out IInstanceValue piva, 4))
-                result = piva.Neuron;
+            if (propertyAssociation.TryGetGreatGranny(out IValue pva, 3))
+                result = pva; 
+            else if (propertyAssociation.TryGetGreatGranny(out IInstanceValue piva, 3))
+                result = piva;
 
             return result != default;
+        }
+
+        internal static string GetValueTag(this IGranny valueGranny, Guid nominalSubjectId)
+        {
+            string result = null;
+            if (valueGranny is IValue)
+                result = valueGranny.Neuron.Tag;
+            else if (
+                valueGranny is IInstanceValue pvg &&
+                pvg.Expression.TryGetValueUnitGrannyByTypeId(nominalSubjectId, out IUnit valueUnit)
+            )
+                result = valueUnit.Value.Tag;
+
+            return result;
         }
 
         internal static bool HasPropertyAssignment(this IPropertyAssociation propertyAssociation, Neuron unit, Neuron property) =>

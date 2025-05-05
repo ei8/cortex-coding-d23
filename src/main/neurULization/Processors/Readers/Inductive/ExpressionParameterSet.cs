@@ -1,5 +1,4 @@
 ﻿using neurUL.Common.Domain.Model;
-using System;
 using System.Collections.Generic;
 
 namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
@@ -8,9 +7,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
     {
         public ExpressionParameterSet(
             Neuron granny,
-            IEnumerable<IUnitParameterSet> unitParameters,
-            // TODO:0 remove optional parameter?
-            Guid? id = null
+            IEnumerable<IUnitParameterSet> unitParameters
             )
         {
             AssertionConcern.AssertArgumentNotNull(granny, nameof(granny));
@@ -18,13 +15,10 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
 
             this.Granny = granny;
             this.UnitParameters = unitParameters;
-            this.Id = id;
         }
 
         public Neuron Granny { get; }
 
         public IEnumerable<IUnitParameterSet> UnitParameters { get; }
-
-        public Guid? Id { get; }
     }
 }

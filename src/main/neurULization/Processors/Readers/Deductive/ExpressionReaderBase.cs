@@ -60,61 +60,61 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                 if (types.Single().Id == externalReferences.Subordination.Id)
                 {
                     result = new[] {
-                new GrannyQuery(
-                    new NeuronQuery()
-                    {
-                        // set Id to values of Dependents (non-Head units)
-                        Id = parameters.UnitParameters.GetValueUnitParametersByTypeId(externalReferences.Unit.Id, false)
-                                .Select(dp => dp.Value.Id.ToString()),
-                        DirectionValues = DirectionValues.Any,
-                        Depth = 4,
-                        TraversalDepthPostsynaptic = new[] {
-                            // 4 edges away and should have postsynaptic of unit or values of Head units
-                            new DepthIdsPair {
+                        new GrannyQuery(
+                            new NeuronQuery()
+                            {
+                                // set Id to values of Dependents (non-Head units)
+                                Id = parameters.UnitParameters.GetValueUnitParametersByTypeId(externalReferences.Unit.Id, false)
+                                        .Select(dp => dp.Value.Id.ToString()),
+                                DirectionValues = DirectionValues.Any,
                                 Depth = 4,
-                                Ids = parameters.UnitParameters.GetValueUnitParametersByTypeId(externalReferences.Unit.Id)
-                                    .Select(up => up.Value.Id)
-                                    .Concat(
-                                        new[] {
-                                            externalReferences.Unit.Id
-                                        }
-                                    )
-                            },
-                            // 3 edges away and should have postsynaptic of subordination
-                            new DepthIdsPair {
-                                Depth = 3,
-                                Ids = new[] { externalReferences.Subordination.Id }
-                            },
-                            // 2 edges away and should have postsynaptic of non-head unit (eg. direct object)
-                            new DepthIdsPair {
-                                Depth = 2,
-                                Ids = parameters.UnitParameters.GetValueUnitParametersByTypeId(externalReferences.Unit.Id, false)
-                                        .Select(up => up.Type.Id)
+                                TraversalDepthPostsynaptic = new[] {
+                                    // 4 edges away and should have postsynaptic of unit or values of Head units
+                                    new DepthIdsPair {
+                                        Depth = 4,
+                                        Ids = parameters.UnitParameters.GetValueUnitParametersByTypeId(externalReferences.Unit.Id)
+                                            .Select(up => up.Value.Id)
+                                            .Concat(
+                                                new[] {
+                                                    externalReferences.Unit.Id
+                                                }
+                                            )
+                                    },
+                                    // 3 edges away and should have postsynaptic of subordination
+                                    new DepthIdsPair {
+                                        Depth = 3,
+                                        Ids = new[] { externalReferences.Subordination.Id }
+                                    },
+                                    // 2 edges away and should have postsynaptic of non-head unit (eg. direct object)
+                                    new DepthIdsPair {
+                                        Depth = 2,
+                                        Ids = parameters.UnitParameters.GetValueUnitParametersByTypeId(externalReferences.Unit.Id, false)
+                                                .Select(up => up.Type.Id)
+                                    }
+                                }
                             }
-                        }
-                    }
-                )
-            };
+                        )
+                    };
                 }
                 else if (types.Single().Id == externalReferences.Simple.Id)
                 {
                     result = new IGrannyQuery[] {
-                new GreatGrannyQuery<IUnit, IUnitReader, IUnitParameterSet>(
-                    unitReader,
-                    (n) => parameters.UnitParameters.Single(u => u.Type.Id == externalReferences.Unit.Id)
-                ),
-                new GrannyQueryBuilder(
-                    (n) => new NeuronQuery()
-                    {
-                        Postsynaptic = new []{
-                            n.Last().Neuron.Id.ToString(),
-                            externalReferences.Simple.Id.ToString()
-                        },
-                        DirectionValues = DirectionValues.Outbound,
-                        Depth = 1
-                    }
-                )
-            };
+                        new GreatGrannyQuery<IUnit, IUnitReader, IUnitParameterSet>(
+                            unitReader,
+                            (n) => parameters.UnitParameters.Single(u => u.Type.Id == externalReferences.Unit.Id)
+                        ),
+                        new GrannyQueryBuilder(
+                            (n) => new NeuronQuery()
+                            {
+                                Postsynaptic = new []{
+                                    n.Last().Neuron.Id.ToString(),
+                                    externalReferences.Simple.Id.ToString()
+                                },
+                                DirectionValues = DirectionValues.Outbound,
+                                Depth = 1
+                            }
+                        )
+                    };
                 }
                 else if (types.Single().Id == externalReferences.Coordination.Id)
                 {
@@ -185,18 +185,18 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                     tempResult.GetValueUnitGranniesByTypeId(this.externalReferences.Unit.Id).Select(u => u.Neuron.Id),
                     new[]
                     {
-                // get the presynaptic via the siblings of the head and subordination
-                new LevelParser(new PresynapticByPostsynapticSibling(
-                    tempResult.GetValueUnitGranniesByTypeId(this.externalReferences.Unit.Id, false)
-                        .Select(i => i.Neuron.Id)
-                        .Concat(
-                            GetExpressionTypes(
-                                (id, isEqual) => parameters.UnitParameters.GetValueUnitParametersByTypeId(id, isEqual).Count(),
-                                this.externalReferences
-                            ).Select(t => t.Id)
-                        ).ToArray()
-                    )
-                )
+                        // get the presynaptic via the siblings of the head and subordination
+                        new LevelParser(new PresynapticByPostsynapticSibling(
+                            tempResult.GetValueUnitGranniesByTypeId(this.externalReferences.Unit.Id, false)
+                                .Select(i => i.Neuron.Id)
+                                .Concat(
+                                    GetExpressionTypes(
+                                        (id, isEqual) => parameters.UnitParameters.GetValueUnitParametersByTypeId(id, isEqual).Count(),
+                                        this.externalReferences
+                                    ).Select(t => t.Id)
+                                ).ToArray()
+                            )
+                        )
                     },
                     (n) => tempResult.Neuron = n,
                     ref result

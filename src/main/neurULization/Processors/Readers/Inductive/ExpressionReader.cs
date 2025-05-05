@@ -1,5 +1,6 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
 using neurUL.Common.Domain.Model;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
@@ -37,7 +38,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
             delegate (out bool bResult) {
                 bResult = true;
                 var coreBResult = true;
-                var coreResult = ProcessHelper.CreateGreatGrannyCandidateSets(
+                var coreResult = ProcessHelper.CreateGreatGrannyInfoSuperset(
                     network,
                     parameters.Granny,
                     parameters.UnitParameters.Where(up => up.Granny == null),
@@ -53,20 +54,21 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                     ),
                     ExpressionReader.target
                 ).Concat(
-                    new GreatGrannyInfoSet<IExpression>(
-                        parameters.UnitParameters.Where(up => up.Granny != null).Select(
-                            up => new InductiveIndependentGreatGrannyInfo<IUnit, IUnitReader, IUnitParameterSet, IExpression>(
+                    ProcessHelper.CreateGreatGrannyInfoSuperset(
+                        network,
+                        parameters.Granny,
+                        parameters.UnitParameters.Where(up => up.Granny != null),
+                        (gc, up) => new InductiveIndependentGreatGrannyInfo<IUnit, IUnitReader, IUnitParameterSet, IExpression>(
+                            up.Granny,
+                            unitReader,
+                            () => UnitParameterSet.CreateWithGrannyAndType(
                                 up.Granny,
-                                unitReader,
-                                () => UnitParameterSet.CreateWithGrannyAndType(
-                                        up.Granny,
-                                        up.Type
-                                    ),
-                                (g, r) => r.Units.Add(g)
-                            )
+                                up.Type
+                            ),
+                            (g, r) => r.Units.Add(g)
                         ),
                         ExpressionReader.target
-                    ).AsSuperset()
+                    )
                 );
                 bResult = coreBResult;
                 return coreResult;

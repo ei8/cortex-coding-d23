@@ -2,6 +2,5 @@
 {
     public interface IInstanceValue : IExpressionGranny, ILesserGranny<IInstantiatesClass>
     {
-        IUnit Value { get; set; }
     }
 }
