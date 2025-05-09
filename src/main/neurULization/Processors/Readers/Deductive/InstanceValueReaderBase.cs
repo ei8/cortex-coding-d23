@@ -1,5 +1,4 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
-using neurUL.Common.Domain.Model;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;

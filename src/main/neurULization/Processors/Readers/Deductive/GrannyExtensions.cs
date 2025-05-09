@@ -15,7 +15,6 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
             INetworkRepository networkRepository,
             Network network,
             IList<IGranny> retrievedGrannies,
-            string userId,
             bool breakBeforeLastGetQuery = false
             )
         {
@@ -42,15 +41,11 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                 if ((query = await grannyQuery.GetQuery(
                     networkRepository, 
                     network, 
-                    retrievedGrannies, 
-                    userId
+                    retrievedGrannies
                 )) != null)
                 {
                     // get network based on parameters and previous granny neuron if it's assigned
-                    var queryResult = await networkRepository.GetByQueryAsync(
-                        query,
-                        userId
-                        );
+                    var queryResult = await networkRepository.GetByQueryAsync(query);
                     // enrich network
                     network.AddReplaceItems(queryResult.Network);
                     // if granny query is retriever

@@ -33,7 +33,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
 
         public bool RequiresPrecedingGrannyQueryResult { get; }
 
-        public async Task<NeuronQuery> GetQuery(INetworkRepository networkRepository, Network network, IList<IGranny> retrievedGrannies, string userId)
+        public async Task<NeuronQuery> GetQuery(INetworkRepository networkRepository, Network network, IList<IGranny> retrievedGrannies)
         {
             var gqs = grannyReader.GetQueries(
                 network,
@@ -43,8 +43,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
             var completed = await gqs.Process(
                 networkRepository, 
                 network, 
-                retrievedGrannies, 
-                userId,
+                retrievedGrannies,
                 true
             );
             // then call GetQuery on last granny query if completed successfully
@@ -52,8 +51,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                 await gqs.Last().GetQuery(
                     networkRepository, 
                     network, 
-                    retrievedGrannies, 
-                    userId
+                    retrievedGrannies
                 ) : 
                 null;
         }

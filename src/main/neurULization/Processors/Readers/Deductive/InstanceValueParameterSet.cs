@@ -25,6 +25,12 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                 $"Id of specified '{nameof(value)}' neuron cannot be equal to '{Guid.Empty}' when '{nameof(valueMatchBy)}' is equal to '{valueMatchBy.ToString()}'.",
                 nameof(value)
             );
+            AssertionConcern.AssertArgumentValid(
+                vmb => valueMatchBy != ValueMatchBy.NotSet,
+                valueMatchBy,
+                $"Specified '{nameof(valueMatchBy)}' value of '{nameof(ValueMatchBy.NotSet)}' is not valid.",
+                nameof(valueMatchBy)
+            );
 
             this.Value = value;
             this.Class = @class;

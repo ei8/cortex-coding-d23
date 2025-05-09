@@ -12,8 +12,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Queries
         Task<NeuronQuery> GetQuery(
             INetworkRepository networkRepository, 
             Network network, 
-            IList<IGranny> retrievedGrannies, 
-            string userId
+            IList<IGranny> retrievedGrannies
         );
     }
 }
