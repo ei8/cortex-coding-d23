@@ -71,7 +71,7 @@ namespace ei8.Cortex.Coding.d23.neurULization
             return result != default;
         }
 
-        internal static string GetValueTag(this IGranny valueGranny, Guid nominalSubjectId)
+        public static string GetValueTag(this IGranny valueGranny, Guid nominalSubjectId)
         {
             string result = null;
             if (valueGranny is IValue)
