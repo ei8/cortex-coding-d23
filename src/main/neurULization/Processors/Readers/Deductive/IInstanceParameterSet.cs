@@ -9,7 +9,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
 
         string Tag { get; }
 
-        string ExternalReferenceUrl { get; }
+        string MirrorUrl { get; }
 
         Guid? RegionId { get; }
 

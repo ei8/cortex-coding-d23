@@ -4,8 +4,8 @@
         ExpressionReaderBase<IIdExpressionParameterSet>, 
         IIdExpressionReader
     {
-        public IdExpressionReader(IUnitReader unitReader, IExternalReferenceSet externalReferences) : 
-            base(unitReader, externalReferences)
+        public IdExpressionReader(IUnitReader unitReader, IMirrorSet mirrors) : 
+            base(unitReader, mirrors)
         {
         }
     }

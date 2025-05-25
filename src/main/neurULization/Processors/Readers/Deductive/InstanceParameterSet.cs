@@ -9,7 +9,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
         public InstanceParameterSet(
             Guid id,
             string tag,
-            string externalReferenceUrl,
+            string mirrorUrl,
             Guid? regionId,
             Neuron @class,
             IEnumerable<IPropertyAssociationParameterSet> propertyAssociationsParameters
@@ -21,7 +21,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
 
             Id = id;
             Tag = tag;
-            ExternalReferenceUrl = externalReferenceUrl;
+            MirrorUrl = mirrorUrl;
             RegionId = regionId;
             Class = @class;
             PropertyAssociationsParameters = propertyAssociationsParameters;
@@ -31,7 +31,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
 
         public string Tag { get; }
 
-        public string ExternalReferenceUrl { get; }
+        public string MirrorUrl { get; }
 
         public Guid? RegionId { get; }
 

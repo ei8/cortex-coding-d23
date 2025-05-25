@@ -9,7 +9,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
         private readonly IInstantiatesClassReader instantiatesClassReader;
         private readonly IPropertyValueAssociationReader propertyValueAssociationReader;
         private readonly IPropertyInstanceValueAssociationReader propertyInstanceValueAssociationReader;
-        private readonly IExternalReferenceSet externalReferences;
+        private readonly IMirrorSet mirrors;
         private readonly IAggregateParser aggregateParser;
 
         private static readonly IGreatGrannyProcess<IInstance>[] targets = new IGreatGrannyProcess<IInstance>[]
@@ -28,27 +28,27 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
             IInstantiatesClassReader instantiatesClassReader, 
             IPropertyValueAssociationReader propertyValueAssociationReader,
             IPropertyInstanceValueAssociationReader propertyInstanceValueAssociationReader,
-            IExternalReferenceSet externalReferences,
+            IMirrorSet mirrors,
             IAggregateParser aggregateParser
         )
         {
             AssertionConcern.AssertArgumentNotNull(instantiatesClassReader, nameof(instantiatesClassReader));
             AssertionConcern.AssertArgumentNotNull(propertyValueAssociationReader, nameof(propertyValueAssociationReader));
             AssertionConcern.AssertArgumentNotNull(propertyInstanceValueAssociationReader, nameof(propertyInstanceValueAssociationReader));
-            AssertionConcern.AssertArgumentNotNull(externalReferences, nameof(externalReferences));
+            AssertionConcern.AssertArgumentNotNull(mirrors, nameof(mirrors));
             AssertionConcern.AssertArgumentNotNull(aggregateParser, nameof(aggregateParser));
 
             this.instantiatesClassReader = instantiatesClassReader;
             this.propertyValueAssociationReader = propertyValueAssociationReader;
             this.propertyInstanceValueAssociationReader = propertyInstanceValueAssociationReader;
-            this.externalReferences = externalReferences;
+            this.mirrors = mirrors;
             this.aggregateParser = aggregateParser;
         }
 
         public bool TryCreateGreatGrannies(
             IInstanceParameterSet parameters, 
             Network network, 
-            IExternalReferenceSet externalReferences, 
+            IMirrorSet mirrors, 
             out IGreatGrannyInfoSuperset<IInstance> result
         ) => this.TryCreateGreatGranniesCore(
             delegate (out bool bResult) {
@@ -129,7 +129,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                 this,
                 parameters,
                 network,
-                this.externalReferences,
+                this.mirrors,
                 out result
             );
     }

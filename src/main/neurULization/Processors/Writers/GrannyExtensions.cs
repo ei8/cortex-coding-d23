@@ -60,7 +60,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
             TParameterSet parameters,
             IEnumerable<IGreatGrannyProcess<TResult>> targets,
             Network network,
-            IExternalReferenceSet externalReferences,
+            IMirrorSet mirrors,
             out TResult result,
             Func<Neuron> grannyNeuronCreator = null,
             Func<TResult, IEnumerable<PostsynapticInfo>> postsynapticsRetriever = null
@@ -83,7 +83,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
                 if (grannyWriter.TryCreateGreatGrannies(
                     parameters,
                     network,
-                    externalReferences, 
+                    mirrors, 
                     out IEnumerable<IGreatGrannyInfo<TResult>> processes
                 ))
                 {

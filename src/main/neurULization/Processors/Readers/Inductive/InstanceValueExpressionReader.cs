@@ -18,24 +18,24 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
         public InstanceValueExpressionReader(
             IInstanceValueReader greatGrannyReader, 
             IExpressionReader expressionReader, 
-            IExternalReferenceSet externalReferences, 
+            IMirrorSet mirrors, 
             IAggregateParser aggregateParser
         ) : base(
             greatGrannyReader, 
             expressionReader, 
-            externalReferences, 
+            mirrors, 
             aggregateParser
         )
         {
         }
 
         protected override IExpressionParameterSet CreateExpressionParameterSet(
-            IExternalReferenceSet externalReferences,
+            IMirrorSet mirrors,
             IInstanceValueExpressionParameterSet parameters,
             IEnumerable<Neuron> grannyCandidates,
             Network network
         ) => ProcessorExtensions.CreateValueExpressionParameterSet(
-            externalReferences,
+            mirrors,
             parameters,
             grannyCandidates.First()
         );

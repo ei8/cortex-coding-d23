@@ -12,27 +12,27 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
         private readonly IPropertyValueAssociationWriter propertyValueAssociationWriter;
         private readonly IPropertyInstanceValueAssociationWriter propertyInstanceValueAssociationWriter;
         private readonly Readers.Deductive.IInstanceReader reader;
-        private readonly IExternalReferenceSet externalReferences;
+        private readonly IMirrorSet mirrors;
 
         public InstanceWriter(
             IInstantiatesClassWriter instantiatesClassWriter, 
             IPropertyValueAssociationWriter propertyValueAssociationWriter,
             IPropertyInstanceValueAssociationWriter propertyInstanceValueAssociationWriter,
             Readers.Deductive.IInstanceReader reader,
-            IExternalReferenceSet externalReferences
+            IMirrorSet mirrors
         )
         {
             AssertionConcern.AssertArgumentNotNull(instantiatesClassWriter, nameof(instantiatesClassWriter));
             AssertionConcern.AssertArgumentNotNull(propertyValueAssociationWriter, nameof(propertyValueAssociationWriter));
             AssertionConcern.AssertArgumentNotNull(propertyInstanceValueAssociationWriter, nameof(propertyInstanceValueAssociationWriter));
             AssertionConcern.AssertArgumentNotNull(reader, nameof(reader));
-            AssertionConcern.AssertArgumentNotNull(externalReferences, nameof(externalReferences));
+            AssertionConcern.AssertArgumentNotNull(mirrors, nameof(mirrors));
 
             this.instantiatesClassWriter = instantiatesClassWriter;
             this.propertyValueAssociationWriter = propertyValueAssociationWriter;
             this.propertyInstanceValueAssociationWriter = propertyInstanceValueAssociationWriter;
             this.reader = reader;
-            this.externalReferences = externalReferences;
+            this.mirrors = mirrors;
         }
 
         public bool TryBuild(Network network, IInstanceParameterSet parameters, out IInstance result) =>
@@ -58,7 +58,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
                     )
                 ),
                 network,
-                this.externalReferences,
+                this.mirrors,
                 out result,
                 () =>
                 {
@@ -66,7 +66,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
                         Neuron.CreateTransient(
                             parameters.Id,
                             parameters.Tag,
-                            parameters.ExternalReferenceUrl,
+                            parameters.MirrorUrl,
                             parameters.RegionId
                         )
                         // TODO: no longer necessary?
@@ -86,7 +86,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
         public bool TryCreateGreatGrannies(
             IInstanceParameterSet parameters,
             Network network,
-            IExternalReferenceSet externalReferences,
+            IMirrorSet mirrors,
             out IEnumerable<IGreatGrannyInfo<IInstance>> result
         ) => this.TryCreateGreatGranniesCore(
             delegate (out bool bResult) {

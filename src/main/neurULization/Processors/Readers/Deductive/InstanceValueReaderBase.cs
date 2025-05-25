@@ -19,28 +19,28 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
         public InstanceValueReaderBase(
             IInstantiatesClassReader greatGrannyReader,
             IExpressionReader expressionReader,
-            IExternalReferenceSet externalReferences
+            IMirrorSet mirrors
         ) : base(
             greatGrannyReader,
             expressionReader,
-            externalReferences
+            mirrors
         )
         {
         }
 
         protected override IExpressionParameterSet CreateExpressionParameterSet(
-            IExternalReferenceSet externalReferences,
+            IMirrorSet mirrors,
             TInstanceValueParameterSet parameters,
             Neuron instantiatesClassNeuron,
             Network network
         ) => CreateExpressionParameterSetCore(
-            externalReferences,
+            mirrors,
             parameters,
             instantiatesClassNeuron,
             network
         );
 
-        private static IExpressionParameterSet CreateExpressionParameterSetCore(IExternalReferenceSet externalReferences, IInstanceValueParameterSet parameters, Neuron instantiatesClassNeuron, Network network)
+        private static IExpressionParameterSet CreateExpressionParameterSetCore(IMirrorSet mirrors, IInstanceValueParameterSet parameters, Neuron instantiatesClassNeuron, Network network)
         {
             Neuron valueNeuron;
             if (parameters.ValueMatchBy == ValueMatchBy.Id)
@@ -53,7 +53,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
             }
 
             return ProcessorExtensions.CreateInstanceValueParameterSet(
-                externalReferences,
+                mirrors,
                 valueNeuron,
                 instantiatesClassNeuron
             );

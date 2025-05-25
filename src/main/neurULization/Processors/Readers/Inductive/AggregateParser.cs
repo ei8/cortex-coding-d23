@@ -1,4 +1,5 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -13,12 +14,14 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
         private readonly IDictionary<string, IGranny> cache;
         private readonly IList<Tuple<IGranny, IGranny>> updatedGrannyCandidates;
         private readonly List<string> skipIds;
+        private readonly IOptions<List<MirrorConfig>> mirrorConfigs;
 
-        public AggregateParser()
+        public AggregateParser(IOptions<List<MirrorConfig>> mirrorConfigs)
         {
             this.cache = new Dictionary<string, IGranny>();
             this.updatedGrannyCandidates = new List<Tuple<IGranny, IGranny>>();
             this.skipIds = new List<string>();
+            this.mirrorConfigs = mirrorConfigs;
         }
 
         public bool TryParse<TResultDerived, TResult, TParameterSet>(
@@ -26,7 +29,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
             ILesserGrannyReader<TResult, TParameterSet> grannyReader,
             TParameterSet parameters,
             Network network,
-            IExternalReferenceSet externalReferences,
+            IMirrorSet mirrors,
             out TResult aggregate
         )
             where TResultDerived : TResult, new()
@@ -39,7 +42,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
 
             int successCount = 0;
             IGranny precedingGranny = null;
-            if (grannyReader.TryCreateGreatGrannies(parameters, network, externalReferences, out IGreatGrannyInfoSuperset<TResult> candidateSets))
+            if (grannyReader.TryCreateGreatGrannies(parameters, network, mirrors, out IGreatGrannyInfoSuperset<TResult> candidateSets))
             {
                 var candidateSetsList = candidateSets.Items.ToList();
 
@@ -72,7 +75,10 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                         ))
                         {
                             AggregateParser.LogCandidateLine($"Obtaining parameters... SUCCESS");
-                            AggregateParser.LogPropertyName(candidateParameters);
+                            AggregateParser.LogPropertyName(
+                                candidateParameters,
+                                this.mirrorConfigs.Value
+                            );
 
                             // ...formulate cacheId
                             bool createCacheIdResult = AggregateParser.TryCreateCacheId(candidate, precedingGranny, candidateParameters, out string cacheId);
@@ -295,10 +301,10 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
         }
 
         [Conditional("PARSELOG")]
-        private static void LogPropertyName(IParameterSet parameters)
+        private static void LogPropertyName(IParameterSet parameters, IEnumerable<MirrorConfig> mirrorConfigs)
         {
             if (parameters is Processors.Readers.IPropertyParameterSetCore prop)
-                LogCandidateLine($"Property Name: {prop.Property.Tag}");
+                LogCandidateLine($"Property Name: {mirrorConfigs.Single(mc => mc.Url == prop.Property.MirrorUrl).Key}");
         }
 
         [Conditional("PARSELOG")]

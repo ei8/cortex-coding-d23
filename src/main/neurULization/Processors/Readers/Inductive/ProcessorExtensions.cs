@@ -4,7 +4,7 @@
     {
         #region ValueExpressionReader
         internal static IExpressionParameterSet CreateValueExpressionParameterSet(
-            IExternalReferenceSet externalReferences,
+            IMirrorSet mirrors,
             IInductiveParameterSet parameters,
             Neuron grannyCandidate
         ) => new ExpressionParameterSet(
@@ -12,7 +12,7 @@
                 new[] {
                     UnitParameterSet.CreateWithGrannyAndType(
                         grannyCandidate,
-                        externalReferences.Unit
+                        mirrors.Unit
                     ),
                 }
             );
@@ -20,7 +20,7 @@
 
         #region PropertyValueExpressionReader
         internal static IExpressionParameterSet CreatePropertyValueExpressionParameterSet(
-            IExternalReferenceSet externalReferences,
+            IMirrorSet mirrors,
             IInductiveParameterSet parameters,
             Neuron grannyCandidate
         ) => new ExpressionParameterSet(
@@ -29,11 +29,11 @@
                 {
                     UnitParameterSet.CreateWithGrannyAndType(
                         grannyCandidate,
-                        externalReferences.Unit
+                        mirrors.Unit
                     ),
                     UnitParameterSet.CreateWithValueAndType(
-                        externalReferences.Of,
-                        externalReferences.Case
+                        mirrors.Of,
+                        mirrors.Case
                     )
                 }
             );
@@ -41,7 +41,7 @@
 
         #region PropertyValueAssignment
         internal static IExpressionParameterSet CreatePropertyValueAssignmentParameterSet(
-            IExternalReferenceSet externalReferences,
+            IMirrorSet mirrors,
             IPropertyParameterSet parameters,
             Neuron grannyCandidate
         ) =>
@@ -51,11 +51,11 @@
                 {
                     UnitParameterSet.CreateWithValueAndType(
                         parameters.Property,
-                        externalReferences.Unit
+                        mirrors.Unit
                     ),
                     UnitParameterSet.CreateWithGrannyAndType(
                         grannyCandidate,
-                        externalReferences.NominalModifier
+                        mirrors.NominalModifier
                     )
                 }
             );
@@ -63,7 +63,7 @@
 
         #region PropertyValueAssociation
         internal static IExpressionParameterSet CreatePropertyValueAssociationParameterSet(
-            IExternalReferenceSet externalReferences,
+            IMirrorSet mirrors,
             IInductiveParameterSet parameters,
             Neuron grannyCandidate
         ) =>
@@ -72,12 +72,12 @@
                 new[]
                 {
                     UnitParameterSet.CreateWithValueAndType(
-                        externalReferences.Has,
-                        externalReferences.Unit
+                        mirrors.Has,
+                        mirrors.Unit
                     ),
                     UnitParameterSet.CreateWithGrannyAndType(
                         grannyCandidate,
-                        externalReferences.DirectObject
+                        mirrors.DirectObject
                     )
                 }
             );

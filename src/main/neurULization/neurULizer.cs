@@ -29,14 +29,14 @@ namespace ei8.Cortex.Coding.d23.neurULization
             TValue value, 
             neurULizerTypeInfo typeInfo,
             IDictionary<Guid, Coding.Neuron> idPropertyValueNeurons,
-            IDictionary<string, Coding.Neuron> externalReferences
+            IDictionary<string, Coding.Neuron> mirrors
         )
             where TValue : class
         {
             AssertionConcern.AssertArgumentNotNull(value, nameof(value));
             AssertionConcern.AssertArgumentNotNull(typeInfo, nameof(typeInfo));
             AssertionConcern.AssertArgumentNotNull(idPropertyValueNeurons, nameof(idPropertyValueNeurons));
-            AssertionConcern.AssertArgumentNotNull(externalReferences, nameof(externalReferences));
+            AssertionConcern.AssertArgumentNotNull(mirrors, nameof(mirrors));
 
             var network = new Network();
             Guid? regionId = typeInfo.NeuronProperties.OfType<RegionIdProperty>().SingleOrDefault()?.Value;
@@ -58,9 +58,9 @@ namespace ei8.Cortex.Coding.d23.neurULization
                             idp.Value :
                             Guid.NewGuid(),
                         typeInfo.NeuronProperties.OfType<TagProperty>().SingleOrDefault()?.Value,
-                        typeInfo.NeuronProperties.OfType<ExternalReferenceUrlProperty>().SingleOrDefault()?.Value,
+                        typeInfo.NeuronProperties.OfType<MirrorUrlProperty>().SingleOrDefault()?.Value,
                         regionId,
-                        externalReferences[typeInfo.ValueClassKey],
+                        mirrors[typeInfo.ValueClassKey],
                         typeInfo.GrannyProperties.Select(gp =>
                             {
                                 IPropertyAssociationParameterSet paps = null;
@@ -69,26 +69,25 @@ namespace ei8.Cortex.Coding.d23.neurULization
                                     idPropertyValueNeurons[Guid.Parse(gp.Value)] :
                                     Neuron.CreateTransient(gp.Value, null, regionId);
 
-                                if (!string.IsNullOrWhiteSpace(gp.ClassKey))
+                                if (neurULizer.IsValueAssociation(gp))
                                 {
-                                    paps = new PropertyInstanceValueAssociationParameterSet(
-                                        externalReferences[gp.Key],
-                                        valueNeuron,
-                                        externalReferences[gp.ClassKey],
-                                        gp.ValueMatchBy
-                                    );
-                                }
-                                else
-                                {
+                                    // TODO:1 validate that valueNeuron represents an Instance of type gp.ClassKey
+                                    // if(!string.IsNullOrWhiteSpace(gp.ClassKey))
                                     paps = new PropertyValueAssociationParameterSet(
-                                        externalReferences[gp.Key],
+                                        mirrors[gp.Key],
                                         valueNeuron
                                     );
                                 }
+                                else
+                                    paps = new PropertyInstanceValueAssociationParameterSet(
+                                        mirrors[gp.Key],
+                                        valueNeuron,
+                                        mirrors[gp.ClassKey],
+                                        gp.ValueMatchBy
+                                    );
 
                                 return paps;
-                            }
-                            )
+                            })
                             .Where(i => i != null)
                     ),
                     out IInstance instance
@@ -104,7 +103,7 @@ namespace ei8.Cortex.Coding.d23.neurULization
                     network,
                     new Processors.Readers.Deductive.IdInstanceValueParameterSet(
                         Neuron.CreateTransient(ivw.Tag, string.Empty, null),
-                        externalReferences[typeInfo.ValueClassKey],
+                        mirrors[typeInfo.ValueClassKey],
                         ValueMatchBy.Tag,
                         ivw.Id
                     ),
@@ -115,124 +114,159 @@ namespace ei8.Cortex.Coding.d23.neurULization
             return network;
         }
 
-        public IEnumerable<TValue> DeneurULize<TValue>(
+        // TODO:1 return single values instead of IEnumerable
+        public IEnumerable<neurULizationResult<TValue>> DeneurULize<TValue>(
             Network value,
             IEnumerable<Neuron> instanceNeurons,
             neurULizerTypeInfo typeInfo,
-            IDictionary<string, Coding.Neuron> externalReferences
+            IDictionary<string, Coding.Neuron> mirrors
         )
             where TValue : class, new()
         {
             AssertionConcern.AssertArgumentNotNull(value, nameof(value));
             AssertionConcern.AssertArgumentNotNull(instanceNeurons, nameof(instanceNeurons));
             AssertionConcern.AssertArgumentNotNull(typeInfo, nameof(typeInfo));
-            AssertionConcern.AssertArgumentNotNull(externalReferences, nameof(externalReferences));
+            AssertionConcern.AssertArgumentNotNull(mirrors, nameof(mirrors));
 
-            List<TValue> result = new List<TValue>();
+            var result = new List<neurULizationResult<TValue>>();
 
             foreach (var instanceNeuron in instanceNeurons)
             {
-                if (this.options.InductiveInstanceReader.TryParse(
-                    value,
-                    new Processors.Readers.Inductive.InstanceParameterSet(
-                        instanceNeuron,
-                        externalReferences[typeInfo.ValueClassKey],
-                        typeInfo.GrannyProperties.Select(gp =>
+                bool bResult = false;
+                TValue tempResult = default;
+
+                if (!typeof(IInstanceValueWrapper).IsAssignableFrom(typeof(TValue)))
+                {
+                    if (this.options.InductiveInstanceReader.TryParse(
+                        value,
+                        new Processors.Readers.Inductive.InstanceParameterSet(
+                            instanceNeuron,
+                            mirrors[typeInfo.ValueClassKey],
+                            typeInfo.GrannyProperties.Select(gp =>
                             {
                                 IPropertyAssociationParameterSet paps = null;
-                                if (!string.IsNullOrWhiteSpace(gp.ClassKey))
-                                {
-                                    paps = Processors.Readers.Inductive.PropertyInstanceValueAssociationParameterSet.CreateWithoutGranny(
-                                        externalReferences[gp.Key],
-                                        externalReferences[gp.ClassKey]
-                                    );
-                                }
-                                else
-                                {
+
+                                if (neurULizer.IsValueAssociation(gp))
                                     paps = Processors.Readers.Inductive.PropertyValueAssociationParameterSet.CreateWithoutGranny(
-                                        externalReferences[gp.Key]
+                                        mirrors[gp.Key]
                                     );
-                                }
+                                else
+                                    paps = Processors.Readers.Inductive.PropertyInstanceValueAssociationParameterSet.CreateWithoutGranny(
+                                        mirrors[gp.Key],
+                                        mirrors[gp.ClassKey]
+                                    );
+
                                 return paps;
                             }
-                        )
-                    ),
-                    out IInstance instance
-                ))
-                {
-                    var tempResult = new TValue();
-
-                    foreach (var gp in typeInfo.GrannyProperties)
-                    {
-                        var propAssoc = instance.PropertyAssociations.SingleOrDefault(
-                            pa => pa.HasPropertyAssignment(
-                                this.options.ExternalReferences.Unit, 
-                                // property neuron
-                                externalReferences[gp.Key]
                             )
-                        );
-                        object propValue = null;
-
-                        var property = tempResult.GetType().GetProperty(gp.PropertyName);
-                        var classAttribute = property.GetCustomAttributes<neurULClassAttribute>().SingleOrDefault();
-
-                        AssertionConcern.AssertStateTrue(
-                            propAssoc.TryGetPropertyValue(out IGranny propValueGranny),
-                            "Property Association does not contain expected Value."
-                        );
-
-                        if (classAttribute != null)
-                        {
-                            AssertionConcern.AssertArgumentValid(
-                                t => property.PropertyType == typeof(Guid),
-                                typeof(TValue),
-                                $"Property '{property.Name}' has '{nameof(neurULClassAttribute)}' but its Type is not equal to 'Guid'.",
-                                nameof(TValue)
-                                );
-                        
-                            propValue = propValueGranny.Neuron.Id;
-                        }
-                        else
-                        {
-                            AssertionConcern.Equals(gp.ClassKey, ExternalReference.ToKeyString(property.PropertyType));
-
-                            string propValueString = propValueGranny.GetValueTag(this.options.ExternalReferences.NominalSubject.Id);
-
-                            if (property.PropertyType == typeof(string))
-                            {
-                                propValue = propValueString;
-                            }
-                            else if (property.PropertyType == typeof(Guid))
-                            {
-                                propValue = Guid.Parse(propValueString);
-                            }
-                            else if (
-                                Nullable.GetUnderlyingType(property.PropertyType) == typeof(DateTimeOffset) ||
-                                property.PropertyType == typeof(DateTimeOffset)
-                                )
-                            {
-                                propValue = DateTimeOffset.Parse(propValueString);
-                            }
-                            // TODO: else use neurULConverterAttribute
-                        }
-                        property.SetValue(tempResult, propValue);
-                    }
-
-                    foreach (var np in typeInfo.NeuronProperties)
+                        ),
+                        out IInstance instance
+                    ))
                     {
-                        var instanceNeuronProperty = instance.Neuron.GetType().GetProperty(
-                            np.GetType().Name.Replace("Property", string.Empty)
-                        );
-                        object propertyValue = instanceNeuronProperty.GetValue(instance.Neuron);
+                        tempResult = new TValue();
 
-                        tempResult.GetType().GetProperty(np.Name).SetValue(tempResult, propertyValue);
+                        foreach (var gp in typeInfo.GrannyProperties)
+                        {
+                            var propAssoc = instance.PropertyAssociations.SingleOrDefault(
+                                pa => pa.HasPropertyAssignment(
+                                    this.options.Mirrors.Unit,
+                                    // property neuron
+                                    mirrors[gp.Key]
+                                )
+                            );
+                            object propValue = null;
+
+                            var property = tempResult.GetType().GetProperty(gp.PropertyName);
+                            var classAttribute = property.GetCustomAttributes<neurULClassAttribute>().SingleOrDefault();
+
+                            AssertionConcern.AssertStateTrue(
+                                propAssoc.TryGetPropertyValue(out IGranny propValueGranny),
+                                "Property Association does not contain expected Value."
+                            );
+
+                            if (classAttribute != null)
+                            {
+                                AssertionConcern.AssertArgumentValid(
+                                    t => property.PropertyType == typeof(Guid),
+                                    typeof(TValue),
+                                    $"Property '{property.Name}' has '{nameof(neurULClassAttribute)}' but its Type is not equal to 'Guid'.",
+                                    nameof(TValue)
+                                    );
+
+                                propValue = propValueGranny.Neuron.Id;
+                            }
+                            else
+                            {
+                                AssertionConcern.Equals(gp.ClassKey, MirrorConfig.ToKeyString(property.PropertyType));
+
+                                string propValueString = propValueGranny.GetValueTag(this.options.Mirrors.NominalSubject.Id);
+
+                                if (property.PropertyType == typeof(string))
+                                {
+                                    propValue = propValueString;
+                                }
+                                else if (property.PropertyType == typeof(Guid))
+                                {
+                                    propValue = Guid.Parse(propValueString);
+                                }
+                                else if (
+                                    Nullable.GetUnderlyingType(property.PropertyType) == typeof(DateTimeOffset) ||
+                                    property.PropertyType == typeof(DateTimeOffset)
+                                    )
+                                {
+                                    propValue = DateTimeOffset.Parse(propValueString);
+                                }
+                                // TODO: else use neurULConverterAttribute
+                            }
+                            property.SetValue(tempResult, propValue);
+                        }
+
+                        foreach (var np in typeInfo.NeuronProperties)
+                        {
+                            var instanceNeuronProperty = instance.Neuron.GetType().GetProperty(
+                                np.GetType().Name.Replace("Property", string.Empty)
+                            );
+                            object propertyValue = instanceNeuronProperty.GetValue(instance.Neuron);
+
+                            tempResult.GetType().GetProperty(np.Name).SetValue(tempResult, propertyValue);
+                        }
+
+                        bResult = true;
                     }
-
-                    result.Add(tempResult);
                 }
+                else
+                {
+                    if (options.InductiveInstanceValueReader.TryParse(
+                        value,
+                        new Processors.Readers.Inductive.InstanceValueParameterSet(
+                            instanceNeuron,
+                            mirrors[typeInfo.ValueClassKey]
+                        ),
+                        out IInstanceValue parseResult
+                    ))
+                    {
+                        var tvw = (IInstanceValueWrapper) new TValue();
+                        tvw.Id = parseResult.Neuron.Id;
+                        tvw.Tag = parseResult.GetValueTag(this.options.Mirrors.NominalSubject.Id);
+                        tempResult = (TValue) tvw;
+                        bResult = true;
+                    }
+                }
+
+                result.Add(new neurULizationResult<TValue>(
+                    bResult,
+                    instanceNeuron,
+                    tempResult
+                ));
             }
 
             return result.AsEnumerable();
+        }
+
+        private static bool IsValueAssociation(PropertyData gp)
+        {
+            return string.IsNullOrWhiteSpace(gp.ClassKey) || 
+                gp.ValueMatchBy == ValueMatchBy.Id;
         }
 
         public IneurULizerOptions Options => this.options;

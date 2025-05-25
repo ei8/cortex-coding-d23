@@ -1,8 +1,8 @@
 ﻿namespace ei8.Cortex.Coding.d23.neurULization
 {
-    public class ExternalReferenceSet : IExternalReferenceSet
+    public class MirrorSet : IMirrorSet
     {
-        public ExternalReferenceSet()
+        public MirrorSet()
         {
         }
 

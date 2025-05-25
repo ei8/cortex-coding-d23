@@ -12,30 +12,30 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
         private readonly IInstantiatesClassReader instantiatesClassReader;
         private readonly IPropertyValueAssociationReader propertyValueAssociationReader;
         private readonly IPropertyInstanceValueAssociationReader propertyInstanceValueAssociationReader;
-        private readonly IExternalReferenceSet externalReferences;
+        private readonly IMirrorSet mirrors;
 
         public InstanceReader(
             IInstantiatesClassReader instantiatesClassReader,
             IPropertyValueAssociationReader propertyValueAssociationReader,
             IPropertyInstanceValueAssociationReader propertyInstanceValueAssociationReader,
-            IExternalReferenceSet externalReferences
+            IMirrorSet mirrors
         )
         {
             AssertionConcern.AssertArgumentNotNull(instantiatesClassReader, nameof(instantiatesClassReader));
             AssertionConcern.AssertArgumentNotNull(propertyValueAssociationReader, nameof(propertyValueAssociationReader));
             AssertionConcern.AssertArgumentNotNull(propertyInstanceValueAssociationReader, nameof(propertyInstanceValueAssociationReader));
-            AssertionConcern.AssertArgumentNotNull(externalReferences, nameof(externalReferences));
+            AssertionConcern.AssertArgumentNotNull(mirrors, nameof(mirrors));
 
             this.instantiatesClassReader = instantiatesClassReader;
             this.propertyValueAssociationReader = propertyValueAssociationReader;
             this.propertyInstanceValueAssociationReader = propertyInstanceValueAssociationReader;
-            this.externalReferences = externalReferences;
+            this.mirrors = mirrors;
         }
 
         public bool TryCreateGreatGrannies(
             IInstanceParameterSet parameters,
             Network network,
-            IExternalReferenceSet externalReferences,
+            IMirrorSet mirrors,
             out IEnumerable<IGreatGrannyInfo<IInstance>> result
         ) => this.TryCreateGreatGranniesCore(
             delegate (out bool bResult) {
@@ -135,7 +135,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                     )
                 ),
                 network,
-                this.externalReferences,
+                this.mirrors,
                 out result
             );
     }

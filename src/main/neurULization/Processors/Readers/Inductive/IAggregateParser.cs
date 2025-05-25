@@ -9,7 +9,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
             ILesserGrannyReader<TResult, TParameterSet> grannyReader,
             TParameterSet parameters,
             Network network,
-            IExternalReferenceSet externalReferences,
+            IMirrorSet mirrors,
             out TResult result
         )
             where TResultDerived : TResult, new()

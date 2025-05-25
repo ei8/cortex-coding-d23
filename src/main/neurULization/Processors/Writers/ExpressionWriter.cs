@@ -9,8 +9,8 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
         public ExpressionWriter(
             IUnitWriter unitWriter, 
             Readers.Deductive.IExpressionReader reader, 
-            IExternalReferenceSet externalReferences
-        ) : base(unitWriter, reader, externalReferences)
+            IMirrorSet mirrors
+        ) : base(unitWriter, reader, mirrors)
         {
         }
 

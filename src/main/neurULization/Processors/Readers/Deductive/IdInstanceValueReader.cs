@@ -7,11 +7,11 @@
         public IdInstanceValueReader(
             IInstantiatesClassReader greatGrannyReader,
             IExpressionReader expressionReader,
-            IExternalReferenceSet externalReferences
+            IMirrorSet mirrors
         ) : base (
             greatGrannyReader, 
             expressionReader, 
-            externalReferences
+            mirrors
         )
         {
         }

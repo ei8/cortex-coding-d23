@@ -13,18 +13,18 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
         where TExpressionParameterSet : IExpressionParameterSet
     {
         private readonly IUnitReader unitReader;
-        private readonly IExternalReferenceSet externalReferences;
+        private readonly IMirrorSet mirrors;
 
-        public ExpressionReaderBase(IUnitReader unitReader, IExternalReferenceSet externalReferences)
+        public ExpressionReaderBase(IUnitReader unitReader, IMirrorSet mirrors)
         {
             this.unitReader = unitReader;
-            this.externalReferences = externalReferences;
+            this.mirrors = mirrors;
         }
 
         public bool TryCreateGreatGrannies(
             TExpressionParameterSet parameters,
             Network network,
-            IExternalReferenceSet externalReferences,
+            IMirrorSet mirrors,
             out IEnumerable<IGreatGrannyInfo<IExpression>> result
         ) => this.TryCreateGreatGranniesCore(
             delegate (out bool bResult) {
@@ -44,27 +44,27 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
         );
 
         public IEnumerable<IGrannyQuery> GetQueries(Network network, TExpressionParameterSet parameters) =>
-            GetQueryByType(this.externalReferences, parameters, this.unitReader);
+            GetQueryByType(this.mirrors, parameters, this.unitReader);
 
-        private static IEnumerable<IGrannyQuery> GetQueryByType(IExternalReferenceSet externalReferences, TExpressionParameterSet parameters, IUnitReader unitReader)
+        private static IEnumerable<IGrannyQuery> GetQueryByType(IMirrorSet mirrors, TExpressionParameterSet parameters, IUnitReader unitReader)
         {
             IEnumerable<IGrannyQuery> result = null;
 
             var types = ExpressionReader.GetExpressionTypes(
                 (id, isEqual) => parameters.UnitParameters.GetValueUnitParametersByTypeId(id, isEqual).Count(),
-                externalReferences
+                mirrors
                 );
 
             if (types.Count() == 1)
             {
-                if (types.Single().Id == externalReferences.Subordination.Id)
+                if (types.Single().Id == mirrors.Subordination.Id)
                 {
                     result = new[] {
                         new GrannyQuery(
                             new NeuronQuery()
                             {
                                 // set Id to values of Dependents (non-Head units)
-                                Id = parameters.UnitParameters.GetValueUnitParametersByTypeId(externalReferences.Unit.Id, false)
+                                Id = parameters.UnitParameters.GetValueUnitParametersByTypeId(mirrors.Unit.Id, false)
                                         .Select(dp => dp.Value.Id.ToString()),
                                 DirectionValues = DirectionValues.Any,
                                 Depth = 4,
@@ -72,23 +72,23 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                                     // 4 edges away and should have postsynaptic of unit or values of Head units
                                     new DepthIdsPair {
                                         Depth = 4,
-                                        Ids = parameters.UnitParameters.GetValueUnitParametersByTypeId(externalReferences.Unit.Id)
+                                        Ids = parameters.UnitParameters.GetValueUnitParametersByTypeId(mirrors.Unit.Id)
                                             .Select(up => up.Value.Id)
                                             .Concat(
                                                 new[] {
-                                                    externalReferences.Unit.Id
+                                                    mirrors.Unit.Id
                                                 }
                                             )
                                     },
                                     // 3 edges away and should have postsynaptic of subordination
                                     new DepthIdsPair {
                                         Depth = 3,
-                                        Ids = new[] { externalReferences.Subordination.Id }
+                                        Ids = new[] { mirrors.Subordination.Id }
                                     },
                                     // 2 edges away and should have postsynaptic of non-head unit (eg. direct object)
                                     new DepthIdsPair {
                                         Depth = 2,
-                                        Ids = parameters.UnitParameters.GetValueUnitParametersByTypeId(externalReferences.Unit.Id, false)
+                                        Ids = parameters.UnitParameters.GetValueUnitParametersByTypeId(mirrors.Unit.Id, false)
                                                 .Select(up => up.Type.Id)
                                     }
                                 }
@@ -96,19 +96,19 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                         )
                     };
                 }
-                else if (types.Single().Id == externalReferences.Simple.Id)
+                else if (types.Single().Id == mirrors.Simple.Id)
                 {
                     result = new IGrannyQuery[] {
                         new GreatGrannyQuery<IUnit, IUnitReader, IUnitParameterSet>(
                             unitReader,
-                            (n) => parameters.UnitParameters.Single(u => u.Type.Id == externalReferences.Unit.Id)
+                            (n) => parameters.UnitParameters.Single(u => u.Type.Id == mirrors.Unit.Id)
                         ),
                         new GrannyQueryBuilder(
                             (n) => new NeuronQuery()
                             {
                                 Postsynaptic = new []{
                                     n.Last().Neuron.Id.ToString(),
-                                    externalReferences.Simple.Id.ToString()
+                                    mirrors.Simple.Id.ToString()
                                 },
                                 DirectionValues = DirectionValues.Outbound,
                                 Depth = 1
@@ -116,7 +116,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                         )
                     };
                 }
-                else if (types.Single().Id == externalReferences.Coordination.Id)
+                else if (types.Single().Id == mirrors.Coordination.Id)
                 {
                     throw new NotImplementedException();
                 }
@@ -130,27 +130,27 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
 
         internal static IEnumerable<Neuron> GetExpressionTypes(
             Func<Guid, bool, int> headCountRetriever,
-            IExternalReferenceSet externalReferences
+            IMirrorSet mirrors
         )
         {
             var result = new List<Neuron>();
 
-            var headCount = headCountRetriever(externalReferences.Unit.Id, true);
-            var dependentCount = headCountRetriever(externalReferences.Unit.Id, false);
+            var headCount = headCountRetriever(mirrors.Unit.Id, true);
+            var dependentCount = headCountRetriever(mirrors.Unit.Id, false);
 
             if (headCount > 0)
             {
                 if (headCount > 1)
                 {
-                    result.Add(externalReferences.Coordination);
+                    result.Add(mirrors.Coordination);
                 }
                 else if (headCount == 1 && dependentCount == 0)
                 {
-                    result.Add(externalReferences.Simple);
+                    result.Add(mirrors.Simple);
                 }
                 if (dependentCount > 0)
                 {
-                    result.Add(externalReferences.Subordination);
+                    result.Add(mirrors.Subordination);
                 }
             }
             else
@@ -172,7 +172,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                     )
                 ),
                 network,
-                this.externalReferences,
+                this.mirrors,
                 out IExpression tempResult,
                 false
             );
@@ -182,17 +182,17 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                 tempResult.TryParseCore(
                     network,
                     // start from the Head units
-                    tempResult.GetValueUnitGranniesByTypeId(this.externalReferences.Unit.Id).Select(u => u.Neuron.Id),
+                    tempResult.GetValueUnitGranniesByTypeId(this.mirrors.Unit.Id).Select(u => u.Neuron.Id),
                     new[]
                     {
                         // get the presynaptic via the siblings of the head and subordination
                         new LevelParser(new PresynapticByPostsynapticSibling(
-                            tempResult.GetValueUnitGranniesByTypeId(this.externalReferences.Unit.Id, false)
+                            tempResult.GetValueUnitGranniesByTypeId(this.mirrors.Unit.Id, false)
                                 .Select(i => i.Neuron.Id)
                                 .Concat(
                                     GetExpressionTypes(
                                         (id, isEqual) => parameters.UnitParameters.GetValueUnitParametersByTypeId(id, isEqual).Count(),
-                                        this.externalReferences
+                                        this.mirrors
                                     ).Select(t => t.Id)
                                 ).ToArray()
                             )

@@ -6,7 +6,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
     {
         #region ValueReader
         internal static IIdExpressionParameterSet CreateIdInstanceValueParameterSet(
-            IExternalReferenceSet externalReferences,
+            IMirrorSet mirrors,
             Neuron value,
             Neuron greatGranny,
             Guid id
@@ -15,18 +15,18 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
             {
                 new UnitParameterSet(
                     greatGranny,
-                    externalReferences.Unit
+                    mirrors.Unit
                 ),
                 new UnitParameterSet(
                     value,
-                    externalReferences.NominalSubject
+                    mirrors.NominalSubject
                 )
             },
             id
         );
 
         internal static IExpressionParameterSet CreateInstanceValueParameterSet(
-            IExternalReferenceSet externalReferences,
+            IMirrorSet mirrors,
             Neuron value,
             Neuron greatGranny
         ) => new ExpressionParameterSet(
@@ -34,11 +34,11 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
             {
                 new UnitParameterSet(
                     greatGranny,
-                    externalReferences.Unit
+                    mirrors.Unit
                 ),
                 new UnitParameterSet(
                     value,
-                    externalReferences.NominalSubject
+                    mirrors.NominalSubject
                 )
             }
         );
@@ -46,13 +46,13 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
 
         #region ValueExpressionReader
         internal static IExpressionParameterSet CreateValueExpressionParameterSet(
-            IExternalReferenceSet externalReferences,
+            IMirrorSet mirrors,
             Neuron greatGranny
         ) => new ExpressionParameterSet(
             new[] {
                 new UnitParameterSet(
                     greatGranny,
-                    externalReferences.Unit
+                    mirrors.Unit
                 ),
             }
         );
@@ -60,18 +60,18 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
 
         #region PropertyValueExpressionReader
         internal static IExpressionParameterSet CreatePropertyValueExpressionParameterSet(
-            IExternalReferenceSet externalReferences,
+            IMirrorSet mirrors,
             Neuron greatGranny
         ) => new ExpressionParameterSet(
             new[]
             {
                 new UnitParameterSet(
                     greatGranny,
-                    externalReferences.Unit
+                    mirrors.Unit
                 ),
                 new UnitParameterSet(
-                    externalReferences.Of,
-                    externalReferences.Case
+                    mirrors.Of,
+                    mirrors.Case
                 )
             }
         );
@@ -79,7 +79,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
 
         #region PropertyValueAssignmentReader
         internal static IExpressionParameterSet CreatePropertyValueAssignmentParameterSet(
-            IExternalReferenceSet externalReferences,
+            IMirrorSet mirrors,
             IPropertyParameterSetCore propertyParameters,
             Neuron greatGranny
         ) => new ExpressionParameterSet(
@@ -87,11 +87,11 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
             {
                 new UnitParameterSet(
                     propertyParameters.Property,
-                    externalReferences.Unit
+                    mirrors.Unit
                 ),
                 new UnitParameterSet(
                     greatGranny,
-                    externalReferences.NominalModifier
+                    mirrors.NominalModifier
                 )
             }
         );
@@ -99,18 +99,18 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
 
         #region PropertyValueAssociationReader
         internal static IExpressionParameterSet CreatePropertyValueAssociationParameterSet(
-            IExternalReferenceSet externalReferences,
+            IMirrorSet mirrors,
             Neuron greatGranny
         ) => new ExpressionParameterSet(
             new[]
             {
                 new UnitParameterSet(
-                    externalReferences.Has,
-                    externalReferences.Unit
+                    mirrors.Has,
+                    mirrors.Unit
                 ),
                 new UnitParameterSet(
                     greatGranny,
-                    externalReferences.DirectObject
+                    mirrors.DirectObject
                 )
             }
         );

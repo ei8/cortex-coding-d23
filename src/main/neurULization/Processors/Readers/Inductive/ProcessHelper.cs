@@ -46,7 +46,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
             where TResult : IGranny
             where TParameterSet : IParameterSet
         {
-            // TODO:0 Refactor duplicate code with overload (see below)
+            // TODO:1 Refactor duplicate code with overload (see below)
             var posts = network.GetPostsynapticNeurons(granny.Id);
 
             var ggis = parameters.Select(p =>
@@ -67,7 +67,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
         )
             where TResult : IGranny
         {
-            // TODO:0 Refactor duplicate code with overload (see above)
+            // TODO:1 Refactor duplicate code with overload (see above)
             var posts = network.GetPostsynapticNeurons(granny.Id);
 
             var ggis = new GreatGrannyInfoSet<TResult>(
@@ -86,7 +86,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
         )
             where TResult : IGranny
         {
-            // TODO:0 Refactor duplicate code with overload (see above)
+            // TODO:1 Refactor duplicate code with overload (see above)
             IEnumerable<IEnumerable<Neuron>> posts = new[] { network.GetPostsynapticNeurons(granny.Id) };
 
             if (posts.First().Any())

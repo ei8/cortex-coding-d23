@@ -90,7 +90,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
             TParameterSet parameters,
             IEnumerable<IGreatGrannyProcess<TResult>> targets,
             Network network,
-            IExternalReferenceSet externalReferences,
+            IMirrorSet mirrors,
             out TResult result,
             bool setGrannyNeuronOnCompletion = true
         )
@@ -108,7 +108,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
             if (grannyReader.TryCreateGreatGrannies(
                 parameters,
                 network,
-                externalReferences,
+                mirrors,
                 out IEnumerable<IGreatGrannyInfo<TResult>> candidates
             ))
             {

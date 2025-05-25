@@ -39,22 +39,22 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
         where TExpressionWriter : ILesserGrannyWriter<IExpression, TExpressionParameterSet>
     {
         private readonly TReader reader;
-        private readonly IExternalReferenceSet externalReferences;
+        private readonly IMirrorSet mirrors;
 
         protected LesserExpressionWriterBase
         (
             TGreatGrannyWriter greatGrannyWriter,
             TExpressionWriter expressionWriter,
             TReader reader,
-            IExternalReferenceSet externalReferences
+            IMirrorSet mirrors
         ) : 
             base(greatGrannyWriter, expressionWriter)
         {
             AssertionConcern.AssertArgumentNotNull(reader, nameof(reader));
-            AssertionConcern.AssertArgumentNotNull(externalReferences, nameof(externalReferences));
+            AssertionConcern.AssertArgumentNotNull(mirrors, nameof(mirrors));
 
             this.reader = reader;
-            this.externalReferences = externalReferences;
+            this.mirrors = mirrors;
         }
 
         public bool TryBuild(Network network, TParameterSet parameters, out TResult result) =>
@@ -71,7 +71,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
                         )
                 },
                 network,
-                this.externalReferences,
+                this.mirrors,
                 out result
             );
 

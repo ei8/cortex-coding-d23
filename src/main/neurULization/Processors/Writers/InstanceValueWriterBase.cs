@@ -31,12 +31,12 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
             IInstantiatesClassWriter greatGrannyWriter,
             TExpressionWriter expressionWriter,
             TInstanceValueReader reader,
-            IExternalReferenceSet externalReferences
+            IMirrorSet mirrors
         ) : base(
             greatGrannyWriter,
             expressionWriter,
             reader,
-            externalReferences
+            mirrors
         )
         {
         }

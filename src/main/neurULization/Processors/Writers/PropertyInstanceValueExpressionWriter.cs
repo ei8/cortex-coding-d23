@@ -22,12 +22,12 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
             IInstanceValueExpressionWriter greatGrannyWriter, 
             IExpressionWriter expressionWriter,
             Readers.Deductive.IPropertyInstanceValueExpressionReader reader,
-            IExternalReferenceSet externalReferences
+            IMirrorSet mirrors
         ) : base(
             greatGrannyWriter,
             expressionWriter,
             reader,
-            externalReferences
+            mirrors
         )
         {
         }
@@ -40,11 +40,11 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
             );
 
         protected override IExpressionParameterSet CreateExpressionParameterSet(
-            IExternalReferenceSet externalReferences, 
+            IMirrorSet mirrors, 
             IPropertyInstanceValueExpressionParameterSet parameters, 
             Neuron greatGranny,
             Network network
         ) =>
-            Readers.Deductive.ProcessorExtensions.CreatePropertyValueExpressionParameterSet(externalReferences, greatGranny);
+            Readers.Deductive.ProcessorExtensions.CreatePropertyValueExpressionParameterSet(mirrors, greatGranny);
     }
 }

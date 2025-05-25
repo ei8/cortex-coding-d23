@@ -9,7 +9,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
         bool TryCreateGreatGrannies(
             TParameterSet parameters,
             Network network,
-            IExternalReferenceSet externalReferences,
+            IMirrorSet mirrors,
             out IGreatGrannyInfoSuperset<TGranny> result
         );
     }

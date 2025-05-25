@@ -8,17 +8,17 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
     {
         private readonly IExpressionWriter expressionWriter;
         private readonly Readers.Deductive.IInstantiatesClassReader reader;
-        private readonly IExternalReferenceSet externalReferences;
+        private readonly IMirrorSet mirrors;
 
         public InstantiatesClassWriter(
             IExpressionWriter expressionWriter,
             Readers.Deductive.IInstantiatesClassReader reader,
-            IExternalReferenceSet externalReferences
+            IMirrorSet mirrors
             )
         {
             this.expressionWriter = expressionWriter;
             this.reader = reader;
-            this.externalReferences = externalReferences;
+            this.mirrors = mirrors;
         }
 
         public bool TryBuild(Network network, IInstantiatesClassParameterSet parameters, out IInstantiatesClass result) =>
@@ -32,14 +32,14 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
                     )
                 },
                 network,
-                this.externalReferences,
+                this.mirrors,
                 out result
             );
 
         public bool TryCreateGreatGrannies(
             IInstantiatesClassParameterSet parameters,
             Network network,
-            IExternalReferenceSet externalReferences,
+            IMirrorSet mirrors,
             out IEnumerable<IGreatGrannyInfo<IInstantiatesClass>> result
         ) => this.TryCreateGreatGranniesCore(
             delegate (out bool bResult) {
@@ -49,9 +49,9 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
                 {
                     new IndependentGreatGrannyInfo<IExpression, IExpressionWriter, IExpressionParameterSet, IInstantiatesClass>(
                         expressionWriter,
-                        () => InstantiatesClassWriter.CreateSubordinationParameterSet(externalReferences, parameters),
+                        () => InstantiatesClassWriter.CreateSubordinationParameterSet(mirrors, parameters),
                         (g, r) => {
-                            if (coreBResult = g.TryGetValueUnitGrannyByTypeId(externalReferences.DirectObject.Id, out IUnit vuResult))
+                            if (coreBResult = g.TryGetValueUnitGrannyByTypeId(mirrors.DirectObject.Id, out IUnit vuResult))
                                 r.Class = vuResult;
                         }
                     )
@@ -62,18 +62,18 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
             out result
         );
 
-        private static ExpressionParameterSet CreateSubordinationParameterSet(IExternalReferenceSet externalReferences, IInstantiatesClassParameterSet parameters)
+        private static ExpressionParameterSet CreateSubordinationParameterSet(IMirrorSet mirrors, IInstantiatesClassParameterSet parameters)
         {
             return new ExpressionParameterSet(
                 new[]
                 {
                     new UnitParameterSet(
-                        externalReferences.Instantiates,
-                        externalReferences.Unit
+                        mirrors.Instantiates,
+                        mirrors.Unit
                     ),
                     new UnitParameterSet(
                         parameters.Class,
-                        externalReferences.DirectObject
+                        mirrors.DirectObject
                     )
                 }
             );

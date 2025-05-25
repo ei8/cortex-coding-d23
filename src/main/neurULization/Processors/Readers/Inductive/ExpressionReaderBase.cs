@@ -23,24 +23,24 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
     {
         private readonly TGreatGrannyReader greatGrannyReader;
         private readonly IExpressionReader expressionReader;
-        private readonly IExternalReferenceSet externalReferences;
+        private readonly IMirrorSet mirrors;
         private readonly IAggregateParser aggregateParser;
 
         protected ExpressionReaderBase(
             TGreatGrannyReader greatGrannyReader,
             IExpressionReader expressionReader,
-            IExternalReferenceSet externalReferences,
+            IMirrorSet mirrors,
             IAggregateParser aggregateParser
         )
         {
             AssertionConcern.AssertArgumentNotNull(greatGrannyReader, nameof(greatGrannyReader));
             AssertionConcern.AssertArgumentNotNull(expressionReader, nameof(expressionReader));
-            AssertionConcern.AssertArgumentNotNull(externalReferences, nameof(externalReferences));
+            AssertionConcern.AssertArgumentNotNull(mirrors, nameof(mirrors));
             AssertionConcern.AssertArgumentNotNull(aggregateParser, nameof(aggregateParser));
 
             this.greatGrannyReader = greatGrannyReader;
             this.expressionReader = expressionReader;
-            this.externalReferences = externalReferences;
+            this.mirrors = mirrors;
             this.aggregateParser = aggregateParser;
         }
 
@@ -50,20 +50,20 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
         );
 
         protected abstract IExpressionParameterSet CreateExpressionParameterSet(
-            IExternalReferenceSet externalReferences,
+            IMirrorSet mirrors,
             TParameterSet parameters,
             IEnumerable<Neuron> grannyCandidates,
             Network network
         );
 
         protected virtual Guid GetValueUnitTypeId(
-            IExternalReferenceSet externalReferences
-        ) => externalReferences.Unit.Id;
+            IMirrorSet mirrors
+        ) => mirrors.Unit.Id;
 
         public bool TryCreateGreatGrannies(
             TParameterSet parameters,
             Network network,
-            IExternalReferenceSet externalReferences,
+            IMirrorSet mirrors,
             out IGreatGrannyInfoSuperset<TResult> result
         ) => this.TryCreateGreatGranniesCore(
             delegate (out bool bResult) {
@@ -75,7 +75,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                     gcs => new InductiveIndependentGreatGrannyInfo<IExpression, IExpressionReader, IExpressionParameterSet, TResult>(
                         gcs,
                         this.expressionReader,
-                        () => this.CreateExpressionParameterSet(externalReferences, parameters, gcs, network),
+                        () => this.CreateExpressionParameterSet(mirrors, parameters, gcs, network),
                         (g, r) => r.Expression = g
                     ),
                     new GreatGrannyProcess<IExpression, IExpressionReader, IExpressionParameterSet, TResult>(
@@ -90,7 +90,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                                 g => {
                                     if (
                                         coreBResult = ((IExpression) g).TryGetValueUnitGrannyByTypeId(
-                                            this.GetValueUnitTypeId(externalReferences), 
+                                            this.GetValueUnitTypeId(mirrors), 
                                             out IUnit vuResult
                                         )
                                     )
@@ -121,7 +121,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                 this,
                 parameters,
                 network,
-                this.externalReferences,
+                this.mirrors,
                 out result
             );
     }

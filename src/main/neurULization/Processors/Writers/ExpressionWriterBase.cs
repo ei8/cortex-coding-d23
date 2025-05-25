@@ -14,17 +14,17 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
         internal const string ExpressionTypePostsynapticInfoName = "ExpressionType";
         private readonly IUnitWriter unitWriter;
         private readonly TExpressionReader reader;
-        private readonly IExternalReferenceSet externalReferences;
+        private readonly IMirrorSet mirrors;
 
         public ExpressionWriterBase(
             IUnitWriter unitWriter,
             TExpressionReader reader,
-            IExternalReferenceSet externalReferences
+            IMirrorSet mirrors
         )
         {
             this.unitWriter = unitWriter;
             this.reader = reader;
-            this.externalReferences = externalReferences;
+            this.mirrors = mirrors;
         }
 
         protected abstract Neuron CreateGrannyNeuron(TExpressionParameterSet parameters);
@@ -39,7 +39,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
                     )
                 ),
                 network,
-                this.externalReferences,
+                this.mirrors,
                 out result,
                 () => network.AddOrGetIfExists(
                     this.CreateGrannyNeuron(parameters)
@@ -48,7 +48,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
                     // concat applicable expression types
                     GetExpressionTypes(
                         (id, isEqual) => parameters.UnitParameters.GetValueUnitParametersByTypeId(id, isEqual).Count(),
-                        this.externalReferences
+                        this.mirrors
                     )
                     .Select(et => new PostsynapticInfo()
                     {
@@ -64,7 +64,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
         public bool TryCreateGreatGrannies(
             TExpressionParameterSet parameters,
             Network network,
-            IExternalReferenceSet externalReferences,
+            IMirrorSet mirrors,
             out IEnumerable<IGreatGrannyInfo<IExpression>> result
         ) => this.TryCreateGreatGranniesCore(
             delegate (out bool bResult) {
@@ -85,27 +85,27 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Writers
 
         internal static IEnumerable<Neuron> GetExpressionTypes(
             Func<Guid, bool, int> headCountRetriever,
-            IExternalReferenceSet externalReferences
+            IMirrorSet mirrors
             )
         {
             var result = new List<Neuron>();
 
-            var headCount = headCountRetriever(externalReferences.Unit.Id, true);
-            var dependentCount = headCountRetriever(externalReferences.Unit.Id, false);
+            var headCount = headCountRetriever(mirrors.Unit.Id, true);
+            var dependentCount = headCountRetriever(mirrors.Unit.Id, false);
 
             if (headCount > 0)
             {
                 if (headCount > 1)
                 {
-                    result.Add(externalReferences.Coordination);
+                    result.Add(mirrors.Coordination);
                 }
                 else if (headCount == 1 && dependentCount == 0)
                 {
-                    result.Add(externalReferences.Simple);
+                    result.Add(mirrors.Simple);
                 }
                 if (dependentCount > 0)
                 {
-                    result.Add(externalReferences.Subordination);
+                    result.Add(mirrors.Subordination);
                 }
             }
             else

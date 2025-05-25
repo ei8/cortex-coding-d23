@@ -8,7 +8,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
     public class ExpressionReader : IExpressionReader
     {
         private readonly IUnitReader unitReader;
-        private readonly IExternalReferenceSet externalReferences;
+        private readonly IMirrorSet mirrors;
         private readonly IAggregateParser aggregateParser;
         private static readonly IGreatGrannyProcess<IExpression> target = new GreatGrannyProcess<IUnit, IUnitReader, IUnitParameterSet, IExpression>(
             ProcessHelper.TryParse
@@ -16,23 +16,23 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
 
         public ExpressionReader(
             IUnitReader unitReader,
-            IExternalReferenceSet externalReferences,
+            IMirrorSet mirrors,
             IAggregateParser aggregateParser
         )
         {
             AssertionConcern.AssertArgumentNotNull(unitReader, nameof(unitReader));
-            AssertionConcern.AssertArgumentNotNull(externalReferences, nameof(externalReferences));
+            AssertionConcern.AssertArgumentNotNull(mirrors, nameof(mirrors));
             AssertionConcern.AssertArgumentNotNull(aggregateParser, nameof(aggregateParser));
 
             this.unitReader = unitReader;
-            this.externalReferences = externalReferences;
+            this.mirrors = mirrors;
             this.aggregateParser = aggregateParser;
         }
 
         public bool TryCreateGreatGrannies(
             IExpressionParameterSet parameters, 
             Network network, 
-            IExternalReferenceSet externalReferences, 
+            IMirrorSet mirrors, 
             out IGreatGrannyInfoSuperset<IExpression> result
         ) => this.TryCreateGreatGranniesCore(
             delegate (out bool bResult) {
@@ -82,7 +82,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
                 this,
                 parameters,
                 network,
-                this.externalReferences,
+                this.mirrors,
                 out result
             );
     }

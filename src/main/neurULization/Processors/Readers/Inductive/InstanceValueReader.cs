@@ -18,29 +18,29 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
         public InstanceValueReader(
             IInstantiatesClassReader greatGrannyReader,
             IExpressionReader expressionReader,
-            IExternalReferenceSet externalReferences,
+            IMirrorSet mirrors,
             IAggregateParser aggregateParser
         ) : base(
             greatGrannyReader,
             expressionReader,
-            externalReferences,
+            mirrors,
             aggregateParser
         )
         {
         }
 
-        protected override IExpressionParameterSet CreateExpressionParameterSet(IExternalReferenceSet externalReferences, IInstanceValueParameterSet parameters, IEnumerable<Neuron> grannyCandidates, Network network) =>
+        protected override IExpressionParameterSet CreateExpressionParameterSet(IMirrorSet mirrors, IInstanceValueParameterSet parameters, IEnumerable<Neuron> grannyCandidates, Network network) =>
             new ExpressionParameterSet(
                 parameters.Granny,
                 new[]
                 {
                     UnitParameterSet.CreateWithGrannyAndType(
                         grannyCandidates.First(),
-                        externalReferences.Unit
+                        mirrors.Unit
                     ),
                     UnitParameterSet.CreateWithGrannyAndType(
                         grannyCandidates.ElementAt(1),
-                        externalReferences.NominalSubject
+                        mirrors.NominalSubject
                     )
                 }
             );

@@ -43,7 +43,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors
         protected abstract TGreatGrannyParameterSet CreateGreatGrannyParameterSet(TParameterSet parameters);
 
         protected abstract TExpressionParameterSet CreateExpressionParameterSet(
-            IExternalReferenceSet externalReferences,
+            IMirrorSet mirrors,
             TParameterSet parameters,
             Neuron greatGranny,
             Network network
@@ -52,7 +52,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors
         public bool TryCreateGreatGrannies(
             TParameterSet parameters,
             Network network,
-            IExternalReferenceSet externalReferences,            
+            IMirrorSet mirrors,            
             out IEnumerable<IGreatGrannyInfo<TGranny>> result
         ) => this.TryCreateGreatGranniesCore(
             delegate (out bool bResult) {
@@ -67,7 +67,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors
                         ),
                     new DependentGreatGrannyInfo<IExpression, TExpressionProcessor, TExpressionParameterSet, TGranny>(
                         expressionProcessor,
-                        (g) => CreateExpressionParameterSet(externalReferences, parameters, g.Neuron, network),
+                        (g) => CreateExpressionParameterSet(mirrors, parameters, g.Neuron, network),
                         (g, r) => r.Expression = g
                         )
                 };

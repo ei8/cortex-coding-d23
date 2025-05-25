@@ -7,18 +7,18 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
     public class InstantiatesClassReader : IInstantiatesClassReader
     {
         private readonly IExpressionReader expressionReader;
-        private readonly IExternalReferenceSet externalReferences;
+        private readonly IMirrorSet mirrors;
 
-        public InstantiatesClassReader(IExpressionReader expressionReader, IExternalReferenceSet externalReferences)
+        public InstantiatesClassReader(IExpressionReader expressionReader, IMirrorSet mirrors)
         {
             this.expressionReader = expressionReader;
-            this.externalReferences = externalReferences;
+            this.mirrors = mirrors;
         }
 
         public bool TryCreateGreatGrannies(
             IInstantiatesClassParameterSet parameters,
             Network network,
-            IExternalReferenceSet externalReferences,
+            IMirrorSet mirrors,
             out IEnumerable<IGreatGrannyInfo<IInstantiatesClass>> result
         ) => this.TryCreateGreatGranniesCore(
             delegate (out bool bResult) {
@@ -28,9 +28,9 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                 {
                     new IndependentGreatGrannyInfo<IExpression, IExpressionReader, IExpressionParameterSet, IInstantiatesClass>(
                         expressionReader,
-                        () => InstantiatesClassReader.CreateSubordinationParameterSet(externalReferences, parameters),
+                        () => InstantiatesClassReader.CreateSubordinationParameterSet(mirrors, parameters),
                         (g, r) => {
-                            if (coreBResult = g.TryGetValueUnitGrannyByTypeId(externalReferences.DirectObject.Id, out IUnit vuResult))
+                            if (coreBResult = g.TryGetValueUnitGrannyByTypeId(mirrors.DirectObject.Id, out IUnit vuResult))
                                 r.Class = vuResult;
                         }
                     )
@@ -43,21 +43,21 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
 
         public IEnumerable<IGrannyQuery> GetQueries(Network network, IInstantiatesClassParameterSet parameters) =>
             this.expressionReader.GetQueries(network,
-                InstantiatesClassReader.CreateSubordinationParameterSet(this.externalReferences, parameters)
+                InstantiatesClassReader.CreateSubordinationParameterSet(this.mirrors, parameters)
             );
 
-        private static ExpressionParameterSet CreateSubordinationParameterSet(IExternalReferenceSet externalReferences, IInstantiatesClassParameterSet parameters)
+        private static ExpressionParameterSet CreateSubordinationParameterSet(IMirrorSet mirrors, IInstantiatesClassParameterSet parameters)
         {
             return new ExpressionParameterSet(
                 new[]
                 {
                     new UnitParameterSet(
-                        externalReferences.Instantiates,
-                        externalReferences.Unit
+                        mirrors.Instantiates,
+                        mirrors.Unit
                     ),
                     new UnitParameterSet(
                         parameters.Class,
-                        externalReferences.DirectObject
+                        mirrors.DirectObject
                     )
                 }
             );
@@ -74,7 +74,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                     )
                 },
                 network,
-                this.externalReferences,
+                this.mirrors,
                 out result
             );
     }

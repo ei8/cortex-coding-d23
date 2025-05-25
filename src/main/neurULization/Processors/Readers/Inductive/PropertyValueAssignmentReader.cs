@@ -19,24 +19,24 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
         public PropertyValueAssignmentReader(
             IPropertyValueExpressionReader greatGrannyReader, 
             IExpressionReader expressionReader, 
-            IExternalReferenceSet externalReferences,
+            IMirrorSet mirrors,
             IAggregateParser aggregateParser
         ) : base(
             greatGrannyReader,
             expressionReader,
-            externalReferences,
+            mirrors,
             aggregateParser
         )
         {
         }
 
         protected override IExpressionParameterSet CreateExpressionParameterSet(
-            IExternalReferenceSet externalReferences,
+            IMirrorSet mirrors,
             IPropertyValueAssignmentParameterSet parameters,
             IEnumerable<Neuron> grannyCandidates,
             Network network
         ) => ProcessorExtensions.CreatePropertyValueAssignmentParameterSet(
-            externalReferences,
+            mirrors,
             parameters,
             grannyCandidates.First()
         );
@@ -48,7 +48,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
             grannyCandidate
         );
 
-        protected override Guid GetValueUnitTypeId(IExternalReferenceSet externalReferences) =>
-            externalReferences.NominalModifier.Id;
+        protected override Guid GetValueUnitTypeId(IMirrorSet mirrors) =>
+            mirrors.NominalModifier.Id;
     }
 }

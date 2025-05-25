@@ -33,17 +33,17 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
         where TParameterSet : IDeductiveParameterSet
         where TGrannyDerived : TGranny, new()
     {
-        private readonly IExternalReferenceSet externalReferences;
+        private readonly IMirrorSet mirrors;
 
         protected LesserExpressionReaderBase(
             TGreatGrannyReader greatGrannyReader,
             IExpressionReader expressionReader,
-            IExternalReferenceSet externalReferences
+            IMirrorSet mirrors
         ) : base (greatGrannyReader, expressionReader)
         {
-            AssertionConcern.AssertArgumentNotNull(externalReferences, nameof(externalReferences));
+            AssertionConcern.AssertArgumentNotNull(mirrors, nameof(mirrors));
 
-            this.externalReferences = externalReferences;
+            this.mirrors = mirrors;
         }
 
         public IEnumerable<IGrannyQuery> GetQueries(Network network, TParameterSet parameters) =>
@@ -54,7 +54,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                 ),
                 new GreatGrannyQuery<IExpression, IExpressionReader, IExpressionParameterSet>(
                     this.expressionProcessor,
-                    (n) => this.CreateExpressionParameterSet(this.externalReferences, parameters, n.Last().Neuron, network)
+                    (n) => this.CreateExpressionParameterSet(this.mirrors, parameters, n.Last().Neuron, network)
                 )
             };
 
@@ -72,7 +72,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
                         )
                 },
                 network,
-                this.externalReferences,
+                this.mirrors,
                 out result
             );
     }

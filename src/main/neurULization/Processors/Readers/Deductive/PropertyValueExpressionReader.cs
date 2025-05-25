@@ -16,22 +16,22 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
         public PropertyValueExpressionReader(
             IValueExpressionReader valueExpressionReader, 
             IExpressionReader expressionReader, 
-            IExternalReferenceSet externalReferences
+            IMirrorSet mirrors
         ) : base ( 
             valueExpressionReader,
             expressionReader,
-            externalReferences
+            mirrors
         )
         {
         }
 
         protected override IExpressionParameterSet CreateExpressionParameterSet(
-            IExternalReferenceSet externalReferences, 
+            IMirrorSet mirrors, 
             IPropertyValueExpressionParameterSet parameters, 
             Neuron greatGranny,
             Network network
         ) => ProcessorExtensions.CreatePropertyValueExpressionParameterSet(
-            externalReferences,
+            mirrors,
             greatGranny
         );
 
