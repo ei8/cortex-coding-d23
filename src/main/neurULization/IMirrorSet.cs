@@ -8,12 +8,6 @@
 
         Neuron Instantiates { get; set; }
 
-        Neuron Simple { get; set; }
-
-        Neuron Subordination { get; set; }
-
-        Neuron Coordination { get; set; }
-
         Neuron Unit { get; set; }
 
         Neuron Of { get; set; }

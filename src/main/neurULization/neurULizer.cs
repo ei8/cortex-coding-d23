@@ -26,9 +26,9 @@ namespace ei8.Cortex.Coding.d23.neurULization
         }
 
         public Network neurULize<TValue>(
-            TValue value, 
+            TValue value,
+            IEnumerable<Coding.Neuron> idPropertyValueNeurons,
             neurULizerTypeInfo typeInfo,
-            IDictionary<Guid, Coding.Neuron> idPropertyValueNeurons,
             IDictionary<string, Coding.Neuron> mirrors
         )
             where TValue : class
@@ -66,7 +66,7 @@ namespace ei8.Cortex.Coding.d23.neurULization
                                 IPropertyAssociationParameterSet paps = null;
 
                                 var valueNeuron = gp.ValueMatchBy == ValueMatchBy.Id ?
-                                    idPropertyValueNeurons[Guid.Parse(gp.Value)] :
+                                    idPropertyValueNeurons.Single(ipvn => ipvn.Id == Guid.Parse(gp.Value)) :
                                     Neuron.CreateTransient(gp.Value, null, regionId);
 
                                 if (neurULizer.IsValueAssociation(gp))

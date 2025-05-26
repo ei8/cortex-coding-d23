@@ -1,6 +1,5 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
 using System;
-using System.Threading.Tasks;
 
 namespace ei8.Cortex.Coding.d23.neurULization
 {
@@ -16,4 +15,13 @@ namespace ei8.Cortex.Coding.d23.neurULization
         where TGrannyProcessor : IGrannyProcessor<TGranny, TParameterSet>
         where TParameterSet : IParameterSet
         where TAggregate : IGranny;
+
+    [Flags]
+    public enum ExpressionType : short
+    {
+        NotSet = 0,
+        Simple = 1,
+        Subordination = 2,
+        Coordination = 4
+    }
 }
