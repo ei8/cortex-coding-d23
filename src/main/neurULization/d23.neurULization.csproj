@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>ei8.Cortex.Coding.d23.neurULization</RootNamespace>
+    <AssemblyName>ei8.Cortex.Coding.d23.neurULization</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Implementation\**" />
+    <Compile Remove="Processors\Readers\**" />
+    <Compile Remove="Processors\Writers\**" />
+    <EmbeddedResource Remove="Implementation\**" />
+    <EmbeddedResource Remove="Processors\Readers\**" />
+    <EmbeddedResource Remove="Processors\Writers\**" />
+    <None Remove="Implementation\**" />
+    <None Remove="Processors\Readers\**" />
+    <None Remove="Processors\Writers\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\d23.csproj" />
+  </ItemGroup>
+
+</Project>

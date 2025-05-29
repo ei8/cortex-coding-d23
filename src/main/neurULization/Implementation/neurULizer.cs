@@ -1,4 +1,5 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
+using ei8.Cortex.Coding.d23.neurULization;
 using ei8.Cortex.Coding.d23.neurULization.Processors.Readers;
 using ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive;
 using ei8.Cortex.Coding.d23.neurULization.Processors.Writers;
@@ -12,7 +13,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace ei8.Cortex.Coding.d23.neurULization
+namespace ei8.Cortex.Coding.d23.neurULization.Implementation
 {
     public class neurULizer : IneurULizer
     {
@@ -269,6 +270,7 @@ namespace ei8.Cortex.Coding.d23.neurULization
                 gp.ValueMatchBy == ValueMatchBy.Id;
         }
 
+        // TODO:0 remove?
         public IneurULizerOptions Options => this.options;
     }
 }

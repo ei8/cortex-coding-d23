@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive</AssemblyName>
+    <RootNamespace>ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\d23.neurULization.csproj" />
+    <ProjectReference Include="..\Readers.csproj" />
+  </ItemGroup>
+
+</Project>

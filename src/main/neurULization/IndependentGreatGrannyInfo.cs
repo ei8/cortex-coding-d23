@@ -3,7 +3,7 @@ using System;
 
 namespace ei8.Cortex.Coding.d23.neurULization
 {
-    internal class IndependentGreatGrannyInfo<TGranny, TProcessor, TParameterSet, TAggregate> : IIndependentGreatGrannyInfo<TGranny, TProcessor, TParameterSet, TAggregate>
+    public class IndependentGreatGrannyInfo<TGranny, TProcessor, TParameterSet, TAggregate> : IIndependentGreatGrannyInfo<TGranny, TProcessor, TParameterSet, TAggregate>
         where TGranny : IGranny
         where TProcessor : IGrannyProcessor<TGranny, TParameterSet>
         where TParameterSet : IParameterSet

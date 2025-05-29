@@ -313,7 +313,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
             Debug.WriteLine($"{AggregateParser.GetPrefix(AggregateParser.Counter, 3)}{value}");
         }
 
-        internal static string GetPrefix(Func<int, int> counter, int indent = 0)
+        public static string GetPrefix(Func<int, int> counter, int indent = 0)
         {
             var prefix = $"{new StringBuilder().Insert(0, "|--", counter(indent))}";
             return prefix;

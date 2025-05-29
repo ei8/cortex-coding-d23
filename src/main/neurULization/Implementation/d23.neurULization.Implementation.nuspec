@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package>
+  <metadata>
+    <id>ei8.Cortex.Coding.d23</id>
+    <version>0.0.8</version>
+    <title>ei8.Cortex.Coding.d23</title>
+    <authors>Elmer Roderick Niem Bool</authors>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <licenseUrl>https://www.gnu.org/licenses/agpl-3.0.en.html</licenseUrl>
+    <description>Cortex Coding d#</description>
+    <releaseNotes>Initial</releaseNotes>
+    <tags>cortex coding d#</tags>
+  </metadata>
+</package>
+
+<!--Use to pack - nuget pack d23.neurULization.Implementation.csproj -IncludeReferencedProjects-->

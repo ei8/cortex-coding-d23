@@ -2,7 +2,7 @@
 
 namespace ei8.Cortex.Coding.d23.neurULization
 {
-    internal class GreatGrannyProcess<TGranny, TGrannyProcessor, TParameterSet, TAggregate> : IGreatGrannyProcess<TAggregate>
+    public class GreatGrannyProcess<TGranny, TGrannyProcessor, TParameterSet, TAggregate> : IGreatGrannyProcess<TAggregate>
         where TGranny : IGranny
         where TGrannyProcessor : IGrannyProcessor<TGranny, TParameterSet>
         where TParameterSet : IParameterSet

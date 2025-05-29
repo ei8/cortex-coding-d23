@@ -9,7 +9,7 @@ namespace ei8.Cortex.Coding.d23.neurULization
 {
     public static class GrannyExtensions
     {
-        internal static void TryParseCore<TGranny>(
+        public static void TryParseCore<TGranny>(
             this TGranny granny,
             Network network,
             IEnumerable<Guid> selection,
@@ -59,7 +59,7 @@ namespace ei8.Cortex.Coding.d23.neurULization
             return bResult;
         }
 
-        internal static bool TryGetPropertyValue(this IPropertyAssociation propertyAssociation, out IGranny result)
+        public static bool TryGetPropertyValue(this IPropertyAssociation propertyAssociation, out IGranny result)
         {
             result = default;
 
@@ -85,7 +85,7 @@ namespace ei8.Cortex.Coding.d23.neurULization
             return result;
         }
 
-        internal static bool HasPropertyAssignment(this IPropertyAssociation propertyAssociation, Neuron unit, Neuron property) =>
+        public static bool HasPropertyAssignment(this IPropertyAssociation propertyAssociation, Neuron unit, Neuron property) =>
             propertyAssociation.TryGetGreatGranny(out IPropertyValueAssignment pva) && pva.Expression.HasUnitValue(unit, property) ||
             propertyAssociation.TryGetGreatGranny(out IPropertyInstanceValueAssignment piva) && piva.Expression.HasUnitValue(unit, property);
 

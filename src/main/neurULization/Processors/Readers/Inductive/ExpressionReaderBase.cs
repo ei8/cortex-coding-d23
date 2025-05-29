@@ -2,7 +2,6 @@
 using neurUL.Common.Domain.Model;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
 {

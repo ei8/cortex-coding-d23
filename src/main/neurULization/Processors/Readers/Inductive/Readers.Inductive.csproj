@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive</AssemblyName>
+    <RootNamespace>ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive</RootNamespace>
+  </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+	    <DefineConstants>$(DefineConstants);PARSELOG;</DefineConstants>
+    </PropertyGroup>
+	
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\d23.csproj" />
+    <ProjectReference Include="..\..\..\d23.neurULization.csproj" />
+    <ProjectReference Include="..\Readers.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -8,8 +8,6 @@
 
         public Neuron DirectObject { get; set; }
 
-        public Neuron Idea { get; set; }
-
         public Neuron Instantiates { get; set; }
 
         public Neuron Unit { get; set; }

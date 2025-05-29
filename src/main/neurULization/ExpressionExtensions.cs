@@ -6,12 +6,12 @@ using System.Linq;
 
 namespace ei8.Cortex.Coding.d23.neurULization
 {
-    internal static class ExpressionExtensions
+    public static class ExpressionExtensions
     {
-        internal static IEnumerable<IUnit> GetValueUnitGranniesByTypeId(this IExpression expression, Guid typeId, bool isEqual = true) =>
+        public static IEnumerable<IUnit> GetValueUnitGranniesByTypeId(this IExpression expression, Guid typeId, bool isEqual = true) =>
             expression.Units.Where(u => isEqual ? u.Type.Id == typeId : u.Type.Id != typeId);
 
-        internal static bool TryGetValueUnitGrannyByTypeId(this IExpression expression, Guid valueTypeId, out IUnit result)
+        public static bool TryGetValueUnitGrannyByTypeId(this IExpression expression, Guid valueTypeId, out IUnit result)
         {
             var bResult = true;
             var valueUnits = expression.GetValueUnitGranniesByTypeId(valueTypeId);

@@ -2,10 +2,10 @@
 
 namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
 {
-    internal static class ProcessorExtensions
+    public static class ProcessorExtensions
     {
         #region ValueReader
-        internal static IIdExpressionParameterSet CreateIdInstanceValueParameterSet(
+        public static IIdExpressionParameterSet CreateIdInstanceValueParameterSet(
             IMirrorSet mirrors,
             Neuron value,
             Neuron greatGranny,
@@ -25,7 +25,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
             id
         );
 
-        internal static IExpressionParameterSet CreateInstanceValueParameterSet(
+        public static IExpressionParameterSet CreateInstanceValueParameterSet(
             IMirrorSet mirrors,
             Neuron value,
             Neuron greatGranny
@@ -45,7 +45,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
         #endregion
 
         #region ValueExpressionReader
-        internal static IExpressionParameterSet CreateValueExpressionParameterSet(
+        public static IExpressionParameterSet CreateValueExpressionParameterSet(
             IMirrorSet mirrors,
             Neuron greatGranny
         ) => new ExpressionParameterSet(
@@ -59,7 +59,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
         #endregion
 
         #region PropertyValueExpressionReader
-        internal static IExpressionParameterSet CreatePropertyValueExpressionParameterSet(
+        public static IExpressionParameterSet CreatePropertyValueExpressionParameterSet(
             IMirrorSet mirrors,
             Neuron greatGranny
         ) => new ExpressionParameterSet(
@@ -78,7 +78,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
         #endregion
 
         #region PropertyValueAssignmentReader
-        internal static IExpressionParameterSet CreatePropertyValueAssignmentParameterSet(
+        public static IExpressionParameterSet CreatePropertyValueAssignmentParameterSet(
             IMirrorSet mirrors,
             IPropertyParameterSetCore propertyParameters,
             Neuron greatGranny
@@ -98,7 +98,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
         #endregion
 
         #region PropertyValueAssociationReader
-        internal static IExpressionParameterSet CreatePropertyValueAssociationParameterSet(
+        public static IExpressionParameterSet CreatePropertyValueAssociationParameterSet(
             IMirrorSet mirrors,
             Neuron greatGranny
         ) => new ExpressionParameterSet(

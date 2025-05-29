@@ -4,8 +4,6 @@
     {
         Neuron DirectObject { get; set; }
 
-        Neuron Idea { get; set; }
-
         Neuron Instantiates { get; set; }
 
         Neuron Unit { get; set; }

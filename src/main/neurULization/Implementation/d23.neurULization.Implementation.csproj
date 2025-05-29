@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+	  <RootNamespace>ei8.Cortex.Coding.d23.neurULization.Implementation</RootNamespace>
+	  <AssemblyName>ei8.Cortex.Coding.d23.neurULization.Implementation</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ei8.Cortex.Coding" Version="0.0.8" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\d23.csproj" />
+    <ProjectReference Include="..\d23.neurULization.csproj" />
+    <ProjectReference Include="..\Processors\Readers\Deductive\Readers.Deductive.csproj" />
+    <ProjectReference Include="..\Processors\Readers\Inductive\Readers.Inductive.csproj" />
+    <ProjectReference Include="..\Processors\Readers\Readers.csproj" />
+    <ProjectReference Include="..\Processors\Writers\Writers.csproj" />
+  </ItemGroup>
+
+</Project>

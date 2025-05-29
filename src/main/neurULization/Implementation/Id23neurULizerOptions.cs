@@ -1,7 +1,7 @@
 ﻿using ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive;
 using ei8.Cortex.Coding.d23.neurULization.Processors.Writers;
 
-namespace ei8.Cortex.Coding.d23.neurULization
+namespace ei8.Cortex.Coding.d23.neurULization.Implementation
 {
     public interface Id23neurULizerOptions : IneurULizerOptions
     {

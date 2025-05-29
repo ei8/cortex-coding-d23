@@ -10,7 +10,7 @@ namespace ei8.Cortex.Coding.d23.neurULization
     /// <typeparam name="TProcessor"></typeparam>
     /// <typeparam name="TParameterSet"></typeparam>
     /// <typeparam name="TAggregate"></typeparam>
-    internal interface IIndependentGreatGrannyInfo<TGranny, TProcessor, TParameterSet, TAggregate> : ICoreGreatGrannyInfo<TGranny, TProcessor, TAggregate>
+    public interface IIndependentGreatGrannyInfo<TGranny, TProcessor, TParameterSet, TAggregate> : ICoreGreatGrannyInfo<TGranny, TProcessor, TAggregate>
         where TGranny : IGranny
         where TProcessor : IGrannyProcessor<TGranny, TParameterSet>
         where TParameterSet : IParameterSet
