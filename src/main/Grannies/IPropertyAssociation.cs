@@ -7,6 +7,7 @@
     public interface IPropertyAssociation<TPropertyAssignment> : 
         IPropertyAssociation,
         ILesserGranny<TPropertyAssignment>
+        where TPropertyAssignment : IGranny
     {
     }
 }

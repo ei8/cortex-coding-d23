@@ -8,6 +8,6 @@
 
         public Neuron Neuron { get; set; }
 
-        public object GetGreatGranny() => this.GreatGranny;
+        public IGranny GetGreatGranny() => this.GreatGranny;
     }
 }

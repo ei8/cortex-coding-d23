@@ -45,6 +45,13 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
         #endregion
 
         #region ValueExpressionReader
+        /// <summary>
+        /// Creates a ValueExpressionParameterSet which consists of a "Simple" expression 
+        /// that contains a single syntactic unit which is a merge of a Value and the Unit neuron, making it a Head unit.
+        /// </summary>
+        /// <param name="mirrors"></param>
+        /// <param name="greatGranny"></param>
+        /// <returns></returns>
         public static IExpressionParameterSet CreateValueExpressionParameterSet(
             IMirrorSet mirrors,
             Neuron greatGranny

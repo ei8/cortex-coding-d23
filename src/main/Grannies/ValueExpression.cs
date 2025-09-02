@@ -1,5 +1,8 @@
 ﻿namespace ei8.Cortex.Coding.d23.Grannies
 {
+    /// <summary>
+    /// An Expression with a single Head Unit - a "merge" of Unit Neuron and a Value.
+    /// </summary>
     public class ValueExpression : IValueExpression
     {
         public IValue GreatGranny { get; set; }
@@ -8,6 +11,6 @@
 
         public Neuron Neuron { get; set; }
 
-        public object GetGreatGranny() => this.GreatGranny;
+        public IGranny GetGreatGranny() => this.GreatGranny;
     }
 }

@@ -2,10 +2,11 @@
 {
     public interface ILesserGranny : IGranny
     {
-        object GetGreatGranny();
+        IGranny GetGreatGranny();
     }
 
-    public interface ILesserGranny<TGreatGranny> : ILesserGranny
+    public interface ILesserGranny<TGreatGranny> : ILesserGranny 
+        where TGreatGranny : IGranny
     {
         TGreatGranny GreatGranny { get; set; }
     }
