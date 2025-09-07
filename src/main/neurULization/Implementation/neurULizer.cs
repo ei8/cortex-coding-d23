@@ -10,6 +10,7 @@ using ei8.Cortex.Coding.Wrappers;
 using neurUL.Common.Domain.Model;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 
@@ -215,7 +216,8 @@ namespace ei8.Cortex.Coding.d23.neurULization.Implementation
                                     property.PropertyType == typeof(DateTimeOffset)
                                     )
                                 {
-                                    propValue = DateTimeOffset.Parse(propValueString);
+                                    // ei8.Cortex.Coding.Reflection.ReflectionExtensions.ToPropertyData uses "o" format-specifier (RoundtripKind)
+                                    propValue = DateTimeOffset.Parse(propValueString, null, DateTimeStyles.RoundtripKind);
                                 }
                                 // TODO: else use neurULConverterAttribute
                             }
