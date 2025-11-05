@@ -304,7 +304,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Inductive
         private static void LogPropertyName(IParameterSet parameters, IEnumerable<MirrorConfig> mirrorConfigs)
         {
             if (parameters is Processors.Readers.IPropertyParameterSetCore prop)
-                LogCandidateLine($"Property Name: {mirrorConfigs.Single(mc => mc.Url == prop.Property.MirrorUrl).Key}");
+                LogCandidateLine($"Property Name(s): {string.Join(", ", mirrorConfigs.Single(mc => mc.Url == prop.Property.MirrorUrl).Keys)}");
         }
 
         [Conditional("PARSELOG")]

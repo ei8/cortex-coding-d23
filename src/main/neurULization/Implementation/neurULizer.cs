@@ -1,12 +1,11 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
-using ei8.Cortex.Coding.d23.neurULization;
 using ei8.Cortex.Coding.d23.neurULization.Processors.Readers;
 using ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive;
 using ei8.Cortex.Coding.d23.neurULization.Processors.Writers;
-using ei8.Cortex.Coding.Properties;
-using ei8.Cortex.Coding.Properties.Neuron;
-using ei8.Cortex.Coding.Reflection;
-using ei8.Cortex.Coding.Wrappers;
+using ei8.Cortex.Coding.Model.Properties;
+using ei8.Cortex.Coding.Model.Properties.Neuron;
+using ei8.Cortex.Coding.Model.Reflection;
+using ei8.Cortex.Coding.Model.Wrappers;
 using neurUL.Common.Domain.Model;
 using System;
 using System.Collections.Generic;
@@ -67,9 +66,18 @@ namespace ei8.Cortex.Coding.d23.neurULization.Implementation
                             {
                                 IPropertyAssociationParameterSet paps = null;
 
-                                var valueNeuron = gp.ValueMatchBy == ValueMatchBy.Id ?
-                                    idPropertyValueNeurons.Single(ipvn => ipvn.Id == Guid.Parse(gp.Value)) :
-                                    Neuron.CreateTransient(gp.Value, null, regionId);
+                                Neuron valueNeuron = null;
+                                if (gp.ValueMatchBy == ValueMatchBy.Id)
+                                {
+                                    valueNeuron = idPropertyValueNeurons.SingleOrDefault(ipvn => ipvn.Id == Guid.Parse(gp.Value));
+                                    AssertionConcern.AssertArgumentNotNull(
+                                        valueNeuron, 
+                                        $"Required '{gp.PropertyName}' property value neuron with ID '{gp.Value}' for class " +
+                                        $"'{typeof(TValue)}' was not found in specified '{nameof(idPropertyValueNeurons)}'."
+                                    );
+                                }
+                                else
+                                    valueNeuron = Neuron.CreateTransient(gp.Value, null, regionId);
 
                                 if (neurULizer.IsValueAssociation(gp))
                                 {
@@ -199,7 +207,7 @@ namespace ei8.Cortex.Coding.d23.neurULization.Implementation
                             }
                             else
                             {
-                                AssertionConcern.Equals(gp.ClassKey, MirrorConfig.ToKeyString(property.PropertyType));
+                                AssertionConcern.Equals(gp.ClassKey, property.PropertyType.ToKeyString());
 
                                 string propValueString = propValueGranny.GetValueTag(this.options.Mirrors.NominalSubject.Id);
 

@@ -1,12 +1,10 @@
 ﻿using ei8.Cortex.Coding.d23.Grannies;
-using ei8.Cortex.Coding.d23.neurULization;
-using ei8.Cortex.Coding.d23.neurULization.Processors;
 using ei8.Cortex.Coding.d23.neurULization.Queries;
 using ei8.Cortex.Coding.d23.neurULization.Selectors;
+using ei8.Cortex.Library.Common;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System;
-using ei8.Cortex.Library.Common;
 
 namespace ei8.Cortex.Coding.d23.neurULization.Processors.Readers.Deductive
 {

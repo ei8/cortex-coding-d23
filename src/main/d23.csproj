@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="ei8.Cortex.Coding" Version="0.1.9" />
+    <PackageReference Include="ei8.Cortex.Coding" Version="0.2.5" />
   </ItemGroup>
 	
 </Project>
