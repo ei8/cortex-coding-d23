@@ -89,12 +89,24 @@ namespace ei8.Cortex.Coding.d23.neurULization.Implementation
                                     );
                                 }
                                 else
-                                    paps = new PropertyInstanceValueAssociationParameterSet(
-                                        mirrors[gp.Key],
-                                        valueNeuron,
-                                        mirrors[gp.ClassKey],
-                                        gp.ValueMatchBy
-                                    );
+                                {
+                                    try
+                                    {
+                                        paps = new PropertyInstanceValueAssociationParameterSet(
+                                            mirrors[gp.Key],
+                                            valueNeuron,
+                                            mirrors[gp.ClassKey],
+                                            gp.ValueMatchBy
+                                        );
+                                    }
+                                    catch(Exception ex)
+                                    {
+                                        throw new ApplicationException(
+                                            $"An exception occurred while constructing property '{gp.Key}' ({gp.ClassKey})",
+                                            ex
+                                        );
+                                    }
+                                }
 
                                 return paps;
                             })
