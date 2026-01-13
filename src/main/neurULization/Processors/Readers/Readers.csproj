@@ -16,10 +16,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="ei8.Cortex.Coding" Version="0.2.5" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\..\d23.neurULization.csproj" />
   </ItemGroup>
 
