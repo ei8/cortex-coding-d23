@@ -1,14 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <package>
   <metadata>
-    <id>ei8.Cortex.Coding.d23</id>
-    <version>0.1.9</version>
-    <title>ei8.Cortex.Coding.d23</title>
+    <id>ei8.Cortex.Coding.d23.neurULization</id>
+    <version>0.1.0</version>
+    <title>ei8.Cortex.Coding.d23.neurULization</title>
     <authors>Elmer Roderick Niem Bool</authors>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <licenseUrl>https://www.gnu.org/licenses/agpl-3.0.en.html</licenseUrl>
-    <description>Cortex Coding d#</description>
-    <releaseNotes>Initial</releaseNotes>
-    <tags>cortex coding d#</tags>
+    <description>Cortex Coding d# neurULization</description>
+    <releaseNotes>Renamed from ei8.Cortex.Coding.d23</releaseNotes>
+    <tags>cortex coding d# neurULization</tags>
   </metadata>
 </package>

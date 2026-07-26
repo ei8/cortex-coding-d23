@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\d23.csproj" />
     <ProjectReference Include="..\d23.neurULization.csproj" />
     <ProjectReference Include="..\Processors\Readers\Deductive\Readers.Deductive.csproj" />
     <ProjectReference Include="..\Processors\Readers\Inductive\Readers.Inductive.csproj" />

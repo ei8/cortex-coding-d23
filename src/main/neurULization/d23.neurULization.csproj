@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\d23.csproj" />
+    <ProjectReference Include="..\Grannies\d23.Grannies.csproj" />
   </ItemGroup>
 
 </Project>

@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Grannies\d23.Grannies.csproj" />
     <ProjectReference Include="..\..\d23.neurULization.csproj" />
   </ItemGroup>
 

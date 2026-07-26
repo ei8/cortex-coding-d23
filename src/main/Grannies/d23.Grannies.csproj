@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+	  <AssemblyName>ei8.Cortex.Coding.d23.Grannies</AssemblyName>
+	  <RootNamespace>ei8.Cortex.Coding.d23.Grannies</RootNamespace>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+	  <DefineConstants>$(DefineConstants);</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+	  <Compile Remove="neurULization\**" />
+	  <EmbeddedResource Remove="neurULization\**" />
+	  <None Remove="neurULization\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+	  <PackageReference Include="ei8.Cortex.Coding" Version="0.3.0" />
+  </ItemGroup>
+
+</Project>

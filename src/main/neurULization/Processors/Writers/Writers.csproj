@@ -10,7 +10,7 @@
 		<DefineConstants>$(DefineConstants);<!--BUILDLOG--></DefineConstants>
 	</PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\d23.csproj" />
+    <ProjectReference Include="..\..\..\Grannies\d23.Grannies.csproj" />
     <ProjectReference Include="..\Readers\Deductive\Readers.Deductive.csproj" />
     <ProjectReference Include="..\Readers\Inductive\Readers.Inductive.csproj" />
   </ItemGroup>

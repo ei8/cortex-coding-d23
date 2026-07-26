@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Grannies\d23.Grannies.csproj" />
     <ProjectReference Include="..\..\..\d23.neurULization.csproj" />
     <ProjectReference Include="..\Readers.csproj" />
   </ItemGroup>
