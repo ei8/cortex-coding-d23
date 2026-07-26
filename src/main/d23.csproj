@@ -1,9 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
     <AssemblyName>ei8.Cortex.Coding.d23</AssemblyName>
     <RootNamespace>ei8.Cortex.Coding.d23</RootNamespace>
+    <LangVersion>12.0</LangVersion>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -20,7 +22,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="ei8.Cortex.Coding" Version="0.3.0" />
+    <PackageReference Include="ei8.Cortex.Coding" Version="0.3.5" />
+    <PackageReference Include="ei8.Cortex.Coding.Spiker" Version="0.1.7" />
   </ItemGroup>
 	
 </Project>
