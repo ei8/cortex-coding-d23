@@ -11,8 +11,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Grannies\**" />
     <Compile Remove="neurULization\**" />
+    <EmbeddedResource Remove="Grannies\**" />
     <EmbeddedResource Remove="neurULization\**" />
+    <None Remove="Grannies\**" />
     <None Remove="neurULization\**" />
   </ItemGroup>
 
