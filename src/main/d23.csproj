@@ -31,7 +31,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="ei8.Cortex.Coding" Version="0.3.5" />
+    <PackageReference Include="ei8.Cortex.Coding" Version="0.3.6" />
     <PackageReference Include="ei8.Cortex.Coding.Spiker" Version="0.1.7" />
   </ItemGroup>
 	
