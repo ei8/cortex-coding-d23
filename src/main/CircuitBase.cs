@@ -3,7 +3,7 @@
 namespace ei8.Cortex.Coding.d23
 {
     public abstract class CircuitBase<TParam, TNeuron> : ICircuit<TParam, TNeuron>
-        where TParam : ProceduralParameterInfo<TNeuron>, new()
+        where TParam : ParameterBase<TNeuron>, new()
         where TNeuron : NeuronInfoBase
     {
         protected Network network;

@@ -1,6 +1,6 @@
 ﻿namespace ei8.Cortex.Coding.d23
 {
-    public abstract class FunctionalCircuitBase<TNeuron> : CircuitBase<FunctionalParameterInfo<TNeuron>, TNeuron>
+    public abstract class FunctionalCircuitBase<TNeuron> : CircuitBase<FunctionalParameter<TNeuron>, TNeuron>
         where TNeuron : NeuronInfoBase
     {
     }

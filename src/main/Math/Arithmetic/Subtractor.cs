@@ -41,7 +41,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
         }
 
         public Subtractor(
-            FunctionalParameterInfo<BinaryNeuronInfo> parameters,
+            FunctionalParameter<BinaryNeuronInfo> parameters,
             int exponent = 0
         )
         {

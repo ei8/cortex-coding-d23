@@ -13,7 +13,7 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
 
         public static bool TryCreate<T>(
             [NotNullWhen(true)] out T? result,
-            FunctionalParameterInfo<BinaryNeuronInfo> parameters,
+            FunctionalParameter<BinaryNeuronInfo> parameters,
             InterneuronTagInfo? interneuronTagInfo = null,
             [CallerArgumentExpression(nameof(result))] string parameterExpression = "",
             params Neuron[] additionalInputs
