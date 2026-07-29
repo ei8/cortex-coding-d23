@@ -28,15 +28,15 @@ namespace ei8.Cortex.Coding.d23
         } 
 
         public static void AddReplaceItems(this Network original, params IneurUL[] neurULizedObjects) =>
-            original.AddReplaceItems(neurULizedObjects.Select(no => no.Network).ToArray());
+            original.AddReplaceItems([..neurULizedObjects.Select(no => no.Network)]);
 
-        public static void AddReplaceItems(this Network original, params Network[] networks)
+        public static void AddReplaceItems(this Network original, params ReadOnlyNetwork[] networks)
         {
             foreach (var n in networks)
                 original.AddReplaceItems(n);
         }
 
-        public static Neuron GetInterneuron(this Network value) => value.GetItems<Neuron>().Single();
+        public static Neuron GetInterneuron(this ReadOnlyNetwork value) => value.GetItems<Neuron>().Single();
 
 
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
@@ -182,6 +182,14 @@ namespace ei8.Cortex.Coding.d23
             }
 
             return result;
+        }
+
+        // Source - https://stackoverflow.com/a/59434717
+        // Posted by Pavel Anikhouski, modified by community. See post 'Timeline' for change history
+        // Retrieved 2026-07-28, License - CC BY-SA 4.0
+        public static IEnumerable<T> WhereNotNull<T>(this IEnumerable<T?> enumerable) where T : class
+        {
+            return enumerable.Where(e => e != null).Select(e => e!);
         }
     }
 }

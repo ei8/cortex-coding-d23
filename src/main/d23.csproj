@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <AssemblyName>ei8.Cortex.Coding.d23</AssemblyName>
     <RootNamespace>ei8.Cortex.Coding.d23</RootNamespace>
     <PackageId>ei8.Cortex.Coding.d23</PackageId>
@@ -13,7 +13,7 @@
     <PackageTags>cortex coding d#</PackageTags>
     <Version>0.2.1</Version>
     <PackageLicenseUrl>https://www.gnu.org/licenses/agpl-3.0.en.html</PackageLicenseUrl>
-    <LangVersion>12.0</LangVersion>
+    <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
@@ -31,8 +31,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="ei8.Cortex.Coding" Version="0.3.6" />
-    <PackageReference Include="ei8.Cortex.Coding.Spiker" Version="0.1.7" />
+    <PackageReference Include="ei8.Cortex.Coding" Version="0.3.8" />
+    <PackageReference Include="ei8.Cortex.Coding.Spiker" Version="0.1.9" />
   </ItemGroup>
 	
 </Project>

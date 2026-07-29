@@ -1,37 +1,48 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace ei8.Cortex.Coding.d23.Math.Logic
 {
-    public abstract class LogicGateBase : ICircuit
+    public abstract class LogicGateBase : FunctionalCircuitBase<BinaryNeuronInfo>
     {
-        public LogicGateBase()
+        public LogicGateBase() : base()
         {
-            this.Network = new();
-            this.Interneurons = [];
-            this.Parameters = new([], []);
         }
 
         public static bool TryCreate<T>(
             [NotNullWhen(true)] out T? result,
-            FunctionParameterInfo parameters,
-            LogicGateInterneuronTagInfo? interneuronTagInfo = null,
+            FunctionalParameterInfo<BinaryNeuronInfo> parameters,
+            InterneuronTagInfo? interneuronTagInfo = null,
             [CallerArgumentExpression(nameof(result))] string parameterExpression = "",
             params Neuron[] additionalInputs
-        ) where T : LogicGateBase, new()
+        ) 
+            where T : LogicGateBase, new()
         {
             bool bResult = false;
             result = null;
             if (VariableInfo.TryParse(parameterExpression, out var variableInfo))
             {
                 result = new();
+                var output = parameters.Outputs.Single();
+                var interneuronNetworks = Enumerable.Empty<ReadOnlyNetwork>();
+                if (output != null)
+                    interneuronNetworks = NetworkHelper.CreateInterneuronNetworks(
+                        result.GetInterneuronOutputs(output),
+                        result.GetInterneuronTags(variableInfo, interneuronTagInfo)
+                    );
+                
                 result.Initialize(
                     parameters,
-                    variableInfo,
-                    interneuronTagInfo,
-                    additionalInputs
+                    [
+                        ..interneuronNetworks,
+                        ..result.LinkInputNeurons(
+                            parameters.Inputs.WhereNotNull(),
+                            interneuronNetworks,
+                            additionalInputs
+                        )
+                    ]
                 );
                 bResult = true;
             }
@@ -43,52 +54,13 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
 
         protected abstract string[] GetInterneuronTags(
             VariableInfo variableInfo,
-            LogicGateInterneuronTagInfo? interneuronTagInfo = null
+            InterneuronTagInfo? interneuronTagInfo = null
         );
 
-        protected static Network[] CreateInterneuronNetworks(
-            Neuron[] outputs,
-            string[] outputInterneuronTags
-        ) => 
-        [
-            ..outputs.Select(o => {
-            var index = Array.IndexOf(outputs, o);
-            return NetworkHelper.CreateInterneuronNetwork(outputInterneuronTags[index], outputs[index]);
-        })];
-
-        protected abstract Network LinkInputNeurons(
-            BinaryNeuronInfo[] inputs,
+        protected abstract IEnumerable<ReadOnlyNetwork> LinkInputNeurons(
+            IEnumerable<BinaryNeuronInfo> inputs,
+            IEnumerable<ReadOnlyNetwork> interneuronNetworks,
             params Neuron[] additionalInputs
         );
-
-        protected void Initialize(
-            FunctionParameterInfo parameters, 
-            VariableInfo variableInfo,
-            LogicGateInterneuronTagInfo? interneuronTagInfo = null,
-            params Neuron[] additionalInputs
-        )
-        {
-            this.Parameters = parameters;
-            this.Network.AddReplaceItems(this.Parameters);
-            this.Interneurons = LogicGateBase.CreateInterneuronNetworks(
-                    this.GetInterneuronOutputs(this.Parameters.Outputs.Single()),
-                    this.GetInterneuronTags(variableInfo, interneuronTagInfo)
-                );
-            this.Network.AddReplaceItems(
-                [
-                    ..this.Interneurons,
-                    this.LinkInputNeurons(
-                        parameters.Inputs,
-                        additionalInputs
-                    )
-                ]
-            );
-        }
-
-        public Network[] Interneurons { get; private set; }
-
-        public Network Network { get; }
-
-        public FunctionParameterInfo Parameters { get; private set; }
     }
 }

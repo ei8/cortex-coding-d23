@@ -1,5 +1,5 @@
 ﻿using neurUL.Common.Domain.Model;
-using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace ei8.Cortex.Coding.d23.Math.Logic
@@ -10,7 +10,7 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
         {
         }
 
-        protected override string[] GetInterneuronTags(VariableInfo variableInfo, LogicGateInterneuronTagInfo? interneuronTagInfo = null)
+        protected override string[] GetInterneuronTags(VariableInfo variableInfo, InterneuronTagInfo? interneuronTagInfo = null)
         {
             string typeTagPrefix = string.Empty,
                 input1TagPrefix = string.Empty,
@@ -35,48 +35,51 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
             ];
         }
 
-        protected override Network LinkInputNeurons(
-            BinaryNeuronInfo[] inputs,
+        protected override IEnumerable<ReadOnlyNetwork> LinkInputNeurons(
+            IEnumerable<BinaryNeuronInfo> inputs,
+            IEnumerable<ReadOnlyNetwork> interneuronNetworks,
             params Neuron[] additionalInputs
         )
         {
-            AssertionConcern.AssertArgumentValid(l => l == 2, inputs.Length, "Length of inputs array must be exactly two.", nameof(inputs));
+            AssertionConcern.AssertArgumentValid(l => l == 2, inputs.Count(), "Length of inputs array must be exactly two.", nameof(inputs));
 
-            var result = new Network();
+            var result = new List<ReadOnlyNetwork>();
 
-            result.AddReplaceItems(
-                NetworkHelper.LinkInputNeuronsToInterneuron(
-                    this.Interneurons[0].GetInterneuron(),
-                    [
-                        inputs[0].Neuron0,
-                        inputs[1].Neuron0,
-                        .. additionalInputs
-                    ]
-                ),
-                NetworkHelper.LinkInputNeuronsToInterneuron(
-                    this.Interneurons[1].GetInterneuron(),
-                    [
-                        inputs[0].Neuron0,
-                        inputs[1].Neuron1,
-                        .. additionalInputs
-                    ]
-                ),
-                NetworkHelper.LinkInputNeuronsToInterneuron(
-                    this.Interneurons[2].GetInterneuron(),
-                    [
-                        inputs[0].Neuron1,
-                        inputs[1].Neuron0,
-                        .. additionalInputs
-                    ]
-                ),
-                NetworkHelper.LinkInputNeuronsToInterneuron(
-                    this.Interneurons[3].GetInterneuron(),
-                    [
-                        inputs[0].Neuron1,
-                        inputs[1].Neuron1,
-                        .. additionalInputs
-                    ]
-                )
+            result.AddRange(
+                [
+                    NetworkHelper.LinkInputNeuronsToInterneuron(
+                        interneuronNetworks.ElementAt(0).GetInterneuron(),
+                        [
+                            inputs.ElementAt(0).Neuron0,
+                            inputs.ElementAt(1).Neuron0,
+                            .. additionalInputs
+                        ]
+                    ),
+                    NetworkHelper.LinkInputNeuronsToInterneuron(
+                        interneuronNetworks.ElementAt(1).GetInterneuron(),
+                        [
+                            inputs.ElementAt(0).Neuron0,
+                            inputs.ElementAt(1).Neuron1,
+                            .. additionalInputs
+                        ]
+                    ),
+                    NetworkHelper.LinkInputNeuronsToInterneuron(
+                        interneuronNetworks.ElementAt(2).GetInterneuron(),
+                        [
+                            inputs.ElementAt(0).Neuron1,
+                            inputs.ElementAt(1).Neuron0,
+                            .. additionalInputs
+                        ]
+                    ),
+                    NetworkHelper.LinkInputNeuronsToInterneuron(
+                        interneuronNetworks.ElementAt(3).GetInterneuron(),
+                        [
+                            inputs.ElementAt(0).Neuron1,
+                            inputs.ElementAt(1).Neuron1,
+                            .. additionalInputs
+                        ]
+                    )
+                ]
             );
 
             return result;

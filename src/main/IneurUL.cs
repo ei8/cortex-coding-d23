@@ -2,6 +2,6 @@
 {
     public interface IneurUL
     {
-        Network Network { get; }
+        ReadOnlyNetwork Network { get; }
     }
 }

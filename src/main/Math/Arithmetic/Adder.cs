@@ -1,13 +1,16 @@
 ﻿using ei8.Cortex.Coding.d23.Math.Logic;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 {
-    public class Adder : ICircuit
+    public class Adder : FunctionalCircuitBase<BinaryNeuronInfo>
     {
         public enum Input
         {
             Addend1,
-            Addend2
+            Addend2,
+            PrecedingCarryOver
         }
 
         public enum Output
@@ -25,30 +28,29 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                 [
                     BinaryNeuronInfo.Create($"{nameof(Adder)}{exponent + 1}.{nameof(Input.Addend1)}"),
                     BinaryNeuronInfo.Create($"{nameof(Adder)}{exponent + 1}.{nameof(Input.Addend2)}"),
+                    precedingCarryOver
                 ],
                 [
                     BinaryNeuronInfo.Create($"{nameof(Adder)}{exponent + 1}.{nameof(Output.Sum)}"),
                     BinaryNeuronInfo.Create($"{nameof(Adder)}{exponent + 1}.{nameof(Output.CarryOver)}")
                 ]
             ),
-            exponent,
-            precedingCarryOver
+            exponent
         )
         {
         }
 
         public Adder(
-            FunctionParameterInfo parameters,
-            int exponent = 0,
-            BinaryNeuronInfo? precedingCarryOver = null
+            FunctionalParameterInfo<BinaryNeuronInfo> parameters,
+            int exponent = 0
         )
         {
-            this.Network = new();
-            this.Network.AddReplaceItems(
+            this.network.AddReplaceItems(
                 this.Parameters = parameters
             );
 
-            string adderName = $"Adder{exponent + 1}";
+            string adderName = $"{nameof(Adder)}{exponent + 1}";
+            var precedingCarryOver = parameters.Inputs.ElementAt((int)Input.PrecedingCarryOver);
 
             if (
                 // is not least significant bit
@@ -58,17 +60,17 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                 BinaryNeuronInfo.TryCreate(out var half2_CarryOver, adderName)
             )
             {
-                this.Network.AddReplaceItems(
+                this.network.AddReplaceItems(
                     half1_XOR_Result,
                     half1_CarryOver,
                     half2_CarryOver
                 );
 
-                string precedingAdderName = $"Adder{exponent}";
+                string precedingAdderName = $"{nameof(Adder)}{exponent}";
 
                 Adder.CreateAdderHalf1Interneurons(
-                    this.Network,
-                    this.Parameters.Inputs,
+                    this.network,
+                    this.Parameters.Inputs.Take(2),
                     half1_XOR_Result,
                     half1_CarryOver,
                     adderName
@@ -84,7 +86,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                                 half1_XOR_Result
                             ],
                             [
-                                this.Parameters.Outputs[(int) Output.Sum]
+                                this.Parameters.Outputs.ElementAt((int) Output.Sum)
                             ]
                         ),
                         new(
@@ -123,14 +125,14 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                                 half2_CarryOver
                             ],
                             [
-                                this.Parameters.Outputs[(int) Output.CarryOver]
+                                this.Parameters.Outputs.ElementAt((int) Output.CarryOver)
                             ]
                         ),
-                        LogicGateInterneuronTagInfo.CreateSameTagForDualInput(adderName)
+                        InterneuronTagInfo.CreateSameTagForDualInput(adderName)
                     )
                 )
                 {
-                    this.Network.AddReplaceItems(
+                    this.network.AddReplaceItems(
                         half2_XOR___CarryOver__Half1_XOR_Result,
                         half2_AND___CarryOver__Half1_XOR_Result,
                         OR___Half1_CarryOver__Half2_CarryOver
@@ -140,10 +142,10 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
             else
             {
                 Adder.CreateAdderHalf1Interneurons(
-                    this.Network,
-                    this.Parameters.Inputs,
-                    this.Parameters.Outputs[(int) Output.Sum],
-                    this.Parameters.Outputs[(int) Output.CarryOver],
+                    this.network,
+                    this.Parameters.Inputs.Take(2),
+                    this.Parameters.Outputs.ElementAt((int) Output.Sum),
+                    this.Parameters.Outputs.ElementAt((int) Output.CarryOver),
                     adderName
                 );
             }
@@ -151,9 +153,9 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 
         private static void CreateAdderHalf1Interneurons(
             Network network,
-            BinaryNeuronInfo[] addends,
-            BinaryNeuronInfo xorOutput,
-            BinaryNeuronInfo andOutput,
+            IEnumerable<BinaryNeuronInfo?> addends,
+            BinaryNeuronInfo? xorOutput,
+            BinaryNeuronInfo? andOutput,
             string prefix
         )
         {
@@ -165,7 +167,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                         addends,
                         [xorOutput]
                     ),
-                    LogicGateInterneuronTagInfo.CreateSameTagForDualInput(prefix)
+                    InterneuronTagInfo.CreateSameTagForDualInput(prefix)
                 ) &&
                 LogicGateBase.TryCreate(
                     out AndGate? half1_AND___Addend1__Addend2,
@@ -173,7 +175,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                         addends,
                         [andOutput]
                     ),
-                    LogicGateInterneuronTagInfo.CreateSameTagForDualInput(prefix)
+                    InterneuronTagInfo.CreateSameTagForDualInput(prefix)
                 )
             )
             {
@@ -183,9 +185,5 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                 );
             }
         }
-
-        public Network Network { get; }
-
-        public FunctionParameterInfo Parameters { get; }
     }
 }

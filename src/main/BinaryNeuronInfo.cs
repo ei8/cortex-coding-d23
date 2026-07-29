@@ -3,15 +3,14 @@ using System.Runtime.CompilerServices;
 
 namespace ei8.Cortex.Coding.d23
 {
-    public class BinaryNeuronInfo : IneurUL
+    public class BinaryNeuronInfo : NeuronInfoBase
     {
-        public BinaryNeuronInfo(Neuron neuron1, Neuron neuron0)
+        public BinaryNeuronInfo(Neuron neuron1, Neuron neuron0) : base()
         {
             this.Neuron1 = neuron1;
             this.Neuron0 = neuron0;
 
-            this.Network = new();
-            this.Network.AddReplaceItems(
+            this.network.AddReplaceItems(
                 [
                     this.Neuron1,
                     this.Neuron0
@@ -57,7 +56,5 @@ namespace ei8.Cortex.Coding.d23
 
         public Neuron Neuron1 { get; }
         public Neuron Neuron0 { get; }
-
-        public Network Network { get; }
     }
 }

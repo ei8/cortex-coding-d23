@@ -30,10 +30,10 @@ namespace ei8.Cortex.Coding.d23
         public static Neuron CreateNeuron(string? tag = null) =>
             Neuron.CreateTransient(Guid.NewGuid(), tag, null, null);
 
-        public static Network CreateInterneuronNetwork(params Neuron[] postsynapticNeurons) =>
+        public static ReadOnlyNetwork CreateInterneuronNetwork(params Neuron[] postsynapticNeurons) =>
             NetworkHelper.CreateInterneuronNetwork(null, postsynapticNeurons);
 
-        public static Network CreateInterneuronNetwork(string? interneuronTag = null, params Neuron[] postsynapticNeurons)
+        public static ReadOnlyNetwork CreateInterneuronNetwork(string? interneuronTag = null, params Neuron[] postsynapticNeurons)
         {
             var network = new Network();
             Neuron neuron = NetworkHelper.CreateNeuron(interneuronTag);
@@ -45,7 +45,18 @@ namespace ei8.Cortex.Coding.d23
             return network;
         }
 
-        public static Network LinkInputNeuronsToInterneuron(Neuron interneuron, params Neuron[] inputNeurons)
+        public static ReadOnlyNetwork[] CreateInterneuronNetworks(
+            Neuron[] outputs,
+            string[] outputInterneuronTags
+        ) =>
+        [
+            ..outputs.Select(o => {
+                var index = Array.IndexOf(outputs, o);
+                return NetworkHelper.CreateInterneuronNetwork(outputInterneuronTags[index], outputs[index]);
+            })
+        ];
+
+        public static ReadOnlyNetwork LinkInputNeuronsToInterneuron(Neuron interneuron, params Neuron[] inputNeurons)
         {
             var network = new Network();
             foreach (Neuron input in inputNeurons)
@@ -53,10 +64,10 @@ namespace ei8.Cortex.Coding.d23
             return network;
         }
 
-        public static Network CreateInputNeuronNetwork(MirrorConfig mirrorConfig, float strengthToInterneurons, params Network[] interneurons) =>
+        public static ReadOnlyNetwork CreateInputNeuronNetwork(MirrorConfig mirrorConfig, float strengthToInterneurons, params ReadOnlyNetwork[] interneurons) =>
             NetworkHelper.CreateInputNeuronNetwork(mirrorConfig, strengthToInterneurons, [.. interneurons.Select(i => i.GetInterneuron())]);
 
-        public static Network CreateInputNeuronNetwork(MirrorConfig mirrorConfig, float strengthToInterneurons, params Neuron[] interneurons)
+        public static ReadOnlyNetwork CreateInputNeuronNetwork(MirrorConfig mirrorConfig, float strengthToInterneurons, params Neuron[] interneurons)
         {
             AssertionConcern.AssertArgumentNotNull(mirrorConfig, nameof(mirrorConfig));
 
