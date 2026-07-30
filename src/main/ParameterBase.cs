@@ -1,6 +1,6 @@
 ﻿namespace ei8.Cortex.Coding.d23
 {
-    public class ParameterBase<T> : IneurUL
+    public class ParameterBase<T> : IVariable
         where T : NeuronInfoBase
     {
         protected Network network;
@@ -11,5 +11,7 @@
         }
 
         public ReadOnlyNetwork Network => this.network;
+
+        public VariableInfo? VariableInfo { get; protected set; }
     }
 }

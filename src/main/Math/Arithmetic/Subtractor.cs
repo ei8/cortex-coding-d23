@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 {
-    public class Subtractor : FunctionalCircuitBase<BinaryNeuronInfo>
+    public class Subtractor : OperationBase
     {
         public enum Input
         {
@@ -19,69 +19,65 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
             Borrow
         }
 
-        public Subtractor(
-            int exponent = 0,
-            BinaryNeuronInfo? precedingBorrow = null
-        ) :
-        this(
-            new(
-                [
-                    BinaryNeuronInfo.Create($"{nameof(Subtractor)}{exponent + 1}.{nameof(Input.Minuend)}"), 
-                    BinaryNeuronInfo.Create($"{nameof(Subtractor)}{exponent + 1}.{nameof(Input.Subtrahend)}"),
-                    precedingBorrow
-                ],
-                [
-                    BinaryNeuronInfo.Create($"{nameof(Subtractor)}{exponent + 1}.{nameof(Output.Difference)}"),
-                    BinaryNeuronInfo.Create($"{nameof(Subtractor)}{exponent + 1}.{nameof(Output.Borrow)}")
-                ]
-            ),
-            exponent
-        )
-        {
-        }
+        protected override FunctionalParameter<BinaryNeuronInfo> GetDefaultParameters(
+            BinaryNeuronInfo? precedingValue,
+            int exponent
+        ) => new(
+            [
+                BinaryNeuronInfo.Create($"{nameof(Subtractor)}{exponent + 1}.{nameof(Input.Minuend)}"),
+                BinaryNeuronInfo.Create($"{nameof(Subtractor)}{exponent + 1}.{nameof(Input.Subtrahend)}"),
+                precedingValue
+            ],
+            [
+                BinaryNeuronInfo.Create($"{nameof(Subtractor)}{exponent + 1}.{nameof(Output.Difference)}"),
+                BinaryNeuronInfo.Create($"{nameof(Subtractor)}{exponent + 1}.{nameof(Output.Borrow)}")
+            ]
+        );
 
-        public Subtractor(
+        protected override IEnumerable<ReadOnlyNetwork> CreateInterneuronNetworks(
             FunctionalParameter<BinaryNeuronInfo> parameters,
-            int exponent = 0
+            VariableInfo variableInfo,
+            VariableInfo? precedingVariableInfo = null
         )
         {
-            this.network.AddReplaceItems(
-                this.Parameters = parameters
-            );
-
-            string subtractorName = $"{nameof(Subtractor)}{exponent + 1}";
+            var result = new List<IneurUL>();
+            string subtractorName = variableInfo.Inputs.First();
             var precedingBorrow = parameters.Inputs.ElementAt((int)Input.PrecedingBorrow);
 
             // Declare Outputs
             if (BinaryNeuronInfo.TryCreate(out var half1_OUT___Half1_NOT___Minuend, subtractorName))
             {
-                this.network.AddReplaceItems(half1_OUT___Half1_NOT___Minuend);
+                result.Add(half1_OUT___Half1_NOT___Minuend);
                 if (
                     // is not least significant bit
                     precedingBorrow != null &&
+                    precedingVariableInfo != null &&
                     BinaryNeuronInfo.TryCreate(out var half1_XOR_Result, subtractorName) &&
                     BinaryNeuronInfo.TryCreate(out var half2_OUT___Half2_NOT___Half1_XOR_Result, subtractorName) &&
                     BinaryNeuronInfo.TryCreate(out var half1_Borrow, subtractorName) &&
                     BinaryNeuronInfo.TryCreate(out var half2_Borrow, subtractorName)
                 )
                 {
-                    this.network.AddReplaceItems(
-                        half1_XOR_Result,
-                        half2_OUT___Half2_NOT___Half1_XOR_Result,
-                        half1_Borrow,
-                        half2_Borrow
+                    result.AddRange(
+                        [
+                            half1_XOR_Result,
+                            half2_OUT___Half2_NOT___Half1_XOR_Result,
+                            half1_Borrow,
+                            half2_Borrow
+                        ]
                     );
 
-                    string precedingSubtractorName = $"{nameof(Subtractor)}{exponent}";
+                    var precedingSubtractorName = precedingVariableInfo.Inputs.First();
 
                     // half1 interneurons
-                    Subtractor.CreateSubtractorHalf1Interneurons(
-                        this.network,
-                        this.Parameters.Inputs.Take(2),
-                        half1_XOR_Result,
-                        half1_OUT___Half1_NOT___Minuend,
-                        half1_Borrow,
-                        subtractorName
+                    result.AddRange(
+                        Subtractor.CreateSubtractorHalf1Interneurons(
+                            parameters.Inputs.Take(2),
+                            half1_XOR_Result,
+                            half1_OUT___Half1_NOT___Minuend,
+                            half1_Borrow,
+                            subtractorName
+                        )
                     );
 
                     // half2 interneurons
@@ -94,7 +90,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                                     half1_XOR_Result
                                 ],
                                 [
-                                    this.Parameters.Outputs.ElementAt((int) Output.Difference)
+                                    parameters.Outputs.ElementAt((int) Output.Difference)
                                 ]
                             ),
                             new(
@@ -120,8 +116,8 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                                     precedingBorrow,
                                     half2_OUT___Half2_NOT___Half1_XOR_Result
                                 ],
-                                [ 
-                                    half2_Borrow 
+                                [
+                                    half2_Borrow
                                 ]
                             ),
                             new(
@@ -141,38 +137,42 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                                     half2_Borrow
                                 ],
                                 [
-                                    this.Parameters.Outputs.ElementAt((int) Output.Borrow)
+                                    parameters.Outputs.ElementAt((int) Output.Borrow)
                                 ]
                             ),
                             InterneuronTagInfo.CreateSameTagForDualInput(subtractorName)
                         )
                     )
                     {
-                        this.network.AddReplaceItems(
-                            half2_XOR___Borrow__Half1_XOR_Result,
-                            half2_NOT___Half1_XOR_Result,
-                            half2_AND___Borrow__Half2_OUT___Half2_NOT___Half1_XOR_Result,
-                            OR___Half1_Borrow__Half2_Borrow
+                        result.AddRange(
+                            [
+                                half2_XOR___Borrow__Half1_XOR_Result,
+                                half2_NOT___Half1_XOR_Result,
+                                half2_AND___Borrow__Half2_OUT___Half2_NOT___Half1_XOR_Result,
+                                OR___Half1_Borrow__Half2_Borrow
+                            ]
                         );
                     }
                 }
                 else
                 {
                     // half1
-                    Subtractor.CreateSubtractorHalf1Interneurons(
-                        this.network,
-                        this.Parameters.Inputs.Take(2),
-                        this.Parameters.Outputs.ElementAt((int)Output.Difference),
-                        half1_OUT___Half1_NOT___Minuend,
-                        this.Parameters.Outputs.ElementAt((int)Output.Borrow),
-                        subtractorName
+                    result.AddRange(
+                        Subtractor.CreateSubtractorHalf1Interneurons(
+                            parameters.Inputs.Take(2),
+                            parameters.Outputs.ElementAt((int)Output.Difference),
+                            half1_OUT___Half1_NOT___Minuend,
+                            parameters.Outputs.ElementAt((int)Output.Borrow),
+                            subtractorName
+                        )
                     );
                 }
             }
+
+            return result.Select(n => n.Network);
         }
 
-        private static void CreateSubtractorHalf1Interneurons(
-            Network network,
+        private static IEnumerable<IneurUL> CreateSubtractorHalf1Interneurons(
             IEnumerable<BinaryNeuronInfo?> inputs,
             BinaryNeuronInfo? xorOutput,
             BinaryNeuronInfo? notOutput,
@@ -180,6 +180,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
             string prefix
         )
         {
+            var result = new List<IneurUL>();
             // Link half1 interneurons
             if (
                 LogicGateBase.TryCreate(
@@ -219,12 +220,15 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                 )
             )
             {
-                network.AddReplaceItems(
-                    half1_XOR___Minuend__Subtrahend,
-                    half1_NOT___Minuend,
-                    half1_AND___Subtrahend__Half1_OUT___Half1_NOT___Minuend
+                result.AddRange(
+                    [
+                        half1_XOR___Minuend__Subtrahend,
+                        half1_NOT___Minuend,
+                        half1_AND___Subtrahend__Half1_OUT___Half1_NOT___Minuend
+                    ]
                 );
             }
+            return result;
         }
     }
 }

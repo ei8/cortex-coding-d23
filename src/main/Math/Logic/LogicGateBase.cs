@@ -44,6 +44,7 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
                         )
                     ]
                 );
+                result.VariableInfo = variableInfo;
                 bResult = true;
             }
 

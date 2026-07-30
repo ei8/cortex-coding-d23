@@ -36,6 +36,7 @@ namespace ei8.Cortex.Coding.d23
                     (string.IsNullOrWhiteSpace(tagPrefix) ? string.Empty : ".") +
                     variableInfo.ToString()
                 );
+                result.VariableInfo = variableInfo;
                 bResult = true;
             }
 

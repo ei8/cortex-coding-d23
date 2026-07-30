@@ -1,4 +1,4 @@
-﻿namespace ei8.Cortex.Coding.d23
+﻿namespace ei8.Cortex.Coding.d23.Math.Logic
 {
     public class InterneuronTagInfo(string[] inputTagPrefixes, string typeTagPrefix)
     {

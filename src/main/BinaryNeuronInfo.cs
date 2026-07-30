@@ -48,6 +48,7 @@ namespace ei8.Cortex.Coding.d23
                     trueString,
                     falseString
                 );
+                result.VariableInfo = variableInfo;
                 bResult = true;
             }
 
