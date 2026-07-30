@@ -10,7 +10,7 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
         {
         }
 
-        protected override string[] GetInterneuronTags(VariableInfo variableInfo, InterneuronTagInfo? interneuronTagInfo = null)
+        protected override IEnumerable<string> GetInterneuronTags(VariableInfo variableInfo, InterneuronTagInfo? interneuronTagInfo = null)
         {
             string coreOperatorPrefix = string.Empty,
                 coreInputTagPrefix = string.Empty;
@@ -29,7 +29,7 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
             ];
         }
 
-        protected override Neuron[] GetInterneuronOutputs(BinaryNeuronInfo output) =>
+        protected override IEnumerable<Neuron> GetInterneuronOutputs(BinaryNeuronInfo output) =>
         [
             output.Neuron1,
             output.Neuron0

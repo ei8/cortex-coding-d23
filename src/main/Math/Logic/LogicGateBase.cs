@@ -51,9 +51,9 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
             return bResult;
         }
 
-        protected abstract Neuron[] GetInterneuronOutputs(BinaryNeuronInfo output);
+        protected abstract IEnumerable<Neuron> GetInterneuronOutputs(BinaryNeuronInfo output);
 
-        protected abstract string[] GetInterneuronTags(
+        protected abstract IEnumerable<string> GetInterneuronTags(
             VariableInfo variableInfo,
             InterneuronTagInfo? interneuronTagInfo = null
         );

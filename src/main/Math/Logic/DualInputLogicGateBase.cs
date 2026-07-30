@@ -10,7 +10,7 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
         {
         }
 
-        protected override string[] GetInterneuronTags(VariableInfo variableInfo, InterneuronTagInfo? interneuronTagInfo = null)
+        protected override IEnumerable<string> GetInterneuronTags(VariableInfo variableInfo, InterneuronTagInfo? interneuronTagInfo = null)
         {
             string typeTagPrefix = string.Empty,
                 input1TagPrefix = string.Empty,

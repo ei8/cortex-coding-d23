@@ -1,8 +1,10 @@
-﻿namespace ei8.Cortex.Coding.d23.Math.Logic
+﻿using System.Collections.Generic;
+
+namespace ei8.Cortex.Coding.d23.Math.Logic
 {
     public class NandGate : DualInputLogicGateBase
     {
-        protected override Neuron[] GetInterneuronOutputs(BinaryNeuronInfo output) =>
+        protected override IEnumerable<Neuron> GetInterneuronOutputs(BinaryNeuronInfo output) =>
         [
             output.Neuron1,
             output.Neuron1,

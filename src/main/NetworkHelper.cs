@@ -1,6 +1,7 @@
 ﻿using ei8.Cortex.Coding.Mirrors;
 using neurUL.Common.Domain.Model;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -45,14 +46,14 @@ namespace ei8.Cortex.Coding.d23
             return network;
         }
 
-        public static ReadOnlyNetwork[] CreateInterneuronNetworks(
-            Neuron[] outputs,
-            string[] outputInterneuronTags
+        public static IEnumerable<ReadOnlyNetwork> CreateInterneuronNetworks(
+            IEnumerable<Neuron> outputs,
+            IEnumerable<string> outputInterneuronTags
         ) =>
         [
             ..outputs.Select(o => {
-                var index = Array.IndexOf(outputs, o);
-                return NetworkHelper.CreateInterneuronNetwork(outputInterneuronTags[index], outputs[index]);
+                var index = outputs.ToList().IndexOf(o);
+                return NetworkHelper.CreateInterneuronNetwork(outputInterneuronTags.ElementAt(index), outputs.ElementAt(index));
             })
         ];
 
