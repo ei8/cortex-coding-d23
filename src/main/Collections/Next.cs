@@ -17,14 +17,13 @@ namespace ei8.Cortex.Coding.d23.Collections
         {
             var interneuronNetworks = NetworkHelper.CreateInterneuronNetworkByOutputNeurons(
                 $"{variableInfo.Function}({variableInfo.Inputs.First()})",
-                [parameters.Outputs.First()!.Neuron],
-                
+                [parameters.Outputs.First()!.Neuron]
             );
             return [
-                interneuronNetworks.Single(),
+                interneuronNetworks,
                 AdjacentBase.LinkInputNeuron(
                     parameters.Inputs.First()!,
-                    interneuronNetworks.Single(),
+                    interneuronNetworks,
                     additionalInputs
                 )
             ];

@@ -25,8 +25,8 @@ namespace ei8.Cortex.Coding.d23.Collections
             params Neuron[] additionalInputs
         ) where T : AdjacentBase, new()
         {
-            ArgumentOutOfRangeException.ThrowIfNotEqual(parameters.Inputs.Count(), 2);
-            ArgumentOutOfRangeException.ThrowIfNotEqual(parameters.Outputs.Count(), 2);
+            ArgumentOutOfRangeException.ThrowIfNotEqual(parameters.Inputs.Count(), 1);
+            ArgumentOutOfRangeException.ThrowIfNotEqual(parameters.Outputs.Count(), 1);
 
             bool bResult = false;
             result = null;
