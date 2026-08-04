@@ -19,8 +19,8 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
             {
                 if (!string.IsNullOrEmpty(interneuronTagInfo.TypeTagPrefix))
                     coreOperatorPrefix = $"{interneuronTagInfo.TypeTagPrefix}.";
-                if (interneuronTagInfo.InputTagPrefixes?.Length > 0)
-                    coreInputTagPrefix = $"{interneuronTagInfo.InputTagPrefixes[0]}.";
+                if (interneuronTagInfo.InputTagPrefixes?.Count() > 0)
+                    coreInputTagPrefix = $"{interneuronTagInfo.InputTagPrefixes.ElementAt(0)}.";
             }
 
             return [
@@ -29,14 +29,14 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
             ];
         }
 
-        protected override IEnumerable<Neuron> GetInterneuronOutputs(BinaryNeuronInfo output) =>
+        protected override IEnumerable<Neuron> GetInterneuronOutputs(BinaryNeuronParameter output) =>
         [
             output.Neuron1,
             output.Neuron0
         ];
 
         protected override IEnumerable<ReadOnlyNetwork> LinkInputNeurons(
-            IEnumerable<BinaryNeuronInfo> inputs, 
+            IEnumerable<BinaryNeuronParameter> inputs, 
             IEnumerable<ReadOnlyNetwork> interneuronNetworks,
             params Neuron[] additionalInputs
         )

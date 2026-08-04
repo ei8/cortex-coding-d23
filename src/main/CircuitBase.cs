@@ -4,7 +4,7 @@ namespace ei8.Cortex.Coding.d23
 {
     public abstract class CircuitBase<TParam, TNeuron> : ICircuit<TParam, TNeuron>, IVariable
         where TParam : ParameterBase<TNeuron>, new()
-        where TNeuron : NeuronInfoBase
+        where TNeuron : NeuronParameterBase
     {
         private Network network;
 

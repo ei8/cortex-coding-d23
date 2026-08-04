@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace ei8.Cortex.Coding.d23.Collections
 {
@@ -8,7 +9,25 @@ namespace ei8.Cortex.Coding.d23.Collections
         {
         }
 
-        protected override string GetInterneuronTag(VariableInfo variableInfo) =>
-            $"{variableInfo.Function}({variableInfo.Inputs.First()})";
+        protected override IEnumerable<ReadOnlyNetwork> CreateInterneuronNetworks(
+            FunctionalParameter<UnaryNeuronParameter> parameters,
+            VariableInfo variableInfo,
+            params Neuron[] additionalInputs
+        )
+        {
+            var interneuronNetworks = NetworkHelper.CreateInterneuronNetworkByOutputNeurons(
+                $"{variableInfo.Function}({variableInfo.Inputs.First()})",
+                [parameters.Outputs.First()!.Neuron],
+                
+            );
+            return [
+                interneuronNetworks.Single(),
+                AdjacentBase.LinkInputNeuron(
+                    parameters.Inputs.First()!,
+                    interneuronNetworks.Single(),
+                    additionalInputs
+                )
+            ];
+        }
     }
 }

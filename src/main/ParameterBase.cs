@@ -1,7 +1,7 @@
 ﻿namespace ei8.Cortex.Coding.d23
 {
     public class ParameterBase<T> : IVariable
-        where T : NeuronInfoBase
+        where T : NeuronParameterBase
     {
         protected Network network;
 

@@ -4,7 +4,7 @@ using System.Linq;
 namespace ei8.Cortex.Coding.d23
 {
     public class FunctionalParameter<T> : ProceduralParameter<T>
-        where T : NeuronInfoBase
+        where T : NeuronParameterBase
     {
         public FunctionalParameter() : this(Enumerable.Empty<T?>(), Enumerable.Empty<T?>())
         {

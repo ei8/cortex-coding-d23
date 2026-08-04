@@ -2,7 +2,7 @@
 {
     public interface ICircuit<TParam, TNeuron> : IneurUL 
         where TParam : ParameterBase<TNeuron>, new()
-        where TNeuron : NeuronInfoBase
+        where TNeuron : NeuronParameterBase
     {
         TParam Parameters { get; }
     }

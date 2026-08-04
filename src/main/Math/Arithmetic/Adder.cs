@@ -19,23 +19,23 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
             CarryOver
         }
 
-        protected override FunctionalParameter<BinaryNeuronInfo> GetDefaultParameters(
-            BinaryNeuronInfo? precedingValue,
+        protected override FunctionalParameter<BinaryNeuronParameter> GetDefaultParameters(
+            BinaryNeuronParameter? precedingValue,
             int exponent
         ) => new(
             [
-                BinaryNeuronInfo.Create($"{nameof(Adder)}{exponent + 1}.{nameof(Input.Addend1)}"),
-                BinaryNeuronInfo.Create($"{nameof(Adder)}{exponent + 1}.{nameof(Input.Addend2)}"),
+                BinaryNeuronParameter.Create($"{nameof(Adder)}{exponent + 1}.{nameof(Input.Addend1)}"),
+                BinaryNeuronParameter.Create($"{nameof(Adder)}{exponent + 1}.{nameof(Input.Addend2)}"),
                 precedingValue
             ],
             [
-                BinaryNeuronInfo.Create($"{nameof(Adder)}{exponent + 1}.{nameof(Output.Sum)}"),
-                BinaryNeuronInfo.Create($"{nameof(Adder)}{exponent + 1}.{nameof(Output.CarryOver)}")
+                BinaryNeuronParameter.Create($"{nameof(Adder)}{exponent + 1}.{nameof(Output.Sum)}"),
+                BinaryNeuronParameter.Create($"{nameof(Adder)}{exponent + 1}.{nameof(Output.CarryOver)}")
             ]
         );
 
         protected override IEnumerable<ReadOnlyNetwork> CreateInterneuronNetworks(
-            FunctionalParameter<BinaryNeuronInfo> parameters,
+            FunctionalParameter<BinaryNeuronParameter> parameters,
             VariableInfo variableInfo,
             VariableInfo? precedingVariableInfo = null
         )
@@ -48,9 +48,9 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                 // is not least significant bit
                 precedingCarryOver != null &&
                 precedingVariableInfo != null &&
-                BinaryNeuronInfo.TryCreate(out var half1_XOR_Result, adderName) &&
-                BinaryNeuronInfo.TryCreate(out var half1_CarryOver, adderName) &&
-                BinaryNeuronInfo.TryCreate(out var half2_CarryOver, adderName)
+                BinaryNeuronParameter.TryCreate(out var half1_XOR_Result, adderName) &&
+                BinaryNeuronParameter.TryCreate(out var half1_CarryOver, adderName) &&
+                BinaryNeuronParameter.TryCreate(out var half2_CarryOver, adderName)
             )
             {
                 result.AddRange(
@@ -153,9 +153,9 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
         }
 
         private static IEnumerable<IneurUL> CreateAdderHalf1Interneurons(
-            IEnumerable<BinaryNeuronInfo?> addends,
-            BinaryNeuronInfo? xorOutput,
-            BinaryNeuronInfo? andOutput,
+            IEnumerable<BinaryNeuronParameter?> addends,
+            BinaryNeuronParameter? xorOutput,
+            BinaryNeuronParameter? andOutput,
             string prefix
         )
         {

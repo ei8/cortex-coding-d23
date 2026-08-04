@@ -31,10 +31,10 @@ namespace ei8.Cortex.Coding.d23
         public static Neuron CreateNeuron(string? tag = null) =>
             Neuron.CreateTransient(Guid.NewGuid(), tag, null, null);
 
-        public static ReadOnlyNetwork CreateInterneuronNetwork(params Neuron[] postsynapticNeurons) =>
-            NetworkHelper.CreateInterneuronNetwork(null, postsynapticNeurons);
+        public static ReadOnlyNetwork CreateInterneuronNetworkByOutputNeurons(params Neuron[] postsynapticNeurons) =>
+            NetworkHelper.CreateInterneuronNetworkByOutputNeurons(null, postsynapticNeurons);
 
-        public static ReadOnlyNetwork CreateInterneuronNetwork(string? interneuronTag = null, params Neuron[] postsynapticNeurons)
+        public static ReadOnlyNetwork CreateInterneuronNetworkByOutputNeurons(string? interneuronTag = null, params Neuron[] postsynapticNeurons)
         {
             var network = new Network();
             Neuron neuron = NetworkHelper.CreateNeuron(interneuronTag);
@@ -46,14 +46,14 @@ namespace ei8.Cortex.Coding.d23
             return network;
         }
 
-        public static IEnumerable<ReadOnlyNetwork> CreateInterneuronNetworks(
+        public static IEnumerable<ReadOnlyNetwork> CreateInterneuronNetworksByOutputNeurons(
             IEnumerable<Neuron> outputs,
             IEnumerable<string> outputInterneuronTags
         ) =>
         [
             ..outputs.Select(o => {
                 var index = outputs.ToList().IndexOf(o);
-                return NetworkHelper.CreateInterneuronNetwork(outputInterneuronTags.ElementAt(index), outputs.ElementAt(index));
+                return NetworkHelper.CreateInterneuronNetworkByOutputNeurons(outputInterneuronTags.ElementAt(index), outputs.ElementAt(index));
             })
         ];
 

@@ -1,51 +1,46 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace ei8.Cortex.Coding.d23.Collections
 {
-    public abstract class AdjacentBase : FunctionalCircuitBase<UnaryNeuronInfo>
+    public abstract class AdjacentBase : FunctionalCircuitBase<UnaryNeuronParameter>
     {
         public AdjacentBase() : base()
         {
         }
 
-        protected abstract string GetInterneuronTag(VariableInfo variableInfo);
+        protected abstract IEnumerable<ReadOnlyNetwork> CreateInterneuronNetworks(
+            FunctionalParameter<UnaryNeuronParameter> parameters,
+            VariableInfo variableInfo,
+            params Neuron[] additionalInputs
+        );
 
         public static bool TryCreate<T>(
             [NotNullWhen(true)] out T? result,
-            FunctionalParameter<UnaryNeuronInfo> parameters,
+            FunctionalParameter<UnaryNeuronParameter> parameters,
             [CallerArgumentExpression(nameof(result))] string parameterExpression = "",
             params Neuron[] additionalInputs
         ) where T : AdjacentBase, new()
         {
+            ArgumentOutOfRangeException.ThrowIfNotEqual(parameters.Inputs.Count(), 2);
+            ArgumentOutOfRangeException.ThrowIfNotEqual(parameters.Outputs.Count(), 2);
+
             bool bResult = false;
             result = null;
 
-            var output = parameters.Outputs.Single();
-            var input = parameters.Inputs.Single();
-
-            if (
-                VariableInfo.TryParse(parameterExpression, out var variableInfo) &&
-                output != null &&
-                input != null
-            )
+            if (VariableInfo.TryParse(parameterExpression, out var variableInfo))
             {
                 result = new();
-                var interneuronNetwork = NetworkHelper.CreateInterneuronNetworks(
-                    [output.Neuron],
-                    [result.GetInterneuronTag(variableInfo)]
-                );
                 result.Initialize(
                     parameters,
-                    [
-                        ..interneuronNetwork,
-                        AdjacentBase.LinkInputNeuron(
-                            input,
-                            interneuronNetwork.Single(),
-                            additionalInputs
-                        )
-                    ]
+                    result.CreateInterneuronNetworks(
+                        parameters,
+                        variableInfo,
+                        additionalInputs
+                    )
                 );
                 bResult = true;
             }
@@ -53,8 +48,8 @@ namespace ei8.Cortex.Coding.d23.Collections
             return bResult;
         }
         
-        private static ReadOnlyNetwork LinkInputNeuron(
-            UnaryNeuronInfo input,
+        protected static ReadOnlyNetwork LinkInputNeuron(
+            UnaryNeuronParameter input,
             ReadOnlyNetwork interneuronNetwork,
             params Neuron[] additionalInputs
         ) =>

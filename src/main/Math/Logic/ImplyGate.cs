@@ -4,7 +4,7 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
 {
     public class ImplyGate : DualInputLogicGateBase
     {
-        protected override IEnumerable<Neuron> GetInterneuronOutputs(BinaryNeuronInfo output) =>
+        protected override IEnumerable<Neuron> GetInterneuronOutputs(BinaryNeuronParameter output) =>
         [
             output.Neuron1,
             output.Neuron1,

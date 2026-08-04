@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 
 namespace ei8.Cortex.Coding.d23.Math.Logic
 {
-    public abstract class LogicGateBase : FunctionalCircuitBase<BinaryNeuronInfo>
+    public abstract class LogicGateBase : FunctionalCircuitBase<BinaryNeuronParameter>
     {
         public LogicGateBase() : base()
         {
@@ -13,7 +13,7 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
 
         public static bool TryCreate<T>(
             [NotNullWhen(true)] out T? result,
-            FunctionalParameter<BinaryNeuronInfo> parameters,
+            FunctionalParameter<BinaryNeuronParameter> parameters,
             InterneuronTagInfo? interneuronTagInfo = null,
             [CallerArgumentExpression(nameof(result))] string parameterExpression = "",
             params Neuron[] additionalInputs
@@ -28,7 +28,7 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
                 var output = parameters.Outputs.Single();
                 var interneuronNetworks = Enumerable.Empty<ReadOnlyNetwork>();
                 if (output != null)
-                    interneuronNetworks = NetworkHelper.CreateInterneuronNetworks(
+                    interneuronNetworks = NetworkHelper.CreateInterneuronNetworksByOutputNeurons(
                         result.GetInterneuronOutputs(output),
                         result.GetInterneuronTags(variableInfo, interneuronTagInfo)
                     );
@@ -51,7 +51,7 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
             return bResult;
         }
 
-        protected abstract IEnumerable<Neuron> GetInterneuronOutputs(BinaryNeuronInfo output);
+        protected abstract IEnumerable<Neuron> GetInterneuronOutputs(BinaryNeuronParameter output);
 
         protected abstract IEnumerable<string> GetInterneuronTags(
             VariableInfo variableInfo,
@@ -59,7 +59,7 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
         );
 
         protected abstract IEnumerable<ReadOnlyNetwork> LinkInputNeurons(
-            IEnumerable<BinaryNeuronInfo> inputs,
+            IEnumerable<BinaryNeuronParameter> inputs,
             IEnumerable<ReadOnlyNetwork> interneuronNetworks,
             params Neuron[] additionalInputs
         );

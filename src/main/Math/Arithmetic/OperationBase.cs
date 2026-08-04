@@ -4,19 +4,19 @@ using System.Runtime.CompilerServices;
 
 namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 {
-    public abstract class OperationBase : FunctionalCircuitBase<BinaryNeuronInfo>
+    public abstract class OperationBase : FunctionalCircuitBase<BinaryNeuronParameter>
     {
         public OperationBase() : base()
         {
         }
 
-        protected abstract FunctionalParameter<BinaryNeuronInfo> GetDefaultParameters(
-            BinaryNeuronInfo? precedingValue,
+        protected abstract FunctionalParameter<BinaryNeuronParameter> GetDefaultParameters(
+            BinaryNeuronParameter? precedingValue,
             int exponent
         );
 
         protected abstract IEnumerable<ReadOnlyNetwork> CreateInterneuronNetworks(
-            FunctionalParameter<BinaryNeuronInfo> parameters,
+            FunctionalParameter<BinaryNeuronParameter> parameters,
             VariableInfo variableInfo,
             VariableInfo? precedingVariableInfo = null
         );
@@ -24,7 +24,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
         public static bool TryCreate<T>(
             [NotNullWhen(true)] out T? result,
             int exponent = 0,
-            BinaryNeuronInfo? precedingValue = null,
+            BinaryNeuronParameter? precedingValue = null,
             VariableInfo? precedingVariableInfo = null,
             [CallerArgumentExpression(nameof(result))] string parameterExpression = ""
         )

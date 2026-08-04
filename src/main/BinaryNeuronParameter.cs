@@ -3,9 +3,13 @@ using System.Runtime.CompilerServices;
 
 namespace ei8.Cortex.Coding.d23
 {
-    public class BinaryNeuronInfo : NeuronInfoBase
+    public class BinaryNeuronParameter : NeuronParameterBase
     {
-        public BinaryNeuronInfo(Neuron neuron1, Neuron neuron0) : base()
+        // TODO: Change to IEnumerable of Neurons then create enum for individual neurons
+        // create terminal info?
+        // create tag differentiator? eg. "1", "0"
+        // create class/struct for 3 properties above (NeuronInfo)
+        public BinaryNeuronParameter(Neuron neuron1, Neuron neuron0) : base()
         {
             this.Neuron1 = neuron1;
             this.Neuron0 = neuron0;
@@ -18,7 +22,7 @@ namespace ei8.Cortex.Coding.d23
             );
         }
 
-        public static BinaryNeuronInfo Create(
+        public static BinaryNeuronParameter Create(
             string tagPrefix,
             string trueString = "1",
             string falseString = "0"
@@ -29,7 +33,7 @@ namespace ei8.Cortex.Coding.d23
             );
 
         public static bool TryCreate(
-            [NotNullWhen(true)] out BinaryNeuronInfo? result,
+            [NotNullWhen(true)] out BinaryNeuronParameter? result,
             string? tagPrefix = null,
             [CallerArgumentExpression(nameof(result))] string parameterExpression = "",
             string trueString = "1",
@@ -41,7 +45,7 @@ namespace ei8.Cortex.Coding.d23
 
             if (VariableInfo.TryParse(parameterExpression, out var variableInfo))
             {
-                result = BinaryNeuronInfo.Create(
+                result = BinaryNeuronParameter.Create(
                     $"{tagPrefix}" +
                     (string.IsNullOrWhiteSpace(tagPrefix) ? string.Empty : ".") +
                     variableInfo.ToString(),

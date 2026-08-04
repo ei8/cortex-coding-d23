@@ -1,13 +1,17 @@
 ﻿namespace ei8.Cortex.Coding.d23
 {
-    public abstract class NeuronInfoBase : IVariable
+    public abstract class NeuronParameterBase : IVariable
     {
         protected Network network;
 
-        protected NeuronInfoBase()
+        protected NeuronParameterBase()
         {
             this.network = new();
         }
+
+        public int Strength { get; }
+
+        public NeurotransmitterEffect Effect { get; }
 
         public ReadOnlyNetwork Network => this.network;
 

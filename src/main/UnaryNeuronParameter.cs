@@ -4,9 +4,9 @@ using System.Runtime.CompilerServices;
 
 namespace ei8.Cortex.Coding.d23
 {
-    public class UnaryNeuronInfo : NeuronInfoBase
+    public class UnaryNeuronParameter : NeuronParameterBase
     {
-        public UnaryNeuronInfo(Neuron neuron) : base()
+        public UnaryNeuronParameter(Neuron neuron) : base()
         {
             this.Neuron = neuron;
 
@@ -17,11 +17,11 @@ namespace ei8.Cortex.Coding.d23
             );
         }
 
-        public static UnaryNeuronInfo Create(string tag) =>
+        public static UnaryNeuronParameter Create(string tag) =>
             new(NetworkHelper.CreateNeuron(tag));
 
         public static bool TryCreate(
-            [NotNullWhen(true)] out UnaryNeuronInfo? result,
+            [NotNullWhen(true)] out UnaryNeuronParameter? result,
             string? tagPrefix = null,
             [CallerArgumentExpression(nameof(result))] string parameterExpression = ""
         )
@@ -31,7 +31,7 @@ namespace ei8.Cortex.Coding.d23
 
             if (VariableInfo.TryParse(parameterExpression, out var variableInfo))
             {
-                result = UnaryNeuronInfo.Create(
+                result = UnaryNeuronParameter.Create(
                     $"{tagPrefix}" +
                     (string.IsNullOrWhiteSpace(tagPrefix) ? string.Empty : ".") +
                     variableInfo.ToString()

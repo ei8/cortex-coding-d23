@@ -19,23 +19,23 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
             Borrow
         }
 
-        protected override FunctionalParameter<BinaryNeuronInfo> GetDefaultParameters(
-            BinaryNeuronInfo? precedingValue,
+        protected override FunctionalParameter<BinaryNeuronParameter> GetDefaultParameters(
+            BinaryNeuronParameter? precedingValue,
             int exponent
         ) => new(
             [
-                BinaryNeuronInfo.Create($"{nameof(Subtractor)}{exponent + 1}.{nameof(Input.Minuend)}"),
-                BinaryNeuronInfo.Create($"{nameof(Subtractor)}{exponent + 1}.{nameof(Input.Subtrahend)}"),
+                BinaryNeuronParameter.Create($"{nameof(Subtractor)}{exponent + 1}.{nameof(Input.Minuend)}"),
+                BinaryNeuronParameter.Create($"{nameof(Subtractor)}{exponent + 1}.{nameof(Input.Subtrahend)}"),
                 precedingValue
             ],
             [
-                BinaryNeuronInfo.Create($"{nameof(Subtractor)}{exponent + 1}.{nameof(Output.Difference)}"),
-                BinaryNeuronInfo.Create($"{nameof(Subtractor)}{exponent + 1}.{nameof(Output.Borrow)}")
+                BinaryNeuronParameter.Create($"{nameof(Subtractor)}{exponent + 1}.{nameof(Output.Difference)}"),
+                BinaryNeuronParameter.Create($"{nameof(Subtractor)}{exponent + 1}.{nameof(Output.Borrow)}")
             ]
         );
 
         protected override IEnumerable<ReadOnlyNetwork> CreateInterneuronNetworks(
-            FunctionalParameter<BinaryNeuronInfo> parameters,
+            FunctionalParameter<BinaryNeuronParameter> parameters,
             VariableInfo variableInfo,
             VariableInfo? precedingVariableInfo = null
         )
@@ -45,17 +45,17 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
             var precedingBorrow = parameters.Inputs.ElementAt((int)Input.PrecedingBorrow);
 
             // Declare Outputs
-            if (BinaryNeuronInfo.TryCreate(out var half1_OUT___Half1_NOT___Minuend, subtractorName))
+            if (BinaryNeuronParameter.TryCreate(out var half1_OUT___Half1_NOT___Minuend, subtractorName))
             {
                 result.Add(half1_OUT___Half1_NOT___Minuend);
                 if (
                     // is not least significant bit
                     precedingBorrow != null &&
                     precedingVariableInfo != null &&
-                    BinaryNeuronInfo.TryCreate(out var half1_XOR_Result, subtractorName) &&
-                    BinaryNeuronInfo.TryCreate(out var half2_OUT___Half2_NOT___Half1_XOR_Result, subtractorName) &&
-                    BinaryNeuronInfo.TryCreate(out var half1_Borrow, subtractorName) &&
-                    BinaryNeuronInfo.TryCreate(out var half2_Borrow, subtractorName)
+                    BinaryNeuronParameter.TryCreate(out var half1_XOR_Result, subtractorName) &&
+                    BinaryNeuronParameter.TryCreate(out var half2_OUT___Half2_NOT___Half1_XOR_Result, subtractorName) &&
+                    BinaryNeuronParameter.TryCreate(out var half1_Borrow, subtractorName) &&
+                    BinaryNeuronParameter.TryCreate(out var half2_Borrow, subtractorName)
                 )
                 {
                     result.AddRange(
@@ -173,10 +173,10 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
         }
 
         private static IEnumerable<IneurUL> CreateSubtractorHalf1Interneurons(
-            IEnumerable<BinaryNeuronInfo?> inputs,
-            BinaryNeuronInfo? xorOutput,
-            BinaryNeuronInfo? notOutput,
-            BinaryNeuronInfo? andOutput,
+            IEnumerable<BinaryNeuronParameter?> inputs,
+            BinaryNeuronParameter? xorOutput,
+            BinaryNeuronParameter? notOutput,
+            BinaryNeuronParameter? andOutput,
             string prefix
         )
         {
