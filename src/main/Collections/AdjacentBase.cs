@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -28,6 +29,7 @@ namespace ei8.Cortex.Coding.d23.Collections
         public static bool TryCreate<T>(
             [NotNullWhen(true)] out T? result,
             FunctionalParameter<UnaryNeuronParameter> parameters,
+            ReadOnlyNetwork? precedingInterneuronNetwork = null,
             [CallerArgumentExpression(nameof(result))] string parameterExpression = "",
             params Neuron[] additionalInputs
         ) 
@@ -48,9 +50,10 @@ namespace ei8.Cortex.Coding.d23.Collections
                 result = T.Create(
                     parameters,
                     interneuronNetwork,
-                    Next.LinkInputNeurons(
+                    T.LinkInputNeurons(
                         interneuronNetwork,
                         parameters,
+                        precedingInterneuronNetwork,
                         additionalInputs
                     ),
                     variableInfo
@@ -60,19 +63,27 @@ namespace ei8.Cortex.Coding.d23.Collections
 
             return bResult;
         }
-        
+
         protected static ReadOnlyNetwork LinkInputNeurons(
-            UnaryNeuronParameter input,
+            UnaryNeuronParameter current,
             ReadOnlyNetwork interneuronNetwork,
+            ReadOnlyNetwork? precedingInterneuronNetwork = null,
             params Neuron[] additionalInputs
-        ) =>
-            NetworkHelper.LinkInputNeuronsToInterneuron(
-                interneuronNetwork.GetInterneuron(),
+        )
+        {
+            var inputNeurons = new List<NeuronInfo>(
                 [
-                    input.Neuron,
-                    .. additionalInputs
-                ]
+                    new(current.Neuron),
+                    .. additionalInputs.Select(n => new NeuronInfo(n))
+                ]);
+            if (precedingInterneuronNetwork != null)
+                inputNeurons.Add(new NeuronInfo(precedingInterneuronNetwork.GetInterneuron(), 1f, NeurotransmitterEffect.Inhibit));
+
+            return NetworkHelper.LinkInputNeuronsToInterneuron(
+                interneuronNetwork.GetInterneuron(),
+                [.. inputNeurons]
             );
+        }
 
         public ReadOnlyNetwork InterneuronNetwork { get; }
     }

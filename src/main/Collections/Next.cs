@@ -4,6 +4,16 @@ namespace ei8.Cortex.Coding.d23.Collections
 {
     public class Next : AdjacentBase, IAdjacent<Next>
     {
+        public enum Input
+        {
+            Current
+        }
+
+        public enum Output
+        {
+            Next,
+        }
+
         protected Next(
             FunctionalParameter<UnaryNeuronParameter> parameters,
             ReadOnlyNetwork interneuronNetwork,
@@ -30,17 +40,18 @@ namespace ei8.Cortex.Coding.d23.Collections
             VariableInfo variableInfo
         ) => NetworkHelper.CreateInterneuronNetworkByOutputNeurons(
             $"{variableInfo.Function}({variableInfo.Inputs.First()})",
-            [parameters.Outputs.First()!.Neuron]
+            [parameters.Outputs.ElementAt((int) Output.Next)!.Neuron]
         );
 
         public static ReadOnlyNetwork LinkInputNeurons(
             ReadOnlyNetwork interneuronNetwork,
             FunctionalParameter<UnaryNeuronParameter> parameters,
+            ReadOnlyNetwork? precedingInterneuronNetwork = null,
             params Neuron[] additionalInputs
         ) => AdjacentBase.LinkInputNeurons(
-            // TODO: pass multiple inputs here, including inhibitor from previous Step
-            parameters.Inputs.First()!,
+            parameters.Inputs.ElementAt((int) Input.Current)!,
             interneuronNetwork,
+            precedingInterneuronNetwork,
             additionalInputs
         );
     }

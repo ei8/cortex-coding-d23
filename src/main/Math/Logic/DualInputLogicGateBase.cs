@@ -58,33 +58,33 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
                     NetworkHelper.LinkInputNeuronsToInterneuron(
                         interneuronNetworks.ElementAt(0).GetInterneuron(),
                         [
-                            inputs.ElementAt(0).Neuron0,
-                            inputs.ElementAt(1).Neuron0,
-                            .. additionalInputs
+                            new(inputs.ElementAt(0).Neuron0),
+                            new(inputs.ElementAt(1).Neuron0),
+                            .. additionalInputs.Select(n => new NeuronInfo(n))
                         ]
                     ),
                     NetworkHelper.LinkInputNeuronsToInterneuron(
                         interneuronNetworks.ElementAt(1).GetInterneuron(),
                         [
-                            inputs.ElementAt(0).Neuron0,
-                            inputs.ElementAt(1).Neuron1,
-                            .. additionalInputs
+                            new(inputs.ElementAt(0).Neuron0),
+                            new(inputs.ElementAt(1).Neuron1),
+                            .. additionalInputs.Select(n => new NeuronInfo(n))
                         ]
                     ),
                     NetworkHelper.LinkInputNeuronsToInterneuron(
                         interneuronNetworks.ElementAt(2).GetInterneuron(),
                         [
-                            inputs.ElementAt(0).Neuron1,
-                            inputs.ElementAt(1).Neuron0,
-                            .. additionalInputs
+                            new(inputs.ElementAt(0).Neuron1),
+                            new(inputs.ElementAt(1).Neuron0),
+                            .. additionalInputs.Select(n => new NeuronInfo(n))
                         ]
                     ),
                     NetworkHelper.LinkInputNeuronsToInterneuron(
                         interneuronNetworks.ElementAt(3).GetInterneuron(),
                         [
-                            inputs.ElementAt(0).Neuron1,
-                            inputs.ElementAt(1).Neuron1,
-                            .. additionalInputs
+                            new(inputs.ElementAt(0).Neuron1),
+                            new(inputs.ElementAt(1).Neuron1),
+                            .. additionalInputs.Select(n => new NeuronInfo(n))
                         ]
                     )
                 ]

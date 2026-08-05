@@ -57,12 +57,19 @@ namespace ei8.Cortex.Coding.d23
             })
         ];
 
-        public static ReadOnlyNetwork LinkInputNeuronsToInterneuron(Neuron interneuron, params Neuron[] inputNeurons)
+        public static ReadOnlyNetwork LinkInputNeuronsToInterneuron(Neuron interneuron, params NeuronInfo[] inputNeuronInfos)
         {
             var network = new Network();
-            foreach (Neuron input in inputNeurons)
-                network.AddReplace(NetworkHelper.CreateTerminal(input, interneuron, NeurotransmitterEffect.Excite, 1f / inputNeurons.Length));
+            NetworkHelper.LinkInputNeuronsToInterneuronByEffect(interneuron, inputNeuronInfos, network, NeurotransmitterEffect.Excite);
+            NetworkHelper.LinkInputNeuronsToInterneuronByEffect(interneuron, inputNeuronInfos, network, NeurotransmitterEffect.Inhibit);
             return network;
+        }
+
+        private static void LinkInputNeuronsToInterneuronByEffect(Neuron interneuron, NeuronInfo[] inputNeuronInfos, Network network, NeurotransmitterEffect effect)
+        {
+            var exciteNeurons = inputNeuronInfos.Where(i => i.Effect == effect).ToArray();
+            foreach (var input in exciteNeurons)
+                network.AddReplace(NetworkHelper.CreateTerminal(input.Neuron, interneuron, input.Effect, input.Strength / exciteNeurons.Length));
         }
 
         public static ReadOnlyNetwork CreateInputNeuronNetwork(MirrorConfig mirrorConfig, float strengthToInterneurons, params ReadOnlyNetwork[] interneurons) =>

@@ -13,6 +13,7 @@ namespace ei8.Cortex.Coding.d23.Collections
         static abstract ReadOnlyNetwork LinkInputNeurons(
             ReadOnlyNetwork interneuronNetwork,
             FunctionalParameter<UnaryNeuronParameter> parameters,
+            ReadOnlyNetwork? precedingInterneuronNetwork = null,
             params Neuron[] additionalInputs
         );
 

@@ -67,15 +67,15 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
                     NetworkHelper.LinkInputNeuronsToInterneuron(
                         interneuronNetworks.ElementAt(0).GetInterneuron(),
                         [
-                            inputs.Single().Neuron0,
-                            .. additionalInputs
+                            new(inputs.Single().Neuron0),
+                            .. additionalInputs.Select(n => new NeuronInfo(n))
                         ]
                     ),
                     NetworkHelper.LinkInputNeuronsToInterneuron(
                         interneuronNetworks.ElementAt(1).GetInterneuron(),
                         [
-                            inputs.Single().Neuron1,
-                            .. additionalInputs
+                            new(inputs.Single().Neuron1),
+                            .. additionalInputs.Select(n => new NeuronInfo(n))
                         ]
                     )
                 ]
