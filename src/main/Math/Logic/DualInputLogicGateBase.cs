@@ -6,11 +6,19 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
 {
     public abstract class DualInputLogicGateBase : LogicGateBase
     {
-        protected DualInputLogicGateBase() : base()
+        protected DualInputLogicGateBase(
+            FunctionalParameter<BinaryNeuronParameter> parameters,
+            IEnumerable<ReadOnlyNetwork> networks,
+            VariableInfo? variableInfo
+        ) : base(
+            parameters,
+            networks,
+            variableInfo
+        )
         {
         }
 
-        protected override IEnumerable<string> GetInterneuronTags(VariableInfo variableInfo, InterneuronTagInfo? interneuronTagInfo = null)
+        public static IEnumerable<string> GetInterneuronTags(VariableInfo variableInfo, InterneuronTagInfo? interneuronTagInfo = null)
         {
             string typeTagPrefix = string.Empty,
                 input1TagPrefix = string.Empty,
@@ -35,7 +43,7 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
             ];
         }
 
-        protected override IEnumerable<ReadOnlyNetwork> LinkInputNeurons(
+        public static IEnumerable<ReadOnlyNetwork> LinkInputNeurons(
             IEnumerable<BinaryNeuronParameter> inputs,
             IEnumerable<ReadOnlyNetwork> interneuronNetworks,
             params Neuron[] additionalInputs

@@ -1,25 +1,14 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace ei8.Cortex.Coding.d23
 {
     public class BinaryNeuronParameter : NeuronParameterBase
     {
-        // TODO: Change to IEnumerable of Neurons then create enum for individual neurons
-        // create terminal info?
-        // create tag differentiator? eg. "1", "0"
-        // create class/struct for 3 properties above (NeuronInfo)
-        public BinaryNeuronParameter(Neuron neuron1, Neuron neuron0) : base()
+        private BinaryNeuronParameter(IEnumerable<NeuronInfo> neuronInfos) : base(neuronInfos)
         {
-            this.Neuron1 = neuron1;
-            this.Neuron0 = neuron0;
-
-            this.network.AddReplaceItems(
-                [
-                    this.Neuron1,
-                    this.Neuron0
-                ]
-            );
         }
 
         public static BinaryNeuronParameter Create(
@@ -28,8 +17,10 @@ namespace ei8.Cortex.Coding.d23
             string falseString = "0"
         ) =>
             new(
-                NetworkHelper.CreateNeuron($"{tagPrefix} = {trueString}"),
-                NetworkHelper.CreateNeuron($"{tagPrefix} = {falseString}")
+                [
+                    new(NetworkHelper.CreateNeuron($"{tagPrefix} = {trueString}")),
+                    new(NetworkHelper.CreateNeuron($"{tagPrefix} = {falseString}"))
+                ]
             );
 
         public static bool TryCreate(
@@ -59,7 +50,8 @@ namespace ei8.Cortex.Coding.d23
             return bResult;
         }
 
-        public Neuron Neuron1 { get; }
-        public Neuron Neuron0 { get; }
+        public Neuron Neuron1 => this.NeuronInfos.First().Neuron;
+
+        public Neuron Neuron0 => this.NeuronInfos.ElementAt(1).Neuron;
     }
 }

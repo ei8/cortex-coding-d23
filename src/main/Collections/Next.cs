@@ -1,32 +1,47 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 
 namespace ei8.Cortex.Coding.d23.Collections
 {
-    public class Next : AdjacentBase
+    public class Next : AdjacentBase, IAdjacent<Next>
     {
-        public Next() : base()
+        protected Next(
+            FunctionalParameter<UnaryNeuronParameter> parameters,
+            ReadOnlyNetwork interneuronNetwork,
+            ReadOnlyNetwork linkedInputNeurons,
+            VariableInfo? variableInfo
+        ) : base(
+            parameters,
+            interneuronNetwork,
+            linkedInputNeurons,
+            variableInfo
+        )
         {
         }
 
-        protected override IEnumerable<ReadOnlyNetwork> CreateInterneuronNetworks(
+        public static Next Create(
             FunctionalParameter<UnaryNeuronParameter> parameters,
-            VariableInfo variableInfo,
+            ReadOnlyNetwork interneuronNetwork,
+            ReadOnlyNetwork linkedInputNeurons,
+            VariableInfo? variableInfo
+        ) => new(parameters, interneuronNetwork, linkedInputNeurons, variableInfo);
+
+        public static ReadOnlyNetwork CreateInterneuronNetwork(
+            FunctionalParameter<UnaryNeuronParameter> parameters,
+            VariableInfo variableInfo
+        ) => NetworkHelper.CreateInterneuronNetworkByOutputNeurons(
+            $"{variableInfo.Function}({variableInfo.Inputs.First()})",
+            [parameters.Outputs.First()!.Neuron]
+        );
+
+        public static ReadOnlyNetwork LinkInputNeurons(
+            ReadOnlyNetwork interneuronNetwork,
+            FunctionalParameter<UnaryNeuronParameter> parameters,
             params Neuron[] additionalInputs
-        )
-        {
-            var interneuronNetworks = NetworkHelper.CreateInterneuronNetworkByOutputNeurons(
-                $"{variableInfo.Function}({variableInfo.Inputs.First()})",
-                [parameters.Outputs.First()!.Neuron]
-            );
-            return [
-                interneuronNetworks,
-                AdjacentBase.LinkInputNeuron(
-                    parameters.Inputs.First()!,
-                    interneuronNetworks,
-                    additionalInputs
-                )
-            ];
-        }
+        ) => AdjacentBase.LinkInputNeurons(
+            // TODO: pass multiple inputs here, including inhibitor from previous Step
+            parameters.Inputs.First()!,
+            interneuronNetwork,
+            additionalInputs
+        );
     }
 }

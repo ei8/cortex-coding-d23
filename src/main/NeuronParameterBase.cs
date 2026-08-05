@@ -1,17 +1,23 @@
-﻿namespace ei8.Cortex.Coding.d23
+﻿using System.Collections.Generic;
+using System.Linq;
+
+namespace ei8.Cortex.Coding.d23
 {
     public abstract class NeuronParameterBase : IVariable
     {
         protected Network network;
 
-        protected NeuronParameterBase()
+        protected NeuronParameterBase(IEnumerable<NeuronInfo> neuronInfos)
         {
+            this.NeuronInfos = neuronInfos;
+
             this.network = new();
+            this.network.AddReplaceItems(
+                this.NeuronInfos.Select(ni => ni.Neuron)
+            );
         }
 
-        public int Strength { get; }
-
-        public NeurotransmitterEffect Effect { get; }
+        public IEnumerable<NeuronInfo> NeuronInfos { get; private set; }
 
         public ReadOnlyNetwork Network => this.network;
 

@@ -7,7 +7,15 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
 {
     public abstract class LogicGateBase : FunctionalCircuitBase<BinaryNeuronParameter>
     {
-        public LogicGateBase() : base()
+        protected LogicGateBase(
+            FunctionalParameter<BinaryNeuronParameter> parameters,
+            IEnumerable<ReadOnlyNetwork> networks,
+            VariableInfo? variableInfo
+        ) : base(
+            parameters,
+            networks,
+            variableInfo
+        )
         {
         }
 
@@ -18,50 +26,36 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
             [CallerArgumentExpression(nameof(result))] string parameterExpression = "",
             params Neuron[] additionalInputs
         ) 
-            where T : LogicGateBase, new()
+            where T : ILogicGate<T>
         {
             bool bResult = false;
-            result = null;
+            result = default;
             if (VariableInfo.TryParse(parameterExpression, out var variableInfo))
             {
-                result = new();
                 var output = parameters.Outputs.Single();
                 var interneuronNetworks = Enumerable.Empty<ReadOnlyNetwork>();
                 if (output != null)
                     interneuronNetworks = NetworkHelper.CreateInterneuronNetworksByOutputNeurons(
-                        result.GetInterneuronOutputs(output),
-                        result.GetInterneuronTags(variableInfo, interneuronTagInfo)
+                        T.GetInterneuronOutputs(output),
+                        T.GetInterneuronTags(variableInfo, interneuronTagInfo)
                     );
                 
-                result.Initialize(
+                result = T.Create(
                     parameters,
                     [
                         ..interneuronNetworks,
-                        ..result.LinkInputNeurons(
+                        ..T.LinkInputNeurons(
                             parameters.Inputs.WhereNotNull(),
                             interneuronNetworks,
                             additionalInputs
                         )
-                    ]
+                    ],
+                    variableInfo
                 );
-                result.VariableInfo = variableInfo;
                 bResult = true;
             }
 
             return bResult;
         }
-
-        protected abstract IEnumerable<Neuron> GetInterneuronOutputs(BinaryNeuronParameter output);
-
-        protected abstract IEnumerable<string> GetInterneuronTags(
-            VariableInfo variableInfo,
-            InterneuronTagInfo? interneuronTagInfo = null
-        );
-
-        protected abstract IEnumerable<ReadOnlyNetwork> LinkInputNeurons(
-            IEnumerable<BinaryNeuronParameter> inputs,
-            IEnumerable<ReadOnlyNetwork> interneuronNetworks,
-            params Neuron[] additionalInputs
-        );
     }
 }

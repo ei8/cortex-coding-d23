@@ -2,9 +2,31 @@
 
 namespace ei8.Cortex.Coding.d23.Math.Logic
 {
-    public class OrGate : DualInputLogicGateBase
+    public class OrGate : DualInputLogicGateBase, ILogicGate<OrGate>
     {
-        protected override IEnumerable<Neuron> GetInterneuronOutputs(BinaryNeuronParameter output) =>
+        protected OrGate(
+            FunctionalParameter<BinaryNeuronParameter> parameters,
+            IEnumerable<ReadOnlyNetwork> networks,
+            VariableInfo? variableInfo
+        ) : base(
+            parameters,
+            networks,
+            variableInfo
+        )
+        {
+        }
+
+        public static OrGate Create(
+            FunctionalParameter<BinaryNeuronParameter> parameters,
+            IEnumerable<ReadOnlyNetwork> networks,
+            VariableInfo? variableInfo
+        ) => new(
+            parameters,
+            networks,
+            variableInfo
+        );
+
+        public static IEnumerable<Neuron> GetInterneuronOutputs(BinaryNeuronParameter output) =>
         [
             output.Neuron0,
             output.Neuron1,

@@ -4,13 +4,31 @@ using System.Linq;
 
 namespace ei8.Cortex.Coding.d23.Math.Logic
 {
-    public class NotGate : LogicGateBase
+    public class NotGate : LogicGateBase, ILogicGate<NotGate>
     {
-        public NotGate() : base()
+        protected NotGate(
+            FunctionalParameter<BinaryNeuronParameter> parameters,
+            IEnumerable<ReadOnlyNetwork> networks,
+            VariableInfo? variableInfo
+        ) : base(
+            parameters,
+            networks,
+            variableInfo
+        )
         {
         }
 
-        protected override IEnumerable<string> GetInterneuronTags(VariableInfo variableInfo, InterneuronTagInfo? interneuronTagInfo = null)
+        public static NotGate Create(
+            FunctionalParameter<BinaryNeuronParameter> parameters,
+            IEnumerable<ReadOnlyNetwork> networks,
+            VariableInfo? variableInfo
+        ) => new(
+            parameters,
+            networks,
+            variableInfo
+        );
+
+        public static IEnumerable<string> GetInterneuronTags(VariableInfo variableInfo, InterneuronTagInfo? interneuronTagInfo = null)
         {
             string coreOperatorPrefix = string.Empty,
                 coreInputTagPrefix = string.Empty;
@@ -29,13 +47,13 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
             ];
         }
 
-        protected override IEnumerable<Neuron> GetInterneuronOutputs(BinaryNeuronParameter output) =>
+        public static IEnumerable<Neuron> GetInterneuronOutputs(BinaryNeuronParameter output) =>
         [
             output.Neuron1,
             output.Neuron0
         ];
 
-        protected override IEnumerable<ReadOnlyNetwork> LinkInputNeurons(
+        public static IEnumerable<ReadOnlyNetwork> LinkInputNeurons(
             IEnumerable<BinaryNeuronParameter> inputs, 
             IEnumerable<ReadOnlyNetwork> interneuronNetworks,
             params Neuron[] additionalInputs

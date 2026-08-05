@@ -6,20 +6,18 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 {
     public abstract class OperationBase : FunctionalCircuitBase<BinaryNeuronParameter>
     {
-        public OperationBase() : base()
+        protected OperationBase(
+            FunctionalParameter<BinaryNeuronParameter> parameters,
+            IEnumerable<ReadOnlyNetwork> networks,
+            VariableInfo? variableInfo
+        ) : 
+        base(
+            parameters,
+            networks,
+            variableInfo
+        )
         {
         }
-
-        protected abstract FunctionalParameter<BinaryNeuronParameter> GetDefaultParameters(
-            BinaryNeuronParameter? precedingValue,
-            int exponent
-        );
-
-        protected abstract IEnumerable<ReadOnlyNetwork> CreateInterneuronNetworks(
-            FunctionalParameter<BinaryNeuronParameter> parameters,
-            VariableInfo variableInfo,
-            VariableInfo? precedingVariableInfo = null
-        );
 
         public static bool TryCreate<T>(
             [NotNullWhen(true)] out T? result,
@@ -28,28 +26,27 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
             VariableInfo? precedingVariableInfo = null,
             [CallerArgumentExpression(nameof(result))] string parameterExpression = ""
         )
-            where T : OperationBase, new()
+            where T : IOperation<T>
         {
             bool bResult = false;
-            result = null;
+            result = default;
             if (VariableInfo.TryParse(parameterExpression, out var variableInfo))
             {
-                result = new();
-                var parameters = result.GetDefaultParameters(
+                var parameters = T.GetDefaultParameters(
                     precedingValue,
                     exponent
                 );
-                result.Initialize(
+                result = T.Create(
                     parameters,
                     [
-                        ..result.CreateInterneuronNetworks(
+                        ..T.CreateInterneuronNetworks(
                             parameters,
                             variableInfo,
                             precedingVariableInfo
                         )
-                    ]
+                    ],
+                    variableInfo
                 );
-                result.VariableInfo = variableInfo;
                 bResult = true;
             }
 

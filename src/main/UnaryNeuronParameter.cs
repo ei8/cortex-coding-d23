@@ -1,24 +1,19 @@
 ﻿
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace ei8.Cortex.Coding.d23
 {
     public class UnaryNeuronParameter : NeuronParameterBase
     {
-        public UnaryNeuronParameter(Neuron neuron) : base()
+        private UnaryNeuronParameter(IEnumerable<NeuronInfo> neuronInfos) : base(neuronInfos)
         {
-            this.Neuron = neuron;
-
-            this.network.AddReplaceItems(
-                [
-                    this.Neuron
-                ]
-            );
         }
 
         public static UnaryNeuronParameter Create(string tag) =>
-            new(NetworkHelper.CreateNeuron(tag));
+            new([new(NetworkHelper.CreateNeuron(tag))]);
 
         public static bool TryCreate(
             [NotNullWhen(true)] out UnaryNeuronParameter? result,
@@ -43,6 +38,6 @@ namespace ei8.Cortex.Coding.d23
             return bResult;
         }
 
-        public Neuron Neuron { get; }
+        public Neuron Neuron => this.NeuronInfos.Single().Neuron;
     }
 }

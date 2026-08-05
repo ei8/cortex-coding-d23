@@ -8,27 +8,20 @@ namespace ei8.Cortex.Coding.d23
     {
         private Network network;
 
-        protected CircuitBase()
+        protected CircuitBase(TParam parameters, IEnumerable<ReadOnlyNetwork> networks, VariableInfo? variableInfo)
         {
             this.network = new();
-            this.Parameters = new();
-        }
-
-        protected virtual void Initialize(
-            TParam parameters,
-            IEnumerable<ReadOnlyNetwork> networks
-        )
-        {
             this.network.AddReplaceItems(
                 this.Parameters = parameters
             );
             this.network.AddReplaceItems([..networks]);
+            this.VariableInfo = variableInfo;
         }
 
         public ReadOnlyNetwork Network => this.network;
 
-        public TParam Parameters { get; protected set; }
+        public TParam Parameters { get; }
 
-        public VariableInfo? VariableInfo { get; protected set; }
+        public VariableInfo? VariableInfo { get; }
     }
 }

@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 {
-    public class Adder : OperationBase
+    public class Adder : OperationBase, IOperation<Adder>
     {
         public enum Input
         {
@@ -19,7 +19,29 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
             CarryOver
         }
 
-        protected override FunctionalParameter<BinaryNeuronParameter> GetDefaultParameters(
+        protected Adder(
+            FunctionalParameter<BinaryNeuronParameter> parameters,
+            IEnumerable<ReadOnlyNetwork> networks,
+            VariableInfo? variableInfo
+        ) : base(
+            parameters,
+            networks,
+            variableInfo
+        )
+        {
+        }
+
+        public static Adder Create(
+            FunctionalParameter<BinaryNeuronParameter> parameters,
+            IEnumerable<ReadOnlyNetwork> networks,
+            VariableInfo? variableInfo
+        ) => new(
+            parameters,
+            networks,
+            variableInfo
+        );
+
+        public static FunctionalParameter<BinaryNeuronParameter> GetDefaultParameters(
             BinaryNeuronParameter? precedingValue,
             int exponent
         ) => new(
@@ -34,7 +56,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
             ]
         );
 
-        protected override IEnumerable<ReadOnlyNetwork> CreateInterneuronNetworks(
+        public static IEnumerable<ReadOnlyNetwork> CreateInterneuronNetworks(
             FunctionalParameter<BinaryNeuronParameter> parameters,
             VariableInfo variableInfo,
             VariableInfo? precedingVariableInfo = null
