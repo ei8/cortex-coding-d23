@@ -17,7 +17,7 @@ namespace ei8.Cortex.Coding.d23
             );
         }
 
-        public IEnumerable<NeuronInfo> NeuronInfos { get; private set; }
+        public IEnumerable<NeuronInfo> NeuronInfos { get; }
 
         public ReadOnlyNetwork Network => this.network;
 
