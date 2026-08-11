@@ -1,15 +1,14 @@
-﻿namespace ei8.Cortex.Coding.d23.Process
+﻿using System;
+using System.Collections.Generic;
+
+namespace ei8.Cortex.Coding.d23.Process
 {
     public interface IProcess
     {
-        void Start(ISpikable spikable, IWorkingMemory workingMemory);
+        void Initialize(IWorkingMemory workingMemory, Action completionCallback);
 
-        void Stop();
-    }
+        IEnumerable<Neuron> GetCurrent();
 
-    public interface IProcess<T> : IProcess
-       where T : notnull
-    {
-        void Start(ISpikable spikable, IWorkingMemory<T> workingMemory);
+        void HandleFire(Neuron target, ReadOnlyNetwork network);
     }
 }
