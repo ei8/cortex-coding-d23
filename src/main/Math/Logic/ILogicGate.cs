@@ -12,12 +12,6 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
             InterneuronTagInfo? interneuronTagInfo = null
         );
 
-        static abstract IEnumerable<ReadOnlyNetwork> LinkInputNeurons(
-            IEnumerable<BinaryNeuronParameter> inputs,
-            IEnumerable<ReadOnlyNetwork> interneuronNetworks,
-            params Neuron[] additionalInputs
-        );
-
         static abstract T Create(
             FunctionalParameter<BinaryNeuronParameter> parameters,
             IEnumerable<ReadOnlyNetwork> networks,

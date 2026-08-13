@@ -7,16 +7,20 @@ namespace ei8.Cortex.Coding.d23.Process.Iteration
 {
     public class DoUntil : IProcess
     {
-        public enum WorkingMemoryKeys
+        public class WorkingMemory(
+            ReadOnlyChunk actions,
+            WriteableChunk counterVariable,
+            ReadOnlyChunk condition
+        ) : IWorkingMemory
         {
-            Actions,
-            Variable,
-            Condition
+            public ReadOnlyChunk Actions { get; } = actions;
+            public WriteableChunk CounterVariable { get; } = counterVariable;
+            public ReadOnlyChunk Condition { get; } = condition;
         }
 
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
-        private IWorkingMemory<WorkingMemoryKeys>? workingMemory;
+        private WorkingMemory? workingMemory;
         private Action? completionCallback;
 
         public DoUntil()
@@ -25,7 +29,7 @@ namespace ei8.Cortex.Coding.d23.Process.Iteration
 
         public void Initialize(IWorkingMemory workingMemory, Action completionCallback)
         {
-            this.workingMemory = (IWorkingMemory<WorkingMemoryKeys>)workingMemory;
+            this.workingMemory = (WorkingMemory) workingMemory;
             this.completionCallback = completionCallback;
         }
 
@@ -34,26 +38,12 @@ namespace ei8.Cortex.Coding.d23.Process.Iteration
             var result = Enumerable.Empty<Neuron>();
             if (
                 this.workingMemory != null &&
-                this.workingMemory.TryGetContents<
-                    WorkingMemoryKeys,
-                    ReadableKeyedChunk<WorkingMemoryKeys>,
-                    IEnumerable<Neuron>
-                >(
-                    WorkingMemoryKeys.Actions,
-                    out var actions
-                ) &&
-                this.workingMemory.TryGetContents<
-                    WorkingMemoryKeys,
-                    WriteableKeyedChunk<WorkingMemoryKeys>,
-                    IList<Neuron>
-                >(
-                    WorkingMemoryKeys.Variable,
-                    out var variable
-                )
+                this.workingMemory.Actions != null &&
+                this.workingMemory.CounterVariable != null
             )
                 result = [
-                    ..actions,
-                    ..variable
+                    ..this.workingMemory.Actions.Contents,
+                    ..this.workingMemory.CounterVariable.Contents
                 ];
 
             return result;
@@ -72,19 +62,12 @@ namespace ei8.Cortex.Coding.d23.Process.Iteration
                 var presynaptics = network.GetPresynapticNeurons(target.Id).ToArray();
                 if (
                     presynaptics.Any() &&
-                    this.workingMemory.TryGetContents<
-                        WorkingMemoryKeys,
-                        WriteableKeyedChunk<WorkingMemoryKeys>,
-                        IList<Neuron>
-                    >(
-                        WorkingMemoryKeys.Variable,
-                        out var variables
-                    ) &&
-                    presynaptics.Intersect(variables).Any()
+                    this.workingMemory.CounterVariable != null &&
+                    presynaptics.Intersect(this.workingMemory.CounterVariable.Contents).Any()
                 )
                 {
-                    variables.Clear();
-                    variables.Add(target);
+                    this.workingMemory.CounterVariable.Contents.Clear();
+                    this.workingMemory.CounterVariable.Contents.Add(target);
                     DoUntil.logger.Info(
                         new LogMessageGenerator(
                             () => $"Updated variable to: {target.ToReadableString()}"
@@ -93,15 +76,8 @@ namespace ei8.Cortex.Coding.d23.Process.Iteration
                 }
 
                 if (
-                    this.workingMemory.TryGetContents<
-                        WorkingMemoryKeys,
-                        ReadableKeyedChunk<WorkingMemoryKeys>,
-                        IEnumerable<Neuron>
-                    >(
-                        WorkingMemoryKeys.Condition,
-                        out var condition
-                    ) &&
-                    target.Id == condition.Single().Id &&
+                    this.workingMemory.Condition != null &&
+                    target.Id == this.workingMemory.Condition.Contents.Single().Id &&
                     this.completionCallback != null
                 )
                     this.completionCallback();

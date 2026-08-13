@@ -2,7 +2,7 @@
 
 namespace ei8.Cortex.Coding.d23.Math.Logic
 {
-    public class NandGate : DualInputLogicGateBase, ILogicGate<NandGate>
+    public class NandGate : DualInputLogicGateBase, IDualInputLogicGate<NandGate>
     {
         protected NandGate(
             FunctionalParameter<BinaryNeuronParameter> parameters,

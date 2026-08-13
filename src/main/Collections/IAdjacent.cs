@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace ei8.Cortex.Coding.d23.Collections
+﻿namespace ei8.Cortex.Coding.d23.Collections
 {
     public interface IAdjacent<T> : ICircuit<FunctionalParameter<UnaryNeuronParameter>, UnaryNeuronParameter>
         where T : ICircuit<FunctionalParameter<UnaryNeuronParameter>, UnaryNeuronParameter>

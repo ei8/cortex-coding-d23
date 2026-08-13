@@ -2,7 +2,7 @@
 
 namespace ei8.Cortex.Coding.d23.Math.Logic
 {
-    public class OrGate : DualInputLogicGateBase, ILogicGate<OrGate>
+    public class OrGate : DualInputLogicGateBase, IDualInputLogicGate<OrGate>
     {
         protected OrGate(
             FunctionalParameter<BinaryNeuronParameter> parameters,

@@ -2,7 +2,7 @@
 
 namespace ei8.Cortex.Coding.d23.Math.Logic
 {
-    public class NimplyGate : DualInputLogicGateBase, ILogicGate<NimplyGate>
+    public class NimplyGate : DualInputLogicGateBase, IDualInputLogicGate<NimplyGate>
     {
         protected NimplyGate(
             FunctionalParameter<BinaryNeuronParameter> parameters,

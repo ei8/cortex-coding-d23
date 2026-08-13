@@ -2,7 +2,7 @@
 
 namespace ei8.Cortex.Coding.d23.Math.Logic
 {
-    public class AndGate : DualInputLogicGateBase, ILogicGate<AndGate>
+    public class AndGate : DualInputLogicGateBase, IDualInputLogicGate<AndGate>
     {
         protected AndGate(
             FunctionalParameter<BinaryNeuronParameter> parameters,

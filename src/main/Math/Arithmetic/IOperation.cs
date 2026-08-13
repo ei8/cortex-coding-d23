@@ -1,5 +1,4 @@
-﻿using ei8.Cortex.Library.Common;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 {

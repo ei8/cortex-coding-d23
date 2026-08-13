@@ -16,16 +16,11 @@ namespace ei8.Cortex.Coding.d23.Process
         T Contents { get; }
     }
 
-    public interface IKeyedChunk<T> : IChunk
-    {
-        T Key { get; }
-    }
-
-    public interface IReadableChunk<T> : IContentChunk<IEnumerable<Neuron>>, IKeyedChunk<T>
+    public interface IReadOnlyChunk : IContentChunk<IEnumerable<Neuron>>
     {
     }
 
-    public interface IWriteableChunk<T> : IContentChunk<IList<Neuron>>, IKeyedChunk<T>
+    public interface IWriteableChunk : IContentChunk<IList<Neuron>>
     {
     }
 }

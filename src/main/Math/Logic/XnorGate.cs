@@ -2,7 +2,7 @@
 
 namespace ei8.Cortex.Coding.d23.Math.Logic
 {
-    public class XnorGate : DualInputLogicGateBase, ILogicGate<XnorGate>
+    public class XnorGate : DualInputLogicGateBase, IDualInputLogicGate<XnorGate>
     {
         protected XnorGate(
             FunctionalParameter<BinaryNeuronParameter> parameters,
