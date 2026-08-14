@@ -4,23 +4,18 @@ using System.Runtime.CompilerServices;
 
 namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 {
-    public abstract class OperationBase<TInput, TOutput> : FunctionalCircuitBase<TInput, TOutput>
+    public abstract class OperationBase<TInput, TOutput>(
+        FunctionalCircuitParameter<TInput, TOutput> parameters,
+        IEnumerable<ReadOnlyNetwork> networks,
+        VariableInfo? variableInfo
+    ) : FunctionalCircuitBase<TInput, TOutput>(
+        parameters,
+        networks,
+        variableInfo
+    )
         where TInput : IInputCircuitParameterSubset
         where TOutput : IOutputCircuitParameterSubset
     {
-        protected OperationBase(
-            FunctionalCircuitParameter<TInput, TOutput> parameters,
-            IEnumerable<ReadOnlyNetwork> networks,
-            VariableInfo? variableInfo
-        ) : 
-        base(
-            parameters,
-            networks,
-            variableInfo
-        )
-        {
-        }
-
         public static bool TryCreate<T>(
             [NotNullWhen(true)] out T? result,
             int exponent = 0,

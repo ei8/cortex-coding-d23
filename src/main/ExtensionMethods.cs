@@ -21,8 +21,8 @@ namespace ei8.Cortex.Coding.d23
         {
             parameter = null;
 
-            if (paramValueMap.ContainsKey(fireInfo.Target.Id))
-                parameter = paramValueMap[fireInfo.Target.Id];
+            if (paramValueMap.TryGetValue(fireInfo.Target.Id, out T? value))
+                parameter = value;
 
             return parameter != null;
         } 
@@ -65,7 +65,7 @@ namespace ei8.Cortex.Coding.d23
                     tempList.Add(new(stimulus.Value, parser.NeuronConverter(stimulus.Value)));
             }
 
-            if (tempList.Count() == stimuli.Length)
+            if (tempList.Count == stimuli.Length)
             {
                 bResult = true;
                 result = tempList;
@@ -74,7 +74,7 @@ namespace ei8.Cortex.Coding.d23
             return bResult;
         }
 
-        private static readonly object parseLock = new object();
+        private static readonly object parseLock = new();
 
         /// <summary>
         /// This might be a temporary approach. 
@@ -101,7 +101,7 @@ namespace ei8.Cortex.Coding.d23
 
             lock (ExtensionMethods.parseLock)
             {
-                ConcurrentDictionary<DateTime, FireInfo> fireHistory = (ConcurrentDictionary<DateTime, FireInfo>)spikable.FireHistory;
+                var fireHistory = (ConcurrentDictionary<DateTime, FireInfo>)spikable.FireHistory;
                 fireHistory.Clean(currentFire.Timestamp.Subtract(spikable.RelatedSpikesPeriod));
                 fireHistory.TryAdd(currentFire.Timestamp, currentFire);
 
@@ -111,7 +111,7 @@ namespace ei8.Cortex.Coding.d23
                 foreach (var rp in responseParsers)
                     if (currentFire.Target.Id == rp.ActionNeuronId || rp.Evaluator(currentFire))
                     {
-                        if (fireHistory.Count() >= ExtensionMethods.GetExpectedResultCount(rp))
+                        if (fireHistory.Count >= ExtensionMethods.GetExpectedResultCount(rp))
                         {
                             var matchedActionNeurons = fireHistory.Select(fh => fh.Value).Where(n => n.Target.Id == rp.ActionNeuronId);
 
@@ -137,7 +137,7 @@ namespace ei8.Cortex.Coding.d23
                                         {
                                             tempResults.Add(new(fi.Target, fi, objectResult));
 
-                                            if (tempResults.Count() == ExtensionMethods.GetExpectedResultCount(rp))
+                                            if (tempResults.Count == ExtensionMethods.GetExpectedResultCount(rp))
                                             {
                                                 fireHistory.Clear();
                                                 bResult = true;
@@ -168,12 +168,11 @@ namespace ei8.Cortex.Coding.d23
 
             foreach (var value in values)
             {
-                Neuron? neuron = null;
                 if (
                     !mirrorConfigs.TryGetMirrorNeuron(
                         value.ToKeyString(),
                         network,
-                        out neuron
+                        out Neuron? neuron
                     )
                 )
                     throw new InvalidOperationException($"Failed retrieving NeuronValueMap for {value.ToKeyString()}");

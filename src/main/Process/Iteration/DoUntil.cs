@@ -61,7 +61,7 @@ namespace ei8.Cortex.Coding.d23.Process.Iteration
             {
                 var presynaptics = network.GetPresynapticNeurons(target.Id).ToArray();
                 if (
-                    presynaptics.Any() &&
+                    presynaptics.Length > 0 &&
                     this.workingMemory.CounterVariable != null &&
                     presynaptics.Intersect(this.workingMemory.CounterVariable.Contents).Any()
                 )

@@ -5,28 +5,22 @@ using System.Runtime.CompilerServices;
 
 namespace ei8.Cortex.Coding.d23.Collections
 {
-    public abstract class AdjacentBase<TInput, TOutput> : FunctionalCircuitBase<TInput, TOutput>
-        where TInput : IInputCircuitParameterSubset
-        where TOutput : IOutputCircuitParameterSubset
-    {
-        protected AdjacentBase(
-            FunctionalCircuitParameter<TInput, TOutput> parameters,
-            ReadOnlyNetwork interneuronNetwork,
-            ReadOnlyNetwork linkedInputNeurons,
-            VariableInfo? variableInfo
-        ) :
-        base(
-            parameters,
-            [
+    public abstract class AdjacentBase<TInput, TOutput>(
+        FunctionalCircuitParameter<TInput, TOutput> parameters,
+        ReadOnlyNetwork interneuronNetwork,
+        ReadOnlyNetwork linkedInputNeurons,
+        VariableInfo? variableInfo
+        ) : FunctionalCircuitBase<TInput, TOutput>(
+        parameters,
+        [
                 interneuronNetwork,
                 linkedInputNeurons
             ],
-            variableInfo
+        variableInfo
         )
-        {
-            this.InterneuronNetwork = interneuronNetwork;
-        }
-
+        where TInput : IInputCircuitParameterSubset
+        where TOutput : IOutputCircuitParameterSubset
+    {
         public static bool TryCreate<T>(
             [NotNullWhen(true)] out T? result,
             FunctionalCircuitParameter<TInput, TOutput> parameters,
@@ -83,6 +77,6 @@ namespace ei8.Cortex.Coding.d23.Collections
             );
         }
 
-        public ReadOnlyNetwork InterneuronNetwork { get; }
+        public ReadOnlyNetwork InterneuronNetwork { get; } = interneuronNetwork;
     }
 }
