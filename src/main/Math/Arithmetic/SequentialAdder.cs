@@ -1,28 +1,46 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 
 namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 {
-    public class SequentialAdder : SequentialOperationBase, ISequentialOperation<SequentialAdder>
+    public class SequentialAdder : SequentialOperationBase<SequentialAdder.Input, SequentialAdder.Output>, ISequentialOperation<SequentialAdder, SequentialAdder.Input, SequentialAdder.Output>
     {
-        // TODO: Input and Output enums to classes
-        public enum Input
+        public class Input(
+            UnaryNeuronParameter? currentDigit,
+            BinaryNeuronParameter? addend1,
+            BinaryNeuronParameter? addend2,
+            BinaryNeuronParameter? precedingCarryOver
+        ) :
+        InputCircuitParameterSubset<UnaryNeuronParameter, BinaryNeuronParameter, BinaryNeuronParameter, BinaryNeuronParameter>(
+            currentDigit,
+            addend1,
+            addend2,
+            precedingCarryOver
+        )
         {
-            CurrentDigit,
-            Addend1,
-            Addend2,
-            PrecedingCarryOver
+            public UnaryNeuronParameter? CurrentDigit => this.Parameter1;
+            public BinaryNeuronParameter? Addend1 => this.Parameter2;
+            public BinaryNeuronParameter? Addend2 => this.Parameter3;
+            public BinaryNeuronParameter? PrecedingCarryOver => this.Parameter4;
         }
 
-        public enum Output
+        public class Output(
+            UnaryNeuronParameter? nextDigit,
+            BinaryNeuronParameter? sum,
+            BinaryNeuronParameter? carryOver
+        ) :
+        OutputCircuitParameterSubset<UnaryNeuronParameter, BinaryNeuronParameter, BinaryNeuronParameter>(
+            nextDigit,
+            sum,
+            carryOver
+        )
         {
-            NextDigit,
-            Sum,
-            CarryOver
+            public UnaryNeuronParameter? NextDigit => this.Parameter1;
+            public BinaryNeuronParameter? Sum => this.Parameter2;
+            public BinaryNeuronParameter? CarryOver => this.Parameter3;
         }
 
         protected SequentialAdder(
-            FunctionalParameter<NeuronParameterBase> parameters,
+            FunctionalCircuitParameter<Input, Output> parameters,
             IEnumerable<ReadOnlyNetwork> networks,
             VariableInfo? variableInfo
         ) : base(
@@ -34,7 +52,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
         }
 
         public static SequentialAdder Create(
-            FunctionalParameter<NeuronParameterBase> parameters,
+            FunctionalCircuitParameter<Input, Output> parameters,
             IEnumerable<ReadOnlyNetwork> networks,
             VariableInfo? variableInfo
         ) => new(
@@ -44,29 +62,29 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
         );
 
         public static IEnumerable<ReadOnlyNetwork> CreateInterneuronNetworks(
-            FunctionalParameter<NeuronParameterBase> parameters,
+            FunctionalCircuitParameter<Input, Output> parameters,
             VariableInfo variableInfo,
             VariableInfo? precedingVariableInfo = null
         )
         {
             var result = new Network();
 
-            var sum = (BinaryNeuronParameter?) parameters.Outputs.ElementAt((int)Output.Sum);
+            var sum = parameters.Outputs.Sum;
 
             var coreNetwork = Adder.CreateInterneuronNetworksCore(
                 variableInfo,
                 precedingVariableInfo,
-                (BinaryNeuronParameter?)parameters.Inputs.ElementAt((int)Input.PrecedingCarryOver),
-                (BinaryNeuronParameter?)parameters.Inputs.ElementAt((int)Input.Addend1),
-                (BinaryNeuronParameter?)parameters.Inputs.ElementAt((int)Input.Addend2),
+                parameters.Inputs.PrecedingCarryOver,
+                parameters.Inputs.Addend1,
+                parameters.Inputs.Addend2,
                 sum,
-                (BinaryNeuronParameter?)parameters.Outputs.ElementAt((int)Output.CarryOver),
-                ((UnaryNeuronParameter?)parameters.Inputs.ElementAt((int)Input.CurrentDigit)!).Neuron
+                parameters.Outputs.CarryOver,
+                parameters.Inputs.CurrentDigit!.Neuron
             );
 
             result.AddReplaceItems([..coreNetwork]);
 
-            var nextDigit = (UnaryNeuronParameter?) parameters.Outputs.ElementAt((int)Output.NextDigit);
+            var nextDigit = parameters.Outputs.NextDigit;
             if (sum != null && nextDigit != null)
             {
                 foreach (var sumNeuron in sum.Network.GetItems<Neuron>())
@@ -76,26 +94,27 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
             return [result];
         }
 
-        public static FunctionalParameter<NeuronParameterBase> GetDefaultParameters(
+        public static FunctionalCircuitParameter<Input, Output> GetDefaultParameters(
             UnaryNeuronParameter? currentDigit,
             BinaryNeuronParameter? input1,
             BinaryNeuronParameter? input2,
             BinaryNeuronParameter? precedingValue,
             UnaryNeuronParameter? nextDigit,
-            BinaryNeuronParameter? sum,
-            BinaryNeuronParameter? carryOver
-        ) => new(
-            [
+            BinaryNeuronParameter? result,
+            BinaryNeuronParameter? regrouping
+         )
+         => new (
+            new(
                 currentDigit, 
                 input1, 
                 input2, 
                 precedingValue
-            ],
-            [
+            ),
+            new(
                 nextDigit,
-                sum, 
-                carryOver 
-            ]
+                result, 
+                regrouping
+            )
         );
     }
 }

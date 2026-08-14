@@ -2,10 +2,13 @@
 
 namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 {
-    public interface ISequentialOperation<T> : ICircuit<FunctionalParameter<NeuronParameterBase>, NeuronParameterBase>
-        where T : ICircuit<FunctionalParameter<NeuronParameterBase>, NeuronParameterBase>
+    public interface ISequentialOperation<T, TInput, TOutput> : ICircuit<FunctionalCircuitParameter<TInput, TOutput>>
+        where T : ICircuit<FunctionalCircuitParameter<TInput, TOutput>>
+        where TInput : IInputCircuitParameterSubset
+        where TOutput : IOutputCircuitParameterSubset
     {
-        static abstract FunctionalParameter<NeuronParameterBase> GetDefaultParameters(
+        // TODO: fix?
+        static abstract FunctionalCircuitParameter<TInput, TOutput> GetDefaultParameters(
             UnaryNeuronParameter? currentDigit,
             BinaryNeuronParameter? input1,
             BinaryNeuronParameter? input2,
@@ -16,13 +19,13 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
         );
 
         static abstract IEnumerable<ReadOnlyNetwork> CreateInterneuronNetworks(
-            FunctionalParameter<NeuronParameterBase> parameters,
+            FunctionalCircuitParameter<TInput, TOutput> parameters,
             VariableInfo variableInfo,
             VariableInfo? precedingVariableInfo = null
         );
 
         static abstract T Create(
-            FunctionalParameter<NeuronParameterBase> parameters,
+            FunctionalCircuitParameter<TInput, TOutput> parameters,
             IEnumerable<ReadOnlyNetwork> networks,
             VariableInfo? variableInfo
         );

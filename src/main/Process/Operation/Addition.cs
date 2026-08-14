@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace ei8.Cortex.Coding.d23.Process.Operation
 {
-    //public class Addition : IProcess
+    // TODO: public class Addition : IProcess
     //{
     //    public class WorkingMemoryKeys(
     //        ReadOnlyChunk addend1Digits,

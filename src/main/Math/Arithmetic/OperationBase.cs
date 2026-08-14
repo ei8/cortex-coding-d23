@@ -4,10 +4,12 @@ using System.Runtime.CompilerServices;
 
 namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 {
-    public abstract class OperationBase : FunctionalCircuitBase<BinaryNeuronParameter>
+    public abstract class OperationBase<TInput, TOutput> : FunctionalCircuitBase<TInput, TOutput>
+        where TInput : IInputCircuitParameterSubset
+        where TOutput : IOutputCircuitParameterSubset
     {
         protected OperationBase(
-            FunctionalParameter<BinaryNeuronParameter> parameters,
+            FunctionalCircuitParameter<TInput, TOutput> parameters,
             IEnumerable<ReadOnlyNetwork> networks,
             VariableInfo? variableInfo
         ) : 
@@ -26,7 +28,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
             VariableInfo? precedingVariableInfo = null,
             [CallerArgumentExpression(nameof(result))] string parameterExpression = ""
         )
-            where T : IOperation<T>
+            where T : IOperation<T, TInput, TOutput>
         {
             bool bResult = false;
             result = default;

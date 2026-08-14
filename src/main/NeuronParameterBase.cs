@@ -3,9 +3,9 @@ using System.Linq;
 
 namespace ei8.Cortex.Coding.d23
 {
-    public abstract class NeuronParameterBase : IVariable
+    public abstract class NeuronParameterBase : INeuronParameter
     {
-        protected Network network;
+        protected readonly Network network;
 
         protected NeuronParameterBase(IEnumerable<NeuronInfo> neuronInfos)
         {

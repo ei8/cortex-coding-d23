@@ -2,20 +2,17 @@
 
 namespace ei8.Cortex.Coding.d23
 {
-    public abstract class FunctionalCircuitBase<TNeuron> : CircuitBase<FunctionalParameter<TNeuron>, TNeuron>
-        where TNeuron : NeuronParameterBase
+    public abstract class FunctionalCircuitBase<TInput, TOutput>(
+        FunctionalCircuitParameter<TInput, TOutput> parameters,
+        IEnumerable<ReadOnlyNetwork> networks,
+        VariableInfo? variableInfo
+    ) : CircuitBase<FunctionalCircuitParameter<TInput, TOutput>>(
+        parameters,
+        networks,
+        variableInfo
+    )
+        where TInput : IInputCircuitParameterSubset
+        where TOutput : IOutputCircuitParameterSubset
     {
-        protected FunctionalCircuitBase(
-            FunctionalParameter<TNeuron> parameters,
-            IEnumerable<ReadOnlyNetwork> networks,
-            VariableInfo? variableInfo
-        ) : 
-        base(
-            parameters,
-            networks,
-            variableInfo
-        )
-        {
-        }
     }
 }

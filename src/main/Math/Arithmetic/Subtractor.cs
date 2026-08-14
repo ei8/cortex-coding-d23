@@ -4,23 +4,39 @@ using System.Linq;
 
 namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 {
-    public class Subtractor : OperationBase, IOperation<Subtractor>
+    public class Subtractor : OperationBase<Subtractor.Input, Subtractor.Output>, IOperation<Subtractor, Subtractor.Input, Subtractor.Output>
     {
-        public enum Input
+        public class Input(
+            BinaryNeuronParameter? minuend,
+            BinaryNeuronParameter? subtrahend,
+            BinaryNeuronParameter? precedingBorrow
+        ) :
+        InputCircuitParameterSubset<BinaryNeuronParameter, BinaryNeuronParameter, BinaryNeuronParameter>(
+            minuend,
+            subtrahend,
+            precedingBorrow
+        )
         {
-            Minuend,
-            Subtrahend,
-            PrecedingBorrow
+            public BinaryNeuronParameter? Minuend => this.Parameter1;
+            public BinaryNeuronParameter? Subtrahend => this.Parameter2;
+            public BinaryNeuronParameter? PrecedingBorrow => this.Parameter3;
         }
 
-        public enum Output
+        public class Output(
+            BinaryNeuronParameter? difference,
+            BinaryNeuronParameter? borrow
+        ) :
+        OutputCircuitParameterSubset<BinaryNeuronParameter, BinaryNeuronParameter>(
+            difference,
+            borrow
+        )
         {
-            Difference,
-            Borrow
+            public BinaryNeuronParameter? Difference => this.Parameter1;
+            public BinaryNeuronParameter? Borrow => this.Parameter2;
         }
 
         protected Subtractor(
-            FunctionalParameter<BinaryNeuronParameter> parameters,
+            FunctionalCircuitParameter<Subtractor.Input, Subtractor.Output> parameters,
             IEnumerable<ReadOnlyNetwork> networks,
             VariableInfo? variableInfo
         ) : base(
@@ -32,7 +48,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
         }
 
         public static Subtractor Create(
-            FunctionalParameter<BinaryNeuronParameter> parameters,
+            FunctionalCircuitParameter<Subtractor.Input, Subtractor.Output> parameters,
             IEnumerable<ReadOnlyNetwork> networks,
             VariableInfo? variableInfo
         ) => new(
@@ -41,30 +57,30 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
             variableInfo
         );
 
-        public static FunctionalParameter<BinaryNeuronParameter> GetDefaultParameters(
+        public static FunctionalCircuitParameter<Subtractor.Input, Subtractor.Output> GetDefaultParameters(
             BinaryNeuronParameter? precedingValue,
             int exponent
         ) => new(
-            [
+            new(
                 BinaryNeuronParameter.Create($"{nameof(Subtractor)}{exponent + 1}.{nameof(Input.Minuend)}"),
                 BinaryNeuronParameter.Create($"{nameof(Subtractor)}{exponent + 1}.{nameof(Input.Subtrahend)}"),
                 precedingValue
-            ],
-            [
+            ),
+            new(
                 BinaryNeuronParameter.Create($"{nameof(Subtractor)}{exponent + 1}.{nameof(Output.Difference)}"),
                 BinaryNeuronParameter.Create($"{nameof(Subtractor)}{exponent + 1}.{nameof(Output.Borrow)}")
-            ]
+            )
         );
 
         public static IEnumerable<ReadOnlyNetwork> CreateInterneuronNetworks(
-            FunctionalParameter<BinaryNeuronParameter> parameters,
+            FunctionalCircuitParameter<Subtractor.Input, Subtractor.Output> parameters,
             VariableInfo variableInfo,
             VariableInfo? precedingVariableInfo = null
         )
         {
             var result = new List<IneurUL>();
             string subtractorName = variableInfo.Inputs.First();
-            var precedingBorrow = parameters.Inputs.ElementAt((int)Input.PrecedingBorrow);
+            var precedingBorrow = parameters.Inputs.PrecedingBorrow;
 
             // Declare Outputs
             if (BinaryNeuronParameter.TryCreate(out var half1_OUT___Half1_NOT___Minuend, subtractorName))
@@ -94,8 +110,8 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                     // half1 interneurons
                     result.AddRange(
                         Subtractor.CreateSubtractorHalf1Interneurons(
-                            parameters.Inputs.ElementAt((int) Input.Minuend),
-                            parameters.Inputs.ElementAt((int) Input.Subtrahend),
+                            parameters.Inputs.Minuend,
+                            parameters.Inputs.Subtrahend,
                             half1_XOR_Result,
                             half1_OUT___Half1_NOT___Minuend,
                             half1_Borrow,
@@ -108,38 +124,46 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                         DualInputLogicGateBase.TryCreate(
                             out XorGate? half2_XOR___Borrow__Half1_XOR_Result,
                             new(
-                                precedingBorrow,
-                                half1_XOR_Result,
-                                parameters.Outputs.ElementAt((int) Output.Difference)
+                                new(
+                                    precedingBorrow,
+                                    half1_XOR_Result
+                                ),
+                                new(
+                                    parameters.Outputs.Difference
+                                )
                             ),
                             new(
-                                [
-                                    precedingSubtractorName,
-                                    subtractorName,
-                                ],
+                                subtractorName,
+                                precedingSubtractorName,
                                 subtractorName
                             )
                         ) &&
                         NotGate.TryCreate(
                             out NotGate? half2_NOT___Half1_XOR_Result,
                             new(
-                                half1_XOR_Result,
-                                half2_OUT___Half2_NOT___Half1_XOR_Result
+                                new(
+                                    half1_XOR_Result
+                                ),
+                                new(
+                                    half2_OUT___Half2_NOT___Half1_XOR_Result
+                                )
                             ),
-                            new SingleInputInterneuronTagInfo(subtractorName)
+                            InterneuronTagInfo.CreateByCommonTagPrefix(subtractorName)
                         ) &&
                         DualInputLogicGateBase.TryCreate(
                             out AndGate? half2_AND___Borrow__Half2_OUT___Half2_NOT___Half1_XOR_Result,
                             new(
-                                precedingBorrow,
-                                half2_OUT___Half2_NOT___Half1_XOR_Result,
-                                half2_Borrow
+                                new(
+                                    precedingBorrow,
+                                    half2_OUT___Half2_NOT___Half1_XOR_Result
+                                ),
+                                new(
+                                    half2_Borrow
+                                )
                             ),
                             new(
-                                [
-                                    precedingSubtractorName,
-                                    subtractorName
-                                ],
+                                subtractorName,
+                                precedingSubtractorName,
                                 subtractorName
                             )
                         ) &&
@@ -147,11 +171,15 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                         DualInputLogicGateBase.TryCreate(
                             out OrGate? OR___Half1_Borrow__Half2_Borrow,
                             new(
-                                half1_Borrow,
-                                half2_Borrow,
-                                parameters.Outputs.ElementAt((int) Output.Borrow)
+                                new(
+                                    half1_Borrow,
+                                    half2_Borrow
+                                ),
+                                new(
+                                    parameters.Outputs.Borrow
+                                )
                             ),
-                            new DualInputInterneuronTagInfo(subtractorName)
+                            InterneuronTagInfo.CreateByCommonTagPrefix(subtractorName, 2)
                         )
                     )
                     {
@@ -170,11 +198,11 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                     // half1
                     result.AddRange(
                         Subtractor.CreateSubtractorHalf1Interneurons(
-                            parameters.Inputs.ElementAt((int)Input.Minuend),
-                            parameters.Inputs.ElementAt((int)Input.Subtrahend),
-                            parameters.Outputs.ElementAt((int)Output.Difference),
+                            parameters.Inputs.Minuend,
+                            parameters.Inputs.Subtrahend,
+                            parameters.Outputs.Difference,
                             half1_OUT___Half1_NOT___Minuend,
-                            parameters.Outputs.ElementAt((int)Output.Borrow),
+                            parameters.Outputs.Borrow,
                             subtractorName
                         )
                     );
@@ -199,28 +227,40 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                 DualInputLogicGateBase.TryCreate(
                     out XorGate? half1_XOR___Minuend__Subtrahend,
                     new(
-                        minuend,
-                        subtrahend,
-                        xorOutput
+                        new(
+                            minuend,
+                            subtrahend
+                        ),
+                        new(
+                            xorOutput
+                        )
                     ),
-                    new DualInputInterneuronTagInfo(prefix)
+                    InterneuronTagInfo.CreateByCommonTagPrefix(prefix, 2)
                 ) &&
                 NotGate.TryCreate(
                     out NotGate? half1_NOT___Minuend,
                     new(
-                        minuend,
-                        notOutput
+                        new(
+                            minuend
+                        ),
+                        new(
+                            notOutput
+                        )
                     ),
-                    new SingleInputInterneuronTagInfo(prefix)
+                    InterneuronTagInfo.CreateByCommonTagPrefix(prefix)
                 ) &&
                 DualInputLogicGateBase.TryCreate(
                     out AndGate? half1_AND___Subtrahend__Half1_OUT___Half1_NOT___Minuend,
                     new(
-                        notOutput,
-                        subtrahend,
-                        andOutput
+                        new(
+                            notOutput,
+                            subtrahend
+                        ),
+                        new(
+                            andOutput
+                        )
                     ),
-                    new DualInputInterneuronTagInfo(prefix)
+                    InterneuronTagInfo.CreateByCommonTagPrefix(prefix, 2)
                 )
             )
             {

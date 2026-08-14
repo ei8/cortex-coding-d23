@@ -2,10 +2,10 @@
 
 namespace ei8.Cortex.Coding.d23.Math.Logic
 {
-    public class XorGate : DualInputLogicGateBase, IDualInputLogicGate<XorGate>
+    public class XorGate : DualInputLogicGateBase, ILogicGate<XorGate, DualInputLogicGateBase.Input, DualInputLogicGateBase.Output>
     {
         protected XorGate(
-            FunctionalParameter<BinaryNeuronParameter> parameters,
+            FunctionalCircuitParameter<DualInputLogicGateBase.Input, DualInputLogicGateBase.Output> parameters,
             IEnumerable<ReadOnlyNetwork> networks,
             VariableInfo? variableInfo
         ) : base(
@@ -17,7 +17,7 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
         }
 
         public static XorGate Create(
-            FunctionalParameter<BinaryNeuronParameter> parameters,
+            FunctionalCircuitParameter<DualInputLogicGateBase.Input, DualInputLogicGateBase.Output> parameters,
             IEnumerable<ReadOnlyNetwork> networks,
             VariableInfo? variableInfo
         ) => new(

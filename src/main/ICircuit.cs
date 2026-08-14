@@ -1,10 +1,7 @@
-﻿using System.Collections.Generic;
-
-namespace ei8.Cortex.Coding.d23
+﻿namespace ei8.Cortex.Coding.d23
 {
-    public interface ICircuit<TParam, TNeuron> : IneurUL 
-        where TParam : ParameterBase<TNeuron>, new()
-        where TNeuron : NeuronParameterBase
+    public interface ICircuit<TParam> : IneurUL 
+        where TParam : CircuitParameterBase
     {
         TParam Parameters { get; }
     }

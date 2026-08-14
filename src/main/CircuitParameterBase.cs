@@ -1,11 +1,10 @@
 ﻿namespace ei8.Cortex.Coding.d23
 {
-    public class ParameterBase<T> : IVariable
-        where T : NeuronParameterBase
+    public class CircuitParameterBase : ICircuitParameter
     {
-        protected Network network;
+        protected readonly Network network;
 
-        public ParameterBase()
+        public CircuitParameterBase()
         {
             this.network = new();
         }

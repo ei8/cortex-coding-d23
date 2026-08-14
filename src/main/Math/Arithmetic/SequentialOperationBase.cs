@@ -3,10 +3,12 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 {
-    public class SequentialOperationBase : FunctionalCircuitBase<NeuronParameterBase>
+    public class SequentialOperationBase<TInput, TOutput> : FunctionalCircuitBase<TInput, TOutput>
+        where TInput : IInputCircuitParameterSubset
+        where TOutput : IOutputCircuitParameterSubset
     {
         protected SequentialOperationBase(
-            FunctionalParameter<NeuronParameterBase> parameters,
+            FunctionalCircuitParameter<TInput, TOutput> parameters,
             IEnumerable<ReadOnlyNetwork> networks,
             VariableInfo? variableInfo
         ) :
@@ -20,12 +22,12 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 
         public static bool TryCreate<T>(
             [NotNullWhen(true)] out T? tryResult,
-            FunctionalParameter<NeuronParameterBase> parameters,
+            FunctionalCircuitParameter<TInput, TOutput> parameters,
             IEnumerable<ReadOnlyNetwork> interneuronNetworks,
             VariableInfo variableInfo,
             VariableInfo? precedingVariableInfo = null
         )
-            where T : ISequentialOperation<T>
+            where T : ISequentialOperation<T, TInput, TOutput>
         {
             tryResult = T.Create(
                 parameters,

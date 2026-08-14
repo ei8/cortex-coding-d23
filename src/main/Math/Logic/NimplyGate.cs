@@ -2,10 +2,10 @@
 
 namespace ei8.Cortex.Coding.d23.Math.Logic
 {
-    public class NimplyGate : DualInputLogicGateBase, IDualInputLogicGate<NimplyGate>
+    public class NimplyGate : DualInputLogicGateBase, ILogicGate<NimplyGate, DualInputLogicGateBase.Input, DualInputLogicGateBase.Output>
     {
         protected NimplyGate(
-            FunctionalParameter<BinaryNeuronParameter> parameters,
+            FunctionalCircuitParameter<DualInputLogicGateBase.Input, DualInputLogicGateBase.Output> parameters,
             IEnumerable<ReadOnlyNetwork> networks,
             VariableInfo? variableInfo
         ) : base(
@@ -17,7 +17,7 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
         }
 
         public static NimplyGate Create(
-            FunctionalParameter<BinaryNeuronParameter> parameters,
+            FunctionalCircuitParameter<DualInputLogicGateBase.Input, DualInputLogicGateBase.Output> parameters,
             IEnumerable<ReadOnlyNetwork> networks,
             VariableInfo? variableInfo
         ) => new(

@@ -4,23 +4,39 @@ using System.Linq;
 
 namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 {
-    public class Adder : OperationBase, IOperation<Adder>
+    public class Adder : OperationBase<Adder.Input, Adder.Output>, IOperation<Adder, Adder.Input, Adder.Output>
     {
-        public enum Input
+        public class Input(
+            BinaryNeuronParameter? addend1,
+            BinaryNeuronParameter? addend2,
+            BinaryNeuronParameter? precedingCarryOver
+        ) : 
+        InputCircuitParameterSubset<BinaryNeuronParameter, BinaryNeuronParameter, BinaryNeuronParameter>(
+            addend1, 
+            addend2, 
+            precedingCarryOver
+        )
         {
-            Addend1,
-            Addend2,
-            PrecedingCarryOver
+            public BinaryNeuronParameter? Addend1 => this.Parameter1;
+            public BinaryNeuronParameter? Addend2 => this.Parameter2;
+            public BinaryNeuronParameter? PrecedingCarryOver => this.Parameter3;
         }
 
-        public enum Output
+        public class Output(
+            BinaryNeuronParameter? sum,
+            BinaryNeuronParameter? carryOver
+        ) : 
+        OutputCircuitParameterSubset<BinaryNeuronParameter, BinaryNeuronParameter>(
+            sum, 
+            carryOver
+        )
         {
-            Sum,
-            CarryOver
+            public BinaryNeuronParameter? Sum => this.Parameter1;
+            public BinaryNeuronParameter? CarryOver => this.Parameter2;
         }
 
         protected Adder(
-            FunctionalParameter<BinaryNeuronParameter> parameters,
+            FunctionalCircuitParameter<Input, Output> parameters,
             IEnumerable<ReadOnlyNetwork> networks,
             VariableInfo? variableInfo
         ) : base(
@@ -32,42 +48,42 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
         }
 
         public static Adder Create(
-            FunctionalParameter<BinaryNeuronParameter> parameters,
+            FunctionalCircuitParameter<Input, Output> parameters,
             IEnumerable<ReadOnlyNetwork> networks,
             VariableInfo? variableInfo
-        ) => new(
+        ) => new (
             parameters,
             networks,
             variableInfo
         );
 
-        public static FunctionalParameter<BinaryNeuronParameter> GetDefaultParameters(
+        public static FunctionalCircuitParameter<Input, Output> GetDefaultParameters(
             BinaryNeuronParameter? precedingValue,
             int exponent
         ) => new(
-            [
+            new(
                 BinaryNeuronParameter.Create($"{nameof(Adder)}{exponent + 1}.{nameof(Input.Addend1)}"),
                 BinaryNeuronParameter.Create($"{nameof(Adder)}{exponent + 1}.{nameof(Input.Addend2)}"),
                 precedingValue
-            ],
-            [
+            ),
+            new(
                 BinaryNeuronParameter.Create($"{nameof(Adder)}{exponent + 1}.{nameof(Output.Sum)}"),
                 BinaryNeuronParameter.Create($"{nameof(Adder)}{exponent + 1}.{nameof(Output.CarryOver)}")
-            ]
+            )
         );
 
         public static IEnumerable<ReadOnlyNetwork> CreateInterneuronNetworks(
-            FunctionalParameter<BinaryNeuronParameter> parameters,
+            FunctionalCircuitParameter<Input, Output> parameters,
             VariableInfo variableInfo,
             VariableInfo? precedingVariableInfo = null
         ) => Adder.CreateInterneuronNetworksCore(
             variableInfo,
             precedingVariableInfo,
-            parameters.Inputs.ElementAt((int)Input.PrecedingCarryOver),
-            parameters.Inputs.ElementAt((int)Input.Addend1),
-            parameters.Inputs.ElementAt((int)Input.Addend2),
-            parameters.Outputs.ElementAt((int)Output.Sum),
-            parameters.Outputs.ElementAt((int)Output.CarryOver)
+            parameters.Inputs.PrecedingCarryOver,
+            parameters.Inputs.Addend1,
+            parameters.Inputs.Addend2,
+            parameters.Outputs.Sum,
+            parameters.Outputs.CarryOver
         );
 
         internal static IEnumerable<ReadOnlyNetwork> CreateInterneuronNetworksCore(
@@ -119,30 +135,34 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                     DualInputLogicGateBase.TryCreate(
                         out XorGate? half2_XOR___CarryOver__Half1_XOR_Result,
                         new(
-                            precedingCarryOver,
-                            half1_XOR_Result,
-                            sum
+                            new(
+                                precedingCarryOver,
+                                half1_XOR_Result
+                            ),
+                            new(
+                                sum
+                            )
                         ),
                         new(
-                            [
-                                precedingAdderName,
-                                adderName
-                            ],
+                            adderName,
+                            precedingAdderName,
                             adderName
                         )
                     ) &&
                     DualInputLogicGateBase.TryCreate(
                         out AndGate? half2_AND___CarryOver__Half1_XOR_Result,
                         new(
-                            precedingCarryOver,
-                            half1_XOR_Result,
-                            half2_CarryOver
+                            new(
+                                precedingCarryOver,
+                                half1_XOR_Result
+                            ),
+                            new(
+                                half2_CarryOver
+                            )
                         ),
                         new(
-                            [
-                                precedingAdderName,
-                                adderName
-                            ],
+                            adderName,
+                            precedingAdderName,
                             adderName
                         )
                     ) &&
@@ -150,11 +170,15 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                     DualInputLogicGateBase.TryCreate(
                         out OrGate? OR___Half1_CarryOver__Half2_CarryOver,
                         new(
-                            half1_CarryOver,
-                            half2_CarryOver,
-                            carryOver
+                            new(
+                                half1_CarryOver,
+                                half2_CarryOver
+                            ),
+                            new(
+                                carryOver
+                            )
                         ),
-                        new DualInputInterneuronTagInfo(adderName)
+                        InterneuronTagInfo.CreateByCommonTagPrefix(adderName, 2)
                     )
                 )
                 {
@@ -199,21 +223,29 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                 DualInputLogicGateBase.TryCreate(
                     out XorGate? half1_XOR___Addend1__Addend2,
                     new(
-                        addend1,
-                        addend2,
-                        xorOutput
+                        new(
+                            addend1,
+                            addend2
+                        ),
+                        new(
+                            xorOutput
+                        )
                     ),
-                    new DualInputInterneuronTagInfo(prefix),
+                    InterneuronTagInfo.CreateByCommonTagPrefix(prefix, 2),
                     additionalInputs: additionalInputs
                 ) &&
                 DualInputLogicGateBase.TryCreate(
                     out AndGate? half1_AND___Addend1__Addend2,
                     new(
-                        addend1,
-                        addend2,
-                        andOutput
+                        new(
+                            addend1,
+                            addend2
+                        ),
+                        new(
+                            andOutput
+                        )
                     ),
-                    new DualInputInterneuronTagInfo(prefix),
+                    InterneuronTagInfo.CreateByCommonTagPrefix(prefix, 2),
                     additionalInputs: additionalInputs
                 )
             )

@@ -2,11 +2,10 @@
 
 namespace ei8.Cortex.Coding.d23
 {
-    public abstract class CircuitBase<TParam, TNeuron> : ICircuit<TParam, TNeuron>, IVariable
-        where TParam : ParameterBase<TNeuron>, new()
-        where TNeuron : NeuronParameterBase
+    public abstract class CircuitBase<TParam> : ICircuit<TParam>, IVariable
+        where TParam : CircuitParameterBase
     {
-        private Network network;
+        private readonly Network network;
 
         protected CircuitBase(TParam parameters, IEnumerable<ReadOnlyNetwork> networks, VariableInfo? variableInfo)
         {

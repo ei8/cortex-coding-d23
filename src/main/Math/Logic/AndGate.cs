@@ -2,10 +2,10 @@
 
 namespace ei8.Cortex.Coding.d23.Math.Logic
 {
-    public class AndGate : DualInputLogicGateBase, IDualInputLogicGate<AndGate>
+    public class AndGate : DualInputLogicGateBase, ILogicGate<AndGate, DualInputLogicGateBase.Input, DualInputLogicGateBase.Output>
     {
         protected AndGate(
-            FunctionalParameter<BinaryNeuronParameter> parameters,
+            FunctionalCircuitParameter<DualInputLogicGateBase.Input, DualInputLogicGateBase.Output> parameters,
             IEnumerable<ReadOnlyNetwork> networks,
             VariableInfo? variableInfo
         ) : base(
@@ -17,7 +17,7 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
         }
 
         public static AndGate Create(
-            FunctionalParameter<BinaryNeuronParameter> parameters,
+            FunctionalCircuitParameter<DualInputLogicGateBase.Input, DualInputLogicGateBase.Output> parameters,
             IEnumerable<ReadOnlyNetwork> networks,
             VariableInfo? variableInfo
         ) => new(

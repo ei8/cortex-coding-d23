@@ -5,10 +5,30 @@ using System.Runtime.CompilerServices;
 
 namespace ei8.Cortex.Coding.d23.Math.Logic
 {
-    public class NotGate : LogicGateBase, ISingleInputLogicGate<NotGate>
+    public class NotGate : LogicGateBase<NotGate.Input, NotGate.Output>, ILogicGate<NotGate, NotGate.Input, NotGate.Output>
     {
+        public class Input(
+            BinaryNeuronParameter? input1
+        ) :
+        InputCircuitParameterSubset<BinaryNeuronParameter>(
+            input1
+        )
+        {
+            public BinaryNeuronParameter? Input1 => this.Parameter1;
+        }
+
+        public class Output(
+            BinaryNeuronParameter? output1
+        ) :
+        OutputCircuitParameterSubset<BinaryNeuronParameter>(
+            output1
+        )
+        {
+            public BinaryNeuronParameter? Output1 => this.Parameter1;
+        }
+
         protected NotGate(
-            FunctionalParameter<BinaryNeuronParameter> parameters,
+            FunctionalCircuitParameter<NotGate.Input, NotGate.Output> parameters,
             IEnumerable<ReadOnlyNetwork> networks,
             VariableInfo? variableInfo
         ) : base(
@@ -20,7 +40,7 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
         }
 
         public static NotGate Create(
-            FunctionalParameter<BinaryNeuronParameter> parameters,
+            FunctionalCircuitParameter<NotGate.Input, NotGate.Output> parameters,
             IEnumerable<ReadOnlyNetwork> networks,
             VariableInfo? variableInfo
         ) => new(
@@ -55,47 +75,51 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
         ];
 
         public static IEnumerable<ReadOnlyNetwork> LinkInputNeurons(
-            BinaryNeuronParameter input, 
+            FunctionalCircuitParameter<NotGate.Input, NotGate.Output> parameters, 
             IEnumerable<ReadOnlyNetwork> interneuronNetworks,
             params Neuron[] additionalInputs
         )
         {
             var result = new List<ReadOnlyNetwork>();
-            result.AddRange(
-                [
-                    NetworkHelper.LinkInputNeuronsToInterneuron(
-                        interneuronNetworks.ElementAt(0).GetInterneuron(),
-                        [
-                            new(input.Neuron0),
-                            .. additionalInputs.Select(n => new NeuronInfo(n))
-                        ]
-                    ),
-                    NetworkHelper.LinkInputNeuronsToInterneuron(
-                        interneuronNetworks.ElementAt(1).GetInterneuron(),
-                        [
-                            new(input.Neuron1),
-                            .. additionalInputs.Select(n => new NeuronInfo(n))
-                        ]
-                    )
-                ]
-            );
+
+            if (parameters.Inputs.Input1 != null)
+            {
+                result.AddRange(
+                    [
+                        NetworkHelper.LinkInputNeuronsToInterneuron(
+                            interneuronNetworks.ElementAt(0).GetInterneuron(),
+                            [
+                                new(parameters.Inputs.Input1.Neuron0),
+                                .. additionalInputs.Select(n => new NeuronInfo(n))
+                            ]
+                        ),
+                        NetworkHelper.LinkInputNeuronsToInterneuron(
+                            interneuronNetworks.ElementAt(1).GetInterneuron(),
+                            [
+                                new(parameters.Inputs.Input1.Neuron1),
+                                .. additionalInputs.Select(n => new NeuronInfo(n))
+                            ]
+                        )
+                    ]
+                );
+            }
             return result;
         }
 
         public static bool TryCreate<T>(
             [NotNullWhen(true)] out T? result,
-            SingleInputFunctionalParameter<BinaryNeuronParameter> parameters,
+            FunctionalCircuitParameter<NotGate.Input, NotGate.Output> parameters,
             InterneuronTagInfo? interneuronTagInfo = null,
             [CallerArgumentExpression(nameof(result))] string parameterExpression = "",
             params Neuron[] additionalInputs
         )
-            where T : ISingleInputLogicGate<T>
+            where T : ILogicGate<T, NotGate.Input, NotGate.Output>
         {
             bool bResult = false;
             result = default;
             if (VariableInfo.TryParse(parameterExpression, out var variableInfo))
             {
-                var output = parameters.Output;
+                var output = parameters.Outputs.Output1;
                 var interneuronNetworks = Enumerable.Empty<ReadOnlyNetwork>();
                 if (output != null)
                     interneuronNetworks = NetworkHelper.CreateInterneuronNetworksByOutputNeurons(
@@ -103,14 +127,14 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
                         T.GetInterneuronTags(variableInfo, interneuronTagInfo)
                     );
 
-                if (parameters.Input != null)
+                if (parameters.Inputs.Input1 != null)
                 {
                     result = T.Create(
                         parameters,
                         [
                             ..interneuronNetworks,
                         ..T.LinkInputNeurons(
-                            parameters.Input,
+                            parameters,
                             interneuronNetworks,
                             additionalInputs
                         )

@@ -2,10 +2,10 @@
 
 namespace ei8.Cortex.Coding.d23.Math.Logic
 {
-    public class OrGate : DualInputLogicGateBase, IDualInputLogicGate<OrGate>
+    public class OrGate : DualInputLogicGateBase, ILogicGate<OrGate, DualInputLogicGateBase.Input, DualInputLogicGateBase.Output>
     {
         protected OrGate(
-            FunctionalParameter<BinaryNeuronParameter> parameters,
+            FunctionalCircuitParameter<DualInputLogicGateBase.Input, DualInputLogicGateBase.Output> parameters,
             IEnumerable<ReadOnlyNetwork> networks,
             VariableInfo? variableInfo
         ) : base(
@@ -17,7 +17,7 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
         }
 
         public static OrGate Create(
-            FunctionalParameter<BinaryNeuronParameter> parameters,
+            FunctionalCircuitParameter<DualInputLogicGateBase.Input, DualInputLogicGateBase.Output> parameters,
             IEnumerable<ReadOnlyNetwork> networks,
             VariableInfo? variableInfo
         ) => new(
