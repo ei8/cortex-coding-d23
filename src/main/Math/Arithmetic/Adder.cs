@@ -94,6 +94,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
             BinaryNeuronParameter? addend2,
             BinaryNeuronParameter? sum,
             BinaryNeuronParameter? carryOver,
+            NetworkHelper.AdditionalInputNeuronType additionalInputNeuronType = NetworkHelper.AdditionalInputNeuronType.And,
             params Neuron[] additionalInputs
         )
         {
@@ -126,6 +127,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                         half1_XOR_Result,
                         half1_CarryOver,
                         adderName,
+                        additionalInputNeuronType,
                         additionalInputs
                     )
                 );
@@ -200,6 +202,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                         sum,
                         carryOver,
                         adderName,
+                        additionalInputNeuronType,
                         additionalInputs
                     )
                 );
@@ -214,6 +217,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
             BinaryNeuronParameter? xorOutput,
             BinaryNeuronParameter? andOutput,
             string prefix,
+            NetworkHelper.AdditionalInputNeuronType additionalInputNeuronType = NetworkHelper.AdditionalInputNeuronType.And,
             params Neuron[] additionalInputs
         )
         {
@@ -232,6 +236,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                         )
                     ),
                     InterneuronTagInfo.CreateByCommonTagPrefix(prefix, 2),
+                    additionalInputNeuronType: additionalInputNeuronType,
                     additionalInputs: additionalInputs
                 ) &&
                 DualInputLogicGateBase.TryCreate(
@@ -246,6 +251,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                         )
                     ),
                     InterneuronTagInfo.CreateByCommonTagPrefix(prefix, 2),
+                    additionalInputNeuronType: additionalInputNeuronType,
                     additionalInputs: additionalInputs
                 )
             )

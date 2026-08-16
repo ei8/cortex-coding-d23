@@ -63,17 +63,14 @@ namespace ei8.Cortex.Coding.d23.Collections
             params Neuron[] additionalInputs
         )
         {
-            var inputNeurons = new List<NeuronInfo>(
-                [
-                    new(current.Neuron),
-                    .. additionalInputs.Select(n => new NeuronInfo(n))
-                ]);
+            var inputNeurons = new List<NeuronInfo>([new(current.Neuron)]);
             if (precedingInterneuronNetwork != null)
                 inputNeurons.Add(new NeuronInfo(precedingInterneuronNetwork.GetInterneuron(), 1f, NeurotransmitterEffect.Inhibit));
 
             return NetworkHelper.LinkInputNeuronsToInterneuron(
                 interneuronNetwork.GetInterneuron(),
-                [.. inputNeurons]
+                [.. inputNeurons],
+                additionalInputNeuronInfos: [..additionalInputs.Select(n => new NeuronInfo(n))]
             );
         }
 

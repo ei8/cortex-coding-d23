@@ -77,6 +77,7 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
         public static IEnumerable<ReadOnlyNetwork> LinkInputNeurons(
             FunctionalCircuitParameter<NotGate.Input, NotGate.Output> parameters, 
             IEnumerable<ReadOnlyNetwork> interneuronNetworks,
+            NetworkHelper.AdditionalInputNeuronType additionalInputNeuronType = NetworkHelper.AdditionalInputNeuronType.And,
             params Neuron[] additionalInputs
         )
         {
@@ -90,14 +91,20 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
                             interneuronNetworks.ElementAt(0).GetInterneuron(),
                             [
                                 new(parameters.Inputs.Input1.Neuron0),
-                                .. additionalInputs.Select(n => new NeuronInfo(n))
+                            ],
+                            additionalInputNeuronType,
+                            [
+                                ..additionalInputs.Select(n => new NeuronInfo(n))
                             ]
                         ),
                         NetworkHelper.LinkInputNeuronsToInterneuron(
                             interneuronNetworks.ElementAt(1).GetInterneuron(),
                             [
                                 new(parameters.Inputs.Input1.Neuron1),
-                                .. additionalInputs.Select(n => new NeuronInfo(n))
+                            ],
+                            additionalInputNeuronType,
+                            [
+                                ..additionalInputs.Select(n => new NeuronInfo(n))
                             ]
                         )
                     ]
@@ -111,6 +118,7 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
             FunctionalCircuitParameter<NotGate.Input, NotGate.Output> parameters,
             InterneuronTagInfo? interneuronTagInfo = null,
             [CallerArgumentExpression(nameof(result))] string parameterExpression = "",
+            NetworkHelper.AdditionalInputNeuronType additionalInputNeuronType = NetworkHelper.AdditionalInputNeuronType.And,
             params Neuron[] additionalInputs
         )
             where T : ILogicGate<T, NotGate.Input, NotGate.Output>
@@ -136,6 +144,7 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
                         ..T.LinkInputNeurons(
                             parameters,
                             interneuronNetworks,
+                            additionalInputNeuronType,
                             additionalInputs
                         )
                         ],

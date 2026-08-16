@@ -1,42 +1,71 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 {
-    public class SequentialAdder : SequentialOperationBase<SequentialAdder.Input, SequentialAdder.Output>, ISequentialOperation<SequentialAdder, SequentialAdder.Input, SequentialAdder.Output>
+    public class SequentialAdder :
+        SequentialOperationBase
+        <
+            SequentialAdder.Input,
+            SequentialAdder.Output
+        >, 
+        ISequentialOperation
+        <
+            SequentialAdder, 
+            SequentialAdder.Input,
+            SequentialAdder.Output
+        >
     {
-        public class Input(
-            UnaryNeuronParameter? currentDigit,
-            BinaryNeuronParameter? addend1,
-            BinaryNeuronParameter? addend2,
-            BinaryNeuronParameter? precedingCarryOver
-        ) :
-        InputCircuitParameterSubset<UnaryNeuronParameter, BinaryNeuronParameter, BinaryNeuronParameter, BinaryNeuronParameter>(
-            currentDigit,
-            addend1,
-            addend2,
-            precedingCarryOver
-        )
+        public class Input : 
+            CircuitParameterSubsetBase, 
+            IInputCircuitParameterSubset
         {
-            public UnaryNeuronParameter? CurrentDigit => this.Parameter1;
-            public BinaryNeuronParameter? Addend1 => this.Parameter2;
-            public BinaryNeuronParameter? Addend2 => this.Parameter3;
-            public BinaryNeuronParameter? PrecedingCarryOver => this.Parameter4;
+            public Input
+            (
+                IEnumerable<UnaryNeuronParameter?> currentDigits,
+                BinaryNeuronParameter? addend1,
+                BinaryNeuronParameter? addend2,
+                BinaryNeuronParameter? precedingCarryOver = null
+            )
+            {
+                base.AddReplace
+                (
+                    [
+                        .. this.CurrentDigits = currentDigits,
+                        this.Addend1 = addend1,
+                        this.Addend2 = addend2,
+                        this.PrecedingCarryOver = precedingCarryOver
+                    ]
+                );
+            }
+
+            public IEnumerable<UnaryNeuronParameter?> CurrentDigits { get; }
+            public BinaryNeuronParameter? Addend1 { get; }
+            public BinaryNeuronParameter? Addend2 { get; }
+            public BinaryNeuronParameter? PrecedingCarryOver { get; }
         }
 
-        public class Output(
-            UnaryNeuronParameter? nextDigit,
-            BinaryNeuronParameter? sum,
-            BinaryNeuronParameter? carryOver
-        ) :
-        OutputCircuitParameterSubset<UnaryNeuronParameter, BinaryNeuronParameter, BinaryNeuronParameter>(
-            nextDigit,
-            sum,
-            carryOver
-        )
+        public class Output : CircuitParameterSubsetBase, IOutputCircuitParameterSubset
         {
-            public UnaryNeuronParameter? NextDigit => this.Parameter1;
-            public BinaryNeuronParameter? Sum => this.Parameter2;
-            public BinaryNeuronParameter? CarryOver => this.Parameter3;
+            public Output
+            (
+                IEnumerable<UnaryNeuronParameter?> nextDigits,
+                BinaryNeuronParameter? sum,
+                BinaryNeuronParameter? carryOver
+            )
+            {
+                base.AddReplace
+                (
+                    [
+                        .. this.NextDigits = nextDigits,
+                        this.Sum = sum,
+                        this.CarryOver = carryOver
+                    ]
+                );
+            }
+            public IEnumerable<UnaryNeuronParameter?> NextDigits { get; }
+            public BinaryNeuronParameter? Sum { get; }
+            public BinaryNeuronParameter? CarryOver { get; }
         }
 
         protected SequentialAdder(
@@ -71,7 +100,8 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 
             var sum = parameters.Outputs.Sum;
 
-            var coreNetwork = Adder.CreateInterneuronNetworksCore(
+            var coreNetwork = Adder.CreateInterneuronNetworksCore
+            (
                 variableInfo,
                 precedingVariableInfo,
                 parameters.Inputs.PrecedingCarryOver,
@@ -79,42 +109,21 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                 parameters.Inputs.Addend2,
                 sum,
                 parameters.Outputs.CarryOver,
-                parameters.Inputs.CurrentDigit!.Neuron
+                NetworkHelper.AdditionalInputNeuronType.Or,
+                [..parameters.Inputs.CurrentDigits.WhereNotNull().Select(cd => cd.Neuron)]
             );
 
             result.AddReplaceItems([..coreNetwork]);
 
-            var nextDigit = parameters.Outputs.NextDigit;
-            if (sum != null && nextDigit != null)
+            var nextDigits = parameters.Outputs.NextDigits;
+            if (sum != null)
             {
                 foreach (var sumNeuron in sum.Network.GetItems<Neuron>())
-                    result.AddReplace(NetworkHelper.CreateTerminal(sumNeuron, nextDigit.Neuron));
+                    foreach (var nextDigit in nextDigits.WhereNotNull())
+                        result.AddReplace(NetworkHelper.CreateTerminal(sumNeuron, nextDigit.Neuron));
             }
 
             return [result];
         }
-
-        public static FunctionalCircuitParameter<Input, Output> GetDefaultParameters(
-            UnaryNeuronParameter? currentDigit,
-            BinaryNeuronParameter? input1,
-            BinaryNeuronParameter? input2,
-            BinaryNeuronParameter? precedingValue,
-            UnaryNeuronParameter? nextDigit,
-            BinaryNeuronParameter? result,
-            BinaryNeuronParameter? regrouping
-         )
-         => new (
-            new(
-                currentDigit, 
-                input1, 
-                input2, 
-                precedingValue
-            ),
-            new(
-                nextDigit,
-                result, 
-                regrouping
-            )
-        );
     }
 }

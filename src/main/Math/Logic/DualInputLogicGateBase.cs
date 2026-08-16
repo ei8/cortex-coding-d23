@@ -66,6 +66,7 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
         public static IEnumerable<ReadOnlyNetwork> LinkInputNeurons(
             FunctionalCircuitParameter<DualInputLogicGateBase.Input, DualInputLogicGateBase.Output> parameters,
             IEnumerable<ReadOnlyNetwork> interneuronNetworks,
+            NetworkHelper.AdditionalInputNeuronType additionalInputNeuronType = NetworkHelper.AdditionalInputNeuronType.And,
             params Neuron[] additionalInputs
         )
         {
@@ -79,8 +80,11 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
                         interneuronNetworks.ElementAt(0).GetInterneuron(),
                         [
                             new(parameters.Inputs.Parameter1.Neuron0),
-                            new(parameters.Inputs.Parameter2.Neuron0),
-                            .. additionalInputs.Select(n => new NeuronInfo(n))
+                            new(parameters.Inputs.Parameter2.Neuron0)
+                        ],
+                        additionalInputNeuronType,
+                        [
+                            ..additionalInputs.Select(n => new NeuronInfo(n))
                         ]
                     ),
                     NetworkHelper.LinkInputNeuronsToInterneuron(
@@ -88,7 +92,10 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
                         [
                             new(parameters.Inputs.Parameter1.Neuron0),
                             new(parameters.Inputs.Parameter2.Neuron1),
-                            .. additionalInputs.Select(n => new NeuronInfo(n))
+                        ],
+                        additionalInputNeuronType,
+                        [
+                            ..additionalInputs.Select(n => new NeuronInfo(n))
                         ]
                     ),
                     NetworkHelper.LinkInputNeuronsToInterneuron(
@@ -96,7 +103,10 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
                         [
                             new(parameters.Inputs.Parameter1.Neuron1),
                             new(parameters.Inputs.Parameter2.Neuron0),
-                            .. additionalInputs.Select(n => new NeuronInfo(n))
+                        ],
+                        additionalInputNeuronType,
+                        [
+                            ..additionalInputs.Select(n => new NeuronInfo(n))
                         ]
                     ),
                     NetworkHelper.LinkInputNeuronsToInterneuron(
@@ -104,7 +114,10 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
                         [
                             new(parameters.Inputs.Parameter1.Neuron1),
                             new(parameters.Inputs.Parameter2.Neuron1),
-                            .. additionalInputs.Select(n => new NeuronInfo(n))
+                        ],
+                        additionalInputNeuronType,
+                        [
+                            ..additionalInputs.Select(n => new NeuronInfo(n))
                         ]
                     )
                     ]
@@ -119,6 +132,7 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
             FunctionalCircuitParameter<DualInputLogicGateBase.Input, DualInputLogicGateBase.Output> parameters,
             InterneuronTagInfo? interneuronTagInfo = null,
             [CallerArgumentExpression(nameof(result))] string parameterExpression = "",
+            NetworkHelper.AdditionalInputNeuronType additionalInputNeuronType = NetworkHelper.AdditionalInputNeuronType.And,
             params Neuron[] additionalInputs
         )
             where T : ILogicGate<T, DualInputLogicGateBase.Input, DualInputLogicGateBase.Output>
@@ -144,6 +158,7 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
                         ..T.LinkInputNeurons(
                             parameters,
                             interneuronNetworks,
+                            additionalInputNeuronType,
                             additionalInputs
                         )
                         ],

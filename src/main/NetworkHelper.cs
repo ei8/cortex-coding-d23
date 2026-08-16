@@ -5,12 +5,19 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Security.Cryptography;
 
 namespace ei8.Cortex.Coding.d23
 {
     // TODO: Use C# 14+ Extension Members and attach to Neuron and Terminal classes
     public static class NetworkHelper
     {
+        public enum AdditionalInputNeuronType
+        {
+            Or,
+            And
+        }
+
         public static bool TryCreateNeuron(
             [NotNullWhen(true)] out Neuron? result,
             [CallerArgumentExpression(nameof(result))] string parameterExpression = ""
@@ -57,19 +64,63 @@ namespace ei8.Cortex.Coding.d23
             })
         ];
 
-        public static ReadOnlyNetwork LinkInputNeuronsToInterneuron(Neuron interneuron, params NeuronInfo[] inputNeuronInfos)
+        public static ReadOnlyNetwork LinkInputNeuronsToInterneuron
+        (
+            Neuron interneuron,
+            IEnumerable<NeuronInfo> inputNeuronInfos,
+            AdditionalInputNeuronType additionalInputNeuronType = AdditionalInputNeuronType.And,
+            params NeuronInfo[] additionalInputNeuronInfos
+        )
         {
             var network = new Network();
-            NetworkHelper.LinkInputNeuronsToInterneuronByEffect(interneuron, inputNeuronInfos, network, NeurotransmitterEffect.Excite);
-            NetworkHelper.LinkInputNeuronsToInterneuronByEffect(interneuron, inputNeuronInfos, network, NeurotransmitterEffect.Inhibit);
+            NetworkHelper.LinkInputNeuronsToInterneuronByEffect
+            (
+                interneuron,
+                inputNeuronInfos,
+                network,
+                NeurotransmitterEffect.Excite,
+                additionalInputNeuronType,
+                additionalInputNeuronInfos
+            );
+            NetworkHelper.LinkInputNeuronsToInterneuronByEffect
+            (
+                interneuron,
+                inputNeuronInfos,
+                network,
+                NeurotransmitterEffect.Inhibit,
+                additionalInputNeuronType,
+                additionalInputNeuronInfos
+            );
             return network;
         }
 
-        private static void LinkInputNeuronsToInterneuronByEffect(Neuron interneuron, NeuronInfo[] inputNeuronInfos, Network network, NeurotransmitterEffect effect)
+        private static void LinkInputNeuronsToInterneuronByEffect
+        (
+            Neuron interneuron,
+            IEnumerable<NeuronInfo> inputNeuronInfos,
+            Network network,
+            NeurotransmitterEffect effect,
+            AdditionalInputNeuronType additionalInputNeuronType,
+            NeuronInfo[] additionalInputNeuronInfos
+        )
         {
-            var exciteNeurons = inputNeuronInfos.Where(i => i.Effect == effect).ToArray();
-            foreach (var input in exciteNeurons)
-                network.AddReplace(NetworkHelper.CreateTerminal(input.Neuron, interneuron, input.Effect, input.Strength / exciteNeurons.Length));
+            var inputNeurons = inputNeuronInfos
+                .Concat(additionalInputNeuronInfos)
+                .Where(i => i.Effect == effect);
+
+            var strengthDivisor = additionalInputNeuronType == AdditionalInputNeuronType.And ?
+                inputNeurons.Count() :
+                inputNeuronInfos.Count() + (additionalInputNeuronInfos.Length > 0 ? 1 : 0);
+
+            foreach (var input in inputNeurons)
+                network.AddReplace(NetworkHelper.CreateTerminal
+                    (
+                        input.Neuron, 
+                        interneuron, 
+                        input.Effect, 
+                        input.Strength / strengthDivisor
+                    )
+                );
         }
 
         public static ReadOnlyNetwork CreateInputNeuronNetwork(MirrorConfig mirrorConfig, float strengthToInterneurons, params ReadOnlyNetwork[] interneurons) =>
