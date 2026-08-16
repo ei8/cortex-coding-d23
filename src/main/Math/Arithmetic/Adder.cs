@@ -4,32 +4,46 @@ using System.Linq;
 
 namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 {
-    public class Adder : OperationBase<Adder.Input, Adder.Output>, IOperation<Adder, Adder.Input, Adder.Output>
+    public class Adder : 
+        OperationBase
+        <
+            Adder.Input, 
+            Adder.Output
+        >, 
+        IOperation
+        <
+            Adder, 
+            Adder.Input, 
+            Adder.Output,
+            InterneuronSet
+        >
     {
-        public class Input(
+        public class Input
+        (
             BinaryNeuronParameter? addend1,
             BinaryNeuronParameter? addend2,
             BinaryNeuronParameter? precedingCarryOver
         ) : 
-        InputCircuitParameterSubset<BinaryNeuronParameter, BinaryNeuronParameter, BinaryNeuronParameter>(
-            addend1, 
-            addend2, 
-            precedingCarryOver
-        )
+            InputCircuitParameterSubset<BinaryNeuronParameter, BinaryNeuronParameter, BinaryNeuronParameter>(
+                addend1, 
+                addend2, 
+                precedingCarryOver
+            )
         {
             public BinaryNeuronParameter? Addend1 => this.Parameter1;
             public BinaryNeuronParameter? Addend2 => this.Parameter2;
             public BinaryNeuronParameter? PrecedingCarryOver => this.Parameter3;
         }
 
-        public class Output(
+        public class Output
+        (
             BinaryNeuronParameter? sum,
             BinaryNeuronParameter? carryOver
         ) : 
-        OutputCircuitParameterSubset<BinaryNeuronParameter, BinaryNeuronParameter>(
-            sum, 
-            carryOver
-        )
+            OutputCircuitParameterSubset<BinaryNeuronParameter, BinaryNeuronParameter>(
+                sum, 
+                carryOver
+            )
         {
             public BinaryNeuronParameter? Sum => this.Parameter1;
             public BinaryNeuronParameter? CarryOver => this.Parameter2;
@@ -37,11 +51,11 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 
         protected Adder(
             FunctionalCircuitParameter<Input, Output> parameters,
-            IEnumerable<ReadOnlyNetwork> networks,
+            InterneuronSet interneurons,
             VariableInfo? variableInfo
         ) : base(
             parameters,
-            networks,
+            interneurons,
             variableInfo
         )
         {
@@ -49,11 +63,11 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 
         public static Adder Create(
             FunctionalCircuitParameter<Input, Output> parameters,
-            IEnumerable<ReadOnlyNetwork> networks,
+            InterneuronSet interneurons,
             VariableInfo? variableInfo
         ) => new (
             parameters,
-            networks,
+            interneurons,
             variableInfo
         );
 
@@ -72,7 +86,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
             )
         );
 
-        public static IEnumerable<ReadOnlyNetwork> CreateInterneuronNetworks(
+        public static InterneuronSet CreateInterneurons(
             FunctionalCircuitParameter<Input, Output> parameters,
             VariableInfo variableInfo,
             VariableInfo? precedingVariableInfo = null
@@ -86,7 +100,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
             parameters.Outputs.CarryOver
         );
 
-        internal static IEnumerable<ReadOnlyNetwork> CreateInterneuronNetworksCore(
+        internal static InterneuronSet CreateInterneuronNetworksCore(
             VariableInfo variableInfo,
             VariableInfo? precedingVariableInfo,
             BinaryNeuronParameter? precedingCarryOver,
@@ -208,7 +222,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                 );
             }
 
-            return result.Select(n => n.Network);
+            return new InterneuronSet(result.Select(n => n.Network));
         }
 
         private static IEnumerable<IneurUL> CreateAdderHalf1Interneurons(

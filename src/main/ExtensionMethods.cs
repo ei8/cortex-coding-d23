@@ -25,10 +25,17 @@ namespace ei8.Cortex.Coding.d23
                 parameter = value;
 
             return parameter != null;
-        } 
+        }
 
-        public static void AddReplaceItems(this Network original, params IneurUL[] neurULizedObjects) =>
-            original.AddReplaceItems([..neurULizedObjects.Select(no => no.Network)]);
+        public static ReadOnlyNetwork FromNetworks(this IEnumerable<ReadOnlyNetwork> networks)
+        {
+            var result = new Network();
+            result.AddReplaceItems([.. networks]);
+            return result;
+        }
+
+        public static void AddReplaceItems(this Network original, params IneurUL[] neurULs) =>
+            original.AddReplaceItems([..neurULs.Select(no => no.Network)]);
 
         public static void AddReplaceItems(this Network original, params ReadOnlyNetwork[] networks)
         {

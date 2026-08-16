@@ -6,7 +6,8 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
     <
         T, 
         TInput, 
-        TOutput
+        TOutput,
+        TInterneuron
     > : 
         ICircuit
         <
@@ -14,7 +15,8 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
             <
                 TInput, 
                 TOutput
-            >
+            >,
+            TInterneuron
         >
         where T : 
             ICircuit
@@ -23,12 +25,14 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                 <
                     TInput, 
                     TOutput
-                >
+                >,
+                TInterneuron
             >
         where TInput : IInputCircuitParameterSubset
         where TOutput : IOutputCircuitParameterSubset
+        where TInterneuron : ICircuitInterneuronSet
     {
-        static abstract IEnumerable<ReadOnlyNetwork> CreateInterneuronNetworks
+        static abstract TInterneuron CreateInterneurons
         (
             FunctionalCircuitParameter<TInput, TOutput> parameters,
             VariableInfo variableInfo,
@@ -38,7 +42,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
         static abstract T Create
         (
             FunctionalCircuitParameter<TInput, TOutput> parameters,
-            IEnumerable<ReadOnlyNetwork> networks,
+            TInterneuron interneurons,
             VariableInfo? variableInfo
         );
     }

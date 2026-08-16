@@ -2,7 +2,7 @@
 
 namespace ei8.Cortex.Coding.d23.Collections
 {
-    public class Next : AdjacentBase<Next.Input, Next.Output>, IAdjacent<Next, Next.Input, Next.Output>
+    public class Next : AdjacentBase<Next.Input, Next.Output>, IAdjacent<Next, Next.Input, Next.Output, InterneuronSet>
     {
         public class Input(UnaryNeuronParameter? current) : InputCircuitParameterSubset<UnaryNeuronParameter>(current)
         {
@@ -16,13 +16,11 @@ namespace ei8.Cortex.Coding.d23.Collections
 
         protected Next(
             FunctionalCircuitParameter<Input, Output> parameters,
-            ReadOnlyNetwork interneuronNetwork,
-            ReadOnlyNetwork linkedInputNeurons,
+            InterneuronSet interneurons,
             VariableInfo? variableInfo
         ) : base(
             parameters,
-            interneuronNetwork,
-            linkedInputNeurons,
+            interneurons,
             variableInfo
         )
         {
@@ -30,34 +28,35 @@ namespace ei8.Cortex.Coding.d23.Collections
 
         public static Next Create(
             FunctionalCircuitParameter<Input, Output> parameters,
-            ReadOnlyNetwork interneuronNetwork,
-            ReadOnlyNetwork linkedInputNeurons,
+            InterneuronSet interneurons,
             VariableInfo? variableInfo
         ) => new(
             parameters,
-            interneuronNetwork,
-            linkedInputNeurons,
+            interneurons,
             variableInfo
         );
 
-        public static ReadOnlyNetwork CreateInterneuronNetwork(
+        public static InterneuronSet CreateInterneurons(
             FunctionalCircuitParameter<Input, Output> parameters,
-            VariableInfo variableInfo
-        ) => NetworkHelper.CreateInterneuronNetworkByOutputNeurons(
-            $"{variableInfo.Function}({variableInfo.Inputs.First()})",
-            [parameters.Outputs.Next!.Neuron]
-        );
-
-        public static ReadOnlyNetwork LinkInputNeurons(
-            ReadOnlyNetwork interneuronNetwork,
-            FunctionalCircuitParameter<Input, Output> parameters,
-            ReadOnlyNetwork? precedingInterneuronNetwork = null,
+            VariableInfo variableInfo,
+            InterneuronSet? precedingInterneuronNetwork = default,
             params Neuron[] additionalInputs
-        ) => AdjacentBase<Next.Input, Next.Output>.LinkInputNeurons(
-            parameters.Inputs.Current!,
-            interneuronNetwork,
-            precedingInterneuronNetwork,
-            additionalInputs
-        );
+        )
+        {
+            var interneuron1 = NetworkHelper.CreateInterneuronNetworkByOutputNeurons(
+                $"{variableInfo.Function}({variableInfo.Inputs.First()})",
+                [parameters.Outputs.Next!.Neuron]
+            );
+
+            return new InterneuronSet(
+                interneuron1,
+                AdjacentBase<Next.Input, Next.Output>.LinkInputNeurons(
+                    parameters.Inputs.Current!,
+                    interneuron1,
+                    precedingInterneuronNetwork,
+                    additionalInputs
+                )
+            );
+        }
     }
 }

@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 {
-    public class Subtractor : OperationBase<Subtractor.Input, Subtractor.Output>, IOperation<Subtractor, Subtractor.Input, Subtractor.Output>
+    public class Subtractor : OperationBase<Subtractor.Input, Subtractor.Output>, IOperation<Subtractor, Subtractor.Input, Subtractor.Output, InterneuronSet>
     {
         public class Input(
             BinaryNeuronParameter? minuend,
@@ -37,11 +37,11 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 
         protected Subtractor(
             FunctionalCircuitParameter<Subtractor.Input, Subtractor.Output> parameters,
-            IEnumerable<ReadOnlyNetwork> networks,
+            InterneuronSet interneurons,
             VariableInfo? variableInfo
         ) : base(
             parameters,
-            networks,
+            interneurons,
             variableInfo
         )
         {
@@ -49,11 +49,11 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 
         public static Subtractor Create(
             FunctionalCircuitParameter<Subtractor.Input, Subtractor.Output> parameters,
-            IEnumerable<ReadOnlyNetwork> networks,
+            InterneuronSet interneurons,
             VariableInfo? variableInfo
         ) => new(
             parameters, 
-            networks, 
+            interneurons, 
             variableInfo
         );
 
@@ -72,7 +72,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
             )
         );
 
-        public static IEnumerable<ReadOnlyNetwork> CreateInterneuronNetworks(
+        public static InterneuronSet CreateInterneurons(
             FunctionalCircuitParameter<Subtractor.Input, Subtractor.Output> parameters,
             VariableInfo variableInfo,
             VariableInfo? precedingVariableInfo = null
@@ -209,7 +209,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                 }
             }
 
-            return result.Select(n => n.Network);
+            return new InterneuronSet(result.Select(n => n.Network));
         }
 
         private static IEnumerable<IneurUL> CreateSubtractorHalf1Interneurons(

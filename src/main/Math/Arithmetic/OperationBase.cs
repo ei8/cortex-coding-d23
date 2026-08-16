@@ -1,16 +1,15 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
 namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 {
     public abstract class OperationBase<TInput, TOutput>(
         FunctionalCircuitParameter<TInput, TOutput> parameters,
-        IEnumerable<ReadOnlyNetwork> networks,
+        InterneuronSet interneurons,
         VariableInfo? variableInfo
-    ) : FunctionalCircuitBase<TInput, TOutput>(
+    ) : FunctionalCircuitBase<TInput, TOutput, InterneuronSet>(
         parameters,
-        networks,
+        interneurons,
         variableInfo
     )
         where TInput : IInputCircuitParameterSubset
@@ -23,7 +22,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
             VariableInfo? precedingVariableInfo = null,
             [CallerArgumentExpression(nameof(result))] string parameterExpression = ""
         )
-            where T : IOperation<T, TInput, TOutput>
+            where T : IOperation<T, TInput, TOutput, InterneuronSet>
         {
             bool bResult = false;
             result = default;
@@ -35,13 +34,11 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                 );
                 result = T.Create(
                     parameters,
-                    [
-                        ..T.CreateInterneuronNetworks(
-                            parameters,
-                            variableInfo,
-                            precedingVariableInfo
-                        )
-                    ],
+                    T.CreateInterneurons(
+                        parameters,
+                        variableInfo,
+                        precedingVariableInfo
+                    ),
                     variableInfo
                 );
                 bResult = true;

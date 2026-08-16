@@ -1,26 +1,21 @@
 ﻿namespace ei8.Cortex.Coding.d23.Collections
 {
-    public interface IAdjacent<T, TInput, TOutput> : ICircuit<FunctionalCircuitParameter<TInput, TOutput>>
-        where T : ICircuit<FunctionalCircuitParameter<TInput, TOutput>>
+    public interface IAdjacent<T, TInput, TOutput, TInterneuron> : ICircuit<FunctionalCircuitParameter<TInput, TOutput>, TInterneuron>
+        where T : ICircuit<FunctionalCircuitParameter<TInput, TOutput>, TInterneuron>
         where TInput : IInputCircuitParameterSubset
         where TOutput : IOutputCircuitParameterSubset
+        where TInterneuron : ICircuitInterneuronSet
     {
-        static abstract ReadOnlyNetwork CreateInterneuronNetwork(
+        static abstract TInterneuron CreateInterneurons(
             FunctionalCircuitParameter<TInput, TOutput> parameters,
-            VariableInfo variableInfo
-        );
-
-        static abstract ReadOnlyNetwork LinkInputNeurons(
-            ReadOnlyNetwork interneuronNetwork,
-            FunctionalCircuitParameter<TInput, TOutput> parameters,
-            ReadOnlyNetwork? precedingInterneuronNetwork = null,
+            VariableInfo variableInfo,
+            TInterneuron? precedingInterneuronNetwork = default,
             params Neuron[] additionalInputs
         );
 
         static abstract T Create(
             FunctionalCircuitParameter<TInput, TOutput> parameters,
-            ReadOnlyNetwork interneuronNetwork,
-            ReadOnlyNetwork linkedInputNeurons,
+            TInterneuron interneurons,
             VariableInfo? variableInfo
         );
     }

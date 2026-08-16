@@ -18,6 +18,9 @@ namespace ei8.Cortex.Coding.d23
             And
         }
 
+        public static IEnumerable<ReadOnlyNetwork> ConvertToNetworks(params IneurUL?[] neurULs) =>
+            neurULs.WhereNotNull().Select(n => n.Network);
+
         public static bool TryCreateNeuron(
             [NotNullWhen(true)] out Neuron? result,
             [CallerArgumentExpression(nameof(result))] string parameterExpression = ""
@@ -33,7 +36,6 @@ namespace ei8.Cortex.Coding.d23
 
             return bResult;
         }
-
 
         public static Neuron CreateNeuron(string? tag = null) =>
             Neuron.CreateTransient(Guid.NewGuid(), tag, null, null);

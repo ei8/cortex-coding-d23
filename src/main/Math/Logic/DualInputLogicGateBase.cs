@@ -5,15 +5,17 @@ using System.Runtime.CompilerServices;
 
 namespace ei8.Cortex.Coding.d23.Math.Logic
 {
-    public abstract class DualInputLogicGateBase(
+    public abstract class DualInputLogicGateBase
+    (
         FunctionalCircuitParameter<DualInputLogicGateBase.Input, DualInputLogicGateBase.Output> parameters,
-        IEnumerable<ReadOnlyNetwork> networks,
+        DualInputLogicGateBase.InterneuronSet interneurons,
         VariableInfo? variableInfo
-    ) : LogicGateBase<DualInputLogicGateBase.Input, DualInputLogicGateBase.Output>(
-        parameters,
-        networks,
-        variableInfo
-    )
+    ) : 
+        LogicGateBase<DualInputLogicGateBase.Input, DualInputLogicGateBase.Output, DualInputLogicGateBase.InterneuronSet>(
+            parameters,
+            interneurons,
+            variableInfo
+        )
     {
         public class Input(
             BinaryNeuronParameter? input1,
@@ -36,6 +38,33 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
         )
         {
             public BinaryNeuronParameter? Output1 => this.Parameter1;
+        }
+
+        public class InterneuronSet
+        (
+            ReadOnlyNetwork interneuron1,
+            ReadOnlyNetwork interneuron2,
+            ReadOnlyNetwork interneuron3,
+            ReadOnlyNetwork interneuron4,
+            ReadOnlyNetwork linkedInputNeurons
+        ) :
+            CircuitInterneuronSetBase,
+            ICircuitInterneuronSet
+        {
+            protected override IEnumerable<ReadOnlyNetwork> GetNetworks() =>
+            [
+                this.Interneuron1,
+                this.Interneuron2,
+                this.Interneuron3,
+                this.Interneuron4,
+                this.LinkedInputNeurons
+            ];
+
+            public ReadOnlyNetwork Interneuron1 = interneuron1;
+            public ReadOnlyNetwork Interneuron2 = interneuron2;
+            public ReadOnlyNetwork Interneuron3 = interneuron3;
+            public ReadOnlyNetwork Interneuron4 = interneuron4;
+            public ReadOnlyNetwork LinkedInputNeurons = linkedInputNeurons;
         }
 
         public static IEnumerable<string> GetInterneuronTags(VariableInfo variableInfo, InterneuronTagInfo? interneuronTagInfo = null)
@@ -135,33 +164,43 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
             NetworkHelper.AdditionalInputNeuronType additionalInputNeuronType = NetworkHelper.AdditionalInputNeuronType.And,
             params Neuron[] additionalInputs
         )
-            where T : ILogicGate<T, DualInputLogicGateBase.Input, DualInputLogicGateBase.Output>
+            where T : ILogicGate<T, DualInputLogicGateBase.Input, DualInputLogicGateBase.Output, InterneuronSet>
         {
             bool bResult = false;
             result = default;
             if (VariableInfo.TryParse(parameterExpression, out var variableInfo))
             {
-                var output = parameters.Outputs.Parameter1;
-                var interneuronNetworks = Enumerable.Empty<ReadOnlyNetwork>();
-                if (output != null)
-                    interneuronNetworks = NetworkHelper.CreateInterneuronNetworksByOutputNeurons(
-                        T.GetInterneuronOutputs(output),
+                if 
+                (
+                    parameters.Outputs.Output1 != null && 
+                    parameters.Inputs.Input1 != null && 
+                    parameters.Inputs.Input2 != null
+                )
+                {
+                    var interneuronNetworks = NetworkHelper.CreateInterneuronNetworksByOutputNeurons
+                    (
+                        T.GetInterneuronOutputs(parameters.Outputs.Output1),
                         T.GetInterneuronTags(variableInfo, interneuronTagInfo)
                     );
-
-                if (parameters.Inputs.Parameter1 != null && parameters.Inputs.Parameter2 != null)
-                {
-                    result = T.Create(
-                        parameters,
-                        [
-                            ..interneuronNetworks,
-                        ..T.LinkInputNeurons(
+                    var interneurons = new DualInputLogicGateBase.InterneuronSet
+                    (
+                        interneuronNetworks.ElementAt(0),
+                        interneuronNetworks.ElementAt(1),
+                        interneuronNetworks.ElementAt(2),
+                        interneuronNetworks.ElementAt(3),
+                        T.LinkInputNeurons
+                        (
                             parameters,
                             interneuronNetworks,
                             additionalInputNeuronType,
                             additionalInputs
-                        )
-                        ],
+                        ).FromNetworks()
+                    );
+
+                    result = T.Create
+                    (
+                        parameters,
+                        interneurons,
                         variableInfo
                     );
                     bResult = true;

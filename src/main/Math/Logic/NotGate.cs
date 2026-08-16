@@ -5,7 +5,20 @@ using System.Runtime.CompilerServices;
 
 namespace ei8.Cortex.Coding.d23.Math.Logic
 {
-    public class NotGate : LogicGateBase<NotGate.Input, NotGate.Output>, ILogicGate<NotGate, NotGate.Input, NotGate.Output>
+    public class NotGate : 
+        LogicGateBase
+        <
+            NotGate.Input, 
+            NotGate.Output, 
+            NotGate.InterneuronSet
+        >, 
+        ILogicGate
+        <
+            NotGate, 
+            NotGate.Input, 
+            NotGate.Output, 
+            NotGate.InterneuronSet
+        >
     {
         public class Input(
             BinaryNeuronParameter? input1
@@ -27,25 +40,49 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
             public BinaryNeuronParameter? Output1 => this.Parameter1;
         }
 
-        protected NotGate(
+        public class InterneuronSet
+        (
+            ReadOnlyNetwork interneuron1,
+            ReadOnlyNetwork interneuron2,
+            ReadOnlyNetwork linkedInputNeurons
+        ) :
+            CircuitInterneuronSetBase,
+            ICircuitInterneuronSet
+        {
+            protected override IEnumerable<ReadOnlyNetwork> GetNetworks() =>
+            [
+                this.Interneuron1,
+                this.Interneuron2,
+                this.LinkedInputNeurons
+            ];
+
+            public ReadOnlyNetwork Interneuron1 = interneuron1;
+            public ReadOnlyNetwork Interneuron2 = interneuron2;
+            public ReadOnlyNetwork LinkedInputNeurons = linkedInputNeurons;
+        }
+
+        protected NotGate
+        (
             FunctionalCircuitParameter<NotGate.Input, NotGate.Output> parameters,
-            IEnumerable<ReadOnlyNetwork> networks,
+            NotGate.InterneuronSet interneurons,
             VariableInfo? variableInfo
-        ) : base(
-            parameters,
-            networks,
-            variableInfo
-        )
+        ) : 
+            base
+            (
+                parameters,
+                interneurons,
+                variableInfo
+            )
         {
         }
 
         public static NotGate Create(
             FunctionalCircuitParameter<NotGate.Input, NotGate.Output> parameters,
-            IEnumerable<ReadOnlyNetwork> networks,
+            NotGate.InterneuronSet interneurons,
             VariableInfo? variableInfo
         ) => new(
             parameters,
-            networks,
+            interneurons,
             variableInfo
         );
 
@@ -121,33 +158,38 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
             NetworkHelper.AdditionalInputNeuronType additionalInputNeuronType = NetworkHelper.AdditionalInputNeuronType.And,
             params Neuron[] additionalInputs
         )
-            where T : ILogicGate<T, NotGate.Input, NotGate.Output>
+            where T : ILogicGate<T, NotGate.Input, NotGate.Output, NotGate.InterneuronSet>
         {
             bool bResult = false;
             result = default;
             if (VariableInfo.TryParse(parameterExpression, out var variableInfo))
             {
-                var output = parameters.Outputs.Output1;
-                var interneuronNetworks = Enumerable.Empty<ReadOnlyNetwork>();
-                if (output != null)
-                    interneuronNetworks = NetworkHelper.CreateInterneuronNetworksByOutputNeurons(
-                        T.GetInterneuronOutputs(output),
+                if 
+                (
+                    parameters.Outputs.Output1 != null &&
+                    parameters.Inputs.Input1 != null
+                )
+                {
+                    var interneuronNetworks = NetworkHelper.CreateInterneuronNetworksByOutputNeurons(
+                        T.GetInterneuronOutputs(parameters.Outputs.Output1),
                         T.GetInterneuronTags(variableInfo, interneuronTagInfo)
                     );
 
-                if (parameters.Inputs.Input1 != null)
-                {
-                    result = T.Create(
-                        parameters,
-                        [
-                            ..interneuronNetworks,
-                        ..T.LinkInputNeurons(
+                    var interneurons = new NotGate.InterneuronSet
+                    (
+                        interneuronNetworks.ElementAt(0),
+                        interneuronNetworks.ElementAt(1),
+                        T.LinkInputNeurons(
                             parameters,
                             interneuronNetworks,
                             additionalInputNeuronType,
                             additionalInputs
-                        )
-                        ],
+                        ).FromNetworks()
+                    );
+                
+                    result = T.Create(
+                        parameters,
+                        interneurons,
                         variableInfo
                     );
                     bResult = true;

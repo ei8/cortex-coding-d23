@@ -7,16 +7,13 @@ namespace ei8.Cortex.Coding.d23.Collections
 {
     public abstract class AdjacentBase<TInput, TOutput>(
         FunctionalCircuitParameter<TInput, TOutput> parameters,
-        ReadOnlyNetwork interneuronNetwork,
-        ReadOnlyNetwork linkedInputNeurons,
+        InterneuronSet interneurons,
         VariableInfo? variableInfo
-        ) : FunctionalCircuitBase<TInput, TOutput>(
-        parameters,
-        [
-                interneuronNetwork,
-                linkedInputNeurons
-            ],
-        variableInfo
+    ) : 
+        FunctionalCircuitBase<TInput, TOutput, InterneuronSet>(
+            parameters,
+            interneurons,
+            variableInfo
         )
         where TInput : IInputCircuitParameterSubset
         where TOutput : IOutputCircuitParameterSubset
@@ -24,28 +21,23 @@ namespace ei8.Cortex.Coding.d23.Collections
         public static bool TryCreate<T>(
             [NotNullWhen(true)] out T? result,
             FunctionalCircuitParameter<TInput, TOutput> parameters,
-            ReadOnlyNetwork? precedingInterneuronNetwork = null,
+            InterneuronSet? precedingInterneurons = default,
             [CallerArgumentExpression(nameof(result))] string parameterExpression = "",
             params Neuron[] additionalInputs
         ) 
-            where T : IAdjacent<T, TInput, TOutput>
+            where T : IAdjacent<T, TInput, TOutput, InterneuronSet>
         {
             bool bResult = false;
             result = default;
 
             if (VariableInfo.TryParse(parameterExpression, out var variableInfo))
             {
-                var interneuronNetwork = T.CreateInterneuronNetwork(
-                    parameters,
-                    variableInfo
-                );
                 result = T.Create(
                     parameters,
-                    interneuronNetwork,
-                    T.LinkInputNeurons(
-                        interneuronNetwork,
+                    T.CreateInterneurons(
                         parameters,
-                        precedingInterneuronNetwork,
+                        variableInfo,
+                        precedingInterneurons,
                         additionalInputs
                     ),
                     variableInfo
@@ -58,22 +50,20 @@ namespace ei8.Cortex.Coding.d23.Collections
 
         protected static ReadOnlyNetwork LinkInputNeurons(
             UnaryNeuronParameter current,
-            ReadOnlyNetwork interneuronNetwork,
-            ReadOnlyNetwork? precedingInterneuronNetwork = null,
+            ReadOnlyNetwork interneuron1,
+            InterneuronSet? precedingInterneurons = default,
             params Neuron[] additionalInputs
         )
         {
             var inputNeurons = new List<NeuronInfo>([new(current.Neuron)]);
-            if (precedingInterneuronNetwork != null)
-                inputNeurons.Add(new NeuronInfo(precedingInterneuronNetwork.GetInterneuron(), 1f, NeurotransmitterEffect.Inhibit));
+            if (precedingInterneurons != null)
+                inputNeurons.Add(new NeuronInfo(precedingInterneurons.Interneuron1.GetInterneuron(), 1f, NeurotransmitterEffect.Inhibit));
 
             return NetworkHelper.LinkInputNeuronsToInterneuron(
-                interneuronNetwork.GetInterneuron(),
+                interneuron1.GetInterneuron(),
                 [.. inputNeurons],
                 additionalInputNeuronInfos: [..additionalInputs.Select(n => new NeuronInfo(n))]
             );
         }
-
-        public ReadOnlyNetwork InterneuronNetwork { get; } = interneuronNetwork;
     }
 }

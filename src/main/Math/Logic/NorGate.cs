@@ -2,29 +2,42 @@
 
 namespace ei8.Cortex.Coding.d23.Math.Logic
 {
-    public class NorGate : DualInputLogicGateBase, ILogicGate<NorGate, DualInputLogicGateBase.Input, DualInputLogicGateBase.Output>
+    public class NorGate : 
+        DualInputLogicGateBase, 
+        ILogicGate
+        <
+            NorGate, 
+            DualInputLogicGateBase.Input, 
+            DualInputLogicGateBase.Output,
+            DualInputLogicGateBase.InterneuronSet
+        >
     {
-        protected NorGate(
+        protected NorGate
+        (
             FunctionalCircuitParameter<DualInputLogicGateBase.Input, DualInputLogicGateBase.Output> parameters,
-            IEnumerable<ReadOnlyNetwork> networks,
+            DualInputLogicGateBase.InterneuronSet interneurons,
             VariableInfo? variableInfo
-        ) : base(
-            parameters,
-            networks,
-            variableInfo
-        )
+        ) : 
+            base
+            (
+                parameters,
+                interneurons,
+                variableInfo
+            )
         {
         }
 
         public static NorGate Create(
             FunctionalCircuitParameter<DualInputLogicGateBase.Input, DualInputLogicGateBase.Output> parameters,
-            IEnumerable<ReadOnlyNetwork> networks,
+            DualInputLogicGateBase.InterneuronSet interneurons,
             VariableInfo? variableInfo
-        ) => new(
-            parameters,
-            networks,
-            variableInfo
-        );
+        ) => 
+            new
+            (
+                parameters,
+                interneurons,
+                variableInfo
+            );
 
         public static IEnumerable<Neuron> GetInterneuronOutputs(BinaryNeuronParameter output) =>
         [

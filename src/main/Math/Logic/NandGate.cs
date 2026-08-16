@@ -2,15 +2,23 @@
 
 namespace ei8.Cortex.Coding.d23.Math.Logic
 {
-    public class NandGate : DualInputLogicGateBase, ILogicGate<NandGate, DualInputLogicGateBase.Input, DualInputLogicGateBase.Output>
+    public class NandGate : 
+        DualInputLogicGateBase, 
+        ILogicGate
+        <
+            NandGate, 
+            DualInputLogicGateBase.Input, 
+            DualInputLogicGateBase.Output,
+            DualInputLogicGateBase.InterneuronSet
+        >
     {
         protected NandGate(
             FunctionalCircuitParameter<DualInputLogicGateBase.Input, DualInputLogicGateBase.Output> parameters,
-            IEnumerable<ReadOnlyNetwork> networks,
+            DualInputLogicGateBase.InterneuronSet interneurons,
             VariableInfo? variableInfo
         ) : base(
             parameters,
-            networks,
+            interneurons,
             variableInfo
         )
         {
@@ -18,11 +26,11 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
 
         public static NandGate Create(
             FunctionalCircuitParameter<DualInputLogicGateBase.Input, DualInputLogicGateBase.Output> parameters,
-            IEnumerable<ReadOnlyNetwork> networks,
+            DualInputLogicGateBase.InterneuronSet interneurons,
             VariableInfo? variableInfo
         ) => new(
             parameters,
-            networks,
+            interneurons,
             variableInfo
         );
 

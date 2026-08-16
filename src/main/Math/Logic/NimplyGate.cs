@@ -2,29 +2,43 @@
 
 namespace ei8.Cortex.Coding.d23.Math.Logic
 {
-    public class NimplyGate : DualInputLogicGateBase, ILogicGate<NimplyGate, DualInputLogicGateBase.Input, DualInputLogicGateBase.Output>
+    public class NimplyGate : 
+        DualInputLogicGateBase, 
+        ILogicGate
+        <
+            NimplyGate, 
+            DualInputLogicGateBase.Input, 
+            DualInputLogicGateBase.Output,
+            DualInputLogicGateBase.InterneuronSet
+        >
     {
-        protected NimplyGate(
+        protected NimplyGate
+        (
             FunctionalCircuitParameter<DualInputLogicGateBase.Input, DualInputLogicGateBase.Output> parameters,
-            IEnumerable<ReadOnlyNetwork> networks,
+            DualInputLogicGateBase.InterneuronSet interneurons,
             VariableInfo? variableInfo
-        ) : base(
-            parameters,
-            networks,
-            variableInfo
-        )
+        ) : 
+            base
+            (
+                parameters,
+                interneurons,
+                variableInfo
+            )
         {
         }
 
-        public static NimplyGate Create(
+        public static NimplyGate Create
+        (
             FunctionalCircuitParameter<DualInputLogicGateBase.Input, DualInputLogicGateBase.Output> parameters,
-            IEnumerable<ReadOnlyNetwork> networks,
+            DualInputLogicGateBase.InterneuronSet interneurons,
             VariableInfo? variableInfo
-        ) => new(
-            parameters,
-            networks,
-            variableInfo
-        );
+        ) => 
+            new
+            (
+                parameters,
+                interneurons,
+                variableInfo
+            );
 
         public static IEnumerable<Neuron> GetInterneuronOutputs(BinaryNeuronParameter output) =>
         [

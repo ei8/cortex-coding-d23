@@ -2,25 +2,28 @@
 
 namespace ei8.Cortex.Coding.d23
 {
-    public abstract class CircuitBase<TParam> : ICircuit<TParam>, IVariable
-        where TParam : CircuitParameterBase
+    public abstract class CircuitBase<TParam, TInterneuron>
+    (
+        TParam parameters,
+        TInterneuron interneurons,
+        VariableInfo? variableInfo
+    ) : 
+        neurULBase,
+        ICircuit<TParam, TInterneuron>, 
+        IVariable
+        where TParam : ICircuitParameter
+        where TInterneuron : ICircuitInterneuronSet
     {
-        private readonly Network network;
+        protected override IEnumerable<ReadOnlyNetwork> GetNetworks() =>
+        [
+            this.Parameters.Network,
+            this.Interneurons.Network
+        ];
 
-        protected CircuitBase(TParam parameters, IEnumerable<ReadOnlyNetwork> networks, VariableInfo? variableInfo)
-        {
-            this.network = new();
-            this.network.AddReplaceItems(
-                this.Parameters = parameters
-            );
-            this.network.AddReplaceItems([..networks]);
-            this.VariableInfo = variableInfo;
-        }
+        public TParam Parameters { get; } = parameters;
 
-        public ReadOnlyNetwork Network => this.network;
+        public TInterneuron Interneurons { get; } = interneurons;
 
-        public TParam Parameters { get; }
-
-        public VariableInfo? VariableInfo { get; }
+        public VariableInfo? VariableInfo { get; } = variableInfo;
     }
 }

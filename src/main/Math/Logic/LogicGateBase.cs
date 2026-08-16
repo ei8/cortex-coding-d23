@@ -2,17 +2,20 @@
 
 namespace ei8.Cortex.Coding.d23.Math.Logic
 {
-    public abstract class LogicGateBase<TInput, TOutput>(
+    public abstract class LogicGateBase<TInput, TOutput, TInterneuron>
+    (
         FunctionalCircuitParameter<TInput, TOutput> parameters,
-        IEnumerable<ReadOnlyNetwork> networks,
+        TInterneuron interneuron,
         VariableInfo? variableInfo
-    ) : FunctionalCircuitBase<TInput, TOutput>(
-        parameters,
-        networks,
-        variableInfo
-    )
+    ) : 
+        FunctionalCircuitBase<TInput, TOutput, TInterneuron>(
+            parameters,
+            interneuron,
+            variableInfo
+        )
         where TInput : IInputCircuitParameterSubset
         where TOutput : IOutputCircuitParameterSubset
+        where TInterneuron : ICircuitInterneuronSet
     {
     }
 }

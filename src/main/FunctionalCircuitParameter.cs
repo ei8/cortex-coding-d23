@@ -1,18 +1,18 @@
-﻿namespace ei8.Cortex.Coding.d23
+﻿using System.Collections.Generic;
+
+namespace ei8.Cortex.Coding.d23
 {
-    public class FunctionalCircuitParameter<TInput, TOutput> : ProceduralCircuitParameter<TInput>
+    public class FunctionalCircuitParameter<TInput, TOutput>
+    (
+        TInput inputs, 
+        TOutput outputs
+    ) : 
+        ProceduralCircuitParameter<TInput>(inputs)
         where TInput : IInputCircuitParameterSubset
         where TOutput : IOutputCircuitParameterSubset
     {
-        public FunctionalCircuitParameter(TInput inputs, TOutput outputs) : base(inputs)
-        {
-            this.network.AddReplaceItems(
-                [
-                    (this.Outputs = outputs).Network
-                ]
-            );
-        }
+        protected override IEnumerable<ReadOnlyNetwork> GetNetworks() => [..base.GetNetworks(), ..NetworkHelper.ConvertToNetworks(this.Outputs)];
 
-        public TOutput Outputs { get; }
+        public TOutput Outputs { get; } = outputs;
     }
 }
