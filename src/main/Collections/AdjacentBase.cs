@@ -1,19 +1,18 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
 namespace ei8.Cortex.Coding.d23.Collections
 {
-    public abstract class AdjacentBase<TParam>(
+    public abstract class AdjacentBase<TParam, TInterneuron>
+    (
         TParam parameters,
-        InterneuronSet interneurons,
+        TInterneuron interneurons,
         VariableInfo? variableInfo
     ) : 
         FunctionalCircuitBase
         <
             TParam, 
-            InterneuronSet
+            TInterneuron
         >
         (
             parameters,
@@ -21,15 +20,17 @@ namespace ei8.Cortex.Coding.d23.Collections
             variableInfo
         )
         where TParam : IFunctionalCircuitParameter
+        where TInterneuron : ICircuitInterneuronSet
     {
-        public static bool TryCreate<T>(
+        public static bool TryCreate<T>
+        (
             [NotNullWhen(true)] out T? result,
             TParam parameters,
-            InterneuronSet? precedingInterneurons = default,
+            TInterneuron? precedingInterneurons = default,
             [CallerArgumentExpression(nameof(result))] string parameterExpression = "",
             params Neuron[] additionalInputs
         ) 
-            where T : IAdjacent<T, TParam, InterneuronSet>
+            where T : IAdjacent<T, TParam, TInterneuron>
         {
             bool bResult = false;
             result = default;
@@ -50,24 +51,6 @@ namespace ei8.Cortex.Coding.d23.Collections
             }
 
             return bResult;
-        }
-
-        protected static ReadOnlyNetwork LinkInputNeurons(
-            UnaryNeuronParameter current,
-            ReadOnlyNetwork interneuron1,
-            InterneuronSet? precedingInterneurons = default,
-            params Neuron[] additionalInputs
-        )
-        {
-            var inputNeurons = new List<NeuronInfo>([new(current.Neuron)]);
-            if (precedingInterneurons != null)
-                inputNeurons.Add(new NeuronInfo(precedingInterneurons.Interneuron1.GetInterneuron(), 1f, NeurotransmitterEffect.Inhibit));
-
-            return NetworkHelper.LinkInputNeuronsToInterneuron(
-                interneuron1.GetInterneuron(),
-                [.. inputNeurons],
-                additionalInputNeuronInfos: [..additionalInputs.Select(n => new NeuronInfo(n))]
-            );
         }
     }
 }

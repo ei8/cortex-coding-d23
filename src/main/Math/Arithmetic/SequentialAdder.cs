@@ -11,7 +11,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                 SequentialAdder.Input,
                 SequentialAdder.Output
             >,
-            InterneuronSet
+            SequentialInterneuronSet
         >,
         ISequentialOperation
         <
@@ -21,7 +21,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                 SequentialAdder.Input,
                 SequentialAdder.Output
             >,
-            InterneuronSet
+            SequentialInterneuronSet
         >
     {
         public class Input
@@ -77,7 +77,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 
         protected SequentialAdder(
             FunctionalCircuitParameter<Input, Output> parameters,
-            InterneuronSet interneurons,
+            SequentialInterneuronSet interneurons,
             VariableInfo? variableInfo
         ) : base(
             parameters,
@@ -89,7 +89,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 
         public static SequentialAdder Create(
             FunctionalCircuitParameter<Input, Output> parameters,
-            InterneuronSet interneurons,
+            SequentialInterneuronSet interneurons,
             VariableInfo? variableInfo
         ) => new(
             parameters,
@@ -97,7 +97,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
             variableInfo
         );
 
-        public static InterneuronSet CreateInterneurons(
+        public static SequentialInterneuronSet CreateInterneurons(
             FunctionalCircuitParameter<Input, Output> parameters,
             VariableInfo variableInfo,
             VariableInfo? precedingVariableInfo = null
@@ -106,6 +106,9 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
             var result = new Network();
 
             var sum = parameters.Outputs.Sum;
+
+            // DEL: var completers = NetworkHelper.CreateInterneuronNetworksByOutputNeurons()
+            //var initiators = NetworkHelper.CreateInterneuronNetworksByOutputNeurons
 
             var coreNetwork = Adder.CreateInterneuronNetworksCore
             (
@@ -131,7 +134,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
             }
 
             // TODO: Create InterneuronSet specifically for SequentialAdder
-            return new InterneuronSet([result]);
+            return null; // new(null, [result]);
         }
     }
 }

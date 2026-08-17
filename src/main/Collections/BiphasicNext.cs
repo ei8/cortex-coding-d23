@@ -1,0 +1,124 @@
+﻿
+using System.Collections.Generic;
+using System.Linq;
+
+namespace ei8.Cortex.Coding.d23.Collections
+{
+    public class BiphasicNext
+    (
+        FunctionalCircuitParameter
+        <
+            Next.Input,
+            Next.Output
+        >
+        parameters,
+        BiphasicNext.InterneuronSet interneurons,
+        VariableInfo? variableInfo
+    ) :
+        AdjacentBase
+        <
+            FunctionalCircuitParameter
+            <
+                Next.Input,
+                Next.Output
+            >,
+            BiphasicNext.InterneuronSet
+        >
+        (
+            parameters,
+            interneurons,
+            variableInfo
+        ),
+        IAdjacent
+        <
+            BiphasicNext,
+            FunctionalCircuitParameter
+            <
+                Next.Input,
+                Next.Output
+            >,
+            BiphasicNext.InterneuronSet
+        >
+    {
+        public class InterneuronSet
+        (
+            ReadOnlyNetwork initiator, 
+            ReadOnlyNetwork completer
+        ) :
+            CircuitInterneuronSetBase,
+            ICircuitInterneuronSet
+        {
+            protected override IEnumerable<ReadOnlyNetwork> GetNetworks() =>
+            [
+                this.Initiator,
+                this.Completer
+            ];
+
+            public ReadOnlyNetwork Initiator { get; } = initiator;
+            public ReadOnlyNetwork Completer { get; } = completer;
+        }
+
+        public static BiphasicNext Create
+        (
+            FunctionalCircuitParameter<Next.Input, Next.Output> parameters,
+            InterneuronSet interneurons,
+            VariableInfo? variableInfo
+        ) =>
+            new
+            (
+                parameters,
+                interneurons,
+                variableInfo
+            );
+
+        public static InterneuronSet CreateInterneurons
+        (
+            FunctionalCircuitParameter<Next.Input, Next.Output> parameters, 
+            VariableInfo variableInfo, 
+            InterneuronSet? precedingInterneurons = null, 
+            params Neuron[] additionalInputs
+        )
+        {
+            var completer = NetworkHelper.CreateInterneuronNetworkByOutputNeurons
+            (
+                $"{variableInfo.Function}.{nameof(InterneuronSet.Completer)}({variableInfo.Inputs.First()})",
+                [parameters.Outputs.Next!.Neuron]
+            );
+
+            var initiator = NetworkHelper.CreateInterneuronNetworkByOutputNeurons
+            (
+                $"{variableInfo.Function}.{nameof(InterneuronSet.Initiator)}({variableInfo.Inputs.First()})",
+                completer.GetInterneuron()
+            );
+
+            var inputNeurons = new List<NeuronInfo>
+            (
+                [
+                    new(parameters.Inputs.Function!.Neuron),
+                    new(parameters.Inputs.Current!.Neuron)
+                ]
+            );
+
+            if (precedingInterneurons != null)
+                inputNeurons.Add
+                (
+                    new NeuronInfo
+                    (
+                        precedingInterneurons.Initiator.GetInterneuron(),
+                        1f,
+                        NeurotransmitterEffect.Inhibit
+                    )
+                );
+
+            var interneuronFromInputsToInitiator = NetworkHelper.LinkInputNeuronsToInterneuron(
+                initiator.GetInterneuron(),
+                [.. inputNeurons],
+                additionalInputNeuronInfos: [.. additionalInputs.Select(n => new NeuronInfo(n))]
+            );
+            
+            initiator = ((IEnumerable<ReadOnlyNetwork>) [initiator, interneuronFromInputsToInitiator]).Combine();
+
+            return new(initiator, completer);
+        }
+    }
+}

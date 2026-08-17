@@ -8,7 +8,7 @@
         static abstract TInterneuron CreateInterneurons(
             TParam parameters,
             VariableInfo variableInfo,
-            TInterneuron? precedingInterneuronNetwork = default,
+            TInterneuron? precedingInterneurons = default,
             params Neuron[] additionalInputs
         );
 
