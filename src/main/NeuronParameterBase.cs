@@ -3,24 +3,19 @@ using System.Linq;
 
 namespace ei8.Cortex.Coding.d23
 {
-    public abstract class NeuronParameterBase : INeuronParameter
+    public abstract class NeuronParameterBase
+    (
+        IEnumerable<NeuronInfo> neuronInfos, 
+        VariableInfo? variableInfo
+    ) : 
+        neurULBase, 
+        INeuronParameter
     {
-        protected readonly Network network;
+        protected override IEnumerable<ReadOnlyNetwork> GetNetworks() =>
+            [this.NeuronInfos.Select(ni => ni.Neuron).ToNetwork()];
 
-        protected NeuronParameterBase(IEnumerable<NeuronInfo> neuronInfos)
-        {
-            this.NeuronInfos = neuronInfos;
+        public IEnumerable<NeuronInfo> NeuronInfos { get; } = neuronInfos;
 
-            this.network = new();
-            this.network.AddReplaceItems(
-                this.NeuronInfos.Select(ni => ni.Neuron)
-            );
-        }
-
-        public IEnumerable<NeuronInfo> NeuronInfos { get; }
-
-        public ReadOnlyNetwork Network => this.network;
-
-        public VariableInfo? VariableInfo { get; protected set; }
+        public VariableInfo? VariableInfo { get; } = variableInfo;
     }
 }

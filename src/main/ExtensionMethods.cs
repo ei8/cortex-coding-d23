@@ -27,7 +27,14 @@ namespace ei8.Cortex.Coding.d23
             return parameter != null;
         }
 
-        public static ReadOnlyNetwork FromNetworks(this IEnumerable<ReadOnlyNetwork> networks)
+        public static ReadOnlyNetwork ToNetwork(this IEnumerable<INetworkItem> items)
+        {
+            var result = new Network();
+            result.AddReplaceItems(items);
+            return result;
+        }
+
+        public static ReadOnlyNetwork Combine(this IEnumerable<ReadOnlyNetwork> networks)
         {
             var result = new Network();
             result.AddReplaceItems([.. networks]);

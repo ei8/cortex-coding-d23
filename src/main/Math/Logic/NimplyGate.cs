@@ -7,8 +7,10 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
         ILogicGate
         <
             NimplyGate, 
-            DualInputLogicGateBase.Input, 
-            DualInputLogicGateBase.Output,
+            FunctionalCircuitParameter<
+                DualInputLogicGateBase.Input, 
+                DualInputLogicGateBase.Output
+            >,
             DualInputLogicGateBase.InterneuronSet
         >
     {

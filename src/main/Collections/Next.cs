@@ -2,7 +2,25 @@
 
 namespace ei8.Cortex.Coding.d23.Collections
 {
-    public class Next : AdjacentBase<Next.Input, Next.Output>, IAdjacent<Next, Next.Input, Next.Output, InterneuronSet>
+    public class Next : 
+        AdjacentBase
+        <
+            FunctionalCircuitParameter
+            <
+                Next.Input, 
+                Next.Output
+            >
+        >, 
+        IAdjacent
+        <
+            Next, 
+            FunctionalCircuitParameter
+            <
+                Next.Input, 
+                Next.Output
+            >, 
+            InterneuronSet
+        >
     {
         public class Input(UnaryNeuronParameter? current) : InputCircuitParameterSubset<UnaryNeuronParameter>(current)
         {
@@ -50,7 +68,7 @@ namespace ei8.Cortex.Coding.d23.Collections
 
             return new InterneuronSet(
                 interneuron1,
-                AdjacentBase<Next.Input, Next.Output>.LinkInputNeurons(
+                AdjacentBase<FunctionalCircuitParameter<Next.Input, Next.Output>>.LinkInputNeurons(
                     parameters.Inputs.Current!,
                     interneuron1,
                     precedingInterneuronNetwork,

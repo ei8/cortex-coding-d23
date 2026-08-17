@@ -5,27 +5,31 @@ using System.Runtime.CompilerServices;
 
 namespace ei8.Cortex.Coding.d23.Collections
 {
-    public abstract class AdjacentBase<TInput, TOutput>(
-        FunctionalCircuitParameter<TInput, TOutput> parameters,
+    public abstract class AdjacentBase<TParam>(
+        TParam parameters,
         InterneuronSet interneurons,
         VariableInfo? variableInfo
     ) : 
-        FunctionalCircuitBase<TInput, TOutput, InterneuronSet>(
+        FunctionalCircuitBase
+        <
+            TParam, 
+            InterneuronSet
+        >
+        (
             parameters,
             interneurons,
             variableInfo
         )
-        where TInput : IInputCircuitParameterSubset
-        where TOutput : IOutputCircuitParameterSubset
+        where TParam : IFunctionalCircuitParameter
     {
         public static bool TryCreate<T>(
             [NotNullWhen(true)] out T? result,
-            FunctionalCircuitParameter<TInput, TOutput> parameters,
+            TParam parameters,
             InterneuronSet? precedingInterneurons = default,
             [CallerArgumentExpression(nameof(result))] string parameterExpression = "",
             params Neuron[] additionalInputs
         ) 
-            where T : IAdjacent<T, TInput, TOutput, InterneuronSet>
+            where T : IAdjacent<T, TParam, InterneuronSet>
         {
             bool bResult = false;
             result = default;

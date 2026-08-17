@@ -4,6 +4,5 @@
         neurULBase,
         ICircuitParameter
     {
-        public VariableInfo? VariableInfo { get; protected set; }
     }
 }

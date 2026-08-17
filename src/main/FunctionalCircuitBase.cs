@@ -1,20 +1,18 @@
 ﻿namespace ei8.Cortex.Coding.d23
 {
-    // TODO: can we just specify TFunctionalParam instead of TInput + TOutput
-    public abstract class FunctionalCircuitBase<TInput, TOutput, TInterneuron>
+    public abstract class FunctionalCircuitBase<TParam, TInterneuron>
     (
-        FunctionalCircuitParameter<TInput, TOutput> parameters,
+        TParam parameters,
         TInterneuron interneurons,
         VariableInfo? variableInfo
     ) : 
-        CircuitBase<FunctionalCircuitParameter<TInput, TOutput>, TInterneuron>
+        CircuitBase<TParam, TInterneuron>
         (
             parameters,
             interneurons,
             variableInfo
         )
-        where TInput : IInputCircuitParameterSubset
-        where TOutput : IOutputCircuitParameterSubset
+        where TParam : IFunctionalCircuitParameter
         where TInterneuron : ICircuitInterneuronSet
     {
     }

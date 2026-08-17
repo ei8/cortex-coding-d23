@@ -5,22 +5,30 @@ using System.Runtime.CompilerServices;
 
 namespace ei8.Cortex.Coding.d23
 {
-    public class BinaryNeuronParameter : NeuronParameterBase
+    public class BinaryNeuronParameter
+    (
+        IEnumerable<NeuronInfo> neuronInfos, 
+        VariableInfo? variableInfo
+    ) : 
+        NeuronParameterBase
+        (
+            neuronInfos, 
+            variableInfo
+        )
     {
-        private BinaryNeuronParameter(IEnumerable<NeuronInfo> neuronInfos) : base(neuronInfos)
-        {
-        }
-
         public static BinaryNeuronParameter Create(
             string tagPrefix,
             string trueString = "1",
-            string falseString = "0"
+            string falseString = "0",
+            VariableInfo? variableInfo = null
         ) =>
-            new(
+            new
+            (
                 [
                     new(NetworkHelper.CreateNeuron($"{tagPrefix} = {trueString}")),
                     new(NetworkHelper.CreateNeuron($"{tagPrefix} = {falseString}"))
-                ]
+                ],
+                variableInfo
             );
 
         public static bool TryCreate(
@@ -36,14 +44,15 @@ namespace ei8.Cortex.Coding.d23
 
             if (VariableInfo.TryParse(parameterExpression, out var variableInfo))
             {
+                var fullTagPrefix = 
                 result = BinaryNeuronParameter.Create(
                     $"{tagPrefix}" +
                     (string.IsNullOrWhiteSpace(tagPrefix) ? string.Empty : ".") +
                     variableInfo.ToString(),
                     trueString,
-                    falseString
+                    falseString,
+                    variableInfo
                 );
-                result.VariableInfo = variableInfo;
                 bResult = true;
             }
 

@@ -5,18 +5,24 @@ using System.Runtime.CompilerServices;
 
 namespace ei8.Cortex.Coding.d23.Math.Logic
 {
-    public class NotGate : 
+    public class NotGate :
         LogicGateBase
         <
-            NotGate.Input, 
-            NotGate.Output, 
+            FunctionalCircuitParameter
+            <
+                NotGate.Input,
+                NotGate.Output
+            >,
             NotGate.InterneuronSet
-        >, 
+        >,
         ILogicGate
         <
-            NotGate, 
-            NotGate.Input, 
-            NotGate.Output, 
+            NotGate,
+            FunctionalCircuitParameter
+            <
+                NotGate.Input,
+                NotGate.Output
+            >,
             NotGate.InterneuronSet
         >
     {
@@ -158,7 +164,7 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
             NetworkHelper.AdditionalInputNeuronType additionalInputNeuronType = NetworkHelper.AdditionalInputNeuronType.And,
             params Neuron[] additionalInputs
         )
-            where T : ILogicGate<T, NotGate.Input, NotGate.Output, NotGate.InterneuronSet>
+            where T : ILogicGate<T, FunctionalCircuitParameter<NotGate.Input, NotGate.Output>, NotGate.InterneuronSet>
         {
             bool bResult = false;
             result = default;
@@ -184,7 +190,7 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
                             interneuronNetworks,
                             additionalInputNeuronType,
                             additionalInputs
-                        ).FromNetworks()
+                        ).Combine()
                     );
                 
                     result = T.Create(

@@ -3,17 +3,17 @@ using System.Runtime.CompilerServices;
 
 namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 {
-    public abstract class OperationBase<TInput, TOutput>(
-        FunctionalCircuitParameter<TInput, TOutput> parameters,
-        InterneuronSet interneurons,
+    public abstract class OperationBase<TParam, TInterneuron>(
+        TParam parameters,
+        TInterneuron interneurons,
         VariableInfo? variableInfo
-    ) : FunctionalCircuitBase<TInput, TOutput, InterneuronSet>(
+    ) : FunctionalCircuitBase<TParam, TInterneuron>(
         parameters,
         interneurons,
         variableInfo
     )
-        where TInput : IInputCircuitParameterSubset
-        where TOutput : IOutputCircuitParameterSubset
+        where TParam : IFunctionalCircuitParameter
+        where TInterneuron : ICircuitInterneuronSet
     {
         public static bool TryCreate<T>(
             [NotNullWhen(true)] out T? result,
@@ -22,7 +22,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
             VariableInfo? precedingVariableInfo = null,
             [CallerArgumentExpression(nameof(result))] string parameterExpression = ""
         )
-            where T : IOperation<T, TInput, TOutput, InterneuronSet>
+            where T : IOperation<T, TParam, TInterneuron>
         {
             bool bResult = false;
             result = default;

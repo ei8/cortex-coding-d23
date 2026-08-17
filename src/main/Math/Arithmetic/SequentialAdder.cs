@@ -6,15 +6,21 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
     public class SequentialAdder :
         SequentialOperationBase
         <
-            SequentialAdder.Input,
-            SequentialAdder.Output,
+            FunctionalCircuitParameter
+            <
+                SequentialAdder.Input,
+                SequentialAdder.Output
+            >,
             InterneuronSet
-        >, 
+        >,
         ISequentialOperation
         <
-            SequentialAdder, 
-            SequentialAdder.Input,
-            SequentialAdder.Output,
+            SequentialAdder,
+            FunctionalCircuitParameter
+            <
+                SequentialAdder.Input,
+                SequentialAdder.Output
+            >,
             InterneuronSet
         >
     {

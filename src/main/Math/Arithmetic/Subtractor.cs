@@ -4,7 +4,26 @@ using System.Linq;
 
 namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 {
-    public class Subtractor : OperationBase<Subtractor.Input, Subtractor.Output>, IOperation<Subtractor, Subtractor.Input, Subtractor.Output, InterneuronSet>
+    public class Subtractor : 
+        OperationBase
+        <
+            FunctionalCircuitParameter
+            <
+                Subtractor.Input, 
+                Subtractor.Output
+            >,
+            InterneuronSet
+        >, 
+        IOperation
+        <
+            Subtractor, 
+            FunctionalCircuitParameter
+            <
+                Subtractor.Input, 
+                Subtractor.Output
+            >, 
+            InterneuronSet
+        >
     {
         public class Input(
             BinaryNeuronParameter? minuend,

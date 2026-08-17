@@ -5,33 +5,31 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
     public interface IOperation
     <
         T, 
-        TInput, 
-        TOutput, 
+        TParam, 
         TInterneuron
     > : 
         ICircuit
         <
-            FunctionalCircuitParameter<TInput, TOutput>, 
+            TParam, 
             TInterneuron
         >
-        where T : ICircuit<FunctionalCircuitParameter<TInput, TOutput>, TInterneuron>
-        where TInput : IInputCircuitParameterSubset
-        where TOutput : IOutputCircuitParameterSubset
+        where T : ICircuit<TParam, TInterneuron>
+        where TParam : IFunctionalCircuitParameter
         where TInterneuron : ICircuitInterneuronSet
     {
-        static abstract FunctionalCircuitParameter<TInput, TOutput> GetDefaultParameters(
+        static abstract TParam GetDefaultParameters(
             BinaryNeuronParameter? precedingValue,
             int exponent
         );
 
         static abstract TInterneuron CreateInterneurons(
-            FunctionalCircuitParameter<TInput, TOutput> parameters,
+            TParam parameters,
             VariableInfo variableInfo,
             VariableInfo? precedingVariableInfo = null
         );
 
         static abstract T Create(
-            FunctionalCircuitParameter<TInput, TOutput> parameters,
+            TParam parameters,
             TInterneuron interneurons,
             VariableInfo? variableInfo
         );

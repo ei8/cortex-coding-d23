@@ -5,43 +5,33 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
     public interface ISequentialOperation
     <
         T, 
-        TInput, 
-        TOutput,
+        TParam,
         TInterneuron
     > : 
         ICircuit
         <
-            FunctionalCircuitParameter
-            <
-                TInput, 
-                TOutput
-            >,
+            TParam,
             TInterneuron
         >
         where T : 
             ICircuit
             <
-                FunctionalCircuitParameter
-                <
-                    TInput, 
-                    TOutput
-                >,
+                TParam,
                 TInterneuron
             >
-        where TInput : IInputCircuitParameterSubset
-        where TOutput : IOutputCircuitParameterSubset
+        where TParam : IFunctionalCircuitParameter
         where TInterneuron : ICircuitInterneuronSet
     {
         static abstract TInterneuron CreateInterneurons
         (
-            FunctionalCircuitParameter<TInput, TOutput> parameters,
+            TParam parameters,
             VariableInfo variableInfo,
             VariableInfo? precedingVariableInfo = null
         );
 
         static abstract T Create
         (
-            FunctionalCircuitParameter<TInput, TOutput> parameters,
+            TParam parameters,
             TInterneuron interneurons,
             VariableInfo? variableInfo
         );

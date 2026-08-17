@@ -6,6 +6,6 @@ namespace ei8.Cortex.Coding.d23
     {
         protected abstract IEnumerable<ReadOnlyNetwork> GetNetworks();
 
-        public ReadOnlyNetwork Network => this.GetNetworks().FromNetworks();
+        public ReadOnlyNetwork Network => this.GetNetworks().Combine();
     }
 }

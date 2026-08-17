@@ -1,20 +1,21 @@
-﻿
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace ei8.Cortex.Coding.d23
 {
-    public class UnaryNeuronParameter : NeuronParameterBase
+    public class UnaryNeuronParameter
+    (
+        IEnumerable<NeuronInfo> neuronInfos, 
+        VariableInfo? variableInfo
+    ) : 
+        NeuronParameterBase
+        (
+            neuronInfos, 
+            variableInfo
+        )
     {
-        private UnaryNeuronParameter(IEnumerable<NeuronInfo> neuronInfos) : base(neuronInfos)
-        {
-        }
-
-        public static UnaryNeuronParameter Create(string tag) =>
-            new([new(NetworkHelper.CreateNeuron(tag))]);
-
         public static bool TryCreate(
             [NotNullWhen(true)] out UnaryNeuronParameter? result,
             string? tagPrefix = null,
@@ -26,12 +27,21 @@ namespace ei8.Cortex.Coding.d23
 
             if (VariableInfo.TryParse(parameterExpression, out var variableInfo))
             {
-                result = UnaryNeuronParameter.Create(
-                    $"{tagPrefix}" +
-                    (string.IsNullOrWhiteSpace(tagPrefix) ? string.Empty : ".") +
-                    variableInfo.ToString()
+                result = new
+                (
+                    [
+                        new
+                        (
+                            NetworkHelper.CreateNeuron
+                            (
+                                $"{tagPrefix}" +
+                                (string.IsNullOrWhiteSpace(tagPrefix) ? string.Empty : ".") +
+                                variableInfo.ToString()
+                            )
+                        )
+                    ],
+                    variableInfo
                 );
-                result.VariableInfo = variableInfo;
                 bResult = true;
             }
 

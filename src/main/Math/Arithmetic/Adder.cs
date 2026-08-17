@@ -4,17 +4,20 @@ using System.Linq;
 
 namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 {
-    public class Adder : 
+    public class Adder :
         OperationBase
         <
-            Adder.Input, 
-            Adder.Output
+            FunctionalCircuitParameter
+            <
+                Adder.Input,
+                Adder.Output
+            >,
+            InterneuronSet
         >, 
         IOperation
         <
-            Adder, 
-            Adder.Input, 
-            Adder.Output,
+            Adder,
+            FunctionalCircuitParameter<Adder.Input, Adder.Output>,
             InterneuronSet
         >
     {

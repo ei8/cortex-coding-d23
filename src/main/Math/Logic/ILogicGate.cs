@@ -2,10 +2,9 @@
 
 namespace ei8.Cortex.Coding.d23.Math.Logic
 {
-    public interface ILogicGate<T, TInput, TOutput, TInterneuron> : ICircuit<FunctionalCircuitParameter<TInput, TOutput>, TInterneuron>
-        where T : ICircuit<FunctionalCircuitParameter<TInput, TOutput>, TInterneuron>
-        where TInput : IInputCircuitParameterSubset
-        where TOutput : IOutputCircuitParameterSubset
+    public interface ILogicGate<T, TParam, TInterneuron> : ICircuit<TParam, TInterneuron>
+        where T : ICircuit<TParam, TInterneuron>
+        where TParam : IFunctionalCircuitParameter
         where TInterneuron : ICircuitInterneuronSet
     {
         static abstract IEnumerable<Neuron> GetInterneuronOutputs(BinaryNeuronParameter output);
@@ -16,13 +15,13 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
         );
 
         static abstract T Create(
-            FunctionalCircuitParameter<TInput, TOutput> parameters,
+            TParam parameters,
             TInterneuron interneurons,
             VariableInfo? variableInfo
         );
 
         static abstract IEnumerable<ReadOnlyNetwork> LinkInputNeurons(
-            FunctionalCircuitParameter<TInput, TOutput> parameters,
+            TParam parameters,
             IEnumerable<ReadOnlyNetwork> interneuronNetworks,
             NetworkHelper.AdditionalInputNeuronType additionalInputNeuronType = NetworkHelper.AdditionalInputNeuronType.And,
             params Neuron[] additionalInputs

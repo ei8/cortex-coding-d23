@@ -4,8 +4,15 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
 {
     public class AndGate : 
         DualInputLogicGateBase, 
-        ILogicGate<
-            AndGate, DualInputLogicGateBase.Input, DualInputLogicGateBase.Output, DualInputLogicGateBase.InterneuronSet
+        ILogicGate
+        <
+            AndGate, 
+            FunctionalCircuitParameter
+            <
+                DualInputLogicGateBase.Input, 
+                DualInputLogicGateBase.Output
+            >, 
+            DualInputLogicGateBase.InterneuronSet
         >
     {
         protected AndGate

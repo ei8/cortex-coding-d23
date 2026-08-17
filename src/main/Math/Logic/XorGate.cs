@@ -6,9 +6,12 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
         DualInputLogicGateBase,
         ILogicGate
         <
-            XorGate, 
-            DualInputLogicGateBase.Input, 
-            DualInputLogicGateBase.Output, 
+            XorGate,
+            FunctionalCircuitParameter
+            <
+                DualInputLogicGateBase.Input, 
+                DualInputLogicGateBase.Output
+            >,
             DualInputLogicGateBase.InterneuronSet
         >
     {

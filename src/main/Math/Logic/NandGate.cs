@@ -2,13 +2,16 @@
 
 namespace ei8.Cortex.Coding.d23.Math.Logic
 {
-    public class NandGate : 
-        DualInputLogicGateBase, 
+    public class NandGate :
+        DualInputLogicGateBase,
         ILogicGate
         <
-            NandGate, 
-            DualInputLogicGateBase.Input, 
-            DualInputLogicGateBase.Output,
+            NandGate,
+            FunctionalCircuitParameter
+            <
+                DualInputLogicGateBase.Input,
+                DualInputLogicGateBase.Output
+            >,
             DualInputLogicGateBase.InterneuronSet
         >
     {

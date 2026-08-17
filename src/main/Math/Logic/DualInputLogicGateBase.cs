@@ -7,11 +7,25 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
 {
     public abstract class DualInputLogicGateBase
     (
-        FunctionalCircuitParameter<DualInputLogicGateBase.Input, DualInputLogicGateBase.Output> parameters,
+        FunctionalCircuitParameter
+        <
+            DualInputLogicGateBase.Input, 
+            DualInputLogicGateBase.Output
+        >
+        parameters,
         DualInputLogicGateBase.InterneuronSet interneurons,
         VariableInfo? variableInfo
     ) : 
-        LogicGateBase<DualInputLogicGateBase.Input, DualInputLogicGateBase.Output, DualInputLogicGateBase.InterneuronSet>(
+        LogicGateBase
+        <
+            FunctionalCircuitParameter
+            <
+                DualInputLogicGateBase.Input, 
+                DualInputLogicGateBase.Output
+            >,
+            DualInputLogicGateBase.InterneuronSet
+        >
+        (
             parameters,
             interneurons,
             variableInfo
@@ -164,7 +178,7 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
             NetworkHelper.AdditionalInputNeuronType additionalInputNeuronType = NetworkHelper.AdditionalInputNeuronType.And,
             params Neuron[] additionalInputs
         )
-            where T : ILogicGate<T, DualInputLogicGateBase.Input, DualInputLogicGateBase.Output, InterneuronSet>
+            where T : ILogicGate<T, FunctionalCircuitParameter<DualInputLogicGateBase.Input, DualInputLogicGateBase.Output>, InterneuronSet>
         {
             bool bResult = false;
             result = default;
@@ -194,7 +208,7 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
                             interneuronNetworks,
                             additionalInputNeuronType,
                             additionalInputs
-                        ).FromNetworks()
+                        ).Combine()
                     );
 
                     result = T.Create
