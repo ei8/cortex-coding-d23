@@ -15,7 +15,7 @@ namespace ei8.Cortex.Coding.d23.Collections
         BiphasicNext.InterneuronSet interneurons,
         VariableInfo? variableInfo
     ) :
-        AdjacentBase
+        BiphasicAdjacentBase
         <
             FunctionalCircuitParameter
             <
@@ -29,7 +29,7 @@ namespace ei8.Cortex.Coding.d23.Collections
             interneurons,
             variableInfo
         ),
-        IAdjacent
+        IBiphasicAdjacent
         <
             BiphasicNext,
             FunctionalCircuitParameter
@@ -73,9 +73,26 @@ namespace ei8.Cortex.Coding.d23.Collections
 
         public static InterneuronSet CreateInterneurons
         (
-            FunctionalCircuitParameter<Next.Input, Next.Output> parameters, 
-            VariableInfo variableInfo, 
-            InterneuronSet? precedingInterneurons = null, 
+            FunctionalCircuitParameter<Next.Input, Next.Output> parameters,
+            VariableInfo variableInfo,
+            InterneuronSet? precedingInterneurons = null,
+            params Neuron[] additionalInputs
+        ) =>
+            BiphasicNext.CreateInterneurons
+            (
+                parameters,
+                variableInfo,
+                precedingInterneurons,
+                true,
+                additionalInputs
+            );
+
+        public static InterneuronSet CreateInterneurons
+        (
+            FunctionalCircuitParameter<Next.Input, Next.Output> parameters,
+            VariableInfo variableInfo,
+            InterneuronSet? precedingInterneurons = null,
+            bool linkPhaseInterneurons = false,
             params Neuron[] additionalInputs
         )
         {
@@ -88,7 +105,9 @@ namespace ei8.Cortex.Coding.d23.Collections
             var initiator = NetworkHelper.CreateInterneuronNetworkByOutputNeurons
             (
                 $"{variableInfo.Function}.{nameof(InterneuronSet.Initiator)}({variableInfo.Inputs.First()})",
-                completer.GetInterneuron()
+                linkPhaseInterneurons ?
+                    [completer.GetInterneuron()] :
+                    []
             );
 
             var inputNeurons = new List<NeuronInfo>

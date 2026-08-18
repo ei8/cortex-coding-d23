@@ -5,7 +5,12 @@ using System.Runtime.CompilerServices;
 
 namespace ei8.Cortex.Coding.d23.Math.Logic
 {
-    public class NotGate :
+    public class NotGate
+    (
+        FunctionalCircuitParameter<NotGate.Input, NotGate.Output> parameters,
+        NotGate.InterneuronSet interneurons,
+        VariableInfo? variableInfo
+    ) :
         LogicGateBase
         <
             FunctionalCircuitParameter
@@ -14,7 +19,12 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
                 NotGate.Output
             >,
             NotGate.InterneuronSet
-        >,
+        >
+        (
+            parameters,
+            interneurons,
+            variableInfo
+        ),
         ILogicGate
         <
             NotGate,
@@ -65,21 +75,6 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
             public ReadOnlyNetwork Interneuron1 = interneuron1;
             public ReadOnlyNetwork Interneuron2 = interneuron2;
             public ReadOnlyNetwork LinkedInputNeurons = linkedInputNeurons;
-        }
-
-        protected NotGate
-        (
-            FunctionalCircuitParameter<NotGate.Input, NotGate.Output> parameters,
-            NotGate.InterneuronSet interneurons,
-            VariableInfo? variableInfo
-        ) : 
-            base
-            (
-                parameters,
-                interneurons,
-                variableInfo
-            )
-        {
         }
 
         public static NotGate Create(

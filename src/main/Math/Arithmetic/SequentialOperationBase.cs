@@ -3,24 +3,23 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 {
-    public class SequentialOperationBase<TParam, TInterneuron> : FunctionalCircuitBase<TParam, TInterneuron>
-        where TParam : IFunctionalCircuitParameter
-        where TInterneuron : ICircuitInterneuronSet
-    {
-        protected SequentialOperationBase(
-            TParam parameters,
-            TInterneuron interneurons,
-            VariableInfo? variableInfo
-        ) :
-        base(
+    public class SequentialOperationBase<TParam, TInterneuron>
+    (
+        TParam parameters,
+        TInterneuron interneurons,
+        VariableInfo? variableInfo
+    ) : 
+        FunctionalCircuitBase<TParam, TInterneuron>
+        (
             parameters,
             interneurons,
             variableInfo
         )
-        {
-        }
-
-        public static bool TryCreate<T>(
+        where TParam : IFunctionalCircuitParameter
+        where TInterneuron : ICircuitInterneuronSet
+    {
+        public static bool TryCreate<T>
+        (
             [NotNullWhen(true)] out T? tryResult,
             TParam parameters,
             TInterneuron interneurons,

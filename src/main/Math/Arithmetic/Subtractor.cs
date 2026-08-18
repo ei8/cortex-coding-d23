@@ -4,7 +4,12 @@ using System.Linq;
 
 namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 {
-    public class Subtractor : 
+    public class Subtractor
+    (
+        FunctionalCircuitParameter<Subtractor.Input, Subtractor.Output> parameters,
+        InterneuronSet interneurons,
+        VariableInfo? variableInfo
+    ) : 
         OperationBase
         <
             FunctionalCircuitParameter
@@ -13,7 +18,12 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                 Subtractor.Output
             >,
             InterneuronSet
-        >, 
+        >
+        (
+            parameters,
+            interneurons,
+            variableInfo
+        ), 
         IOperation
         <
             Subtractor, 
@@ -52,18 +62,6 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
         {
             public BinaryNeuronParameter? Difference => this.Parameter1;
             public BinaryNeuronParameter? Borrow => this.Parameter2;
-        }
-
-        protected Subtractor(
-            FunctionalCircuitParameter<Subtractor.Input, Subtractor.Output> parameters,
-            InterneuronSet interneurons,
-            VariableInfo? variableInfo
-        ) : base(
-            parameters,
-            interneurons,
-            variableInfo
-        )
-        {
         }
 
         public static Subtractor Create(

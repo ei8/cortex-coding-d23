@@ -4,7 +4,12 @@ using System.Linq;
 
 namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 {
-    public class Adder :
+    public class Adder
+    (
+        FunctionalCircuitParameter<Adder.Input, Adder.Output> parameters,
+        InterneuronSet interneurons,
+        VariableInfo? variableInfo
+    ) :
         OperationBase
         <
             FunctionalCircuitParameter
@@ -13,7 +18,12 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                 Adder.Output
             >,
             InterneuronSet
-        >, 
+        >
+        (
+            parameters,
+            interneurons,
+            variableInfo
+        ), 
         IOperation
         <
             Adder,
@@ -50,18 +60,6 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
         {
             public BinaryNeuronParameter? Sum => this.Parameter1;
             public BinaryNeuronParameter? CarryOver => this.Parameter2;
-        }
-
-        protected Adder(
-            FunctionalCircuitParameter<Input, Output> parameters,
-            InterneuronSet interneurons,
-            VariableInfo? variableInfo
-        ) : base(
-            parameters,
-            interneurons,
-            variableInfo
-        )
-        {
         }
 
         public static Adder Create(

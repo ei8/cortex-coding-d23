@@ -1,13 +1,14 @@
 ﻿namespace ei8.Cortex.Coding.d23.Collections
 {
-    public interface IAdjacent
+    public interface IBiphasicAdjacent
     <
         T, 
         TParam, 
         TInterneuron
     > : 
-        ICircuit
+        IAdjacent
         <
+            T, 
             TParam, 
             TInterneuron
         >
@@ -20,14 +21,8 @@
             TParam parameters,
             VariableInfo variableInfo,
             TInterneuron? precedingInterneurons = default,
+            bool linkPhaseInterneurons = false,
             params Neuron[] additionalInputs
-        );
-
-        static abstract T Create
-        (
-            TParam parameters,
-            TInterneuron interneurons,
-            VariableInfo? variableInfo
         );
     }
 }

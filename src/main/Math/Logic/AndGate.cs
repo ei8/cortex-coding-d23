@@ -2,8 +2,18 @@
 
 namespace ei8.Cortex.Coding.d23.Math.Logic
 {
-    public class AndGate : 
-        DualInputLogicGateBase, 
+    public class AndGate
+    (
+        FunctionalCircuitParameter<DualInputLogicGateBase.Input, DualInputLogicGateBase.Output> parameters,
+        DualInputLogicGateBase.InterneuronSet interneurons,
+        VariableInfo? variableInfo
+    ) : 
+        DualInputLogicGateBase
+        (
+            parameters,
+            interneurons,
+            variableInfo
+        ), 
         ILogicGate
         <
             AndGate, 
@@ -15,29 +25,18 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
             DualInputLogicGateBase.InterneuronSet
         >
     {
-        protected AndGate
+        public static AndGate Create
         (
             FunctionalCircuitParameter<DualInputLogicGateBase.Input, DualInputLogicGateBase.Output> parameters,
             DualInputLogicGateBase.InterneuronSet interneurons,
             VariableInfo? variableInfo
-        ) : base
+        ) => 
+            new
             (
                 parameters,
                 interneurons,
                 variableInfo
-            ) 
-        {
-        }
-
-        public static AndGate Create(
-            FunctionalCircuitParameter<DualInputLogicGateBase.Input, DualInputLogicGateBase.Output> parameters,
-            DualInputLogicGateBase.InterneuronSet interneurons,
-            VariableInfo? variableInfo
-        ) => new(
-            parameters,
-            interneurons,
-            variableInfo
-        );
+            );
         
         public static IEnumerable<Neuron> GetInterneuronOutputs(BinaryNeuronParameter output) =>
         [

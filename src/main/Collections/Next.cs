@@ -89,8 +89,9 @@ namespace ei8.Cortex.Coding.d23.Collections
                 [parameters.Outputs.Next!.Neuron]
             );
 
-            return new InterneuronSet
-            (
+            interneuronToNext = ((IEnumerable<ReadOnlyNetwork>)
+            [
+                interneuronToNext,
                 Next.LinkInputNeurons
                 (
                     parameters.Inputs.Function!,
@@ -99,7 +100,9 @@ namespace ei8.Cortex.Coding.d23.Collections
                     precedingInterneurons,
                     additionalInputs
                 )
-            );
+            ]).Combine();
+
+            return new InterneuronSet(interneuronToNext);
         }
 
         private static ReadOnlyNetwork LinkInputNeurons

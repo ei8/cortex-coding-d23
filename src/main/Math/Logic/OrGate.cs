@@ -2,8 +2,18 @@
 
 namespace ei8.Cortex.Coding.d23.Math.Logic
 {
-    public class OrGate : 
-        DualInputLogicGateBase, 
+    public class OrGate
+    (
+        FunctionalCircuitParameter<DualInputLogicGateBase.Input, DualInputLogicGateBase.Output> parameters,
+        DualInputLogicGateBase.InterneuronSet interneurons,
+        VariableInfo? variableInfo
+    ) : 
+        DualInputLogicGateBase
+        (
+            parameters,
+            interneurons,
+            variableInfo
+        ), 
         ILogicGate
         <
             OrGate, 
@@ -14,21 +24,6 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
             DualInputLogicGateBase.InterneuronSet
         >
     {
-        protected OrGate
-        (
-            FunctionalCircuitParameter<DualInputLogicGateBase.Input, DualInputLogicGateBase.Output> parameters,
-            DualInputLogicGateBase.InterneuronSet interneurons,
-            VariableInfo? variableInfo
-        ) : 
-            base
-            (
-                parameters,
-                interneurons,
-                variableInfo
-            )
-        {
-        }
-
         public static OrGate Create
         (
             FunctionalCircuitParameter<DualInputLogicGateBase.Input, DualInputLogicGateBase.Output> parameters,

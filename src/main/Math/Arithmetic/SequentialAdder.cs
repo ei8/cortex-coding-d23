@@ -3,7 +3,12 @@ using System.Linq;
 
 namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 {
-    public class SequentialAdder :
+    public class SequentialAdder
+    (
+        FunctionalCircuitParameter<SequentialAdder.Input, SequentialAdder.Output> parameters,
+        SequentialInterneuronSet interneurons,
+        VariableInfo? variableInfo
+    ) :
         SequentialOperationBase
         <
             FunctionalCircuitParameter
@@ -12,7 +17,12 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                 SequentialAdder.Output
             >,
             SequentialInterneuronSet
-        >,
+        >
+        (
+            parameters,
+            interneurons,
+            variableInfo
+        ),
         ISequentialOperation
         <
             SequentialAdder,
@@ -75,29 +85,21 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
             public BinaryNeuronParameter? CarryOver { get; } = carryOver;
         }
 
-        protected SequentialAdder(
+        public static SequentialAdder Create
+        (
             FunctionalCircuitParameter<Input, Output> parameters,
             SequentialInterneuronSet interneurons,
             VariableInfo? variableInfo
-        ) : base(
-            parameters,
-            interneurons,
-            variableInfo
-        )
-        {
-        }
+        ) => 
+            new
+            (
+                parameters,
+                interneurons,
+                variableInfo
+            );
 
-        public static SequentialAdder Create(
-            FunctionalCircuitParameter<Input, Output> parameters,
-            SequentialInterneuronSet interneurons,
-            VariableInfo? variableInfo
-        ) => new(
-            parameters,
-            interneurons,
-            variableInfo
-        );
-
-        public static SequentialInterneuronSet CreateInterneurons(
+        public static SequentialInterneuronSet CreateInterneurons
+        (
             FunctionalCircuitParameter<Input, Output> parameters,
             VariableInfo variableInfo,
             VariableInfo? precedingVariableInfo = null
