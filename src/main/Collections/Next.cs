@@ -81,8 +81,9 @@ namespace ei8.Cortex.Coding.d23.Collections
         (
             FunctionalCircuitParameter<Input, Output> parameters,
             VariableInfo variableInfo,
+            float inputStrength = 0.5f,
             InterneuronSet? precedingInterneurons = default,
-            params Neuron[] additionalInputs
+            params NeuronInfo[] additionalInputs
         )
         {
             ArgumentNullException.ThrowIfNull(parameters.Outputs.Next);
@@ -99,9 +100,9 @@ namespace ei8.Cortex.Coding.d23.Collections
                 interneuronToNext,
                 Next.LinkInputNeurons
                 (
-                    parameters.Inputs.Function,
-                    parameters.Inputs.Current,
+                    parameters,
                     interneuronToNext,
+                    inputStrength,
                     precedingInterneurons,
                     additionalInputs
                 )
@@ -112,18 +113,21 @@ namespace ei8.Cortex.Coding.d23.Collections
 
         private static ReadOnlyNetwork LinkInputNeurons
         (
-            UnaryNeuronParameter function,
-            UnaryNeuronParameter current,
+            FunctionalCircuitParameter<Input, Output> parameters,
             ReadOnlyNetwork interneuronToNext,
+            float inputStrength,
             InterneuronSet? precedingInterneurons = default,
-            params Neuron[] additionalInputs
+            params NeuronInfo[] additionalInputNeuronInfos
         )
         {
+            ArgumentNullException.ThrowIfNull(parameters.Inputs.Function);
+            ArgumentNullException.ThrowIfNull(parameters.Inputs.Current);
+
             var inputNeurons = new List<NeuronInfo>
             (
                 [
-                    new(function.Neuron),
-                    new(current.Neuron)
+                    new(parameters.Inputs.Function.Neuron, NeurotransmitterEffect.Excite, inputStrength),
+                    new(parameters.Inputs.Current.Neuron, NeurotransmitterEffect.Excite, inputStrength)
                 ]
             );
             if (precedingInterneurons != null)
@@ -132,15 +136,16 @@ namespace ei8.Cortex.Coding.d23.Collections
                     new NeuronInfo
                     (
                         precedingInterneurons.Interneuron.GetInterneuron(),
-                        1f,
-                        NeurotransmitterEffect.Inhibit
+                        NeurotransmitterEffect.Inhibit,
+                        1f
                     )
                 );
 
             return NetworkHelper.LinkInputNeuronsToInterneuron(
                 interneuronToNext.GetInterneuron(),
                 [.. inputNeurons],
-                additionalInputNeuronInfos: [.. additionalInputs.Select(n => new NeuronInfo(n))]
+                NetworkHelper.AdditionalInputNeuronStrengthMode.Manual,
+                additionalInputNeuronInfos
             );
         }
     }

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace ei8.Cortex.Coding.d23.Math.Arithmetic
@@ -9,17 +10,17 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
     public class SequentialAdder
     (
         SequentialAdder.AugmentationInfo augmentation,
-        BiphasicNext biphasicNext,
+        Next next,
         Adder adder,
         VariableInfo? variableInfo
     ) : 
         CompositeCircuitBase
         <
-            BiphasicNext, 
+            Next, 
             Adder
         >
         (
-            biphasicNext,
+            next,
             adder,
             variableInfo
         ),
@@ -27,21 +28,15 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
         <
             SequentialAdder,
             SequentialAdder.AugmentationInfo,
-            BiphasicNext,
+            Next,
             Adder
         >
     {
-        public class AugmentationInfo(ReadOnlyNetwork initiatorPostsynapticTerminals, ReadOnlyNetwork completerPresynapticTerminals) : AugmentationBase
+        public class AugmentationInfo(ReadOnlyNetwork interneuronPresynapticTerminals) : AugmentationBase
         {
-            protected override IEnumerable<ReadOnlyNetwork> GetNetworks() =>
-                [
-                    this.InitiatorPostsynapticTerminals,
-                    this.CompleterPresynapticTerminals
-                ];
+            protected override IEnumerable<ReadOnlyNetwork> GetNetworks() => [this.InterneuronPresynapticTerminals];
 
-            public ReadOnlyNetwork InitiatorPostsynapticTerminals { get; } = initiatorPostsynapticTerminals;
-
-            public ReadOnlyNetwork CompleterPresynapticTerminals { get; } = completerPresynapticTerminals;
+            public ReadOnlyNetwork InterneuronPresynapticTerminals { get; } = interneuronPresynapticTerminals;
         }
 
         protected override IEnumerable<ReadOnlyNetwork> GetNetworks() =>
@@ -50,14 +45,14 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
         public static SequentialAdder Create
         (
             AugmentationInfo augmentation,
-            BiphasicNext biphasicNext,
+            Next next,
             Adder adder,
             VariableInfo? variableInfo
         ) =>
             new
             (
                 augmentation,
-                biphasicNext,
+                next,
                 adder,
                 variableInfo
             );
@@ -65,7 +60,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
         public static bool TryCreate<T>
         (
             [NotNullWhen(true)] out T? result,
-            BiphasicNext biphasicNext,
+            Next next,
             Adder adder,
             VariableInfo? precedingVariableInfo = null,
             [CallerArgumentExpression(nameof(result))] string parameterExpression = ""
@@ -75,7 +70,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                 <
                     T,
                     SequentialAdder.AugmentationInfo,
-                    BiphasicNext,
+                    Next,
                     Adder
                 >
         {
@@ -87,44 +82,26 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                 ArgumentNullException.ThrowIfNull(adder.Parameters.Inputs.Addend1);
                 ArgumentNullException.ThrowIfNull(adder.Parameters.Inputs.Addend2);
                 ArgumentNullException.ThrowIfNull(adder.Parameters.Outputs.Sum);
-
-                var initiatorInterneuron = biphasicNext.Interneurons.Initiator.GetInterneuron();
-                var initiatorPostsynapticTerminals = NetworkHelper.CreateTerminals
-                (
-                    [initiatorInterneuron],
-                    (
-                        (IEnumerable<IneurUL>)
-                        [
-                            adder.Parameters.Inputs.Addend1,
-                            adder.Parameters.Inputs.Addend2
-                        ]
-                    ).Combine().GetItems<Neuron>(),
-                    NeurotransmitterEffect.Excite,
-                    0.5f
-                ).ToNetwork();
-
-                var completerInterneuron = biphasicNext.Interneurons.Completer.GetInterneuron();
-                var completerPresynapticTerminals = NetworkHelper.CreateTerminals
-                (
-                    (
-                        (IEnumerable<IneurUL>)
-                        [
-                            adder.Parameters.Outputs.Sum
-                        ]
-                    ).Combine().GetItems<Neuron>(),
-                    [completerInterneuron],
-                    NeurotransmitterEffect.Excite,
-                    0.5f
-                ).ToNetwork();
+                ArgumentNullException.ThrowIfNull(adder.Parameters.Outputs.CarryOver);
 
                 result = T.Create
                 (
                     new
                     (
-                        initiatorPostsynapticTerminals,
-                        completerPresynapticTerminals
+                        NetworkHelper.LinkInputNeuronsToInterneuron
+                        (
+                            next.Interneurons.Interneuron.GetInterneuron(),
+                            (
+                                (IEnumerable<IneurUL>)
+                                [
+                                    adder.Parameters.Outputs.Sum,
+                                    adder.Parameters.Outputs.CarryOver
+                                ]
+                            ).Combine().GetItems<Neuron>().Select(n => new NeuronInfo(n, NeurotransmitterEffect.Excite, 0.25f)),
+                            NetworkHelper.AdditionalInputNeuronStrengthMode.Manual
+                        )
                     ),
-                    biphasicNext,
+                    next,
                     adder,
                     variableInfo
                 );
@@ -135,5 +112,9 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
         }
 
         public SequentialAdder.AugmentationInfo Augmentation { get; } = augmentation;
+
+        public Next Next => this.Circuit1;
+
+        public Adder Adder => this.Circuit2;
     }
 }

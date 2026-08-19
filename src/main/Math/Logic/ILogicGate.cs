@@ -27,7 +27,7 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
         static abstract IEnumerable<ReadOnlyNetwork> LinkInputNeurons(
             TParam parameters,
             IEnumerable<ReadOnlyNetwork> interneuronNetworks,
-            NetworkHelper.AdditionalInputNeuronType additionalInputNeuronType = NetworkHelper.AdditionalInputNeuronType.And,
+            NetworkHelper.AdditionalInputNeuronStrengthMode additionalInputNeuronType = NetworkHelper.AdditionalInputNeuronStrengthMode.And,
             params Neuron[] additionalInputs
         );
     }

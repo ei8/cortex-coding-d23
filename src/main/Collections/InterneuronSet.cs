@@ -14,6 +14,6 @@ namespace ei8.Cortex.Coding.d23.Collections
             this.Interneuron
         ];
 
-        public ReadOnlyNetwork Interneuron = interneuron;
+        public ReadOnlyNetwork Interneuron { get; } = interneuron;
     }
 }

@@ -12,10 +12,11 @@ namespace ei8.Cortex.Coding.d23
     // TODO: Use C# 14+ Extension Members and attach to Neuron and Terminal classes
     public static class NetworkHelper
     {
-        public enum AdditionalInputNeuronType
+        public enum AdditionalInputNeuronStrengthMode
         {
             Or,
-            And
+            And,
+            Manual
         }
 
         public static IEnumerable<ReadOnlyNetwork> ConvertToNetworks(params IneurUL?[] neurULs) =>
@@ -113,7 +114,7 @@ namespace ei8.Cortex.Coding.d23
         (
             Neuron interneuron,
             IEnumerable<NeuronInfo> inputNeuronInfos,
-            AdditionalInputNeuronType additionalInputNeuronType = AdditionalInputNeuronType.And,
+            AdditionalInputNeuronStrengthMode additionalInputNeuronStrengthMode = AdditionalInputNeuronStrengthMode.And,
             params NeuronInfo[] additionalInputNeuronInfos
         )
         {
@@ -124,7 +125,7 @@ namespace ei8.Cortex.Coding.d23
                 inputNeuronInfos,
                 network,
                 NeurotransmitterEffect.Excite,
-                additionalInputNeuronType,
+                additionalInputNeuronStrengthMode,
                 additionalInputNeuronInfos
             );
             NetworkHelper.LinkInputNeuronsToInterneuronByEffect
@@ -133,7 +134,7 @@ namespace ei8.Cortex.Coding.d23
                 inputNeuronInfos,
                 network,
                 NeurotransmitterEffect.Inhibit,
-                additionalInputNeuronType,
+                additionalInputNeuronStrengthMode,
                 additionalInputNeuronInfos
             );
             return network;
@@ -145,7 +146,7 @@ namespace ei8.Cortex.Coding.d23
             IEnumerable<NeuronInfo> inputNeuronInfos,
             Network network,
             NeurotransmitterEffect effect,
-            AdditionalInputNeuronType additionalInputNeuronType,
+            AdditionalInputNeuronStrengthMode additionalInputNeuronStrengthMode,
             NeuronInfo[] additionalInputNeuronInfos
         )
         {
@@ -153,19 +154,28 @@ namespace ei8.Cortex.Coding.d23
                 .Concat(additionalInputNeuronInfos)
                 .Where(i => i.Effect == effect);
 
-            var strengthDivisor = additionalInputNeuronType == AdditionalInputNeuronType.And ?
-                inputNeurons.Count() :
-                inputNeuronInfos.Count() + (additionalInputNeuronInfos.Length > 0 ? 1 : 0);
-
             foreach (var input in inputNeurons)
-                network.AddReplace(NetworkHelper.CreateTerminal
+            {
+                float strength = input.Strength;
+
+                if (additionalInputNeuronStrengthMode != AdditionalInputNeuronStrengthMode.Manual)
+                {
+                    var strengthDivisor = additionalInputNeuronStrengthMode == AdditionalInputNeuronStrengthMode.And ?
+                    inputNeurons.Count() :
+                    inputNeuronInfos.Count() + (additionalInputNeuronInfos.Length > 0 ? 1 : 0);
+                    strength =  input.Strength / strengthDivisor;
+                }
+
+                network.AddReplace(
+                    NetworkHelper.CreateTerminal
                     (
-                        input.Neuron, 
-                        interneuron, 
-                        input.Effect, 
-                        input.Strength / strengthDivisor
+                        input.Neuron,
+                        interneuron,
+                        input.Effect,
+                        strength
                     )
                 );
+            }
         }
 
         public static ReadOnlyNetwork CreateInputNeuronNetwork(MirrorConfig mirrorConfig, float strengthToInterneurons, params ReadOnlyNetwork[] interneurons) =>

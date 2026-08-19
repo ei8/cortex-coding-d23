@@ -26,10 +26,11 @@ namespace ei8.Cortex.Coding.d23.Collections
         (
             [NotNullWhen(true)] out T? result,
             TParam parameters,
+            float inputStrength = 0.5f,
             TInterneuron? precedingInterneurons = default,
             float interPhaseStrength = 1f,
             [CallerArgumentExpression(nameof(result))] string parameterExpression = "",
-            params Neuron[] additionalInputs
+            params NeuronInfo[] additionalInputs
         )
             where T : IBiphasicAdjacent<T, TParam, TInterneuron>
         {
@@ -43,6 +44,7 @@ namespace ei8.Cortex.Coding.d23.Collections
                     T.CreateInterneurons(
                         parameters,
                         variableInfo,
+                        inputStrength,
                         precedingInterneurons,
                         interPhaseStrength,
                         additionalInputs

@@ -19,8 +19,9 @@
         (
             TParam parameters,
             VariableInfo variableInfo,
+            float inputStrength = 0.5f,
             TInterneuron? precedingInterneurons = default,
-            params Neuron[] additionalInputs
+            params NeuronInfo[] additionalInputNeuronInfos
         );
 
         static abstract T Create

@@ -76,13 +76,15 @@ namespace ei8.Cortex.Coding.d23.Collections
         (
             FunctionalCircuitParameter<Next.Input, Next.Output> parameters,
             VariableInfo variableInfo,
+            float inputStrength = 0.5f,
             InterneuronSet? precedingInterneurons = null,
-            params Neuron[] additionalInputs
+            params NeuronInfo[] additionalInputs
         ) =>
             BiphasicNext.CreateInterneurons
             (
                 parameters,
                 variableInfo,
+                inputStrength,
                 precedingInterneurons,
                 1f,
                 additionalInputs
@@ -92,9 +94,10 @@ namespace ei8.Cortex.Coding.d23.Collections
         (
             FunctionalCircuitParameter<Next.Input, Next.Output> parameters,
             VariableInfo variableInfo,
+            float inputStrength = 0.5f,
             InterneuronSet? precedingInterneurons = null,
             float interPhaseStrength = 1f,
-            params Neuron[] additionalInputs
+            params NeuronInfo[] additionalInputs
         )
         {
             ArgumentNullException.ThrowIfNull(parameters.Outputs.Next);
@@ -117,8 +120,8 @@ namespace ei8.Cortex.Coding.d23.Collections
             var inputNeurons = new List<NeuronInfo>
             (
                 [
-                    new(parameters.Inputs.Function.Neuron),
-                    new(parameters.Inputs.Current.Neuron)
+                    new(parameters.Inputs.Function.Neuron, NeurotransmitterEffect.Excite, inputStrength),
+                    new(parameters.Inputs.Current.Neuron, NeurotransmitterEffect.Excite, inputStrength)
                 ]
             );
 
@@ -128,15 +131,16 @@ namespace ei8.Cortex.Coding.d23.Collections
                     new NeuronInfo
                     (
                         precedingInterneurons.Initiator.GetInterneuron(),
-                        1f,
-                        NeurotransmitterEffect.Inhibit
+                        NeurotransmitterEffect.Inhibit,
+                        1f
                     )
                 );
 
             var interneuronFromInputsToInitiator = NetworkHelper.LinkInputNeuronsToInterneuron(
                 initiator.GetInterneuron(),
                 [.. inputNeurons],
-                additionalInputNeuronInfos: [.. additionalInputs.Select(n => new NeuronInfo(n))]
+                NetworkHelper.AdditionalInputNeuronStrengthMode.Manual,
+                additionalInputs
             );
             
             initiator = ((IEnumerable<ReadOnlyNetwork>) [initiator, interneuronFromInputsToInitiator]).Combine();

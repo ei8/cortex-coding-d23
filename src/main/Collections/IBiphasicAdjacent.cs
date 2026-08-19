@@ -20,9 +20,10 @@
         (
             TParam parameters,
             VariableInfo variableInfo,
+            float inputStrength = 0.5f,
             TInterneuron? precedingInterneurons = default,
             float interPhaseStrength = 1f,
-            params Neuron[] additionalInputs
+            params NeuronInfo[] additionalInputs
         );
     }
 }

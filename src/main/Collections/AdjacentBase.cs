@@ -26,9 +26,10 @@ namespace ei8.Cortex.Coding.d23.Collections
         (
             [NotNullWhen(true)] out T? result,
             TParam parameters,
+            float inputStrength = 0.5f,
             TInterneuron? precedingInterneurons = default,
             [CallerArgumentExpression(nameof(result))] string parameterExpression = "",
-            params Neuron[] additionalInputs
+            params NeuronInfo[] additionalInputNeuronInfos
         ) 
             where T : IAdjacent<T, TParam, TInterneuron>
         {
@@ -42,8 +43,9 @@ namespace ei8.Cortex.Coding.d23.Collections
                     T.CreateInterneurons(
                         parameters,
                         variableInfo,
+                        inputStrength,
                         precedingInterneurons,
-                        additionalInputs
+                        additionalInputNeuronInfos
                     ),
                     variableInfo
                 );
