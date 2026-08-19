@@ -109,7 +109,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
             BinaryNeuronParameter? addend2,
             BinaryNeuronParameter? sum,
             BinaryNeuronParameter? carryOver,
-            NetworkHelper.AdditionalInputNeuronStrengthMode additionalInputNeuronType = NetworkHelper.AdditionalInputNeuronStrengthMode.And,
+            NetworkHelper.InputNeuronStrengthMode additionalInputNeuronType = NetworkHelper.InputNeuronStrengthMode.And,
             params Neuron[] additionalInputs
         )
         {
@@ -232,7 +232,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
             BinaryNeuronParameter? xorOutput,
             BinaryNeuronParameter? andOutput,
             string prefix,
-            NetworkHelper.AdditionalInputNeuronStrengthMode additionalInputNeuronType = NetworkHelper.AdditionalInputNeuronStrengthMode.And,
+            NetworkHelper.InputNeuronStrengthMode additionalInputNeuronType = NetworkHelper.InputNeuronStrengthMode.And,
             params Neuron[] additionalInputs
         )
         {

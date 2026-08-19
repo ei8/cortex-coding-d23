@@ -12,7 +12,7 @@ namespace ei8.Cortex.Coding.d23
     // TODO: Use C# 14+ Extension Members and attach to Neuron and Terminal classes
     public static class NetworkHelper
     {
-        public enum AdditionalInputNeuronStrengthMode
+        public enum InputNeuronStrengthMode
         {
             Or,
             And,
@@ -114,7 +114,7 @@ namespace ei8.Cortex.Coding.d23
         (
             Neuron interneuron,
             IEnumerable<NeuronInfo> inputNeuronInfos,
-            AdditionalInputNeuronStrengthMode additionalInputNeuronStrengthMode = AdditionalInputNeuronStrengthMode.And,
+            InputNeuronStrengthMode additionalInputNeuronStrengthMode = InputNeuronStrengthMode.And,
             params NeuronInfo[] additionalInputNeuronInfos
         )
         {
@@ -146,7 +146,7 @@ namespace ei8.Cortex.Coding.d23
             IEnumerable<NeuronInfo> inputNeuronInfos,
             Network network,
             NeurotransmitterEffect effect,
-            AdditionalInputNeuronStrengthMode additionalInputNeuronStrengthMode,
+            InputNeuronStrengthMode additionalInputNeuronStrengthMode,
             NeuronInfo[] additionalInputNeuronInfos
         )
         {
@@ -158,9 +158,9 @@ namespace ei8.Cortex.Coding.d23
             {
                 float strength = input.Strength;
 
-                if (additionalInputNeuronStrengthMode != AdditionalInputNeuronStrengthMode.Manual)
+                if (additionalInputNeuronStrengthMode != InputNeuronStrengthMode.Manual)
                 {
-                    var strengthDivisor = additionalInputNeuronStrengthMode == AdditionalInputNeuronStrengthMode.And ?
+                    var strengthDivisor = additionalInputNeuronStrengthMode == InputNeuronStrengthMode.And ?
                     inputNeurons.Count() :
                     inputNeuronInfos.Count() + (additionalInputNeuronInfos.Length > 0 ? 1 : 0);
                     strength =  input.Strength / strengthDivisor;

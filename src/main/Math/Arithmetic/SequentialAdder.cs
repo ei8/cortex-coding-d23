@@ -62,6 +62,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
             [NotNullWhen(true)] out T? result,
             Next next,
             Adder adder,
+            float inputStrength,
             VariableInfo? precedingVariableInfo = null,
             [CallerArgumentExpression(nameof(result))] string parameterExpression = ""
         )
@@ -97,8 +98,8 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                                     adder.Parameters.Outputs.Sum,
                                     adder.Parameters.Outputs.CarryOver
                                 ]
-                            ).Combine().GetItems<Neuron>().Select(n => new NeuronInfo(n, NeurotransmitterEffect.Excite, 0.25f)),
-                            NetworkHelper.AdditionalInputNeuronStrengthMode.Manual
+                            ).Combine().GetItems<Neuron>().Select(n => new NeuronInfo(n, NeurotransmitterEffect.Excite, inputStrength)),
+                            NetworkHelper.InputNeuronStrengthMode.Manual
                         )
                     ),
                     next,

@@ -115,7 +115,7 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
         public static IEnumerable<ReadOnlyNetwork> LinkInputNeurons(
             FunctionalCircuitParameter<NotGate.Input, NotGate.Output> parameters, 
             IEnumerable<ReadOnlyNetwork> interneuronNetworks,
-            NetworkHelper.AdditionalInputNeuronStrengthMode additionalInputNeuronType = NetworkHelper.AdditionalInputNeuronStrengthMode.And,
+            NetworkHelper.InputNeuronStrengthMode additionalInputNeuronType = NetworkHelper.InputNeuronStrengthMode.And,
             params Neuron[] additionalInputs
         )
         {
@@ -156,7 +156,7 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
             FunctionalCircuitParameter<NotGate.Input, NotGate.Output> parameters,
             InterneuronTagInfo? interneuronTagInfo = null,
             [CallerArgumentExpression(nameof(result))] string parameterExpression = "",
-            NetworkHelper.AdditionalInputNeuronStrengthMode additionalInputNeuronType = NetworkHelper.AdditionalInputNeuronStrengthMode.And,
+            NetworkHelper.InputNeuronStrengthMode additionalInputNeuronType = NetworkHelper.InputNeuronStrengthMode.And,
             params Neuron[] additionalInputs
         )
             where T : ILogicGate<T, FunctionalCircuitParameter<NotGate.Input, NotGate.Output>, NotGate.InterneuronSet>

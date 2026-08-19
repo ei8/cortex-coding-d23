@@ -139,7 +139,7 @@ namespace ei8.Cortex.Coding.d23.Collections
             var interneuronFromInputsToInitiator = NetworkHelper.LinkInputNeuronsToInterneuron(
                 initiator.GetInterneuron(),
                 [.. inputNeurons],
-                NetworkHelper.AdditionalInputNeuronStrengthMode.Manual,
+                NetworkHelper.InputNeuronStrengthMode.Manual,
                 additionalInputs
             );
             

@@ -144,7 +144,7 @@ namespace ei8.Cortex.Coding.d23.Collections
             return NetworkHelper.LinkInputNeuronsToInterneuron(
                 interneuronToNext.GetInterneuron(),
                 [.. inputNeurons],
-                NetworkHelper.AdditionalInputNeuronStrengthMode.Manual,
+                NetworkHelper.InputNeuronStrengthMode.Manual,
                 additionalInputNeuronInfos
             );
         }
