@@ -1,142 +1,139 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using ei8.Cortex.Coding.d23.Collections;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 
 namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 {
     public class SequentialAdder
     (
-        FunctionalCircuitParameter<SequentialAdder.Input, SequentialAdder.Output> parameters,
-        SequentialInterneuronSet interneurons,
+        SequentialAdder.AugmentationInfo augmentation,
+        BiphasicNext biphasicNext,
+        Adder adder,
         VariableInfo? variableInfo
-    ) :
-        SequentialOperationBase
+    ) : 
+        CompositeCircuitBase
         <
-            FunctionalCircuitParameter
-            <
-                SequentialAdder.Input,
-                SequentialAdder.Output
-            >,
-            SequentialInterneuronSet
+            BiphasicNext, 
+            Adder
         >
         (
-            parameters,
-            interneurons,
+            biphasicNext,
+            adder,
             variableInfo
         ),
-        ISequentialOperation
+        IAugmentedCompositeCircuit
         <
             SequentialAdder,
-            FunctionalCircuitParameter
-            <
-                SequentialAdder.Input,
-                SequentialAdder.Output
-            >,
-            SequentialInterneuronSet
+            SequentialAdder.AugmentationInfo,
+            BiphasicNext,
+            Adder
         >
     {
-        public class Input
-        (
-            IEnumerable<UnaryNeuronParameter?> currentDigits,
-            BinaryNeuronParameter? addend1,
-            BinaryNeuronParameter? addend2,
-            BinaryNeuronParameter? precedingCarryOver = null
-        ) : 
-            CircuitParameterSubsetBase, 
-            IInputCircuitParameterSubset
-        {
-            protected override IEnumerable<ReadOnlyNetwork> GetNetworks() => 
-                NetworkHelper.ConvertToNetworks
-                (
-                    [
-                        ..this.CurrentDigits,
-                        this.Addend1,
-                        this.Addend2,
-                        this.PrecedingCarryOver
-                    ]
-                );
-
-            public IEnumerable<UnaryNeuronParameter?> CurrentDigits { get; } = currentDigits;
-            public BinaryNeuronParameter? Addend1 { get; } = addend1;
-            public BinaryNeuronParameter? Addend2 { get; } = addend2;
-            public BinaryNeuronParameter? PrecedingCarryOver { get; } = precedingCarryOver;
-        }
-
-        public class Output
-        (
-            IEnumerable<UnaryNeuronParameter?> nextDigits,
-            BinaryNeuronParameter? sum,
-            BinaryNeuronParameter? carryOver
-        ) : 
-            CircuitParameterSubsetBase, 
-            IOutputCircuitParameterSubset
+        public class AugmentationInfo(ReadOnlyNetwork initiatorPostsynapticTerminals, ReadOnlyNetwork completerPresynapticTerminals) : AugmentationBase
         {
             protected override IEnumerable<ReadOnlyNetwork> GetNetworks() =>
-                NetworkHelper.ConvertToNetworks
-                (
-                    [
-                        ..this.NextDigits,
-                        this.Sum,
-                        this.CarryOver
-                    ]
-                );
+                [
+                    this.InitiatorPostsynapticTerminals,
+                    this.CompleterPresynapticTerminals
+                ];
 
-            public IEnumerable<UnaryNeuronParameter?> NextDigits { get; } = nextDigits;
-            public BinaryNeuronParameter? Sum { get; } = sum;
-            public BinaryNeuronParameter? CarryOver { get; } = carryOver;
+            public ReadOnlyNetwork InitiatorPostsynapticTerminals { get; } = initiatorPostsynapticTerminals;
+
+            public ReadOnlyNetwork CompleterPresynapticTerminals { get; } = completerPresynapticTerminals;
         }
+
+        protected override IEnumerable<ReadOnlyNetwork> GetNetworks() =>
+            [.. base.GetNetworks(), this.Augmentation.Network ];
 
         public static SequentialAdder Create
         (
-            FunctionalCircuitParameter<Input, Output> parameters,
-            SequentialInterneuronSet interneurons,
+            AugmentationInfo augmentation,
+            BiphasicNext biphasicNext,
+            Adder adder,
             VariableInfo? variableInfo
-        ) => 
+        ) =>
             new
             (
-                parameters,
-                interneurons,
+                augmentation,
+                biphasicNext,
+                adder,
                 variableInfo
             );
 
-        public static SequentialInterneuronSet CreateInterneurons
+        public static bool TryCreate<T>
         (
-            FunctionalCircuitParameter<Input, Output> parameters,
-            VariableInfo variableInfo,
-            VariableInfo? precedingVariableInfo = null
+            [NotNullWhen(true)] out T? result,
+            BiphasicNext biphasicNext,
+            Adder adder,
+            VariableInfo? precedingVariableInfo = null,
+            [CallerArgumentExpression(nameof(result))] string parameterExpression = ""
         )
+            where T :
+                IAugmentedCompositeCircuit
+                <
+                    T,
+                    SequentialAdder.AugmentationInfo,
+                    BiphasicNext,
+                    Adder
+                >
         {
-            var result = new Network();
-
-            var sum = parameters.Outputs.Sum;
-
-            // DEL: var completers = NetworkHelper.CreateInterneuronNetworksByOutputNeurons()
-            //var initiators = NetworkHelper.CreateInterneuronNetworksByOutputNeurons
-
-            var coreNetwork = Adder.CreateInterneuronNetworksCore
-            (
-                variableInfo,
-                precedingVariableInfo,
-                parameters.Inputs.PrecedingCarryOver,
-                parameters.Inputs.Addend1,
-                parameters.Inputs.Addend2,
-                sum,
-                parameters.Outputs.CarryOver,
-                NetworkHelper.AdditionalInputNeuronType.Or,
-                [..parameters.Inputs.CurrentDigits.WhereNotNull().Select(cd => cd.Neuron)]
-            );
-
-            result.AddReplaceItems(coreNetwork.Network);
-
-            var nextDigits = parameters.Outputs.NextDigits;
-            if (sum != null)
+            bool bResult = false;
+            result = default;
+            // TODO: use variableInfo
+            if (VariableInfo.TryParse(parameterExpression, out var variableInfo))
             {
-                foreach (var sumNeuron in sum.Network.GetItems<Neuron>())
-                    foreach (var nextDigit in nextDigits.WhereNotNull())
-                        result.AddReplace(NetworkHelper.CreateTerminal(sumNeuron, nextDigit.Neuron));
+                ArgumentNullException.ThrowIfNull(adder.Parameters.Inputs.Addend1);
+                ArgumentNullException.ThrowIfNull(adder.Parameters.Inputs.Addend2);
+                ArgumentNullException.ThrowIfNull(adder.Parameters.Outputs.Sum);
+
+                var initiatorInterneuron = biphasicNext.Interneurons.Initiator.GetInterneuron();
+                var initiatorPostsynapticTerminals = NetworkHelper.CreateTerminals
+                (
+                    [initiatorInterneuron],
+                    (
+                        (IEnumerable<IneurUL>)
+                        [
+                            adder.Parameters.Inputs.Addend1,
+                            adder.Parameters.Inputs.Addend2
+                        ]
+                    ).Combine().GetItems<Neuron>(),
+                    NeurotransmitterEffect.Excite,
+                    0.5f
+                ).ToNetwork();
+
+                var completerInterneuron = biphasicNext.Interneurons.Completer.GetInterneuron();
+                var completerPresynapticTerminals = NetworkHelper.CreateTerminals
+                (
+                    (
+                        (IEnumerable<IneurUL>)
+                        [
+                            adder.Parameters.Outputs.Sum
+                        ]
+                    ).Combine().GetItems<Neuron>(),
+                    [completerInterneuron],
+                    NeurotransmitterEffect.Excite,
+                    0.5f
+                ).ToNetwork();
+
+                result = T.Create
+                (
+                    new
+                    (
+                        initiatorPostsynapticTerminals,
+                        completerPresynapticTerminals
+                    ),
+                    biphasicNext,
+                    adder,
+                    variableInfo
+                );
+                bResult = true;
             }
 
-            // TODO: Create InterneuronSet specifically for SequentialAdder
-            return null; // new(null, [result]);
+            return bResult;
         }
+
+        public SequentialAdder.AugmentationInfo Augmentation { get; } = augmentation;
     }
 }

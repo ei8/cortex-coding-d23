@@ -41,28 +41,71 @@ namespace ei8.Cortex.Coding.d23
             Neuron.CreateTransient(Guid.NewGuid(), tag, null, null);
 
         public static ReadOnlyNetwork CreateInterneuronNetworkByOutputNeurons(params Neuron[] postsynapticNeurons) =>
-            NetworkHelper.CreateInterneuronNetworkByOutputNeurons(null, postsynapticNeurons);
+            NetworkHelper.CreateInterneuronNetworkByOutputNeurons
+            (
+                NeurotransmitterEffect.Excite,
+                1f,
+                postsynapticNeurons
+            );
 
-        public static ReadOnlyNetwork CreateInterneuronNetworkByOutputNeurons(string? interneuronTag = null, params Neuron[] postsynapticNeurons)
+        public static ReadOnlyNetwork CreateInterneuronNetworkByOutputNeurons
+        (
+            NeurotransmitterEffect effect,
+            float strength, 
+            params Neuron[] postsynapticNeurons
+        ) =>
+            NetworkHelper.CreateInterneuronNetworkByOutputNeurons(null, effect, strength, postsynapticNeurons);
+
+        public static ReadOnlyNetwork CreateInterneuronNetworkByOutputNeurons
+        (
+            string? interneuronTag,
+            params Neuron[] postsynapticNeurons
+        ) =>
+            NetworkHelper.CreateInterneuronNetworkByOutputNeurons(interneuronTag, NeurotransmitterEffect.Excite, 1f, postsynapticNeurons);
+
+        public static ReadOnlyNetwork CreateInterneuronNetworkByOutputNeurons
+        (
+            string? interneuronTag,
+            float strength,
+            params Neuron[] postsynapticNeurons
+        )
+            =>
+            NetworkHelper.CreateInterneuronNetworkByOutputNeurons(interneuronTag, NeurotransmitterEffect.Excite, strength, postsynapticNeurons);
+
+        public static ReadOnlyNetwork CreateInterneuronNetworkByOutputNeurons
+        (
+            string? interneuronTag, 
+            NeurotransmitterEffect effect, 
+            float strength, 
+            params Neuron[] postsynapticNeurons
+        )
         {
             var network = new Network();
             Neuron neuron = NetworkHelper.CreateNeuron(interneuronTag);
             network.AddReplace(neuron);
 
             foreach (var post in postsynapticNeurons)
-                network.AddReplace(NetworkHelper.CreateTerminal(neuron, post));
+                network.AddReplace(NetworkHelper.CreateTerminal(neuron, post, effect, strength));
 
             return network;
         }
 
         public static IEnumerable<ReadOnlyNetwork> CreateInterneuronNetworksByOutputNeurons(
             IEnumerable<Neuron> outputs,
-            IEnumerable<string> outputInterneuronTags
+            IEnumerable<string> outputInterneuronTags,
+            NeurotransmitterEffect effect = NeurotransmitterEffect.Excite,
+            float strength = 1f
         ) =>
         [
             ..outputs.Select(o => {
                 var index = outputs.ToList().IndexOf(o);
-                return NetworkHelper.CreateInterneuronNetworkByOutputNeurons(outputInterneuronTags.ElementAt(index), outputs.ElementAt(index));
+                return NetworkHelper.CreateInterneuronNetworkByOutputNeurons
+                (
+                    outputInterneuronTags.ElementAt(index),
+                    effect,
+                    strength,
+                    outputs.ElementAt(index)
+                );
             })
         ];
 
@@ -159,11 +202,35 @@ namespace ei8.Cortex.Coding.d23
             Neuron postsynapticNeuron
         ) => NetworkHelper.CreateTerminal(presynapticNeuron, postsynapticNeuron, NeurotransmitterEffect.Excite, 1f);
 
-        public static Terminal CreateTerminal(
+        public static Terminal CreateTerminal
+        (
             Neuron presynapticNeuron,
             Neuron postsynapticNeuron,
             NeurotransmitterEffect effect,
             float strength
-        ) => new(Guid.NewGuid(), presynapticNeuron.Id, postsynapticNeuron.Id, effect, strength);
+        ) => 
+            new
+            (
+                Guid.NewGuid(), 
+                presynapticNeuron.Id, 
+                postsynapticNeuron.Id, 
+                effect, strength
+            );
+
+        public static IEnumerable<Terminal> CreateTerminals
+        (
+            IEnumerable<Neuron> presynapticNeurons, 
+            IEnumerable<Neuron> postsynapticNeurons, 
+            NeurotransmitterEffect effect, 
+            float strength
+        )
+        {
+            var result = new List<Terminal>();
+            foreach (var presynapticNeuron in presynapticNeurons)
+                foreach (var postsynapticNeuron in postsynapticNeurons)
+                    result.Add(NetworkHelper.CreateTerminal(presynapticNeuron, postsynapticNeuron, effect, strength));
+
+            return result;
+        }
     }
 }

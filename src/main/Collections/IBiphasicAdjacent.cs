@@ -21,7 +21,7 @@
             TParam parameters,
             VariableInfo variableInfo,
             TInterneuron? precedingInterneurons = default,
-            bool linkPhaseInterneurons = false,
+            float interPhaseStrength = 1f,
             params Neuron[] additionalInputs
         );
     }

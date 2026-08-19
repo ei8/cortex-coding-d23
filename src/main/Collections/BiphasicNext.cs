@@ -1,4 +1,5 @@
 ﻿
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -83,7 +84,7 @@ namespace ei8.Cortex.Coding.d23.Collections
                 parameters,
                 variableInfo,
                 precedingInterneurons,
-                true,
+                1f,
                 additionalInputs
             );
 
@@ -92,29 +93,32 @@ namespace ei8.Cortex.Coding.d23.Collections
             FunctionalCircuitParameter<Next.Input, Next.Output> parameters,
             VariableInfo variableInfo,
             InterneuronSet? precedingInterneurons = null,
-            bool linkPhaseInterneurons = false,
+            float interPhaseStrength = 1f,
             params Neuron[] additionalInputs
         )
         {
+            ArgumentNullException.ThrowIfNull(parameters.Outputs.Next);
+            ArgumentNullException.ThrowIfNull(parameters.Inputs.Function);
+            ArgumentNullException.ThrowIfNull(parameters.Inputs.Current);
+
             var completer = NetworkHelper.CreateInterneuronNetworkByOutputNeurons
             (
                 $"{variableInfo.Function}.{nameof(InterneuronSet.Completer)}({variableInfo.Inputs.First()})",
-                [parameters.Outputs.Next!.Neuron]
+                parameters.Outputs.Next.Neuron
             );
 
             var initiator = NetworkHelper.CreateInterneuronNetworkByOutputNeurons
             (
                 $"{variableInfo.Function}.{nameof(InterneuronSet.Initiator)}({variableInfo.Inputs.First()})",
-                linkPhaseInterneurons ?
-                    [completer.GetInterneuron()] :
-                    []
+                interPhaseStrength,
+                completer.GetInterneuron()
             );
 
             var inputNeurons = new List<NeuronInfo>
             (
                 [
-                    new(parameters.Inputs.Function!.Neuron),
-                    new(parameters.Inputs.Current!.Neuron)
+                    new(parameters.Inputs.Function.Neuron),
+                    new(parameters.Inputs.Current.Neuron)
                 ]
             );
 

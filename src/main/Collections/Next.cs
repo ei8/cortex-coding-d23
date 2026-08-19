@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace ei8.Cortex.Coding.d23.Collections
@@ -84,9 +85,13 @@ namespace ei8.Cortex.Coding.d23.Collections
             params Neuron[] additionalInputs
         )
         {
+            ArgumentNullException.ThrowIfNull(parameters.Outputs.Next);
+            ArgumentNullException.ThrowIfNull(parameters.Inputs.Function);
+            ArgumentNullException.ThrowIfNull(parameters.Inputs.Current);
+
             var interneuronToNext = NetworkHelper.CreateInterneuronNetworkByOutputNeurons(
                 $"{variableInfo.Function}({variableInfo.Inputs.First()})",
-                [parameters.Outputs.Next!.Neuron]
+                [parameters.Outputs.Next.Neuron]
             );
 
             interneuronToNext = ((IEnumerable<ReadOnlyNetwork>)
@@ -94,8 +99,8 @@ namespace ei8.Cortex.Coding.d23.Collections
                 interneuronToNext,
                 Next.LinkInputNeurons
                 (
-                    parameters.Inputs.Function!,
-                    parameters.Inputs.Current!,
+                    parameters.Inputs.Function,
+                    parameters.Inputs.Current,
                     interneuronToNext,
                     precedingInterneurons,
                     additionalInputs

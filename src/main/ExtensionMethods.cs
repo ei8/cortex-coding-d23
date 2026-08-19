@@ -41,6 +41,13 @@ namespace ei8.Cortex.Coding.d23
             return result;
         }
 
+        public static ReadOnlyNetwork Combine(this IEnumerable<IneurUL> neurULs)
+        {
+            var result = new Network();
+            result.AddReplaceItems([.. neurULs]);
+            return result;
+        }
+
         public static void AddReplaceItems(this Network original, params IneurUL[] neurULs) =>
             original.AddReplaceItems([..neurULs.Select(no => no.Network)]);
 

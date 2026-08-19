@@ -27,7 +27,7 @@ namespace ei8.Cortex.Coding.d23.Collections
             [NotNullWhen(true)] out T? result,
             TParam parameters,
             TInterneuron? precedingInterneurons = default,
-            bool linkPhaseInterneurons = false,
+            float interPhaseStrength = 1f,
             [CallerArgumentExpression(nameof(result))] string parameterExpression = "",
             params Neuron[] additionalInputs
         )
@@ -44,7 +44,7 @@ namespace ei8.Cortex.Coding.d23.Collections
                         parameters,
                         variableInfo,
                         precedingInterneurons,
-                        linkPhaseInterneurons,
+                        interPhaseStrength,
                         additionalInputs
                     ),
                     variableInfo

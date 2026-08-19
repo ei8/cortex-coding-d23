@@ -2,15 +2,24 @@
 
 namespace ei8.Cortex.Coding.d23
 {
+    public abstract class CircuitBase
+    (
+        VariableInfo? variableInfo
+    ) : 
+        neurULBase,
+        ICircuit,
+        IVariable
+    {
+        public VariableInfo? VariableInfo { get; } = variableInfo;
+    }
     public abstract class CircuitBase<TParam, TInterneuron>
     (
         TParam parameters,
         TInterneuron interneurons,
         VariableInfo? variableInfo
     ) : 
-        neurULBase,
-        ICircuit<TParam, TInterneuron>, 
-        IVariable
+        CircuitBase(variableInfo),
+        ICircuit<TParam, TInterneuron>
         where TParam : ICircuitParameter
         where TInterneuron : ICircuitInterneuronSet
     {
@@ -23,7 +32,5 @@ namespace ei8.Cortex.Coding.d23
         public TParam Parameters { get; } = parameters;
 
         public TInterneuron Interneurons { get; } = interneurons;
-
-        public VariableInfo? VariableInfo { get; } = variableInfo;
     }
 }
