@@ -1,50 +1,77 @@
 ﻿using ei8.Cortex.Coding.d23.Process.Iteration;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ei8.Cortex.Coding.d23.Process.Operation
 {
-    // TODO: public class Addition : IProcess
-    //{
-    //    public class WorkingMemoryKeys(
-    //        ReadOnlyChunk addend1Digits,
-    //        ReadOnlyChunk addend2Digits,
-    //        WriteableChunk currentDigit,
-    //        WriteableChunk digitSums,
-    //        ReadOnlyChunk digitCount
-    //    )
-    //    {
-    //        // TODO: how to reuse single adder for whole operation?
-    //        // create Do Until that fires output for each (step / max) of (DigitAddend1Values / DigitAddend2Values)?
-    //        DigitAddend1Values,
-    //        DigitAddend2Values,
-    //        DigitSums, // store results from each digit
-    //        DigitCount // eg. Do Until (Condition) - eg. Digit7
-    //    }
+    public partial class Addition
+    (
+        Addition.WorkingMemoryInfo workingMemory,
+        DoUntil doUntil,
+        string digitPrefix
+    ) :
+        FiniteCompositeProcessBase<Addition.WorkingMemoryInfo, DoUntil>
+        (
+            workingMemory,
+            doUntil
+        )
+    {
+        public override IEnumerable<Neuron> GetCurrent()
+        {
+            int digitIndex = GetCurrentDigitIndex();
+            List<Neuron> result = new(
+                [
+                    this.WorkingMemory.DoUntil.Action.Value,
+                    this.WorkingMemory.DoUntil.CounterVariable.Value,
+                    this.WorkingMemory.Addend1Digits.Content.ElementAt(digitIndex),
+                    this.WorkingMemory.Addend2Digits.Content.ElementAt(digitIndex)
+                ]
+            );
+            if (this.WorkingMemory.CarryOver.Content != null)
+                result.Add(this.WorkingMemory.CarryOver.Content);
 
-    //    private DoUntil doUntil;
+            return result;
+        }
 
-    //    public Addition()
-    //    {
-    //        this.doUntil = new DoUntil();
-    //    }
+        protected override void ResetTransientMemory()
+        {
+            base.ResetTransientMemory();
 
-    //    public IEnumerable<Neuron> GetCurrent()
-    //    {
-    //        throw new NotImplementedException();
-    //    }
+            this.WorkingMemory.CarryOver.Value = null;
+        }
 
-    //    public void HandleFire(Neuron target, ReadOnlyNetwork network)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
+        private int GetCurrentDigitIndex()
+        {
+            var currentDigit = this.WorkingMemory.DoUntil.CounterVariable.Value;
+            var digitIndex = int.Parse(currentDigit.Tag.ToUpper().Replace(digitPrefix.ToUpper(), string.Empty)) - 1;
+            return digitIndex;
+        }
 
-    //    public void Initialize(IWorkingMemory workingMemory, Action completionCallback)
-    //    {
-    //        // TODO: this.doUntil.Initialize(
-    //        //    WorkingMemory.Create>(
-    //        //        ReadableKeyedChunk.Create(DoUntil.WorkingMemoryKeys.
-    //        //    )
-    //    }
-    //}
+        public override void HandleFire(Neuron targetNeuron, ReadOnlyNetwork network)
+        {
+            base.HandleFire(targetNeuron, network);
+
+            this.Process.HandleFire(targetNeuron, network);
+
+            // if one of specified sum values, add to sums
+            if
+            (
+                this.WorkingMemory.SumValues.Content.Contains(targetNeuron) &&
+                this.GetCurrentDigitIndex() == this.WorkingMemory.Sums.Content.Count
+            )
+                this.WorkingMemory.Sums.Content.Add(targetNeuron);
+
+            // if one of specified carry over values, update carry over
+            if(this.WorkingMemory.CarryOverValues.Content.Contains(targetNeuron))
+                this.WorkingMemory.CarryOver.Value = targetNeuron;
+
+            if (this.Process.IsCompleted)
+                this.Complete();
+        }
+
+        private string digitPrefix = digitPrefix;
+
+        public DoUntil DoUntil => this.Process;
+    }
 }

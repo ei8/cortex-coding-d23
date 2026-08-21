@@ -1,4 +1,4 @@
-﻿using ei8.Cortex.Coding.d23.Collections;
+﻿using ei8.Cortex.Coding.d23.Sequences;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -7,7 +7,7 @@ using System.Runtime.CompilerServices;
 
 namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 {
-    public class SequentialAdder
+    public partial class SequentialAdder
     (
         SequentialAdder.AugmentationInfo augmentation,
         Next next,
@@ -32,13 +32,6 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
             Adder
         >
     {
-        public class AugmentationInfo(ReadOnlyNetwork interneuronPresynapticTerminals) : AugmentationBase
-        {
-            protected override IEnumerable<ReadOnlyNetwork> GetNetworks() => [this.InterneuronPresynapticTerminals];
-
-            public ReadOnlyNetwork InterneuronPresynapticTerminals { get; } = interneuronPresynapticTerminals;
-        }
-
         protected override IEnumerable<ReadOnlyNetwork> GetNetworks() =>
             [.. base.GetNetworks(), this.Augmentation.Network ];
 

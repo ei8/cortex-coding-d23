@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ei8.Cortex.Coding.d23.Collections
+namespace ei8.Cortex.Coding.d23.Sequences
 {
-    public class Next
+    public partial class Next
     (
         FunctionalCircuitParameter
         <
@@ -12,7 +12,7 @@ namespace ei8.Cortex.Coding.d23.Collections
             Next.Output
         > 
         parameters,
-        InterneuronSet interneurons,
+        Next.InterneuronSet interneurons,
         VariableInfo? variableInfo
     ) : 
         AdjacentBase
@@ -22,7 +22,7 @@ namespace ei8.Cortex.Coding.d23.Collections
                 Next.Input, 
                 Next.Output
             >,
-            InterneuronSet
+            Next.InterneuronSet
         >
         (
             parameters,
@@ -37,33 +37,9 @@ namespace ei8.Cortex.Coding.d23.Collections
                 Next.Input, 
                 Next.Output
             >, 
-            InterneuronSet
+            Next.InterneuronSet
         >
     {
-        public class Input
-        (
-            UnaryNeuronParameter? function, 
-            UnaryNeuronParameter? current
-        ) : 
-            InputCircuitParameterSubset
-            <
-                UnaryNeuronParameter, 
-                UnaryNeuronParameter
-            >
-            (
-                function, 
-                current
-            )
-        {
-            public UnaryNeuronParameter? Function => this.Parameter1;
-            public UnaryNeuronParameter? Current => this.Parameter2;
-        }
-
-        public class Output(UnaryNeuronParameter? subsequent) : OutputCircuitParameterSubset<UnaryNeuronParameter>(subsequent)
-        {
-            public UnaryNeuronParameter? Next => this.Parameter1;
-        }
-
         public static Next Create
         (
             FunctionalCircuitParameter<Input, Output> parameters,

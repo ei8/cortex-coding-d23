@@ -3,9 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ei8.Cortex.Coding.d23.Collections
+namespace ei8.Cortex.Coding.d23.Sequences
 {
-    public class BiphasicNext
+    public partial class BiphasicNext
     (
         FunctionalCircuitParameter
         <
@@ -41,24 +41,6 @@ namespace ei8.Cortex.Coding.d23.Collections
             BiphasicNext.InterneuronSet
         >
     {
-        public class InterneuronSet
-        (
-            ReadOnlyNetwork initiator, 
-            ReadOnlyNetwork completer
-        ) :
-            CircuitInterneuronSetBase,
-            ICircuitInterneuronSet
-        {
-            protected override IEnumerable<ReadOnlyNetwork> GetNetworks() =>
-            [
-                this.Initiator,
-                this.Completer
-            ];
-
-            public ReadOnlyNetwork Initiator { get; } = initiator;
-            public ReadOnlyNetwork Completer { get; } = completer;
-        }
-
         public static BiphasicNext Create
         (
             FunctionalCircuitParameter<Next.Input, Next.Output> parameters,

@@ -1,86 +1,46 @@
 ﻿using NLog;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace ei8.Cortex.Coding.d23.Process.Iteration
 {
-    public class DoUntil : IProcess
+    public partial class DoUntil(DoUntil.WorkingMemoryInfo workingMemory) :
+        FiniteProcessBase<DoUntil.WorkingMemoryInfo>(workingMemory)
     {
-        public class WorkingMemory(
-            ReadOnlyChunk actions,
-            WriteableChunk counterVariable,
-            ReadOnlyChunk condition
-        ) : IWorkingMemory
-        {
-            public ReadOnlyChunk Actions { get; } = actions;
-            public WriteableChunk CounterVariable { get; } = counterVariable;
-            public ReadOnlyChunk Condition { get; } = condition;
-        }
-
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
-        private WorkingMemory? workingMemory;
-        private Action? completionCallback;
+        public override IEnumerable<Neuron> GetCurrent() => 
+            [
+                this.WorkingMemory.Action.Value,
+                this.WorkingMemory.CounterVariable.Value
+            ];
 
-        public DoUntil()
+        public override void HandleFire(Neuron targetNeuron, ReadOnlyNetwork network)
         {
-        }
+            base.HandleFire(targetNeuron, network);
 
-        public void Initialize(IWorkingMemory workingMemory, Action completionCallback)
-        {
-            this.workingMemory = (WorkingMemory) workingMemory;
-            this.completionCallback = completionCallback;
-        }
+            if (this.Status == FiniteStatus.Idle)
+                this.Start();
 
-        public IEnumerable<Neuron> GetCurrent()
-        {
-            var result = Enumerable.Empty<Neuron>();
-            if (
-                this.workingMemory != null &&
-                this.workingMemory.Actions != null &&
-                this.workingMemory.CounterVariable != null
-            )
-                result = [
-                    ..this.workingMemory.Actions.Contents,
-                    ..this.workingMemory.CounterVariable.Contents
-                ];
-
-            return result;
-        }
-
-        public void HandleFire(Neuron target, ReadOnlyNetwork network)
-        {
-            DoUntil.logger.Info(
-                new LogMessageGenerator(
-                    () => $"Fired: {target.ToReadableString()}"
-                )
-            );
-
-            if (this.workingMemory != null)
+            if (this.WorkingMemory != null)
             {
-                var presynaptics = network.GetPresynapticNeurons(target.Id).ToArray();
+                var presynaptics = network.GetPresynapticNeurons(targetNeuron.Id).ToArray();
                 if (
                     presynaptics.Length > 0 &&
-                    this.workingMemory.CounterVariable != null &&
-                    presynaptics.Intersect(this.workingMemory.CounterVariable.Contents).Any()
+                    this.WorkingMemory.CounterVariable != null &&
+                    presynaptics.Contains(this.WorkingMemory.CounterVariable.Value)
                 )
                 {
-                    this.workingMemory.CounterVariable.Contents.Clear();
-                    this.workingMemory.CounterVariable.Contents.Add(target);
+                    this.WorkingMemory.CounterVariable.Value = targetNeuron;
                     DoUntil.logger.Info(
                         new LogMessageGenerator(
-                            () => $"Updated variable to: {target.ToReadableString()}"
+                            () => $"Updated variable to: {targetNeuron.ToReadableString()}"
                         )
                     );
                 }
 
-                if (
-                    this.workingMemory.Condition != null &&
-                    target.Id == this.workingMemory.Condition.Contents.Single().Id &&
-                    this.completionCallback != null
-                )
-                    this.completionCallback();
+                if (targetNeuron == this.WorkingMemory.Condition.Content)
+                    this.Complete();
             }
         }
     }

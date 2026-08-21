@@ -160,9 +160,10 @@ namespace ei8.Cortex.Coding.d23
 
                 if (additionalInputNeuronStrengthMode != InputNeuronStrengthMode.Manual)
                 {
-                    var strengthDivisor = additionalInputNeuronStrengthMode == InputNeuronStrengthMode.And ?
-                    inputNeurons.Count() :
-                    inputNeuronInfos.Count() + (additionalInputNeuronInfos.Length > 0 ? 1 : 0);
+                    var strengthDivisor = 
+                        additionalInputNeuronStrengthMode == InputNeuronStrengthMode.And ?
+                            inputNeurons.Count() :
+                            inputNeuronInfos.Count() + (additionalInputNeuronInfos.Length > 0 ? 1 : 0);
                     strength =  input.Strength / strengthDivisor;
                 }
 

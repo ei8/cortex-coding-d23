@@ -1,5 +1,7 @@
 ﻿namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 {
+    // TODO: transfer static abstract functions to IOperationStatic so OperationBase can implement IOperation
+    // TOOD: look for similar patterns where this update is applicable
     public interface IOperation
     <
         T, 

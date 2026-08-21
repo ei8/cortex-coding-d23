@@ -1,17 +1,17 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
-namespace ei8.Cortex.Coding.d23.Collections
+namespace ei8.Cortex.Coding.d23.Sequences
 {
-    public class BiphasicAdjacentBase<TParam, TInterneuron>
+    public abstract class AdjacentBase<TParam, TInterneuron>
     (
         TParam parameters,
         TInterneuron interneurons,
         VariableInfo? variableInfo
-    ) :
+    ) : 
         FunctionalCircuitBase
         <
-            TParam,
+            TParam, 
             TInterneuron
         >
         (
@@ -28,11 +28,10 @@ namespace ei8.Cortex.Coding.d23.Collections
             TParam parameters,
             float inputStrength = 0.5f,
             TInterneuron? precedingInterneurons = default,
-            float interPhaseStrength = 1f,
             [CallerArgumentExpression(nameof(result))] string parameterExpression = "",
-            params NeuronInfo[] additionalInputs
-        )
-            where T : IBiphasicAdjacent<T, TParam, TInterneuron>
+            params NeuronInfo[] additionalInputNeuronInfos
+        ) 
+            where T : IAdjacent<T, TParam, TInterneuron>
         {
             bool bResult = false;
             result = default;
@@ -46,8 +45,7 @@ namespace ei8.Cortex.Coding.d23.Collections
                         variableInfo,
                         inputStrength,
                         precedingInterneurons,
-                        interPhaseStrength,
-                        additionalInputs
+                        additionalInputNeuronInfos
                     ),
                     variableInfo
                 );

@@ -1,13 +1,14 @@
-﻿namespace ei8.Cortex.Coding.d23.Collections
+﻿namespace ei8.Cortex.Coding.d23.Sequences
 {
-    public interface IAdjacent
+    public interface IBiphasicAdjacent
     <
         T, 
         TParam, 
         TInterneuron
     > : 
-        ICircuit
+        IAdjacent
         <
+            T, 
             TParam, 
             TInterneuron
         >
@@ -21,14 +22,8 @@
             VariableInfo variableInfo,
             float inputStrength = 0.5f,
             TInterneuron? precedingInterneurons = default,
-            params NeuronInfo[] additionalInputNeuronInfos
-        );
-
-        static abstract T Create
-        (
-            TParam parameters,
-            TInterneuron interneurons,
-            VariableInfo? variableInfo
+            float interPhaseStrength = 1f,
+            params NeuronInfo[] additionalInputs
         );
     }
 }
