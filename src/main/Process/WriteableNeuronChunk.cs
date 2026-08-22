@@ -1,6 +1,6 @@
 ﻿namespace ei8.Cortex.Coding.d23.Process
 {
-    public class WriteableNullableNeuronChunk(Neuron? value) :
+    public class WriteableNullableNeuronChunk(Neuron? value = null) :
         WriteableChunkBase<Neuron?>(value)
     {
         public Neuron? Value
