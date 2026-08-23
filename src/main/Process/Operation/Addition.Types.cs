@@ -10,8 +10,6 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
             EnumerableChunk precedingCarryOverValues,
             EnumerableChunk addend1Values,
             EnumerableChunk addend2Values,
-            EnumerableChunk addend1Digits,
-            EnumerableChunk addend2Digits,
             EnumerableChunk sumValues,
             ListChunk sums,
             EnumerableChunk carryOverValues,
@@ -19,8 +17,6 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
         ) :
             WorkingMemoryBase
             <
-                EnumerableChunk,
-                EnumerableChunk,
                 EnumerableChunk,
                 EnumerableChunk,
                 EnumerableChunk,
@@ -33,8 +29,6 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                 precedingCarryOverValues,
                 addend1Values,
                 addend2Values,
-                addend1Digits,
-                addend2Digits,
                 sumValues,
                 sums,
                 carryOverValues,
@@ -46,8 +40,6 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                 EnumerableChunk precedingCarryOverValues,
                 EnumerableChunk addend1Values,
                 EnumerableChunk addend2Values,
-                EnumerableChunk addend1Digits,
-                EnumerableChunk addend2Digits,
                 EnumerableChunk sumValues,
                 EnumerableChunk carryOverValues
             ) : 
@@ -56,15 +48,12 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                     precedingCarryOverValues,
                     addend1Values,
                     addend2Values,
-                    addend1Digits,
-                    addend2Digits,
                     sumValues,
                     new(),
                     carryOverValues,
                     new()
                 )
             {
-                ArgumentOutOfRangeException.ThrowIfNotEqual(addend1Digits.Content.Count(), addend2Digits.Content.Count());
             }
 
             public EnumerableChunk PrecedingCarryOverValues => this.Chunk1;
@@ -73,17 +62,13 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
 
             public EnumerableChunk Addend2Values => this.Chunk3;
 
-            public EnumerableChunk Addend1Digits => this.Chunk4;
+            public EnumerableChunk SumValues => this.Chunk4;
 
-            public EnumerableChunk Addend2Digits => this.Chunk5;
+            public ListChunk Sums => this.Chunk5;
 
-            public EnumerableChunk SumValues => this.Chunk6;
+            public EnumerableChunk CarryOverValues => this.Chunk6;
 
-            public ListChunk Sums => this.Chunk7;
-
-            public EnumerableChunk CarryOverValues => this.Chunk8;
-
-            public WriteableNullableNeuronChunk CarryOver => this.Chunk9;
+            public WriteableNullableNeuronChunk CarryOver => this.Chunk7;
         }
     }
 }

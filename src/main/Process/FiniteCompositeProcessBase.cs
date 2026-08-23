@@ -6,17 +6,18 @@ namespace ei8.Cortex.Coding.d23.Process
     <
         TProcess, 
         TWorkingMemory, 
-        TProcess1
+        TProcess1,
+        TResult
     >
     (
         TWorkingMemory workingMemory, 
-        Action<TProcess, IProcess?> completionCallback
+        Action<TProcess, IProcess?, TResult> completionCallback
     ) :
         CompositeProcessBase<TWorkingMemory, TProcess1>(workingMemory)
         where TProcess : IProcess<TWorkingMemory>
         where TWorkingMemory : IWorkingMemory
         where TProcess1 : IProcess
     {
-        protected Action<TProcess, IProcess?> completionCallback = completionCallback;
+        protected Action<TProcess, IProcess?, TResult> completionCallback = completionCallback;
     }
 }

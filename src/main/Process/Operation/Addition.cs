@@ -12,12 +12,15 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
         <
             Addition, 
             Addition.WorkingMemoryInfo, 
-            DoUntil
+            DoUntil,
+            IEnumerable<Neuron>
         >
     {
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+        private readonly Func<Neuron, int> digitRetriever;
+        private readonly Func<int, Addition.WorkingMemoryInfo, IEnumerable<Neuron>> addendsRetriever;
 
-        private readonly string digitPrefix;
+        private Neuron? lastSumDigit;
 
         [SetsRequiredMembers]
         public Addition
@@ -26,9 +29,9 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
             ReadOnlyNeuronChunk action,
             EnumerableChunk digitVariableValues,
             WriteableNeuronChunk digitVariable,
-            // TODO: remove digitPrefix and workingMemory.digit1Addends and digit2Addends, use digitRetrievalCallback that returns two digit values based on a specified digit neuron
-            string digitPrefix,
-            Action<Addition, IProcess?> completionCallback
+            Func<Neuron, int> digitRetriever,
+            Func<int, Addition.WorkingMemoryInfo, IEnumerable<Neuron>> addendsRetriever,
+            Action<Addition, IProcess?, IEnumerable<Neuron>> completionCallback
         ) :
             base
             (
@@ -49,52 +52,29 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                 this.Complete
             );
 
-            this.digitPrefix = digitPrefix;
+            this.digitRetriever = digitRetriever;
+            this.addendsRetriever = addendsRetriever;
         }
 
         public override IEnumerable<Neuron> GetCurrent()
         {
-            int digitIndex = this.GetCurrentDigitIndex();
             List<Neuron> result = [];
 
             result.AddRange(this.DoUntil.GetCurrent());
 
+            var digitIndex = this.digitRetriever(this.DoUntil.WorkingMemory.CounterVariable.Value);
             if (digitIndex == 0)
                 result.Add(this.WorkingMemory.PrecedingCarryOverValues.Content.Single(n => n.Tag.EndsWith('0')));
-            else if (this.WorkingMemory.CarryOver.Content != null) 
-                result.Add(this.WorkingMemory.CarryOver.Content); 
+            else if (this.WorkingMemory.CarryOver.Content != null)
+                result.Add(this.WorkingMemory.CarryOver.Content);
 
-            if (digitIndex < this.WorkingMemory.Addend1Digits.Content.Count())
-            {
-                result.AddRange
-                (
-                    [
-                        this.WorkingMemory.Addend1Digits.Content.ElementAt(digitIndex),
-                        this.WorkingMemory.Addend2Digits.Content.ElementAt(digitIndex)
-                    ]
-                );
-            }
-            else if (digitIndex == this.WorkingMemory.Addend1Digits.Content.Count())
-            {
-                result.AddRange
-                (
-                    [
-                        this.WorkingMemory.Addend1Values.Content.Single(ad => ad.Tag.EndsWith('0')),
-                        this.WorkingMemory.Addend2Values.Content.Single(ad => ad.Tag.EndsWith('0'))
-                    ]
-                );
-            }
-            else
+            var addends = this.addendsRetriever(digitIndex, this.WorkingMemory);
+            if (!addends.Any())
                 this.Complete(null);
+            else
+                result.AddRange(addends);
 
             return result;
-        }
-
-        private int GetCurrentDigitIndex()
-        {
-            var currentDigit = this.DoUntil.WorkingMemory.CounterVariable.Value;
-            var digitIndex = int.Parse(currentDigit.Tag.ToUpper().Replace(digitPrefix.ToUpper(), string.Empty)) - 1;
-            return digitIndex;
         }
 
         public override void HandleFire(Neuron targetNeuron, ReadOnlyNetwork network)
@@ -102,15 +82,15 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
             this.Process1.HandleFire(targetNeuron, network);
 
             // if one of specified sum values, add to sums
-            int currentDigitIndex = this.GetCurrentDigitIndex();
             if
             (
                 this.WorkingMemory.SumValues.Content.Contains(targetNeuron) &&
-                currentDigitIndex == this.WorkingMemory.Sums.Content.Count
+                lastSumDigit != this.Process1.WorkingMemory.CounterVariable.Value
             )
             {
                 Addition.logger.Info(new LogMessageGenerator(() => $"Added to Sum(s): {targetNeuron.Tag}"));
 
+                this.lastSumDigit = this.Process1.WorkingMemory.CounterVariable.Value;
                 this.WorkingMemory.Sums.Content.Add(targetNeuron);
             }
 
@@ -127,12 +107,8 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
 
         private void Complete(IProcess? process)
         {
-            Addition.logger.Info
-            (
-                new LogMessageGenerator(() => $"Sum: {string.Join("", this.WorkingMemory.Sums.Content.Reverse().Select(s => s.Tag.Last()))}")
-            );
-
-            this.completionCallback(this, process);
+            this.completionCallback(this, process, this.WorkingMemory.Sums.Content);
+            this.WorkingMemory.Sums.Content.Clear();
         }
 
         public DoUntil DoUntil => this.Process1;
