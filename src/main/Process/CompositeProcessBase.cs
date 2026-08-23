@@ -2,15 +2,22 @@
 
 namespace ei8.Cortex.Coding.d23.Process
 {
-    public abstract class CompositeProcessBase<TWorkingMemory, TProcess>(TWorkingMemory workingMemory, TProcess process) :
+    public abstract class CompositeProcessBase
+    <
+        TWorkingMemory, 
+        TProcess1
+    >
+    (
+        TWorkingMemory workingMemory
+    ) :
         ProcessBase<TWorkingMemory>
         (
             workingMemory
         ),
-        ICompositeProcess<TProcess>
-        where TProcess : IProcess
+        ICompositeProcess<TProcess1>
+        where TProcess1 : IProcess
         where TWorkingMemory : IWorkingMemory
     {
-        public TProcess Process => process;
+        public required TProcess1 Process1 { get; set; }
     }
 }

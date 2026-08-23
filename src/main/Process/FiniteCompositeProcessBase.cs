@@ -1,39 +1,22 @@
-﻿namespace ei8.Cortex.Coding.d23.Process
+﻿using System;
+
+namespace ei8.Cortex.Coding.d23.Process
 {
-    public abstract class FiniteCompositeProcessBase<TWorkingMemory, TProcess>(TWorkingMemory workingMemory, TProcess process) :
-        CompositeProcessBase<TWorkingMemory, TProcess>(workingMemory, process),
-        IFinite
+    public abstract class FiniteCompositeProcessBase
+    <
+        TProcess, 
+        TWorkingMemory, 
+        TProcess1
+    >
+    (
+        TWorkingMemory workingMemory, 
+        Action<TProcess, IProcess?> completionCallback
+    ) :
+        CompositeProcessBase<TWorkingMemory, TProcess1>(workingMemory)
+        where TProcess : IProcess<TWorkingMemory>
         where TWorkingMemory : IWorkingMemory
-        where TProcess : IProcess
+        where TProcess1 : IProcess
     {
-        // TODO: check if possible refactor with FiniteProcessBase
-        public FiniteStatus Status { get; protected set; }
-
-        public bool IsCompleted { get; protected set; }
-
-        protected void Complete()
-        {
-            this.StopCore(true);
-        }
-
-        protected virtual void ResetTransientMemory() { }
-
-        protected virtual void Start()
-        {
-            this.ResetTransientMemory();
-            this.Status = FiniteStatus.InProgress;
-            this.IsCompleted = false;
-        }
-
-        protected virtual void StopCore(bool isCompleted)
-        {
-            this.Status = FiniteStatus.Idle;
-            this.IsCompleted = isCompleted;
-        }
-
-        public void Stop()
-        {
-            this.StopCore(false);
-        }
+        protected Action<TProcess, IProcess?> completionCallback = completionCallback;
     }
 }

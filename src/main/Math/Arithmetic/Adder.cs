@@ -88,7 +88,6 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
             if (
                 // is not least significant bit
                 precedingCarryOver != null &&
-                precedingVariableInfo != null &&
                 BinaryNeuronParameter.TryCreate(out var half1_XOR_Result, adderName) &&
                 BinaryNeuronParameter.TryCreate(out var half1_CarryOver, adderName) &&
                 BinaryNeuronParameter.TryCreate(out var half2_CarryOver, adderName)
@@ -102,7 +101,9 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                     ]
                 );
 
-                string precedingAdderName = precedingVariableInfo.Inputs.First();
+                string precedingAdderName = precedingVariableInfo != null ?
+                    precedingVariableInfo.Inputs.First() : 
+                    string.Empty;
 
                 result.AddRange(
                     Adder.CreateAdderHalf1Interneurons(

@@ -4,10 +4,10 @@
     {
     }
 
-    public interface ICompositeProcess<TProcess> :
+    public interface ICompositeProcess<TProcess1> :
         ICompositeProcess
-        where TProcess : IProcess
+        where TProcess1 : IProcess
     {
-        TProcess Process { get; }
+        TProcess1 Process1 { get; }
     }
 }

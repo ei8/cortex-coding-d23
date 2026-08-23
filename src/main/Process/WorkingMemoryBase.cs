@@ -146,4 +146,73 @@
     {
         public T7 Chunk7 { get; } = chunk7;
     }
+
+    public abstract class WorkingMemoryBase<T1, T2, T3, T4, T5, T6, T7, T8>
+    (
+        T1 chunk1,
+        T2 chunk2,
+        T3 chunk3,
+        T4 chunk4,
+        T5 chunk5,
+        T6 chunk6,
+        T7 chunk7,
+        T8 chunk8
+    ) :
+        WorkingMemoryBase<T1, T2, T3, T4, T5, T6, T7>
+        (
+            chunk1,
+            chunk2,
+            chunk3,
+            chunk4,
+            chunk5,
+            chunk6,
+            chunk7
+        )
+        where T1 : IChunk
+        where T2 : IChunk
+        where T3 : IChunk
+        where T4 : IChunk
+        where T5 : IChunk
+        where T6 : IChunk
+        where T7 : IChunk
+        where T8 : IChunk
+    {
+        public T8 Chunk8 { get; } = chunk8;
+    }
+
+    public abstract class WorkingMemoryBase<T1, T2, T3, T4, T5, T6, T7, T8, T9>
+    (
+        T1 chunk1,
+        T2 chunk2,
+        T3 chunk3,
+        T4 chunk4,
+        T5 chunk5,
+        T6 chunk6,
+        T7 chunk7,
+        T8 chunk8,
+        T9 chunk9
+    ) :
+        WorkingMemoryBase<T1, T2, T3, T4, T5, T6, T7, T8>
+        (
+            chunk1,
+            chunk2,
+            chunk3,
+            chunk4,
+            chunk5,
+            chunk6,
+            chunk7,
+            chunk8
+        )
+        where T1 : IChunk
+        where T2 : IChunk
+        where T3 : IChunk
+        where T4 : IChunk
+        where T5 : IChunk
+        where T6 : IChunk
+        where T7 : IChunk
+        where T8 : IChunk
+        where T9 : IChunk
+    {
+        public T9 Chunk9 { get; } = chunk9;
+    }
 }

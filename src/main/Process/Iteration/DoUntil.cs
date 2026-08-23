@@ -1,13 +1,29 @@
 ﻿using NLog;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace ei8.Cortex.Coding.d23.Process.Iteration
 {
-    public partial class DoUntil(DoUntil.WorkingMemoryInfo workingMemory) :
-        FiniteProcessBase<DoUntil.WorkingMemoryInfo>(workingMemory)
+    public partial class DoUntil
+    (
+        DoUntil.WorkingMemoryInfo workingMemory,
+        Action<DoUntil>? counterChangedCallback,
+        Action<DoUntil> completionCallback
+    ) :
+        FiniteProcessBase
+        <
+            DoUntil, 
+            DoUntil.WorkingMemoryInfo
+        >
+        (
+            workingMemory, 
+            completionCallback
+        )
     {
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+
+        protected Action<DoUntil>? counterChangedCallback = counterChangedCallback;
 
         public override IEnumerable<Neuron> GetCurrent() => 
             [
@@ -17,21 +33,18 @@ namespace ei8.Cortex.Coding.d23.Process.Iteration
 
         public override void HandleFire(Neuron targetNeuron, ReadOnlyNetwork network)
         {
-            base.HandleFire(targetNeuron, network);
-
-            if (this.Status == FiniteStatus.Idle)
-                this.Start();
-
             if (this.WorkingMemory != null)
             {
-                var presynaptics = network.GetPresynapticNeurons(targetNeuron.Id).ToArray();
-                if (
-                    presynaptics.Length > 0 &&
-                    this.WorkingMemory.CounterVariable != null &&
-                    presynaptics.Contains(this.WorkingMemory.CounterVariable.Value)
+                if 
+                (
+                    this.WorkingMemory.CounterVariableValues.Content.Contains(targetNeuron) &&
+                    this.WorkingMemory.CounterVariable.Value != targetNeuron
                 )
                 {
                     this.WorkingMemory.CounterVariable.Value = targetNeuron;
+                    if (this.counterChangedCallback != null)
+                        this.counterChangedCallback(this);
+
                     DoUntil.logger.Info(
                         new LogMessageGenerator(
                             () => $"Updated variable to: {targetNeuron.ToReadableString()}"
@@ -40,7 +53,7 @@ namespace ei8.Cortex.Coding.d23.Process.Iteration
                 }
 
                 if (targetNeuron == this.WorkingMemory.Condition.Content)
-                    this.Complete();
+                    this.completionCallback(this);
             }
         }
     }

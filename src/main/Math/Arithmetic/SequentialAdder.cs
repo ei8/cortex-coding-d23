@@ -73,6 +73,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
             // TODO: use variableInfo
             if (VariableInfo.TryParse(parameterExpression, out var variableInfo))
             {
+                ArgumentNullException.ThrowIfNull(adder.Parameters.Inputs.PrecedingCarryOver);
                 ArgumentNullException.ThrowIfNull(adder.Parameters.Inputs.Addend1);
                 ArgumentNullException.ThrowIfNull(adder.Parameters.Inputs.Addend2);
                 ArgumentNullException.ThrowIfNull(adder.Parameters.Outputs.Sum);

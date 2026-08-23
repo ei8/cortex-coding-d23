@@ -1,4 +1,5 @@
-﻿using ei8.Cortex.Coding.Mirrors;
+﻿using ei8.Cortex.Coding.d23.Process;
+using ei8.Cortex.Coding.Mirrors;
 using ei8.Cortex.Coding.Model.Reflection;
 using ei8.Cortex.Coding.Spiker;
 using NLog;
@@ -12,6 +13,11 @@ namespace ei8.Cortex.Coding.d23
 {
     public static class ExtensionMethods
     {
+        public static string LogFire(Neuron n) => $"Fired: {n.ToReadableString()}";
+
+        public static void Log(this IProcess process, Logger logger, LogLevel level, LogMessageGenerator logMessageGenerator) =>
+            logger.Log(level, logMessageGenerator);
+
         public static string ToReadableString(this Neuron neuron)
         {
             return $"{neuron.Id}:'{neuron.Tag}'";

@@ -14,14 +14,7 @@ namespace ei8.Cortex.Coding.d23.Process
 
         public abstract IEnumerable<Neuron> GetCurrent();
 
-        public virtual void HandleFire(Neuron targetNeuron, ReadOnlyNetwork network)
-        {
-            ProcessBase<T>.logger.Info(
-                new LogMessageGenerator(
-                    () => $"Fired: {targetNeuron.ToReadableString()}"
-                )
-            );
-        }
+        public abstract void HandleFire(Neuron targetNeuron, ReadOnlyNetwork network);
 
         public T WorkingMemory { get; } = workingMemory;
     }

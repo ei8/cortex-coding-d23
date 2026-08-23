@@ -5,24 +5,28 @@
         public class WorkingMemoryInfo
         (
             ReadOnlyNeuronChunk action,
+            EnumerableChunk counterVariableValues,
             WriteableNeuronChunk counterVariable,
             ReadOnlyNeuronChunk condition
         ) :
             WorkingMemoryBase
             <
                 ReadOnlyNeuronChunk,
+                EnumerableChunk,
                 WriteableNeuronChunk,
                 ReadOnlyNeuronChunk
             >
             (
                 action,
+                counterVariableValues,
                 counterVariable,
                 condition
             )
         {
             public ReadOnlyNeuronChunk Action => this.Chunk1;
-            public WriteableNeuronChunk CounterVariable => this.Chunk2;
-            public ReadOnlyNeuronChunk Condition => this.Chunk3;
+            public EnumerableChunk CounterVariableValues => this.Chunk2;
+            public WriteableNeuronChunk CounterVariable => this.Chunk3;
+            public ReadOnlyNeuronChunk Condition => this.Chunk4;
         }
     }
 }
