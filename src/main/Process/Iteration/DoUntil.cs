@@ -14,7 +14,8 @@ namespace ei8.Cortex.Coding.d23.Process.Iteration
         FiniteProcessBase
         <
             DoUntil, 
-            DoUntil.WorkingMemoryInfo
+            DoUntil.WorkingMemoryInfo,
+            Action<DoUntil>
         >
         (
             workingMemory, 

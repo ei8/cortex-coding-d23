@@ -7,31 +7,31 @@ using System.Linq;
 
 namespace ei8.Cortex.Coding.d23.Process.Operation
 {
-    public partial class Addition :
+    public class SequentialAddition :
         FiniteCompositeProcessBase
         <
-            Addition, 
-            Addition.WorkingMemoryInfo, 
+            SequentialAddition, 
+            WorkingMemoryInfo, 
             DoUntil,
-            IEnumerable<Neuron>
+            Action<SequentialAddition, IProcess?, IEnumerable<Neuron>>
         >
     {
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
         private readonly Func<Neuron, int> digitRetriever;
-        private readonly Func<int, Addition.WorkingMemoryInfo, IEnumerable<Neuron>> addendsRetriever;
+        private readonly Func<int, WorkingMemoryInfo, IEnumerable<Neuron>> addendsRetriever;
 
         private Neuron? lastSumDigit;
 
         [SetsRequiredMembers]
-        public Addition
+        public SequentialAddition
         (
             WorkingMemoryInfo workingMemory,
             ReadOnlyNeuronChunk action,
             EnumerableChunk digitVariableValues,
             WriteableNeuronChunk digitVariable,
             Func<Neuron, int> digitRetriever,
-            Func<int, Addition.WorkingMemoryInfo, IEnumerable<Neuron>> addendsRetriever,
-            Action<Addition, IProcess?, IEnumerable<Neuron>> completionCallback
+            Func<int, WorkingMemoryInfo, IEnumerable<Neuron>> addendsRetriever,
+            Action<SequentialAddition, IProcess?, IEnumerable<Neuron>> completionCallback
         ) :
             base
             (
@@ -88,7 +88,7 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                 lastSumDigit != this.Process1.WorkingMemory.CounterVariable.Value
             )
             {
-                Addition.logger.Info(new LogMessageGenerator(() => $"Added to Sum(s): {targetNeuron.Tag}"));
+                SequentialAddition.logger.Info(new LogMessageGenerator(() => $"Added to Sum(s): {targetNeuron.Tag}"));
 
                 this.lastSumDigit = this.Process1.WorkingMemory.CounterVariable.Value;
                 this.WorkingMemory.Sums.Content.Add(targetNeuron);
@@ -107,8 +107,24 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
 
         private void Complete(IProcess? process)
         {
-            this.completionCallback(this, process, this.WorkingMemory.Sums.Content);
+            List<Neuron> result = SequentialAddition.GetSum
+            (
+                this.WorkingMemory.Sums.Content, 
+                this.WorkingMemory.CarryOver.Value
+            );
+
+            this.completionCallback(this, process, [.. result]);
             this.WorkingMemory.Sums.Content.Clear();
+        }
+
+        internal static List<Neuron> GetSum(IEnumerable<Neuron> sums, Neuron? carryOver)
+        {
+            var result = new List<Neuron>(sums);
+
+            if (carryOver != null)
+                result.Add(carryOver);
+
+            return result;
         }
 
         public DoUntil DoUntil => this.Process1;
