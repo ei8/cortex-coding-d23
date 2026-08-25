@@ -28,6 +28,9 @@
 	  <EmbeddedResource Remove="neurULization\**" />
 	  <None Remove="Grannies\**" />
 	  <None Remove="neurULization\**" />
+	  <Compile Update="Math\Arithmetic\Multiplier.Types.cs">
+	    <DependentUpon>Multiplier.cs</DependentUpon>
+	  </Compile>
 	  <Compile Update="Math\Arithmetic\Adder.Types.cs">
 		  <DependentUpon>Adder.cs</DependentUpon>
 	  </Compile>

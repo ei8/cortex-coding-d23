@@ -1,13 +1,14 @@
 ﻿namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 {
-    public interface IOperation
+    public interface IUngroupedOperation
     <
         T,
         TParam,
         TInterneuron
     > :
-        ICircuit
+        IOperation
         <
+            T,
             TParam,
             TInterneuron
         >
@@ -15,10 +16,13 @@
         where TParam : IFunctionalCircuitParameter
         where TInterneuron : ICircuitInterneuronSet
     {
-        static abstract T Create(
+        static abstract TParam GetDefaultParameters(
+            int exponent
+        );
+
+        static abstract TInterneuron CreateInterneurons(
             TParam parameters,
-            TInterneuron interneurons,
-            VariableInfo? variableInfo
+            VariableInfo variableInfo
         );
     }
 }

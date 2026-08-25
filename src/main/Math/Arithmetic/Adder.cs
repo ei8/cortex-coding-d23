@@ -10,7 +10,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
         InterneuronSet interneurons,
         VariableInfo? variableInfo
     ) :
-        OperationBase
+        GroupedOperationBase
         <
             FunctionalCircuitParameter
             <
@@ -24,7 +24,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
             interneurons,
             variableInfo
         ), 
-        IOperation
+        IGroupedOperation
         <
             Adder,
             FunctionalCircuitParameter<Adder.Input, Adder.Output>,
