@@ -49,12 +49,12 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
             (
                 new
                 (
-                    BinaryNeuronParameter.Create($"{nameof(Adder)}{exponent + 1}.{nameof(Input.Multiplicand)}"),
-                    BinaryNeuronParameter.Create($"{nameof(Adder)}{exponent + 1}.{nameof(Input.Multiplier)}")
+                    BinaryNeuronParameter.Create($"{nameof(Multiplier)}{exponent + 1}.{nameof(Input.Multiplicand)}"),
+                    BinaryNeuronParameter.Create($"{nameof(Multiplier)}{exponent + 1}.{nameof(Input.Multiplier)}")
                 ),
                 new
                 (
-                    BinaryNeuronParameter.Create($"{nameof(Adder)}{exponent + 1}.{nameof(Output.Product)}")
+                    BinaryNeuronParameter.Create($"{nameof(Multiplier)}{exponent + 1}.{nameof(Output.Product)}")
                 )
             );
 
