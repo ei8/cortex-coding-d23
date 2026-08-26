@@ -1,5 +1,4 @@
-﻿using ei8.Cortex.Coding.d23.Math.Arithmetic;
-using NLog;
+﻿using NLog;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -11,24 +10,24 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
         FiniteProcessBase
         <
             DynamicAddition, 
-            WorkingMemoryInfo,
+            Addition.WorkingMemoryInfo,
             Action<DynamicAddition, IEnumerable<Neuron>>
         >
     {
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
         private readonly Func<int> digitRetriever;
         private readonly Action digitUpdater;
-        private readonly Func<int, WorkingMemoryInfo, IEnumerable<Neuron>> addendsRetriever;
+        private readonly Func<int, Addition.WorkingMemoryInfo, IEnumerable<Neuron>> addendsRetriever;
 
         private int? lastSumDigit;
 
         [SetsRequiredMembers]
         public DynamicAddition
         (
-            WorkingMemoryInfo workingMemory,
+            Addition.WorkingMemoryInfo workingMemory,
             Func<int> digitRetriever,
             Action digitUpdater,
-            Func<int, WorkingMemoryInfo, IEnumerable<Neuron>> addendsRetriever,
+            Func<int, Addition.WorkingMemoryInfo, IEnumerable<Neuron>> addendsRetriever,
             Action<DynamicAddition, IEnumerable<Neuron>> completionCallback
         ) :
             base
@@ -74,7 +73,7 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                 DynamicAddition.logger.Info(new LogMessageGenerator(() => $"Added to Sum(s): {targetNeuron.Tag}"));
 
                 this.lastSumDigit = currentDigit;
-                this.WorkingMemory.Sums.Content.Add(targetNeuron);
+                this.WorkingMemory.Sum.Content.Add(targetNeuron);
                 this.digitUpdater();
             }
 
@@ -93,12 +92,12 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
         {
             var result = SequentialAddition.GetSum
             (
-                this.WorkingMemory.Sums.Content,
+                this.WorkingMemory.Sum.Content,
                 this.WorkingMemory.CarryOver.Value
             );
 
             this.completionCallback(this, [..result]);
-            this.WorkingMemory.Sums.Content.Clear();
+            this.WorkingMemory.Sum.Content.Clear();
         }
     }
 }
