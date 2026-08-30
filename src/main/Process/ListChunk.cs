@@ -2,10 +2,9 @@
 
 namespace ei8.Cortex.Coding.d23.Process
 {
-    public class ListChunk(IList<Neuron> content) : IListChunk
+    public class ListChunk<T>(IList<T> content) : ChunkBase<IList<T>>(content), IListChunk<T>
+        where T : IChunk
     {
         public ListChunk() : this([]) { }
-
-        public IList<Neuron> Content { get; } = content;
     }
 }

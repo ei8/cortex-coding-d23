@@ -6,45 +6,33 @@ namespace ei8.Cortex.Coding.d23.Process.Iteration
     {
         public class WorkingMemoryInfo
         (
-            ReadOnlyNeuronChunk action,
-            EnumerableChunk counterVariableValues,
-            WriteableNeuronChunk counterVariable,
-            ReadOnlyNeuronChunk condition
+            NeuronChunk action,
+            EnumerableChunk<NeuronChunk> counterVariableValues,
+            NeuronChunk counterVariable,
+            NeuronChunk condition
         ) :
-            WorkingMemoryBase
-            <
-                ReadOnlyNeuronChunk,
-                EnumerableChunk,
-                WriteableNeuronChunk,
-                ReadOnlyNeuronChunk
-            >
-            (
-                action,
-                counterVariableValues,
-                counterVariable,
-                condition
-            )
+            IWorkingMemory
         {
             public WorkingMemoryInfo
             (
-                ReadOnlyNeuronChunk action,
-                EnumerableChunk counterVariableValues,
-                WriteableNeuronChunk counterVariable
+                NeuronChunk action,
+                EnumerableChunk<NeuronChunk> counterVariableValues,
+                NeuronChunk counterVariable
             ) : 
                 this
                 (
                     action,
                     counterVariableValues,
                     counterVariable,
-                    new(counterVariableValues.Content.Last())
+                    counterVariableValues.Content.Last()
                 )
             {
             }
 
-            public ReadOnlyNeuronChunk Action => this.Chunk1;
-            public EnumerableChunk CounterVariableValues => this.Chunk2;
-            public WriteableNeuronChunk CounterVariable => this.Chunk3;
-            public ReadOnlyNeuronChunk Condition => this.Chunk4;
+            public NeuronChunk Action => action;
+            public EnumerableChunk<NeuronChunk> CounterVariableValues => counterVariableValues;
+            public NeuronChunk CounterVariable { get; set; } = counterVariable;
+            public NeuronChunk Condition => condition;
         }
     }
 }

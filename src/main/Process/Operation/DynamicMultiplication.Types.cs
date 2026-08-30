@@ -1,57 +1,75 @@
-﻿namespace ei8.Cortex.Coding.d23.Process.Operation
+﻿using System.Linq;
+
+namespace ei8.Cortex.Coding.d23.Process.Operation
 {
     public partial class DynamicMultiplication
     {
         public class WorkingMemoryInfo
         (
-            EnumerableChunk multiplicandValues,
-            EnumerableChunk multiplierValues,
-            EnumerableChunk productValues,
-            NestedListChunk multiplierProducts,
-            ListChunk product
+            EnumerableChunk<NeuronChunk> multiplicandValues,
+            EnumerableChunk<NeuronChunk> multiplierValues,
+            EnumerableChunk<NeuronChunk> multiplicand,
+            EnumerableChunk<NeuronChunk> multiplier,
+            NeuronChunk? currentMultiplicandDigit,
+            NeuronChunk? currentMultiplierDigit,
+            NeuronChunk? lastMultiplicandDigit,
+            EnumerableChunk<NeuronChunk> productValues,
+            NestedListChunk<NeuronChunk> multiplierProducts,
+            IListChunk<NeuronChunk>? currentMultiplierProduct,
+            IListChunk<NeuronChunk>? lastAdditionSum,
+            ListChunk<NeuronChunk> product
         ) :
-            WorkingMemoryBase
-            <
-                EnumerableChunk,
-                EnumerableChunk,
-                EnumerableChunk,
-                NestedListChunk,
-                ListChunk
-            >
-            (
-                multiplicandValues,
-                multiplierValues,
-                productValues,
-                multiplierProducts,
-                product
-            )
+            IWorkingMemory
         {
             public WorkingMemoryInfo
             (
-                EnumerableChunk multiplicandValues,
-                EnumerableChunk multiplierValues,
-                EnumerableChunk productValues
+                EnumerableChunk<NeuronChunk> multiplicandValues,
+                EnumerableChunk<NeuronChunk> multiplierValues,
+                EnumerableChunk<NeuronChunk> multiplicand,
+                EnumerableChunk<NeuronChunk> multiplier,
+                EnumerableChunk<NeuronChunk> productValues
             ) :
                 this
                 (
                     multiplicandValues,
                     multiplierValues,
+                    multiplicand,
+                    multiplier,
+                    multiplicand.Content.First(),
+                    multiplier.Content.First(),
+                    null,
                     productValues,
                     new(),
+                    null,
+                    null,
                     new()
                 )
             {
             }
 
-            public EnumerableChunk MultiplicandValues => this.Chunk1;
+            public EnumerableChunk<NeuronChunk> MultiplicandValues => multiplicandValues;
 
-            public EnumerableChunk MultiplierValues => this.Chunk2;
+            public EnumerableChunk<NeuronChunk> MultiplierValues => multiplierValues;
 
-            public EnumerableChunk ProductValues => this.Chunk3;
+            public EnumerableChunk<NeuronChunk> Multiplicand => multiplicand;
 
-            public NestedListChunk MultiplierProducts => this.Chunk4;
+            public EnumerableChunk<NeuronChunk> Multiplier => multiplier;
 
-            public ListChunk Product => this.Chunk5;
+            public NeuronChunk? CurrentMultiplicandDigit { get; set; } = currentMultiplicandDigit;
+
+            public NeuronChunk? CurrentMultiplierDigit { get; set; } = currentMultiplierDigit;
+
+            public NeuronChunk? LastMultiplicandDigit { get; set; } = lastMultiplicandDigit;
+
+            public EnumerableChunk<NeuronChunk> ProductValues => productValues;
+
+            public NestedListChunk<NeuronChunk> MultiplierProducts => multiplierProducts;
+
+            public IListChunk<NeuronChunk>? CurrentMultiplierProduct { get; set; } = currentMultiplierProduct;
+            
+            public IListChunk<NeuronChunk>? LastAdditionSum { get; set; } = lastAdditionSum;
+
+            public ListChunk<NeuronChunk> Product => product;
         }
     }
 }

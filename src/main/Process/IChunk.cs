@@ -10,17 +10,35 @@ namespace ei8.Cortex.Coding.d23.Process
     {
     }
 
-    public interface IEnumerableChunk<T> :
-        IReadOnlyChunk<T>
-        where T : IEnumerable<Neuron>
+    public interface IChunk<T1> : IChunk
+    {
+        T1 Content { get; }
+    }
+
+    public interface IChunk<T1, T2> : IChunk<T1>
+    {
+        T2 Content2 { get; }
+    }
+
+    public interface IChunk<T1, T2, T3> : IChunk<T1, T2>
+    {
+        T3 Content3 { get; }
+    }
+
+    public interface IEnumerableChunkCore<T, TItem> :
+        IChunk<T>
+        where T : IEnumerable<TItem>
+        where TItem : IChunk
     {
     }
 
-    public interface IEnumerableChunk : IEnumerableChunk<IEnumerable<Neuron>>
+    public interface IEnumerableChunk<T> : IEnumerableChunkCore<IEnumerable<T>, T>
+        where T : IChunk
     {
     }
 
-    public interface IListChunk : IEnumerableChunk<IList<Neuron>>
+    public interface IListChunk<T> : IEnumerableChunkCore<IList<T>, T>
+        where T : IChunk
     {
     }
 }

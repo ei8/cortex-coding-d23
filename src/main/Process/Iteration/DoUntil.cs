@@ -36,13 +36,14 @@ namespace ei8.Cortex.Coding.d23.Process.Iteration
         {
             if (this.WorkingMemory != null)
             {
+                NeuronChunk? targetChunk = null;
                 if 
                 (
-                    this.WorkingMemory.CounterVariableValues.Content.Contains(targetNeuron) &&
-                    this.WorkingMemory.CounterVariable.Value != targetNeuron
+                    (targetChunk = this.WorkingMemory.CounterVariableValues.Content.SingleOrDefault(nc => nc.Value == targetNeuron)) != null &&
+                    this.WorkingMemory.CounterVariable != targetChunk
                 )
                 {
-                    this.WorkingMemory.CounterVariable.Value = targetNeuron;
+                    this.WorkingMemory.CounterVariable = targetChunk;
                     if (this.counterChangedCallback != null)
                         this.counterChangedCallback(this);
 

@@ -4,41 +4,23 @@
     {
         public class WorkingMemoryInfo
         (
-            EnumerableChunk precedingCarryOverValues,
-            EnumerableChunk addend1Values,
-            EnumerableChunk addend2Values,
-            EnumerableChunk sumValues,
-            ListChunk sum,
-            EnumerableChunk carryOverValues,
-            WriteableNullableNeuronChunk carryOver
+            EnumerableChunk<NeuronChunk> precedingCarryOverValues,
+            EnumerableChunk<NeuronChunk> addend1Values,
+            EnumerableChunk<NeuronChunk> addend2Values,
+            EnumerableChunk<NeuronChunk> sumValues,
+            ListChunk<NeuronChunk> sum,
+            EnumerableChunk<NeuronChunk> carryOverValues,
+            NeuronChunk? carryOver
         ) :
-            WorkingMemoryBase
-            <
-                EnumerableChunk,
-                EnumerableChunk,
-                EnumerableChunk,
-                EnumerableChunk,
-                ListChunk,
-                EnumerableChunk,
-                WriteableNullableNeuronChunk
-            >
-            (
-                precedingCarryOverValues,
-                addend1Values,
-                addend2Values,
-                sumValues,
-                sum,
-                carryOverValues,
-                carryOver
-            )
+            IWorkingMemory
         {
             public WorkingMemoryInfo
             (
-                EnumerableChunk precedingCarryOverValues,
-                EnumerableChunk addend1Values,
-                EnumerableChunk addend2Values,
-                EnumerableChunk sumValues,
-                EnumerableChunk carryOverValues
+                EnumerableChunk<NeuronChunk> precedingCarryOverValues,
+                EnumerableChunk<NeuronChunk> addend1Values,
+                EnumerableChunk<NeuronChunk> addend2Values,
+                EnumerableChunk<NeuronChunk> sumValues,
+                EnumerableChunk<NeuronChunk> carryOverValues
             ) :
                 this
                 (
@@ -48,24 +30,24 @@
                     sumValues,
                     new(),
                     carryOverValues,
-                    new()
+                    null
                 )
             {
             }
 
-            public EnumerableChunk PrecedingCarryOverValues => this.Chunk1;
+            public EnumerableChunk<NeuronChunk> PrecedingCarryOverValues => precedingCarryOverValues;
 
-            public EnumerableChunk Addend1Values => this.Chunk2;
+            public EnumerableChunk<NeuronChunk> Addend1Values => addend1Values;
 
-            public EnumerableChunk Addend2Values => this.Chunk3;
+            public EnumerableChunk<NeuronChunk> Addend2Values => addend2Values;
 
-            public EnumerableChunk SumValues => this.Chunk4;
+            public EnumerableChunk<NeuronChunk> SumValues => sumValues;
 
-            public ListChunk Sum => this.Chunk5;
+            public ListChunk<NeuronChunk> Sum => sum;
 
-            public EnumerableChunk CarryOverValues => this.Chunk6;
+            public EnumerableChunk<NeuronChunk> CarryOverValues => carryOverValues;
 
-            public WriteableNullableNeuronChunk CarryOver => this.Chunk7;
+            public NeuronChunk? CarryOver { get; set; } = carryOver;
         }
     }
 }

@@ -56,8 +56,8 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
 
             var digitIndex = this.digitRetriever(this.DoUntil.WorkingMemory.CounterVariable.Value);
             if (digitIndex == 0)
-                result.Add(this.WorkingMemory.PrecedingCarryOverValues.Content.Single(n => n.Tag.EndsWith('0')));
-            else if (this.WorkingMemory.CarryOver.Content != null)
+                result.Add(this.WorkingMemory.PrecedingCarryOverValues.Content.Single(n => n.Value.Tag.EndsWith('0')).Value);
+            else if (this.WorkingMemory.CarryOver != null)
                 result.Add(this.WorkingMemory.CarryOver.Content);
 
             var addends = this.addendsRetriever(digitIndex, this.WorkingMemory);
@@ -76,23 +76,23 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
             // if one of specified sum values, add to sums
             if
             (
-                this.WorkingMemory.SumValues.Content.Contains(targetNeuron) &&
+                this.WorkingMemory.SumValues.Content.Any(c => c.Value == targetNeuron) &&
                 lastSumDigit != this.DoUntil.WorkingMemory.CounterVariable.Value
             )
             {
                 SequentialAddition.logger.Info(new LogMessageGenerator(() => $"Added to Sum(s): {targetNeuron.Tag}"));
 
                 this.lastSumDigit = this.DoUntil.WorkingMemory.CounterVariable.Value;
-                this.WorkingMemory.Sum.Content.Add(targetNeuron);
+                this.WorkingMemory.Sum.Content.Add(new(targetNeuron));
             }
 
             // if one of specified carry over values, update carry over
-            if(this.WorkingMemory.CarryOverValues.Content.Contains(targetNeuron))
+            if(this.WorkingMemory.CarryOverValues.Content.Any(c => c.Value == targetNeuron))
             {
-                this.WorkingMemory.CarryOver.Content = 
+                this.WorkingMemory.CarryOver = 
                     this.WorkingMemory.PrecedingCarryOverValues.Content.Single
                     (
-                        n => n.Tag.EndsWith(targetNeuron.Tag.Last())
+                        n => n.Value.Tag.EndsWith(targetNeuron.Tag.Last())
                     );
             }
         }
@@ -101,8 +101,8 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
         {
             List<Neuron> result = SequentialAddition.GetSum
             (
-                this.WorkingMemory.Sum.Content, 
-                this.WorkingMemory.CarryOver.Value
+                this.WorkingMemory.Sum.Content.Select(c => c.Value), 
+                this.WorkingMemory.CarryOver?.Value
             );
 
             this.completionCallback(this, process, [.. result]);
