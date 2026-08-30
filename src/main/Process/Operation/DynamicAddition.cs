@@ -15,8 +15,6 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
         >
     {
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
-        private readonly Func<int> digitRetriever;
-        private readonly Action digitUpdater;
         private readonly Func<int, Addition.WorkingMemoryInfo, IEnumerable<Neuron>> addendsRetriever;
 
         private int? lastSumDigit;
@@ -25,8 +23,6 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
         public DynamicAddition
         (
             Addition.WorkingMemoryInfo workingMemory,
-            Func<int> digitRetriever,
-            Action digitUpdater,
             Func<int, Addition.WorkingMemoryInfo, IEnumerable<Neuron>> addendsRetriever,
             Action<DynamicAddition, IEnumerable<Neuron>> completionCallback
         ) :
@@ -36,8 +32,6 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                 completionCallback
             )
         {
-            this.digitRetriever = digitRetriever;
-            this.digitUpdater = digitUpdater;
             this.addendsRetriever = addendsRetriever;
         }
 
@@ -45,7 +39,7 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
         {
             List<Neuron> result = [];
 
-            var digitIndex = this.digitRetriever();
+            var digitIndex = this.WorkingMemory.Sum.Content.Count();
             if (digitIndex == 0)
                 result.Add(this.WorkingMemory.PrecedingCarryOverValues.Content.Single(n => n.Value.Tag.EndsWith('0')).Value);
             else if (this.WorkingMemory.CarryOver != null)
@@ -62,7 +56,7 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
 
         public override void HandleFire(Neuron targetNeuron, ReadOnlyNetwork network)
         {
-            var currentDigit = this.digitRetriever();
+            var currentDigit = this.WorkingMemory.Sum.Content.Count();
             // if one of specified sum values, add to sums
             if
             (
@@ -74,7 +68,6 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
 
                 this.lastSumDigit = currentDigit;
                 this.WorkingMemory.Sum.Content.Add(new(targetNeuron));
-                this.digitUpdater();
             }
 
             // if one of specified carry over values, update carry over

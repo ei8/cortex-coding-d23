@@ -19,9 +19,6 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
 
         private readonly IList<NeuronChunk> multiplier;
 
-        // TODO: transfer all fields and parameters into working memory as chunks
-        private int currentAdditionDigit;
-
         [SetsRequiredMembers]
         public DynamicMultiplication
         (
@@ -38,8 +35,6 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
             this.Process1 = new
             (
                 additionWorkingMemory,
-                () => this.currentAdditionDigit,
-                () => this.currentAdditionDigit++,
                 (i, wm) =>
                 {
                     List<Neuron> result = [];
@@ -100,8 +95,6 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                 {
                     // Update lastAdditionSum with sums
                     this.WorkingMemory.LastAdditionSum = new ListChunk<NeuronChunk>([.. s.Select(n => new NeuronChunk(n))]);
-                    // Reset currentAdditionDigit 
-                    this.currentAdditionDigit = 0;
 
                     if (this.WorkingMemory.CurrentMultiplierProduct != null)
                         DynamicMultiplication.logger.Info
@@ -130,8 +123,6 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
             );
 
             this.multiplier = [.. this.WorkingMemory.Multiplier.Content];
-
-            this.currentAdditionDigit = 0;
         }
 
         private int GetCurrentMultiplierProductIndex(IListChunk<NeuronChunk> currentListChunk)
