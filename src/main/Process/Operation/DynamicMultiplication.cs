@@ -1,7 +1,6 @@
 ﻿using NLog;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace ei8.Cortex.Coding.d23.Process.Operation
@@ -18,12 +17,12 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
         private readonly IList<NeuronChunk> multiplier;
+        private readonly Addition.WorkingMemoryValuesInfo additionWorkingMemory;
 
-        [SetsRequiredMembers]
         public DynamicMultiplication
         (
             DynamicMultiplication.WorkingMemoryInfo workingMemory,
-            Addition.WorkingMemoryInfo additionWorkingMemory,
+            Addition.WorkingMemoryValuesInfo additionWorkingMemory,
             Action<DynamicMultiplication, IEnumerable<Neuron>> completionCallback
         ) :
             base
@@ -32,151 +31,45 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                 completionCallback
             )
         {
-            this.Process1 = new
-            (
-                additionWorkingMemory,
-                (i, wm) =>
-                {
-                    List<Neuron> result = [];
-
-                    if (this.WorkingMemory.MultiplierProducts.Content.Count > 0)
-                    {
-                        if (this.WorkingMemory.MultiplierProducts.Content.Count == 1)
-                        {
-                            foreach (var mp in this.WorkingMemory.MultiplierProducts.Content[0].Content)
-                                this.WorkingMemory.Product.Content.Add(mp);
-                            this.Complete();
-                        }
-                        else
-                        {
-                            if (this.WorkingMemory.CurrentMultiplierProduct == null)
-                                this.WorkingMemory.CurrentMultiplierProduct = this.WorkingMemory.MultiplierProducts.Content[1];
-
-                            IListChunk<NeuronChunk> addend1;
-
-                            var currentMultiplierProductIndex = this.GetCurrentMultiplierProductIndex(this.WorkingMemory.CurrentMultiplierProduct);
-
-                            if (this.WorkingMemory.LastAdditionSum != null)
-                                addend1 = this.WorkingMemory.LastAdditionSum;
-                            else
-                                addend1 = this.WorkingMemory.MultiplierProducts.Content[currentMultiplierProductIndex - 1];
-
-                            if (currentMultiplierProductIndex > this.WorkingMemory.Product.Content.Count)
-                                this.WorkingMemory.Product.Content.Add(addend1.Content[0]);
-
-                            var addend1Array = addend1.Content.Skip(1).ToArray();
-
-                            IList<Neuron[]> addends =
-                            [
-                                [.. addend1Array.Select(ad => ad.Value)],
-                                [.. this.WorkingMemory.MultiplierProducts.Content[currentMultiplierProductIndex].Content.Select(c => c.Value)]
-                            ];
-
-                            if (addends.Any(a => i < a.Length))
-                                foreach (var addend in addends)
-                                {
-                                    EnumerableChunk<NeuronChunk> values;
-                                    if (addends.IndexOf(addend) == 0)
-                                        values = wm.Addend1Values;
-                                    else
-                                        values = wm.Addend2Values;
-
-                                    if (i < addend.Length)
-                                        result.Add(values.Content.Single(ad => ad.Value.Tag.EndsWith(addend[i].Tag.Last())).Value);
-                                    else
-                                        result.Add(values.Content.Single(ad => ad.Value.Tag.EndsWith('0')).Value);
-                                }
-                        }
-                    }
-
-                    return result;
-                },
-                (a, s) =>
-                {
-                    // Update lastAdditionSum with sums
-                    this.WorkingMemory.LastAdditionSum = new ListChunk<NeuronChunk>([.. s.Select(n => new NeuronChunk(n))]);
-
-                    if (this.WorkingMemory.CurrentMultiplierProduct != null)
-                        DynamicMultiplication.logger.Info
-                        (
-                            new LogMessageGenerator(() => $"Sum [{this.GetCurrentMultiplierProductIndex(this.WorkingMemory.CurrentMultiplierProduct)}]: {string.Join(string.Empty, s.Reverse().Select(s => s.Tag.Last()))}")
-                        );
-
-                    if 
-                    (
-                        this.WorkingMemory.LastAdditionSum != null &&
-                        (
-                            this.WorkingMemory.CurrentMultiplierProduct = 
-                                DynamicMultiplication.IncrementReset
-                                (
-                                    this.WorkingMemory.CurrentMultiplierProduct, 
-                                    this.WorkingMemory.MultiplierProducts.Content
-                                )
-                        ) == null
-                    )
-                    {
-                        foreach (var n in this.WorkingMemory.LastAdditionSum.Content)
-                            this.WorkingMemory.Product.Content.Add(n);
-                        this.Complete();
-                    }
-                }
-            );
-
             this.multiplier = [.. this.WorkingMemory.Multiplier.Content];
+            this.additionWorkingMemory = additionWorkingMemory;
         }
 
-        private int GetCurrentMultiplierProductIndex(IListChunk<NeuronChunk> currentListChunk)
+        private static int GetCurrentMultiplierProductIndex(WorkingMemoryInfo workingMemory)
         {
-            return this.WorkingMemory.MultiplierProducts.Content.IndexOf(currentListChunk);
+            if (workingMemory.CurrentMultiplierProduct != null)
+                return workingMemory.MultiplierProducts.Content.IndexOf(workingMemory.CurrentMultiplierProduct);
+            else
+                return -1;
         }
 
         public override IEnumerable<Neuron> GetCurrent()
         {
             List<Neuron> result = [];
 
-            if
-            (
-                DynamicMultiplication.IsMultiplying
-                (
-                    this.WorkingMemory.CurrentMultiplicandDigit, 
-                    this.WorkingMemory.CurrentMultiplierDigit
-                )
-            )
+            if(this.DynamicAddition == null)
             {
-                result.AddRange
+                if 
                 (
-                    [
-                        this.WorkingMemory.MultiplicandValues.Content.Single(mv => mv.Value.Tag.EndsWith(this.WorkingMemory.CurrentMultiplicandDigit.Content.Tag.Last())).Value,
-                        this.WorkingMemory.MultiplierValues.Content.Single(mv => mv.Value.Tag.EndsWith(this.WorkingMemory.CurrentMultiplierDigit.Content.Tag.Last())).Value
-                    ]
-                );
+                    this.WorkingMemory.CurrentMultiplicandDigit != null &&
+                    this.WorkingMemory.CurrentMultiplierDigit != null
+                )
+                    result.AddRange
+                    (
+                        [
+                            this.WorkingMemory.MultiplicandValues.Content.Single(mv => mv.Value.Tag.EndsWith(this.WorkingMemory.CurrentMultiplicandDigit.Content.Tag.Last())).Value,
+                            this.WorkingMemory.MultiplierValues.Content.Single(mv => mv.Value.Tag.EndsWith(this.WorkingMemory.CurrentMultiplierDigit.Content.Tag.Last())).Value
+                        ]
+                    );
             }
             else
                 result.AddRange(this.DynamicAddition.GetCurrent());
 
             return result;
         }
-
-        private static bool IsMultiplying
-        (
-            [NotNullWhen(true)]
-            NeuronChunk? multiplicandDigit,
-            [NotNullWhen(true)]
-            NeuronChunk? multiplierDigit
-        ) =>
-            multiplicandDigit != null &&
-            multiplierDigit != null;
-
         public override void HandleFire(Neuron targetNeuron, ReadOnlyNetwork network)
         {
-            if 
-            (
-                DynamicMultiplication.IsMultiplying
-                (
-                    this.WorkingMemory.CurrentMultiplicandDigit,
-                    this.WorkingMemory.CurrentMultiplierDigit
-                )
-            )
+            if(this.DynamicAddition == null)
             {
                 int currentMultiplierDigitIndex = -1;
 
@@ -238,29 +131,47 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                         {
                             this.WorkingMemory.CurrentMultiplicandDigit = this.WorkingMemory.Multiplicand.Content.First();
                         }
-                        else
+                        else if (this.WorkingMemory.MultiplierProducts.Content.Count > 0)
                         {
-                            DynamicMultiplication.logger.Info
-                            (
-                                new LogMessageGenerator
+                            if (this.WorkingMemory.MultiplierProducts.Content.Count == 1)
+                            {
+                                foreach (var mp in this.WorkingMemory.MultiplierProducts.Content[0].Content)
+                                    this.WorkingMemory.Product.Content.Add(mp);
+                                this.Complete();
+                            }
+                            else
+                            {
+                                this.WorkingMemory.CurrentMultiplierProduct = this.WorkingMemory.MultiplierProducts.Content[1];
+
+                                this.Process1 = DynamicMultiplication.CreateDynamicAddition
                                 (
-                                    () => $"Addition started: " +
-                                        $"[{string.Join
-                                            (
-                                                ',',
-                                                this.WorkingMemory.MultiplierProducts
-                                                    .Content.Select
-                                                    (
-                                                        mp =>
-                                                            string.Join
-                                                            (
-                                                                string.Empty,
-                                                                mp.Content.Reverse().Select(d => d.Value.Tag.Last())
-                                                            )
-                                                    )
-                                        )}]"
-                                )
-                            );
+                                    this.WorkingMemory, 
+                                    this.additionWorkingMemory,
+                                    this.AdditionCompleteHandler
+                                );
+
+                                DynamicMultiplication.logger.Info
+                                (
+                                    new LogMessageGenerator
+                                    (
+                                        () => $"Addition started: " +
+                                            $"[{string.Join
+                                                (
+                                                    ',',
+                                                    this.WorkingMemory.MultiplierProducts
+                                                        .Content.Select
+                                                        (
+                                                            mp =>
+                                                                string.Join
+                                                                (
+                                                                    string.Empty,
+                                                                    mp.Content.Reverse().Select(d => d.Value.Tag.Last())
+                                                                )
+                                                        )
+                                            )}]"
+                                    )
+                                );
+                            }
                         }
                     }
                 }
@@ -269,26 +180,112 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                 this.DynamicAddition.HandleFire(targetNeuron, network);
         }
 
-        private static T? IncrementReset<T>(T? item, IEnumerable<T> list)
+        private static DynamicAddition? CreateDynamicAddition
+        (
+            WorkingMemoryInfo workingMemory, 
+            Addition.WorkingMemoryValuesInfo additionWorkingMemoryValuesInfo,
+            Action complete
+        )
+        {
+            var currentMultiplierProductIndex = DynamicMultiplication.GetCurrentMultiplierProductIndex(workingMemory);
+
+            IListChunk<NeuronChunk> addend1;
+            if (workingMemory.LastAdditionSum != null)
+                addend1 = workingMemory.LastAdditionSum;
+            else
+                addend1 = workingMemory.MultiplierProducts.Content[currentMultiplierProductIndex - 1];
+
+            if (currentMultiplierProductIndex > workingMemory.Product.Content.Count)
+                workingMemory.Product.Content.Add(addend1.Content[0]);
+
+            var addend1Array = addend1.Content.Skip(1).ToArray();
+
+            IList<Neuron[]> addends =
+            [
+                [.. addend1Array.Select(ad => ad.Value)],
+                [.. workingMemory.MultiplierProducts.Content[currentMultiplierProductIndex].Content.Select(c => c.Value)]
+            ];
+
+            return new
+            (
+                new
+                (
+                    additionWorkingMemoryValuesInfo.PrecedingCarryOverValues,
+                    additionWorkingMemoryValuesInfo.AugendValues,
+                    additionWorkingMemoryValuesInfo.AddendValues,
+                    new([..addends[0].Select(a => new NeuronChunk(a))]),
+                    new([..addends[1].Select(a => new NeuronChunk(a))]),
+                    additionWorkingMemoryValuesInfo.SumValues,
+                    additionWorkingMemoryValuesInfo.CarryOverValues
+                ),
+                (a, s) =>
+                {
+                    // Update lastAdditionSum with sums
+                    workingMemory.LastAdditionSum = new ListChunk<NeuronChunk>([.. s.Select(n => new NeuronChunk(n))]);
+
+                    if (workingMemory.CurrentMultiplierProduct != null)
+                        DynamicMultiplication.logger.Info
+                        (
+                            new LogMessageGenerator(() => $"Sum [{DynamicMultiplication.GetCurrentMultiplierProductIndex(workingMemory)}]: {string.Join(string.Empty, s.Reverse().Select(s => s.Tag.Last()))}")
+                        );
+
+                    workingMemory.CurrentMultiplierProduct = DynamicMultiplication.IncrementReset
+                        (
+                            workingMemory.CurrentMultiplierProduct,
+                            workingMemory.MultiplierProducts.Content
+                        );
+
+                    complete();
+                }
+            );
+        }
+
+        // TODO: transfer to static helper
+        internal static T? IncrementReset<T>(T? currentItem, IEnumerable<T> list)
             where T : class
         {
             T? nextItem = default;
             
-            if (item != null)
+            if (currentItem != null)
                 nextItem = list
-                    .SkipWhile(li => li != item)
+                    .SkipWhile(li => li != currentItem)
                     .Skip(1)
                     .FirstOrDefault();
 
             return nextItem;
         }
 
-        private void Complete()
+        private void AdditionCompleteHandler()
         {
-            this.completionCallback(this, [.. this.WorkingMemory.Product.Content.Select(c => c.Value)]);
-            this.WorkingMemory.Product.Content.Clear();
+            if (this.WorkingMemory.CurrentMultiplierProduct != null)
+            {
+                this.Process1 = DynamicMultiplication.CreateDynamicAddition
+                    (
+                        this.WorkingMemory,
+                        this.additionWorkingMemory,
+                        this.AdditionCompleteHandler
+                    );
+            }
+            else
+            {
+                this.Process1 = null;
+                Complete();
+            }
         }
 
-        public DynamicAddition DynamicAddition => this.Process1;
+        private void Complete()
+        {
+            if (this.WorkingMemory.LastAdditionSum != null)
+            {
+                foreach (var n in this.WorkingMemory.LastAdditionSum.Content)
+                    this.WorkingMemory.Product.Content.Add(n);
+
+                // TODO: why are there 0's before leftmost digit
+                this.completionCallback(this, [.. this.WorkingMemory.Product.Content.Select(c => c.Value)]);
+                this.WorkingMemory.Product.Content.Clear();
+            }
+        }
+
+        public DynamicAddition? DynamicAddition => this.Process1;
     }
 }

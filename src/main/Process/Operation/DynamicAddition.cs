@@ -15,15 +15,11 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
         >
     {
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
-        private readonly Func<int, Addition.WorkingMemoryInfo, IEnumerable<Neuron>> addendsRetriever;
-
-        private int? lastSumDigit;
 
         [SetsRequiredMembers]
         public DynamicAddition
         (
             Addition.WorkingMemoryInfo workingMemory,
-            Func<int, Addition.WorkingMemoryInfo, IEnumerable<Neuron>> addendsRetriever,
             Action<DynamicAddition, IEnumerable<Neuron>> completionCallback
         ) :
             base
@@ -32,42 +28,67 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                 completionCallback
             )
         {
-            this.addendsRetriever = addendsRetriever;
         }
 
         public override IEnumerable<Neuron> GetCurrent()
         {
             List<Neuron> result = [];
 
-            var digitIndex = this.WorkingMemory.Sum.Content.Count();
-            if (digitIndex == 0)
-                result.Add(this.WorkingMemory.PrecedingCarryOverValues.Content.Single(n => n.Value.Tag.EndsWith('0')).Value);
-            else if (this.WorkingMemory.CarryOver != null)
-                result.Add(this.WorkingMemory.CarryOver.Content);
-
-            var addends = this.addendsRetriever(digitIndex, this.WorkingMemory);
-            if (!addends.Any())
+            var digitIndex = this.WorkingMemory.Sum.Content.Count;
+            if (!SequentialAddition.AddAddends(result, digitIndex, this.WorkingMemory))
                 this.Complete();
-            else
-                result.AddRange(addends);
 
             return result;
         }
 
         public override void HandleFire(Neuron targetNeuron, ReadOnlyNetwork network)
         {
-            var currentDigit = this.WorkingMemory.Sum.Content.Count();
             // if one of specified sum values, add to sums
             if
             (
                 this.WorkingMemory.SumValues.Content.Any(c => c.Value == targetNeuron) &&
-                this.lastSumDigit != currentDigit
+                (
+                    (
+                        this.WorkingMemory.LastAugendDigit != this.WorkingMemory.CurrentAugendDigit &&
+                        this.WorkingMemory.CurrentAugendDigit != null
+                    ) ||
+                    (
+                        this.WorkingMemory.LastAddendDigit != this.WorkingMemory.CurrentAugendDigit &&
+                        this.WorkingMemory.CurrentAddendDigit != null
+                    )
+                ) 
             )
             {
+                if (this.WorkingMemory.LastAugendDigit != this.WorkingMemory.CurrentAugendDigit)
+                    this.WorkingMemory.LastAugendDigit = this.WorkingMemory.CurrentAugendDigit;
+
+                if (this.WorkingMemory.LastAddendDigit != this.WorkingMemory.CurrentAddendDigit)
+                    this.WorkingMemory.LastAddendDigit = this.WorkingMemory.CurrentAddendDigit;
+
+                this.WorkingMemory.Sum.Content.Add(new(targetNeuron));
+
                 DynamicAddition.logger.Info(new LogMessageGenerator(() => $"Added to Sum(s): {targetNeuron.Tag}"));
 
-                this.lastSumDigit = currentDigit;
-                this.WorkingMemory.Sum.Content.Add(new(targetNeuron));
+                if
+                (
+                    (
+                        this.WorkingMemory.CurrentAugendDigit =
+                            DynamicMultiplication.IncrementReset
+                            (
+                                this.WorkingMemory.CurrentAugendDigit,
+                                this.WorkingMemory.Augend.Content
+                            )
+                    ) == null &&
+                    (
+                        this.WorkingMemory.CurrentAddendDigit =
+                            DynamicMultiplication.IncrementReset
+                            (
+                                this.WorkingMemory.CurrentAddendDigit,
+                                this.WorkingMemory.Addend.Content
+                            )
+                    ) == null
+                )
+                    this.Complete();
             }
 
             // if one of specified carry over values, update carry over

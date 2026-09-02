@@ -8,6 +8,6 @@
         ICompositeProcess
         where TProcess1 : IProcess
     {
-        TProcess1 Process1 { get; }
+        TProcess1? Process1 { get; }
     }
 }

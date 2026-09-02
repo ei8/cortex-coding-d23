@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ei8.Cortex.Coding.d23.Process
+﻿namespace ei8.Cortex.Coding.d23.Process
 {
     public abstract class CompositeProcessBase
     <
@@ -18,6 +16,6 @@ namespace ei8.Cortex.Coding.d23.Process
         where TProcess1 : IProcess
         where TWorkingMemory : IWorkingMemory
     {
-        public required TProcess1 Process1 { get; set; }
+        public TProcess1? Process1 { get; protected set; }
     }
 }

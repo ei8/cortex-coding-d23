@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace ei8.Cortex.Coding.d23.Process.Operation
 {
-    public class SequentialAddition :
+    public partial class SequentialAddition :
         FiniteCompositeProcessBase
         <
             SequentialAddition, 
@@ -18,8 +18,6 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
     {
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
         private readonly Func<Neuron, int> digitRetriever;
-        private readonly Func<int, Addition.WorkingMemoryInfo, IEnumerable<Neuron>> addendsRetriever;
-
         private Neuron? lastSumDigit;
 
         [SetsRequiredMembers]
@@ -28,7 +26,6 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
             Addition.WorkingMemoryInfo workingMemory,
             DoUntil.WorkingMemoryInfo doUntilWorkingMemory,
             Func<Neuron, int> digitRetriever,
-            Func<int, Addition.WorkingMemoryInfo, IEnumerable<Neuron>> addendsRetriever,
             Action<SequentialAddition, IProcess?, IEnumerable<Neuron>> completionCallback
         ) :
             base
@@ -45,45 +42,75 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
             );
 
             this.digitRetriever = digitRetriever;
-            this.addendsRetriever = addendsRetriever;
         }
 
         public override IEnumerable<Neuron> GetCurrent()
         {
             List<Neuron> result = [];
 
-            result.AddRange(this.DoUntil.GetCurrent());
+            if (this.DoUntil != null)
+            {
+                result.AddRange(this.DoUntil.GetCurrent());
 
-            var digitIndex = this.digitRetriever(this.DoUntil.WorkingMemory.CounterVariable.Value);
-            if (digitIndex == 0)
-                result.Add(this.WorkingMemory.PrecedingCarryOverValues.Content.Single(n => n.Value.Tag.EndsWith('0')).Value);
-            else if (this.WorkingMemory.CarryOver != null)
-                result.Add(this.WorkingMemory.CarryOver.Content);
-
-            var addends = this.addendsRetriever(digitIndex, this.WorkingMemory);
-            if (!addends.Any())
-                this.Complete(null);
-            else
-                result.AddRange(addends);
+                var digitIndex = this.digitRetriever(this.DoUntil.WorkingMemory.CounterVariable.Value);
+                if (!SequentialAddition.AddAddends(result, digitIndex, this.WorkingMemory))
+                    this.Complete(null);
+            }
 
             return result;
         }
 
-        public override void HandleFire(Neuron targetNeuron, ReadOnlyNetwork network)
+        internal static bool AddAddends(List<Neuron> result, int digitIndex, Addition.WorkingMemoryInfo workingMemory)
         {
-            this.DoUntil.HandleFire(targetNeuron, network);
+            var bResult = true;
 
-            // if one of specified sum values, add to sums
+            if (digitIndex == 0)
+                result.Add(workingMemory.PrecedingCarryOverValues.Content.Single(n => n.Value.Tag.EndsWith('0')).Value);
+            else if (workingMemory.CarryOver != null)
+                result.Add(workingMemory.CarryOver.Content);
+
             if
             (
-                this.WorkingMemory.SumValues.Content.Any(c => c.Value == targetNeuron) &&
-                lastSumDigit != this.DoUntil.WorkingMemory.CounterVariable.Value
+                digitIndex > workingMemory.Augend.Content.Count() &&
+                digitIndex > workingMemory.Addend.Content.Count()
             )
+                bResult = false;
+            else
             {
-                SequentialAddition.logger.Info(new LogMessageGenerator(() => $"Added to Sum(s): {targetNeuron.Tag}"));
+                SequentialAddition.AddAddend(digitIndex, result, workingMemory.AugendValues, workingMemory.Augend);
+                SequentialAddition.AddAddend(digitIndex, result, workingMemory.AddendValues, workingMemory.Addend);
+            }
 
-                this.lastSumDigit = this.DoUntil.WorkingMemory.CounterVariable.Value;
-                this.WorkingMemory.Sum.Content.Add(new(targetNeuron));
+            return bResult;
+        }
+
+        // TODO: transfer to helper function
+        private static void AddAddend(int digitIndex, List<Neuron> addendsResult, EnumerableChunk<NeuronChunk> addendValues, EnumerableChunk<NeuronChunk> addend)
+        {
+            if (digitIndex < addend.Content.Count())
+                addendsResult.Add(addendValues.Content.Single(ad => ad.Value.Tag.EndsWith(addend.Content.ElementAt(digitIndex).Value.Tag.Last())).Value);
+            else
+                addendsResult.Add(addendValues.Content.Single(ad => ad.Value.Tag.EndsWith('0')).Value);
+        }
+
+        public override void HandleFire(Neuron targetNeuron, ReadOnlyNetwork network)
+        {
+            if (this.DoUntil != null)
+            {
+                this.DoUntil.HandleFire(targetNeuron, network);
+
+                // if one of specified sum values, add to sums
+                if
+                (
+                    this.WorkingMemory.SumValues.Content.Any(c => c.Value == targetNeuron) &&
+                    lastSumDigit != this.DoUntil.WorkingMemory.CounterVariable.Value
+                )
+                {
+                    SequentialAddition.logger.Info(new LogMessageGenerator(() => $"Added to Sum(s): {targetNeuron.Tag}"));
+
+                    this.lastSumDigit = this.DoUntil.WorkingMemory.CounterVariable.Value;
+                    this.WorkingMemory.Sum.Content.Add(new(targetNeuron));
+                }
             }
 
             // if one of specified carry over values, update carry over
@@ -119,6 +146,6 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
             return result;
         }
 
-        public DoUntil DoUntil => this.Process1;
+        public DoUntil? DoUntil => this.Process1;
     }
 }
