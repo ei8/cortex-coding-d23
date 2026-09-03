@@ -47,11 +47,6 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
             {
             }
 
-            public int GetCurrentMultiplierProductIndex() =>
-                this.CurrentMultiplierProduct != null ?
-                    this.MultiplierProducts.Content.IndexOf(this.CurrentMultiplierProduct) : 
-                    -1;
-
             public EnumerableChunk<NeuronChunk> MultiplicandValues => multiplicandValues;
 
             public EnumerableChunk<NeuronChunk> MultiplierValues => multiplierValues;

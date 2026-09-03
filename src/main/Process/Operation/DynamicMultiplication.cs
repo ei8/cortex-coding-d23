@@ -183,7 +183,11 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                 workingMemory.CurrentMultiplierProduct = workingMemory.MultiplierProducts.Content[1];
             }
 
-            if (workingMemory.GetCurrentMultiplierProductIndex() > workingMemory.Product.Content.Count)
+            if 
+            (
+                workingMemory.MultiplierProducts.Content.IndexOf(workingMemory.CurrentMultiplierProduct) > 
+                workingMemory.Product.Content.Count
+            )
                 workingMemory.Product.Content.Add(augend.Content[0]);
 
             return new
@@ -209,7 +213,7 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                             new LogMessageGenerator
                             (
                                 () => 
-                                    $"Sum [{workingMemory.GetCurrentMultiplierProductIndex()}]: " +
+                                    $"Sum [{workingMemory.MultiplierProducts.Content.IndexOf(workingMemory.CurrentMultiplierProduct)}]: " +
                                     $"{string.Join(string.Empty, s.Reverse().Select(s => s.Tag.Last()))}")
                         );
 
