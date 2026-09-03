@@ -35,14 +35,6 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
             this.additionWorkingMemory = additionWorkingMemory;
         }
 
-        private static int GetCurrentMultiplierProductIndex(WorkingMemoryInfo workingMemory)
-        {
-            if (workingMemory.CurrentMultiplierProduct != null)
-                return workingMemory.MultiplierProducts.Content.IndexOf(workingMemory.CurrentMultiplierProduct);
-            else
-                return -1;
-        }
-
         public override IEnumerable<Neuron> GetCurrent()
         {
             List<Neuron> result = [];
@@ -67,6 +59,7 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
 
             return result;
         }
+
         public override void HandleFire(Neuron targetNeuron, ReadOnlyNetwork network)
         {
             if(this.DynamicAddition == null)
@@ -109,11 +102,7 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                     (
                         (
                             this.WorkingMemory.CurrentMultiplicandDigit =
-                                DynamicMultiplication.IncrementReset
-                                (
-                                    this.WorkingMemory.CurrentMultiplicandDigit,
-                                    this.WorkingMemory.Multiplicand.Content
-                                )
+                                this.WorkingMemory.Multiplicand.Content.IncrementReset(this.WorkingMemory.CurrentMultiplicandDigit)
                         ) == null
                     )
                     {
@@ -121,11 +110,7 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                         (
                             (
                                 this.WorkingMemory.CurrentMultiplierDigit =
-                                    DynamicMultiplication.IncrementReset
-                                    (
-                                        this.WorkingMemory.CurrentMultiplierDigit,
-                                        this.WorkingMemory.Multiplier.Content
-                                    )
+                                    this.WorkingMemory.Multiplier.Content.IncrementReset(this.WorkingMemory.CurrentMultiplierDigit)
                             ) != null
                         )
                         {
@@ -141,8 +126,6 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                             }
                             else
                             {
-                                this.WorkingMemory.CurrentMultiplierProduct = this.WorkingMemory.MultiplierProducts.Content[1];
-
                                 this.Process1 = DynamicMultiplication.CreateDynamicAddition
                                 (
                                     this.WorkingMemory, 
@@ -154,21 +137,22 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                                 (
                                     new LogMessageGenerator
                                     (
-                                        () => $"Addition started: " +
-                                            $"[{string.Join
+                                        () => 
+                                            $"Addition started: [{
+                                                string.Join
                                                 (
                                                     ',',
-                                                    this.WorkingMemory.MultiplierProducts
-                                                        .Content.Select
-                                                        (
-                                                            mp =>
-                                                                string.Join
-                                                                (
-                                                                    string.Empty,
-                                                                    mp.Content.Reverse().Select(d => d.Value.Tag.Last())
-                                                                )
-                                                        )
-                                            )}]"
+                                                    this.WorkingMemory.MultiplierProducts.Content.Select
+                                                    (
+                                                        mp =>
+                                                            string.Join
+                                                            (
+                                                                string.Empty,
+                                                                mp.Content.Reverse().Select(d => d.Value.Tag.Last())
+                                                            )
+                                                    )
+                                                )
+                                            }]"
                                     )
                                 );
                             }
@@ -187,24 +171,20 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
             Action complete
         )
         {
-            var currentMultiplierProductIndex = DynamicMultiplication.GetCurrentMultiplierProductIndex(workingMemory);
-
-            IListChunk<NeuronChunk> addend1;
+            IListChunk<NeuronChunk> augend;
             if (workingMemory.LastAdditionSum != null)
-                addend1 = workingMemory.LastAdditionSum;
+            {
+                augend = workingMemory.LastAdditionSum;
+                ArgumentNullException.ThrowIfNull(workingMemory.CurrentMultiplierProduct);
+            }
             else
-                addend1 = workingMemory.MultiplierProducts.Content[currentMultiplierProductIndex - 1];
+            {
+                augend = workingMemory.MultiplierProducts.Content[0];
+                workingMemory.CurrentMultiplierProduct = workingMemory.MultiplierProducts.Content[1];
+            }
 
-            if (currentMultiplierProductIndex > workingMemory.Product.Content.Count)
-                workingMemory.Product.Content.Add(addend1.Content[0]);
-
-            var addend1Array = addend1.Content.Skip(1).ToArray();
-
-            IList<Neuron[]> addends =
-            [
-                [.. addend1Array.Select(ad => ad.Value)],
-                [.. workingMemory.MultiplierProducts.Content[currentMultiplierProductIndex].Content.Select(c => c.Value)]
-            ];
+            if (workingMemory.GetCurrentMultiplierProductIndex() > workingMemory.Product.Content.Count)
+                workingMemory.Product.Content.Add(augend.Content[0]);
 
             return new
             (
@@ -213,8 +193,8 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                     additionWorkingMemoryValuesInfo.PrecedingCarryOverValues,
                     additionWorkingMemoryValuesInfo.AugendValues,
                     additionWorkingMemoryValuesInfo.AddendValues,
-                    new([..addends[0].Select(a => new NeuronChunk(a))]),
-                    new([..addends[1].Select(a => new NeuronChunk(a))]),
+                    new([.. augend.Content.Skip(1).Select(ad => new NeuronChunk(ad.Value))]),
+                    new([.. workingMemory.CurrentMultiplierProduct.Content.Select(c => new NeuronChunk(c.Value))]),
                     additionWorkingMemoryValuesInfo.SumValues,
                     additionWorkingMemoryValuesInfo.CarryOverValues
                 ),
@@ -226,33 +206,19 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                     if (workingMemory.CurrentMultiplierProduct != null)
                         DynamicMultiplication.logger.Info
                         (
-                            new LogMessageGenerator(() => $"Sum [{DynamicMultiplication.GetCurrentMultiplierProductIndex(workingMemory)}]: {string.Join(string.Empty, s.Reverse().Select(s => s.Tag.Last()))}")
+                            new LogMessageGenerator
+                            (
+                                () => 
+                                    $"Sum [{workingMemory.GetCurrentMultiplierProductIndex()}]: " +
+                                    $"{string.Join(string.Empty, s.Reverse().Select(s => s.Tag.Last()))}")
                         );
 
-                    workingMemory.CurrentMultiplierProduct = DynamicMultiplication.IncrementReset
-                        (
-                            workingMemory.CurrentMultiplierProduct,
-                            workingMemory.MultiplierProducts.Content
-                        );
+                    workingMemory.CurrentMultiplierProduct =
+                        workingMemory.MultiplierProducts.Content.IncrementReset(workingMemory.CurrentMultiplierProduct);
 
                     complete();
                 }
             );
-        }
-
-        // TODO: transfer to static helper
-        internal static T? IncrementReset<T>(T? currentItem, IEnumerable<T> list)
-            where T : class
-        {
-            T? nextItem = default;
-            
-            if (currentItem != null)
-                nextItem = list
-                    .SkipWhile(li => li != currentItem)
-                    .Skip(1)
-                    .FirstOrDefault();
-
-            return nextItem;
         }
 
         private void AdditionCompleteHandler()
@@ -269,7 +235,7 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
             else
             {
                 this.Process1 = null;
-                Complete();
+                this.Complete();
             }
         }
 
@@ -280,7 +246,6 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                 foreach (var n in this.WorkingMemory.LastAdditionSum.Content)
                     this.WorkingMemory.Product.Content.Add(n);
 
-                // TODO: why are there 0's before leftmost digit
                 this.completionCallback(this, [.. this.WorkingMemory.Product.Content.Select(c => c.Value)]);
                 this.WorkingMemory.Product.Content.Clear();
             }

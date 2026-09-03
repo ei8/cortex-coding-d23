@@ -1,41 +1,33 @@
 ﻿using NLog;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace ei8.Cortex.Coding.d23.Process.Operation
 {
-    public partial class DynamicAddition :
+    public partial class DynamicAddition
+    (
+        Addition.WorkingMemoryInfo workingMemory,
+        Action<DynamicAddition, IEnumerable<Neuron>> completionCallback
+    ) :
         FiniteProcessBase
         <
             DynamicAddition, 
             Addition.WorkingMemoryInfo,
             Action<DynamicAddition, IEnumerable<Neuron>>
         >
+        (
+            workingMemory,
+            completionCallback
+        )
     {
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
-
-        [SetsRequiredMembers]
-        public DynamicAddition
-        (
-            Addition.WorkingMemoryInfo workingMemory,
-            Action<DynamicAddition, IEnumerable<Neuron>> completionCallback
-        ) :
-            base
-            (
-                workingMemory,
-                completionCallback
-            )
-        {
-        }
 
         public override IEnumerable<Neuron> GetCurrent()
         {
             List<Neuron> result = [];
 
-            var digitIndex = this.WorkingMemory.Sum.Content.Count;
-            if (!SequentialAddition.AddAddends(result, digitIndex, this.WorkingMemory))
+            if (!this.WorkingMemory.TryAddCurrent(result))
                 this.Complete();
 
             return result;
@@ -72,20 +64,12 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                 if
                 (
                     (
-                        this.WorkingMemory.CurrentAugendDigit =
-                            DynamicMultiplication.IncrementReset
-                            (
-                                this.WorkingMemory.CurrentAugendDigit,
-                                this.WorkingMemory.Augend.Content
-                            )
+                        this.WorkingMemory.CurrentAugendDigit = 
+                            this.WorkingMemory.Augend.Content.IncrementReset(this.WorkingMemory.CurrentAugendDigit)
                     ) == null &&
                     (
                         this.WorkingMemory.CurrentAddendDigit =
-                            DynamicMultiplication.IncrementReset
-                            (
-                                this.WorkingMemory.CurrentAddendDigit,
-                                this.WorkingMemory.Addend.Content
-                            )
+                            this.WorkingMemory.Addend.Content.IncrementReset(this.WorkingMemory.CurrentAddendDigit)
                     ) == null
                 )
                     this.Complete();
@@ -104,13 +88,7 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
 
         private void Complete()
         {
-            var result = SequentialAddition.GetSum
-            (
-                this.WorkingMemory.Sum.Content.Select(c => c.Value),
-                this.WorkingMemory.CarryOver?.Value
-            );
-
-            this.completionCallback(this, [..result]);
+            this.completionCallback(this, [.. this.WorkingMemory.GetSumNeurons()]);
             this.WorkingMemory.Sum.Content.Clear();
         }
     }

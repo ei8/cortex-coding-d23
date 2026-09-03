@@ -189,6 +189,20 @@ namespace ei8.Cortex.Coding.d23
             // if number of related fires equals eg. 2 parameters + 1 method
             responseParser.ParameterConverters.Count() + 1;
 
+        internal static T? IncrementReset<T>(this IEnumerable<T> list, T? currentItem)
+            where T : class
+        {
+            T? nextItem = default;
+
+            if (currentItem != null)
+                nextItem = list
+                    .SkipWhile(li => li != currentItem)
+                    .Skip(1)
+                    .FirstOrDefault();
+
+            return nextItem;
+        }
+
         public static IDictionary<Guid, T> ConvertToNeuronValueMap<T>(this IEnumerable<T> values, IEnumerable<MirrorConfig> mirrorConfigs, Network network) where T : Enum
         {
             var result = new Dictionary<Guid, T>();
