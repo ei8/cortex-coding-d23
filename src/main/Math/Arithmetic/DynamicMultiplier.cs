@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 
 namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 {
+    // TODO: Add Adder Circuit to determine current digit
     public partial class DynamicMultiplier
     (
         Multiplier multiplier,

@@ -189,6 +189,10 @@ namespace ei8.Cortex.Coding.d23
             // if number of related fires equals eg. 2 parameters + 1 method
             responseParser.ParameterConverters.Count() + 1;
 
+        // TODO: Use Adder to:
+        // 1. Store current digit info
+        // 2. Retrieve next digit value by looping from first digit to current digit
+        // 3. Use Equal (Operation-TBD) as condition in DoUntil  to determine if current Digit Index is equal to current digit info
         internal static T? IncrementReset<T>(this IEnumerable<T> list, T? currentItem)
             where T : class
         {
