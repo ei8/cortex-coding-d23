@@ -1,6 +1,8 @@
 ﻿namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 {
-    // TODO: transfer static abstract functions to IOperationStatic so OperationBase can implement IOperation
+    // TODO: So OperationBase can implement IOperation
+    // 1. transfer static abstract functions to IOperationStatic or 
+    // 2. Create base interface for IOperation and implement from here,  eg. see LogicGateBase, ILogicGate
     // TOOD: look for similar patterns where this update is applicable
     public interface IGroupedOperation
     <
