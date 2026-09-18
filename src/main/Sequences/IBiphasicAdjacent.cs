@@ -1,14 +1,33 @@
 ﻿namespace ei8.Cortex.Coding.d23.Sequences
 {
     public interface IBiphasicAdjacent
+    {
+    }
+
+    public interface IBiphasicAdjacent
+    <
+        TParam,
+        TInterneuron
+    > :
+        IBiphasicAdjacent,
+        IAdjacent
+        <
+            TParam,
+            TInterneuron
+        >
+        where TParam : IFunctionalCircuitParameter
+        where TInterneuron : ICircuitInterneuronSet
+    {
+    }
+    
+    public interface IBiphasicAdjacentStatic
     <
         T, 
         TParam, 
         TInterneuron
     > : 
-        IAdjacent
+        IBiphasicAdjacent
         <
-            T, 
             TParam, 
             TInterneuron
         >

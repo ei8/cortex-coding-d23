@@ -3,7 +3,11 @@ using System.Runtime.CompilerServices;
 
 namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 {
-    public abstract class UngroupedOperationBase<TParam, TInterneuron>
+    public abstract class UngroupedOperationBase
+    <
+        TParam, 
+        TInterneuron
+    >
     (
         TParam parameters,
         TInterneuron interneurons,
@@ -14,7 +18,12 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
             parameters,
             interneurons,
             variableInfo
-        )
+        ),
+        IUngroupedOperation
+        <
+            TParam, 
+            TInterneuron
+        >
         where TParam : IFunctionalCircuitParameter
         where TInterneuron : ICircuitInterneuronSet
     {
@@ -24,7 +33,19 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
             int exponent = 0,
             [CallerArgumentExpression(nameof(result))] string parameterExpression = ""
         )
-            where T : IUngroupedOperation<T, TParam, TInterneuron>
+            where T : 
+                IUngroupedOperationStatic
+                <
+                    T, 
+                    TParam, 
+                    TInterneuron
+                >, 
+                IOperationStatic
+                <
+                    T, 
+                    TParam, 
+                    TInterneuron
+                >
         {
             bool bResult = false;
             result = default;

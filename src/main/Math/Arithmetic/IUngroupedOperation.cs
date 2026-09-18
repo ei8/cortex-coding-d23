@@ -1,14 +1,33 @@
 ﻿namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 {
     public interface IUngroupedOperation
+    {
+    }
+
+    public interface IUngroupedOperation
+    <
+        TParam,
+        TInterneuron
+    > :
+        IUngroupedOperation,
+        IOperation
+        <
+            TParam,
+            TInterneuron
+        >
+        where TParam : IFunctionalCircuitParameter
+        where TInterneuron : ICircuitInterneuronSet
+    {
+    }
+
+    public interface IUngroupedOperationStatic
     <
         T,
         TParam,
         TInterneuron
     > :
-        IOperation
+        IUngroupedOperation
         <
-            T,
             TParam,
             TInterneuron
         >

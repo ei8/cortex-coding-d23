@@ -1,5 +1,4 @@
-﻿using NLog;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace ei8.Cortex.Coding.d23.Process
 {
@@ -10,8 +9,6 @@ namespace ei8.Cortex.Coding.d23.Process
         IProcess<T>
         where T : IWorkingMemory
     {
-        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
-
         public abstract IEnumerable<Neuron> GetCurrent();
 
         public abstract void HandleFire(Neuron targetNeuron, ReadOnlyNetwork network);

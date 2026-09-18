@@ -4,19 +4,17 @@ namespace ei8.Cortex.Coding.d23.Process
 {
     public abstract class FiniteCompositeProcessBase
     <
-        TProcess, 
         TWorkingMemory, 
-        TProcess1,
+        TProcess,
         TCompletion
     >
     (
         TWorkingMemory workingMemory, 
         TCompletion completionCallback
     ) :
-        CompositeProcessBase<TWorkingMemory, TProcess1>(workingMemory)
-        where TProcess : IProcess<TWorkingMemory>
+        CompositeProcessBase<TWorkingMemory, TProcess>(workingMemory)
         where TWorkingMemory : IWorkingMemory
-        where TProcess1 : IProcess
+        where TProcess : IProcess
         where TCompletion : Delegate
     {
         protected TCompletion completionCallback = completionCallback;

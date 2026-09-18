@@ -12,7 +12,6 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
     ) :
         FiniteProcessBase
         <
-            DynamicAddition, 
             Addition.WorkingMemoryInfo,
             Action<DynamicAddition, IEnumerable<Neuron>>
         >

@@ -24,7 +24,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
             adder,
             variableInfo
         ),
-        IAugmentedCompositeCircuit
+        IAugmentedCompositeCircuitStatic
         <
             SequentialAdder,
             SequentialAdder.AugmentationInfo,
@@ -60,7 +60,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
             [CallerArgumentExpression(nameof(result))] string parameterExpression = ""
         )
             where T :
-                IAugmentedCompositeCircuit
+                IAugmentedCompositeCircuitStatic
                 <
                     T,
                     SequentialAdder.AugmentationInfo,

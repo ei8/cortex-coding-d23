@@ -1,6 +1,10 @@
 ﻿namespace ei8.Cortex.Coding.d23.Math.Logic
 {
-    public abstract class LogicGateBase<TParam, TInterneuron>
+    public abstract class LogicGateBase
+    <
+        TParam, 
+        TInterneuron
+    >
     (
         TParam parameters,
         TInterneuron interneuron,
@@ -10,7 +14,12 @@
             parameters,
             interneuron,
             variableInfo
-        )
+        ),
+        ILogicGate
+        <
+            TParam,
+            TInterneuron
+        >
         where TParam : IFunctionalCircuitParameter
         where TInterneuron : ICircuitInterneuronSet
     {

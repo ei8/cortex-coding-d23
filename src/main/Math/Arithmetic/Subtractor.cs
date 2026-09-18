@@ -24,7 +24,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
             interneurons,
             variableInfo
         ), 
-        IGroupedOperation
+        IGroupedOperationStatic
         <
             Subtractor, 
             FunctionalCircuitParameter
@@ -32,6 +32,16 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                 Subtractor.Input, 
                 Subtractor.Output
             >, 
+            InterneuronSet
+        >,
+        IOperationStatic
+        <
+            Subtractor,
+            FunctionalCircuitParameter
+            <
+                Subtractor.Input,
+                Subtractor.Output
+            >,
             InterneuronSet
         >
     {

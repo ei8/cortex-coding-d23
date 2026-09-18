@@ -24,7 +24,13 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
             interneurons,
             variableInfo
         ), 
-        IUngroupedOperation
+        IUngroupedOperationStatic
+        <
+            Multiplier,
+            FunctionalCircuitParameter<Multiplier.Input, Multiplier.Output>,
+            InterneuronSet
+        >,
+        IOperationStatic
         <
             Multiplier,
             FunctionalCircuitParameter<Multiplier.Input, Multiplier.Output>,

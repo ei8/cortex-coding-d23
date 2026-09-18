@@ -6,7 +6,28 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
     {
     }
 
-    public interface ILogicGate<T, TParam, TInterneuron> : ICircuit<TParam, TInterneuron>, ILogicGate
+    public interface ILogicGate
+    <
+        TParam, 
+        TInterneuron
+    > :
+        ILogicGate,
+        ICircuit
+        <
+            TParam, 
+            TInterneuron
+        >
+        where TParam : IFunctionalCircuitParameter
+        where TInterneuron : ICircuitInterneuronSet
+    {
+    }
+
+    public interface ILogicGateStatic<T, TParam, TInterneuron> :
+        ILogicGate
+        <
+            TParam,
+            TInterneuron
+        >
         where T : ICircuit<TParam, TInterneuron>
         where TParam : IFunctionalCircuitParameter
         where TInterneuron : ICircuitInterneuronSet

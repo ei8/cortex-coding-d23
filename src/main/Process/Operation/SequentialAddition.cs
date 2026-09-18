@@ -9,7 +9,6 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
     public partial class SequentialAddition :
         FiniteCompositeProcessBase
         <
-            SequentialAddition, 
             Addition.WorkingMemoryInfo, 
             DoUntil,
             Action<SequentialAddition, IProcess?, IEnumerable<Neuron>>

@@ -14,7 +14,12 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
             parameters,
             interneurons,
             variableInfo
-        )
+        ),
+        IGroupedOperation
+        <
+            TParam,
+            TInterneuron
+        >
         where TParam : IFunctionalCircuitParameter
         where TInterneuron : ICircuitInterneuronSet
     {
@@ -26,7 +31,19 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
             VariableInfo? precedingVariableInfo = null,
             [CallerArgumentExpression(nameof(result))] string parameterExpression = ""
         )
-            where T : IGroupedOperation<T, TParam, TInterneuron>
+            where T : 
+                IGroupedOperationStatic
+                <
+                    T, 
+                    TParam, 
+                    TInterneuron
+                >, 
+                IOperationStatic
+                <
+                    T, 
+                    TParam, 
+                    TInterneuron
+                >
         {
             bool bResult = false;
             result = default;

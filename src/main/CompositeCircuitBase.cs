@@ -10,7 +10,12 @@ namespace ei8.Cortex.Coding.d23
         T2 circuit2,
         VariableInfo? variableInfo
     ) : 
-        CircuitBase(variableInfo)
+        CircuitBase(variableInfo),
+        ICompositeCircuit
+        <
+            T1,
+            T2
+        >
         where T1 : ICircuit
         where T2 : ICircuit
     {
@@ -27,7 +32,7 @@ namespace ei8.Cortex.Coding.d23
             T2 circuit2,
             [CallerArgumentExpression(nameof(result))] string parameterExpression = ""
         )
-            where T : ICreatableCompositeCircuit<T, T1, T2>
+            where T : ICompositeCircuitStatic<T, T1, T2>
         {
             bool bResult = false;
             result = default;

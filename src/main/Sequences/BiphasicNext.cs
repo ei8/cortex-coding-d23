@@ -30,7 +30,17 @@ namespace ei8.Cortex.Coding.d23.Sequences
             interneurons,
             variableInfo
         ),
-        IBiphasicAdjacent
+        IBiphasicAdjacentStatic
+        <
+            BiphasicNext,
+            FunctionalCircuitParameter
+            <
+                Next.Input,
+                Next.Output
+            >,
+            BiphasicNext.InterneuronSet
+        >,
+        IAdjacentStatic
         <
             BiphasicNext,
             FunctionalCircuitParameter

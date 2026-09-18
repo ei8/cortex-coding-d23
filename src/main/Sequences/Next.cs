@@ -29,7 +29,7 @@ namespace ei8.Cortex.Coding.d23.Sequences
             interneurons,
             variableInfo
         ), 
-        IAdjacent
+        IAdjacentStatic
         <
             Next, 
             FunctionalCircuitParameter

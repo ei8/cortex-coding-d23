@@ -3,7 +3,11 @@ using System.Runtime.CompilerServices;
 
 namespace ei8.Cortex.Coding.d23.Sequences
 {
-    public abstract class AdjacentBase<TParam, TInterneuron>
+    public abstract class AdjacentBase
+    <
+        TParam, 
+        TInterneuron
+    >
     (
         TParam parameters,
         TInterneuron interneurons,
@@ -18,7 +22,12 @@ namespace ei8.Cortex.Coding.d23.Sequences
             parameters,
             interneurons,
             variableInfo
-        )
+        ),
+        IAdjacent
+        <
+            TParam,
+            TInterneuron
+        >
         where TParam : IFunctionalCircuitParameter
         where TInterneuron : ICircuitInterneuronSet
     {
@@ -31,7 +40,7 @@ namespace ei8.Cortex.Coding.d23.Sequences
             [CallerArgumentExpression(nameof(result))] string parameterExpression = "",
             params NeuronInfo[] additionalInputNeuronInfos
         ) 
-            where T : IAdjacent<T, TParam, TInterneuron>
+            where T : IAdjacentStatic<T, TParam, TInterneuron>
         {
             bool bResult = false;
             result = default;

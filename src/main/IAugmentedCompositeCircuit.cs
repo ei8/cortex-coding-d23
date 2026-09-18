@@ -7,9 +7,17 @@
     {
     }
 
-    public interface IAugmentedCompositeCircuit<T, TAug, T1, T2> :
+    public interface IAugmentedCompositeCircuit<TAug, T1, T2> :
         ICompositeCircuit<T1, T2>,
         IAugmentedCircuit<TAug>
+        where TAug : IAugmentation
+        where T1 : ICircuit
+        where T2 : ICircuit
+    {
+    }
+
+    public interface IAugmentedCompositeCircuitStatic<T, TAug, T1, T2> :
+        IAugmentedCompositeCircuit<TAug, T1, T2>
         where T : ICompositeCircuit<T1, T2>
         where TAug : IAugmentation
         where T1 : ICircuit

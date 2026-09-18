@@ -25,7 +25,7 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
             interneurons,
             variableInfo
         ),
-        ILogicGate
+        ILogicGateStatic
         <
             NotGate,
             FunctionalCircuitParameter
@@ -118,7 +118,17 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
             NetworkHelper.InputNeuronStrengthMode additionalInputNeuronType = NetworkHelper.InputNeuronStrengthMode.And,
             params Neuron[] additionalInputs
         )
-            where T : ILogicGate<T, FunctionalCircuitParameter<NotGate.Input, NotGate.Output>, NotGate.InterneuronSet>
+            where T : 
+                ILogicGateStatic
+                <
+                    T, 
+                    FunctionalCircuitParameter
+                    <
+                        NotGate.Input, 
+                        NotGate.Output
+                    >, 
+                    NotGate.InterneuronSet
+                >
         {
             bool bResult = false;
             result = default;

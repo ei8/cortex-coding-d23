@@ -14,7 +14,7 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
             interneurons,
             variableInfo
         ), 
-        ILogicGate
+        ILogicGateStatic
         <
             AndGate, 
             FunctionalCircuitParameter

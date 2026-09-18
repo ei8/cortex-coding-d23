@@ -12,6 +12,7 @@ namespace ei8.Cortex.Coding.d23
     {
         public VariableInfo? VariableInfo { get; } = variableInfo;
     }
+
     public abstract class CircuitBase<TParam, TInterneuron>
     (
         TParam parameters,

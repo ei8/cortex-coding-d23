@@ -3,7 +3,7 @@
     public abstract class CompositeProcessBase
     <
         TWorkingMemory, 
-        TProcess1
+        TProcess
     >
     (
         TWorkingMemory workingMemory
@@ -12,10 +12,10 @@
         (
             workingMemory
         ),
-        ICompositeProcess<TProcess1>
-        where TProcess1 : IProcess
+        ICompositeProcess<TProcess>
+        where TProcess : IProcess
         where TWorkingMemory : IWorkingMemory
     {
-        public TProcess1? Process1 { get; protected set; }
+        public TProcess? Process1 { get; protected set; }
     }
 }

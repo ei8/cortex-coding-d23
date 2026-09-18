@@ -8,7 +8,6 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
     public partial class DynamicMultiplication :
         FiniteCompositeProcessBase
         <
-            DynamicMultiplication,
             DynamicMultiplication.WorkingMemoryInfo,
             DynamicAddition,
             Action<DynamicMultiplication, IEnumerable<Neuron>>
