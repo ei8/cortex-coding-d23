@@ -2,7 +2,11 @@
 
 namespace ei8.Cortex.Coding.d23
 {
-    public class FunctionalCircuitParameter<TInput, TOutput>
+    public class FunctionalCircuitParameter
+    <
+        TInput, 
+        TOutput
+    >
     (
         TInput inputs, 
         TOutput outputs

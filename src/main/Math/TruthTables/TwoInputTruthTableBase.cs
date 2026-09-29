@@ -3,27 +3,18 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
-namespace ei8.Cortex.Coding.d23.Math.Logic
+namespace ei8.Cortex.Coding.d23.Math.TruthTables
 {
-    public abstract partial class DualInputLogicGateBase
+    public abstract partial class TwoInputTruthTableBase
     (
-        FunctionalCircuitParameter
-        <
-            DualInputLogicGateBase.Input, 
-            DualInputLogicGateBase.Output
-        >
-        parameters,
-        DualInputLogicGateBase.InterneuronSet interneurons,
+        TwoInputTruthTableBase.ParameterInfo parameters,
+        TwoInputTruthTableBase.InterneuronSet interneurons,
         VariableInfo? variableInfo
-    ) : 
-        LogicGateBase
+    ) :
+        TruthTableBase
         <
-            FunctionalCircuitParameter
-            <
-                DualInputLogicGateBase.Input, 
-                DualInputLogicGateBase.Output
-            >,
-            DualInputLogicGateBase.InterneuronSet
+            TwoInputTruthTableBase.ParameterInfo,
+            TwoInputTruthTableBase.InterneuronSet
         >
         (
             parameters,
@@ -31,7 +22,11 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
             variableInfo
         )
     {
-        public static IEnumerable<string> GetInterneuronTags(VariableInfo variableInfo, InterneuronTagInfo? interneuronTagInfo = null)
+        public static IEnumerable<string> GetInterneuronTags
+        (
+            VariableInfo variableInfo, 
+            InterneuronTagInfo? interneuronTagInfo = null
+        )
         {
             string typeTagPrefix = string.Empty,
                 input1TagPrefix = string.Empty,
@@ -56,8 +51,9 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
             ];
         }
 
-        public static IEnumerable<ReadOnlyNetwork> LinkInputNeurons(
-            FunctionalCircuitParameter<DualInputLogicGateBase.Input, DualInputLogicGateBase.Output> parameters,
+        public static IEnumerable<ReadOnlyNetwork> LinkInputNeurons
+        (
+            TwoInputTruthTableBase.ParameterInfo parameters,
             IEnumerable<ReadOnlyNetwork> interneuronNetworks,
             NetworkHelper.InputNeuronStrengthMode additionalInputNeuronType = NetworkHelper.InputNeuronStrengthMode.And,
             params Neuron[] additionalInputs
@@ -120,23 +116,20 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
             return result;
         }
 
-        public static bool TryCreate<T>(
+        public static bool TryCreate<T>
+        (
             [NotNullWhen(true)] out T? result,
-            FunctionalCircuitParameter<DualInputLogicGateBase.Input, DualInputLogicGateBase.Output> parameters,
+            TwoInputTruthTableBase.ParameterInfo parameters,
             InterneuronTagInfo? interneuronTagInfo = null,
             [CallerArgumentExpression(nameof(result))] string parameterExpression = "",
             NetworkHelper.InputNeuronStrengthMode additionalInputNeuronType = NetworkHelper.InputNeuronStrengthMode.And,
             params Neuron[] additionalInputs
         )
-            where T : 
-                ILogicGateStatic
+            where T :
+                ITruthTableStatic
                 <
-                    T, 
-                    FunctionalCircuitParameter
-                    <
-                        DualInputLogicGateBase.Input, 
-                        DualInputLogicGateBase.Output
-                    >, 
+                    T,
+                    TwoInputTruthTableBase.ParameterInfo,
                     InterneuronSet
                 >
         {
@@ -144,10 +137,10 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
             result = default;
             if (VariableInfo.TryParse(parameterExpression, out var variableInfo))
             {
-                if 
+                if
                 (
-                    parameters.Outputs.Output1 != null && 
-                    parameters.Inputs.Input1 != null && 
+                    parameters.Outputs.Output1 != null &&
+                    parameters.Inputs.Input1 != null &&
                     parameters.Inputs.Input2 != null
                 )
                 {
@@ -156,7 +149,7 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
                         T.GetInterneuronOutputs(parameters.Outputs.Output1),
                         T.GetInterneuronTags(variableInfo, interneuronTagInfo)
                     );
-                    var interneurons = new DualInputLogicGateBase.InterneuronSet
+                    var interneurons = new TwoInputTruthTableBase.InterneuronSet
                     (
                         interneuronNetworks.ElementAt(0),
                         interneuronNetworks.ElementAt(1),

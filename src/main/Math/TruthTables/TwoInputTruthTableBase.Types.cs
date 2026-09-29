@@ -1,14 +1,37 @@
 ﻿using System.Collections.Generic;
 
-namespace ei8.Cortex.Coding.d23.Math.Logic
+namespace ei8.Cortex.Coding.d23.Math.TruthTables
 {
-    public abstract partial class DualInputLogicGateBase
+    public abstract partial class TwoInputTruthTableBase
     {
-        public class Input(
+        public class ParameterInfo
+        (
+            Input inputs,
+            Output outputs
+        ) :
+            FunctionalCircuitParameter
+            <
+                Input,
+                Output
+            >
+            (
+                inputs,
+                outputs
+            )
+        {
+        }
+
+        public class Input
+        (
             BinaryNeuronParameter? input1,
             BinaryNeuronParameter? input2
         ) :
-        InputCircuitParameterSubset<BinaryNeuronParameter, BinaryNeuronParameter>(
+            InputCircuitParameterSubset
+            <
+                BinaryNeuronParameter,
+                BinaryNeuronParameter
+            >
+        (
             input1,
             input2
         )
@@ -17,12 +40,7 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
             public BinaryNeuronParameter? Input2 => this.Parameter2;
         }
 
-        public class Output(
-            BinaryNeuronParameter? output1
-        ) :
-        OutputCircuitParameterSubset<BinaryNeuronParameter>(
-            output1
-        )
+        public class Output(BinaryNeuronParameter? output1) : OutputCircuitParameterSubset<BinaryNeuronParameter>(output1)
         {
             public BinaryNeuronParameter? Output1 => this.Parameter1;
         }

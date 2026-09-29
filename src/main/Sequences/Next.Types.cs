@@ -4,6 +4,23 @@ namespace ei8.Cortex.Coding.d23.Sequences
 {
     public partial class Next
     {
+        public class ParameterInfo
+        (
+            Input inputs,
+            Output outputs
+        ) :
+            FunctionalCircuitParameter
+            <
+                Input,
+                Output
+            >
+            (
+                inputs,
+                outputs
+            )
+        {
+        }
+
         public class Input
         (
             UnaryNeuronParameter? function,

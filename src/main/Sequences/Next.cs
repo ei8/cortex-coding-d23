@@ -6,22 +6,13 @@ namespace ei8.Cortex.Coding.d23.Sequences
 {
     public partial class Next
     (
-        FunctionalCircuitParameter
-        <
-            Next.Input, 
-            Next.Output
-        > 
-        parameters,
+        Next.ParameterInfo parameters,
         Next.InterneuronSet interneurons,
         VariableInfo? variableInfo
     ) : 
         AdjacentBase
         <
-            FunctionalCircuitParameter
-            <
-                Next.Input, 
-                Next.Output
-            >,
+            Next.ParameterInfo,
             Next.InterneuronSet
         >
         (
@@ -32,17 +23,13 @@ namespace ei8.Cortex.Coding.d23.Sequences
         IAdjacentStatic
         <
             Next, 
-            FunctionalCircuitParameter
-            <
-                Next.Input, 
-                Next.Output
-            >, 
+            Next.ParameterInfo, 
             Next.InterneuronSet
         >
     {
         public static Next Create
         (
-            FunctionalCircuitParameter<Input, Output> parameters,
+            Next.ParameterInfo parameters,
             InterneuronSet interneurons,
             VariableInfo? variableInfo
         ) => 
@@ -55,7 +42,7 @@ namespace ei8.Cortex.Coding.d23.Sequences
 
         public static InterneuronSet CreateInterneurons
         (
-            FunctionalCircuitParameter<Input, Output> parameters,
+            Next.ParameterInfo parameters,
             VariableInfo variableInfo,
             float inputStrength = 0.5f,
             InterneuronSet? precedingInterneurons = default,
@@ -89,7 +76,7 @@ namespace ei8.Cortex.Coding.d23.Sequences
 
         private static ReadOnlyNetwork LinkInputNeurons
         (
-            FunctionalCircuitParameter<Input, Output> parameters,
+            Next.ParameterInfo parameters,
             ReadOnlyNetwork interneuronToNext,
             float inputStrength,
             InterneuronSet? precedingInterneurons = default,

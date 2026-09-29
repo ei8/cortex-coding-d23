@@ -40,17 +40,17 @@
 	  <Compile Update="Math\Arithmetic\Subtractor.Types.cs">
 		  <DependentUpon>Subtractor.cs</DependentUpon>
 	  </Compile>
+	  <Compile Update="Math\TruthTables\OneInputTruthTableBase.Types.cs">
+		  <DependentUpon>OneInputTruthTableBase.cs</DependentUpon>
+	  </Compile>
+	  <Compile Update="Math\TruthTables\TwoInputTruthTableBase.Types.cs">
+		  <DependentUpon>TwoInputTruthTableBase.cs</DependentUpon>
+	  </Compile>
 	  <Compile Update="Sequences\BiphasicNext.Types.cs">
 		  <DependentUpon>BiphasicNext.cs</DependentUpon>
 	  </Compile>
 	  <Compile Update="Sequences\Next.Types.cs">
 		  <DependentUpon>Next.cs</DependentUpon>
-	  </Compile>
-	  <Compile Update="Math\Logic\DualInputLogicGateBase.Types.cs">
-		  <DependentUpon>DualInputLogicGateBase.cs</DependentUpon>
-	  </Compile>
-	  <Compile Update="Math\Logic\NotGate.Types.cs">
-		  <DependentUpon>NotGate.cs</DependentUpon>
 	  </Compile>
 	  <Compile Update="Process\Iteration\DoUntil.Types.cs">
 		  <DependentUpon>DoUntil.cs</DependentUpon>

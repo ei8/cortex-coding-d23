@@ -11,7 +11,12 @@
             parameters,
             interneurons,
             variableInfo
-        )
+        ),
+        IFunctionalCircuit
+        <
+            TParam,
+            TInterneuron
+        >
         where TParam : IFunctionalCircuitParameter
         where TInterneuron : ICircuitInterneuronSet
     {

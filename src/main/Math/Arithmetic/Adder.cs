@@ -1,4 +1,5 @@
 ﻿using ei8.Cortex.Coding.d23.Math.Logic;
+using ei8.Cortex.Coding.d23.Math.TruthTables;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -6,17 +7,13 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 {
     public partial class Adder
     (
-        FunctionalCircuitParameter<Adder.Input, Adder.Output> parameters,
+        Adder.ParameterInfo parameters,
         InterneuronSet interneurons,
         VariableInfo? variableInfo
     ) :
         GroupedOperationBase
         <
-            FunctionalCircuitParameter
-            <
-                Adder.Input,
-                Adder.Output
-            >,
+            Adder.ParameterInfo,
             InterneuronSet
         >
         (
@@ -27,26 +24,18 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
         IGroupedOperationStatic
         <
             Adder,
-            FunctionalCircuitParameter
-            <
-                Adder.Input,
-                Adder.Output
-            >,
+            Adder.ParameterInfo,
             InterneuronSet
         >,
         IOperationStatic
         <
             Adder,
-            FunctionalCircuitParameter
-            <
-                Adder.Input,
-                Adder.Output
-            >,
+            Adder.ParameterInfo,
             InterneuronSet
         >
     {
         public static Adder Create(
-            FunctionalCircuitParameter<Input, Output> parameters,
+            Adder.ParameterInfo parameters,
             InterneuronSet interneurons,
             VariableInfo? variableInfo
         ) => new (
@@ -55,7 +44,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
             variableInfo
         );
 
-        public static FunctionalCircuitParameter<Input, Output> GetDefaultParameters(
+        public static Adder.ParameterInfo GetDefaultParameters(
             BinaryNeuronParameter? precedingValue,
             int exponent
         ) => new(
@@ -71,7 +60,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
         );
 
         public static InterneuronSet CreateInterneurons(
-            FunctionalCircuitParameter<Input, Output> parameters,
+            Adder.ParameterInfo parameters,
             VariableInfo variableInfo,
             VariableInfo? precedingVariableInfo = null
         ) => Adder.CreateInterneuronNetworksCore(
@@ -133,7 +122,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 
                 // half2
                 if (
-                    DualInputLogicGateBase.TryCreate(
+                    TwoInputLogicGateBase.TryCreate(
                         out XorGate? half2_XOR___CarryOver__Half1_XOR_Result,
                         new(
                             new(
@@ -150,7 +139,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                             adderName
                         )
                     ) &&
-                    DualInputLogicGateBase.TryCreate(
+                    TwoInputLogicGateBase.TryCreate(
                         out AndGate? half2_AND___CarryOver__Half1_XOR_Result,
                         new(
                             new(
@@ -168,7 +157,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                         )
                     ) &&
                     // OR carryOvers
-                    DualInputLogicGateBase.TryCreate(
+                    TwoInputLogicGateBase.TryCreate(
                         out OrGate? OR___Half1_CarryOver__Half2_CarryOver,
                         new(
                             new(
@@ -223,7 +212,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
             var result = new List<IneurUL>();
             // Link half1 interneurons
             if (
-                DualInputLogicGateBase.TryCreate(
+                TwoInputLogicGateBase.TryCreate(
                     out XorGate? half1_XOR___Addend1__Addend2,
                     new(
                         new(
@@ -238,7 +227,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                     additionalInputNeuronType: additionalInputNeuronType,
                     additionalInputs: additionalInputs
                 ) &&
-                DualInputLogicGateBase.TryCreate(
+                TwoInputLogicGateBase.TryCreate(
                     out AndGate? half1_AND___Addend1__Addend2,
                     new(
                         new(

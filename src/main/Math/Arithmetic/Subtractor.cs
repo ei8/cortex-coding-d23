@@ -1,4 +1,5 @@
 ﻿using ei8.Cortex.Coding.d23.Math.Logic;
+using ei8.Cortex.Coding.d23.Math.TruthTables;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -6,17 +7,13 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 {
     public partial class Subtractor
     (
-        FunctionalCircuitParameter<Subtractor.Input, Subtractor.Output> parameters,
+        Subtractor.ParameterInfo parameters,
         InterneuronSet interneurons,
         VariableInfo? variableInfo
     ) : 
         GroupedOperationBase
         <
-            FunctionalCircuitParameter
-            <
-                Subtractor.Input, 
-                Subtractor.Output
-            >,
+            Subtractor.ParameterInfo,
             InterneuronSet
         >
         (
@@ -27,26 +24,18 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
         IGroupedOperationStatic
         <
             Subtractor, 
-            FunctionalCircuitParameter
-            <
-                Subtractor.Input, 
-                Subtractor.Output
-            >, 
+            Subtractor.ParameterInfo, 
             InterneuronSet
         >,
         IOperationStatic
         <
             Subtractor,
-            FunctionalCircuitParameter
-            <
-                Subtractor.Input,
-                Subtractor.Output
-            >,
+            Subtractor.ParameterInfo,
             InterneuronSet
         >
     {
         public static Subtractor Create(
-            FunctionalCircuitParameter<Subtractor.Input, Subtractor.Output> parameters,
+            Subtractor.ParameterInfo parameters,
             InterneuronSet interneurons,
             VariableInfo? variableInfo
         ) => new(
@@ -55,7 +44,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
             variableInfo
         );
 
-        public static FunctionalCircuitParameter<Subtractor.Input, Subtractor.Output> GetDefaultParameters(
+        public static Subtractor.ParameterInfo GetDefaultParameters(
             BinaryNeuronParameter? precedingValue,
             int exponent
         ) => new(
@@ -71,7 +60,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
         );
 
         public static InterneuronSet CreateInterneurons(
-            FunctionalCircuitParameter<Subtractor.Input, Subtractor.Output> parameters,
+            Subtractor.ParameterInfo parameters,
             VariableInfo variableInfo,
             VariableInfo? precedingVariableInfo = null
         )
@@ -119,7 +108,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 
                     // half2 interneurons
                     if (
-                        DualInputLogicGateBase.TryCreate(
+                        TwoInputLogicGateBase.TryCreate(
                             out XorGate? half2_XOR___Borrow__Half1_XOR_Result,
                             new(
                                 new(
@@ -148,7 +137,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                             ),
                             InterneuronTagInfo.CreateByCommonTagPrefix(subtractorName)
                         ) &&
-                        DualInputLogicGateBase.TryCreate(
+                        TwoInputLogicGateBase.TryCreate(
                             out AndGate? half2_AND___Borrow__Half2_OUT___Half2_NOT___Half1_XOR_Result,
                             new(
                                 new(
@@ -166,7 +155,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                             )
                         ) &&
                         // OR Borrows
-                        DualInputLogicGateBase.TryCreate(
+                        TwoInputLogicGateBase.TryCreate(
                             out OrGate? OR___Half1_Borrow__Half2_Borrow,
                             new(
                                 new(
@@ -222,7 +211,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
             var result = new List<IneurUL>();
             // Link half1 interneurons
             if (
-                DualInputLogicGateBase.TryCreate(
+                TwoInputLogicGateBase.TryCreate(
                     out XorGate? half1_XOR___Minuend__Subtrahend,
                     new(
                         new(
@@ -247,7 +236,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                     ),
                     InterneuronTagInfo.CreateByCommonTagPrefix(prefix)
                 ) &&
-                DualInputLogicGateBase.TryCreate(
+                TwoInputLogicGateBase.TryCreate(
                     out AndGate? half1_AND___Subtrahend__Half1_OUT___Half1_NOT___Minuend,
                     new(
                         new(

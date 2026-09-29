@@ -2,6 +2,23 @@
 {
     public partial class Subtractor
     {
+        public class ParameterInfo
+        (
+            Input inputs,
+            Output outputs
+        ) :
+            FunctionalCircuitParameter
+            <
+                Input,
+                Output
+            >
+            (
+                inputs,
+                outputs
+            )
+        {
+        }
+
         public class Input(
             BinaryNeuronParameter? minuend,
             BinaryNeuronParameter? subtrahend,

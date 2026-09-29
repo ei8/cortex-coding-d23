@@ -1,34 +1,31 @@
-﻿using System.Collections.Generic;
+﻿using ei8.Cortex.Coding.d23.Math.TruthTables;
+using System.Collections.Generic;
 
 namespace ei8.Cortex.Coding.d23.Math.Logic
 {
     public class XnorGate
     (
-        FunctionalCircuitParameter<DualInputLogicGateBase.Input, DualInputLogicGateBase.Output> parameters,
-        DualInputLogicGateBase.InterneuronSet interneurons,
+        TwoInputTruthTableBase.ParameterInfo parameters,
+        TwoInputTruthTableBase.InterneuronSet interneurons,
         VariableInfo? variableInfo
     ) : 
-        DualInputLogicGateBase
+        TwoInputLogicGateBase
         (
             parameters,
             interneurons,
             variableInfo
         ), 
-        ILogicGateStatic
+        ITruthTableStatic
         <
-            XnorGate, 
-            FunctionalCircuitParameter
-            <
-                DualInputLogicGateBase.Input, 
-                DualInputLogicGateBase.Output
-            >,
-            DualInputLogicGateBase.InterneuronSet
+            XnorGate,
+            TwoInputTruthTableBase.ParameterInfo,
+            TwoInputTruthTableBase.InterneuronSet
         >
     {
         public static XnorGate Create
         (
-            FunctionalCircuitParameter<DualInputLogicGateBase.Input, DualInputLogicGateBase.Output> parameters,
-            DualInputLogicGateBase.InterneuronSet interneurons,
+            TwoInputTruthTableBase.ParameterInfo parameters,
+            TwoInputTruthTableBase.InterneuronSet interneurons,
             VariableInfo? variableInfo
         ) => 
             new

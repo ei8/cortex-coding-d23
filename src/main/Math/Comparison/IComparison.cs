@@ -1,20 +1,20 @@
 ﻿using ei8.Cortex.Coding.d23.Math.TruthTables;
 
-namespace ei8.Cortex.Coding.d23.Math.Logic
+namespace ei8.Cortex.Coding.d23.Math.Comparison
 {
-    public interface ILogicGate
+    public interface IComparison
     {
     }
 
-    public interface ILogicGate
+    public interface IComparison
     <
-        TParam, 
+        TParam,
         TInterneuron
     > :
-        ILogicGate,
+        IComparison,
         ITruthTable
         <
-            TParam, 
+            TParam,
             TInterneuron
         >
         where TParam : IFunctionalCircuitParameter

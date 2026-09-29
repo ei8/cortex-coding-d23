@@ -1,4 +1,5 @@
 ﻿using ei8.Cortex.Coding.d23.Math.Logic;
+using ei8.Cortex.Coding.d23.Math.TruthTables;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -6,17 +7,13 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 {
     public partial class Multiplier
     (
-        FunctionalCircuitParameter<Multiplier.Input, Multiplier.Output> parameters,
+        Multiplier.ParameterInfo parameters,
         InterneuronSet interneurons,
         VariableInfo? variableInfo
     ) :
         UngroupedOperationBase
         <
-            FunctionalCircuitParameter
-            <
-                Multiplier.Input,
-                Multiplier.Output
-            >,
+            Multiplier.ParameterInfo,
             InterneuronSet
         >
         (
@@ -27,19 +24,19 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
         IUngroupedOperationStatic
         <
             Multiplier,
-            FunctionalCircuitParameter<Multiplier.Input, Multiplier.Output>,
+            Multiplier.ParameterInfo,
             InterneuronSet
         >,
         IOperationStatic
         <
             Multiplier,
-            FunctionalCircuitParameter<Multiplier.Input, Multiplier.Output>,
+            Multiplier.ParameterInfo,
             InterneuronSet
         >
     {
         public static Multiplier Create
         (
-            FunctionalCircuitParameter<Input, Output> parameters,
+            Multiplier.ParameterInfo parameters,
             InterneuronSet interneurons,
             VariableInfo? variableInfo
         ) => 
@@ -50,7 +47,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                 variableInfo
             );
 
-        public static FunctionalCircuitParameter<Input, Output> GetDefaultParameters(int exponent) => 
+        public static Multiplier.ParameterInfo GetDefaultParameters(int exponent) => 
             new
             (
                 new
@@ -66,7 +63,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 
         public static InterneuronSet CreateInterneurons
         (
-            FunctionalCircuitParameter<Input, Output> parameters,
+            Multiplier.ParameterInfo parameters,
             VariableInfo variableInfo
         )
         {
@@ -74,7 +71,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 
             if
             (
-                DualInputLogicGateBase.TryCreate
+                TwoInputLogicGateBase.TryCreate
                 (
                     out AndGate? AND___Multiplicand__Multiplier,
                     new(

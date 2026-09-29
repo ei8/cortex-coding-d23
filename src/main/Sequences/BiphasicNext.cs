@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -7,22 +6,13 @@ namespace ei8.Cortex.Coding.d23.Sequences
 {
     public partial class BiphasicNext
     (
-        FunctionalCircuitParameter
-        <
-            Next.Input,
-            Next.Output
-        >
-        parameters,
+        Next.ParameterInfo parameters,
         BiphasicNext.InterneuronSet interneurons,
         VariableInfo? variableInfo
     ) :
         BiphasicAdjacentBase
         <
-            FunctionalCircuitParameter
-            <
-                Next.Input,
-                Next.Output
-            >,
+            Next.ParameterInfo,
             BiphasicNext.InterneuronSet
         >
         (
@@ -33,27 +23,19 @@ namespace ei8.Cortex.Coding.d23.Sequences
         IBiphasicAdjacentStatic
         <
             BiphasicNext,
-            FunctionalCircuitParameter
-            <
-                Next.Input,
-                Next.Output
-            >,
+            Next.ParameterInfo,
             BiphasicNext.InterneuronSet
         >,
         IAdjacentStatic
         <
             BiphasicNext,
-            FunctionalCircuitParameter
-            <
-                Next.Input,
-                Next.Output
-            >,
+            Next.ParameterInfo,
             BiphasicNext.InterneuronSet
         >
     {
         public static BiphasicNext Create
         (
-            FunctionalCircuitParameter<Next.Input, Next.Output> parameters,
+            Next.ParameterInfo parameters,
             InterneuronSet interneurons,
             VariableInfo? variableInfo
         ) =>
@@ -66,7 +48,7 @@ namespace ei8.Cortex.Coding.d23.Sequences
 
         public static InterneuronSet CreateInterneurons
         (
-            FunctionalCircuitParameter<Next.Input, Next.Output> parameters,
+            Next.ParameterInfo parameters,
             VariableInfo variableInfo,
             float inputStrength = 0.5f,
             InterneuronSet? precedingInterneurons = null,
@@ -84,7 +66,7 @@ namespace ei8.Cortex.Coding.d23.Sequences
 
         public static InterneuronSet CreateInterneurons
         (
-            FunctionalCircuitParameter<Next.Input, Next.Output> parameters,
+            Next.ParameterInfo parameters,
             VariableInfo variableInfo,
             float inputStrength = 0.5f,
             InterneuronSet? precedingInterneurons = null,

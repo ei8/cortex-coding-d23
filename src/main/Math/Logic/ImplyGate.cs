@@ -1,34 +1,31 @@
-﻿using System.Collections.Generic;
+﻿using ei8.Cortex.Coding.d23.Math.TruthTables;
+using System.Collections.Generic;
 
 namespace ei8.Cortex.Coding.d23.Math.Logic
 {
     public class ImplyGate
     (
-        FunctionalCircuitParameter<DualInputLogicGateBase.Input, DualInputLogicGateBase.Output> parameters,
-        DualInputLogicGateBase.InterneuronSet interneurons,
+        TwoInputTruthTableBase.ParameterInfo parameters,
+        TwoInputTruthTableBase.InterneuronSet interneurons,
         VariableInfo? variableInfo
     ) : 
-        DualInputLogicGateBase
+        TwoInputLogicGateBase
         (
             parameters,
             interneurons,
             variableInfo
         ), 
-        ILogicGateStatic
+        ITruthTableStatic
         <
             ImplyGate, 
-            FunctionalCircuitParameter
-            <
-                DualInputLogicGateBase.Input, 
-                DualInputLogicGateBase.Output
-            >,
-            DualInputLogicGateBase.InterneuronSet
+            TwoInputTruthTableBase.ParameterInfo,
+            TwoInputTruthTableBase.InterneuronSet
         >
     {
         public static ImplyGate Create
         (
-            FunctionalCircuitParameter<DualInputLogicGateBase.Input, DualInputLogicGateBase.Output> parameters,
-            DualInputLogicGateBase.InterneuronSet interneurons,
+            TwoInputTruthTableBase.ParameterInfo parameters,
+            TwoInputTruthTableBase.InterneuronSet interneurons,
             VariableInfo? variableInfo
         ) => 
             new(
