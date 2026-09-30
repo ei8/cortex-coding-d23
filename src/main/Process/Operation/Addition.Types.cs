@@ -35,8 +35,8 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
             EnumerableChunk<NeuronChunk> addend,
             NeuronChunk? currentAugendDigit,
             NeuronChunk? currentAddendDigit,
-            NeuronChunk? lastAugendDigit,
-            NeuronChunk? lastAddendDigit,
+            NeuronChunk? previousAugendDigit,
+            NeuronChunk? previousAddendDigit,
             EnumerableChunk<NeuronChunk> sumValues,
             ListChunk<NeuronChunk> sum,
             EnumerableChunk<NeuronChunk> carryOverValues,
@@ -133,9 +133,9 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
 
             public NeuronChunk? CurrentAddendDigit { get; set; } = currentAddendDigit;
 
-            public NeuronChunk? LastAugendDigit { get; set; } = lastAugendDigit;
+            public NeuronChunk? PreviousAugendDigit { get; set; } = previousAugendDigit;
 
-            public NeuronChunk? LastAddendDigit { get; set; } = lastAddendDigit;
+            public NeuronChunk? PreviousAddendDigit { get; set; } = previousAddendDigit;
 
             public ListChunk<NeuronChunk> Sum => sum;
 

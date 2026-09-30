@@ -2,6 +2,7 @@
 using ei8.Cortex.Coding.Mirrors;
 using ei8.Cortex.Coding.Model.Reflection;
 using ei8.Cortex.Coding.Spiker;
+using ei8.Cortex.Library.Common;
 using NLog;
 using System;
 using System.Collections.Concurrent;
@@ -234,6 +235,41 @@ namespace ei8.Cortex.Coding.d23
         public static IEnumerable<T> WhereNotNull<T>(this IEnumerable<T?> enumerable) where T : class
         {
             return enumerable.Where(e => e != null).Select(e => e!);
+        }
+
+        public static bool NextExists<T>(this T? currentValue, T? nextValue)
+            where T : class =>
+            currentValue != nextValue && nextValue != null;
+
+        public static T? GetIfUnequal<T>(this T? value, T? otherValue)
+            where T : class
+        {
+            if (value != otherValue)
+                return otherValue;
+            else
+                return value;
+        }
+
+        public static T GetByComparer<T>(this IEnumerable<T> values, Predicate<T> comparer)
+            where T : class
+        {
+            return values.Single(ad => comparer(ad));
+        }
+
+        public static bool IsMatchingValue(this NeuronChunk value, EnumerableChunk<NeuronChunk> targetList, int targetIndex)
+        {
+            return value.Value.Tag.EndsWith
+            (
+                targetList
+                    .Content
+                    .ElementAt
+                        (
+                            targetIndex
+                        )
+                    .Value
+                    .Tag
+                    .Last()
+            );
         }
     }
 }

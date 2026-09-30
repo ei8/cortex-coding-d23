@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace ei8.Cortex.Coding.d23.Process.Operation
 {
-    public partial class DynamicAddition
+    public class DynamicAddition
     (
         Addition.WorkingMemoryInfo workingMemory,
         Action<DynamicAddition, IEnumerable<Neuron>> completionCallback
@@ -39,22 +39,13 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
             (
                 this.WorkingMemory.SumValues.Content.Any(c => c.Value == targetNeuron) &&
                 (
-                    (
-                        this.WorkingMemory.LastAugendDigit != this.WorkingMemory.CurrentAugendDigit &&
-                        this.WorkingMemory.CurrentAugendDigit != null
-                    ) ||
-                    (
-                        this.WorkingMemory.LastAddendDigit != this.WorkingMemory.CurrentAugendDigit &&
-                        this.WorkingMemory.CurrentAddendDigit != null
-                    )
+                    this.WorkingMemory.PreviousAugendDigit.NextExists(this.WorkingMemory.CurrentAugendDigit) ||
+                    this.WorkingMemory.PreviousAddendDigit.NextExists(this.WorkingMemory.CurrentAddendDigit)
                 ) 
             )
             {
-                if (this.WorkingMemory.LastAugendDigit != this.WorkingMemory.CurrentAugendDigit)
-                    this.WorkingMemory.LastAugendDigit = this.WorkingMemory.CurrentAugendDigit;
-
-                if (this.WorkingMemory.LastAddendDigit != this.WorkingMemory.CurrentAddendDigit)
-                    this.WorkingMemory.LastAddendDigit = this.WorkingMemory.CurrentAddendDigit;
+                this.WorkingMemory.PreviousAugendDigit = this.WorkingMemory.PreviousAugendDigit.GetIfUnequal(this.WorkingMemory.CurrentAugendDigit);
+                this.WorkingMemory.PreviousAddendDigit = this.WorkingMemory.PreviousAddendDigit.GetIfUnequal(this.WorkingMemory.CurrentAddendDigit);
 
                 this.WorkingMemory.Sum.Content.Add(new(targetNeuron));
 
