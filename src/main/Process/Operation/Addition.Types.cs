@@ -90,9 +90,6 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                 return result;
             }
 
-            public bool TryAddCurrent(IList<Neuron> result) =>
-                this.TryAddCurrent(result, this.Sum.Content.Count);
-
             public bool TryAddCurrent(IList<Neuron> result, int digitIndex)
             {
                 var bResult = true;

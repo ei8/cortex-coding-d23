@@ -237,9 +237,9 @@ namespace ei8.Cortex.Coding.d23
             return enumerable.Where(e => e != null).Select(e => e!);
         }
 
-        public static bool NextExists<T>(this T? currentValue, T? nextValue)
+        public static bool HasCurrentChanged<T>(this T? previousValue, T? currentValue)
             where T : class =>
-            currentValue != nextValue && nextValue != null;
+            previousValue != currentValue && currentValue != null;
 
         public static T? GetIfUnequal<T>(this T? value, T? otherValue)
             where T : class

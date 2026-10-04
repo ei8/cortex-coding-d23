@@ -26,7 +26,17 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
         {
             List<Neuron> result = [];
 
-            if (!this.WorkingMemory.TryAddCurrent(result))
+            var currentAugendDigitIndex = this.WorkingMemory.CurrentAugendDigit != null ?
+                this.WorkingMemory.Augend.Content.ToList().IndexOf(this.WorkingMemory.CurrentAugendDigit) :
+                -1;
+
+            var currentAddendDigitIndex = this.WorkingMemory.CurrentAddendDigit != null ?
+                this.WorkingMemory.Addend.Content.ToList().IndexOf(this.WorkingMemory.CurrentAddendDigit) :
+                -1;
+
+            var digitIndex = System.Math.Max(currentAugendDigitIndex, currentAddendDigitIndex);
+
+            if (!this.WorkingMemory.TryAddCurrent(result, digitIndex))
                 this.Complete();
 
             return result;
@@ -39,9 +49,9 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
             (
                 this.WorkingMemory.SumValues.Content.Any(c => c.Value == targetNeuron) &&
                 (
-                    this.WorkingMemory.PreviousAugendDigit.NextExists(this.WorkingMemory.CurrentAugendDigit) ||
-                    this.WorkingMemory.PreviousAddendDigit.NextExists(this.WorkingMemory.CurrentAddendDigit)
-                ) 
+                    this.WorkingMemory.PreviousAugendDigit.HasCurrentChanged(this.WorkingMemory.CurrentAugendDigit) ||
+                    this.WorkingMemory.PreviousAddendDigit.HasCurrentChanged(this.WorkingMemory.CurrentAddendDigit)
+                )
             )
             {
                 this.WorkingMemory.PreviousAugendDigit = this.WorkingMemory.PreviousAugendDigit.GetIfUnequal(this.WorkingMemory.CurrentAugendDigit);
@@ -51,17 +61,10 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
 
                 DynamicAddition.logger.Info(new LogMessageGenerator(() => $"Added to Sum(s): {targetNeuron.Tag}"));
 
-                if
-                (
-                    (
-                        this.WorkingMemory.CurrentAugendDigit = 
-                            this.WorkingMemory.Augend.Content.IncrementReset(this.WorkingMemory.CurrentAugendDigit)
-                    ) == null &&
-                    (
-                        this.WorkingMemory.CurrentAddendDigit =
-                            this.WorkingMemory.Addend.Content.IncrementReset(this.WorkingMemory.CurrentAddendDigit)
-                    ) == null
-                )
+                this.WorkingMemory.CurrentAugendDigit = this.WorkingMemory.Augend.Content.IncrementReset(this.WorkingMemory.CurrentAugendDigit);
+                this.WorkingMemory.CurrentAddendDigit = this.WorkingMemory.Addend.Content.IncrementReset(this.WorkingMemory.CurrentAddendDigit);
+
+                if (this.WorkingMemory.CurrentAugendDigit == null && this.WorkingMemory.CurrentAddendDigit == null)
                     this.Complete();
             }
 
