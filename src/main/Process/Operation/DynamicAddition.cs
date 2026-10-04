@@ -26,17 +26,22 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
         {
             List<Neuron> result = [];
 
-            var currentAugendDigitIndex = this.WorkingMemory.CurrentAugendDigit != null ?
+            // TODO: Refactor with DynamicLessThan
+            int? currentAugendDigitIndex = this.WorkingMemory.CurrentAugendDigit != null ?
                 this.WorkingMemory.Augend.Content.ToList().IndexOf(this.WorkingMemory.CurrentAugendDigit) :
-                -1;
+                null;
 
-            var currentAddendDigitIndex = this.WorkingMemory.CurrentAddendDigit != null ?
+            int? currentAddendDigitIndex = this.WorkingMemory.CurrentAddendDigit != null ?
                 this.WorkingMemory.Addend.Content.ToList().IndexOf(this.WorkingMemory.CurrentAddendDigit) :
-                -1;
+                null;
 
-            var digitIndex = System.Math.Max(currentAugendDigitIndex, currentAddendDigitIndex);
+            int? digitIndex = currentAugendDigitIndex.HasValue && currentAddendDigitIndex.HasValue ?
+                System.Math.Max(currentAugendDigitIndex.Value, currentAddendDigitIndex.Value) :
+                currentAugendDigitIndex ?? currentAddendDigitIndex;
 
-            if (!this.WorkingMemory.TryAddCurrent(result, digitIndex))
+            if (digitIndex.HasValue)
+                this.WorkingMemory.AddCurrent(result, digitIndex.Value);
+            else
                 this.Complete();
 
             return result;
@@ -61,8 +66,8 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
 
                 DynamicAddition.logger.Info(new LogMessageGenerator(() => $"Added to Sum(s): {targetNeuron.Tag}"));
 
-                this.WorkingMemory.CurrentAugendDigit = this.WorkingMemory.Augend.Content.IncrementReset(this.WorkingMemory.CurrentAugendDigit);
-                this.WorkingMemory.CurrentAddendDigit = this.WorkingMemory.Addend.Content.IncrementReset(this.WorkingMemory.CurrentAddendDigit);
+                this.WorkingMemory.CurrentAugendDigit = this.WorkingMemory.Augend.Content.GetAdjacentOrDefault(this.WorkingMemory.CurrentAugendDigit);
+                this.WorkingMemory.CurrentAddendDigit = this.WorkingMemory.Addend.Content.GetAdjacentOrDefault(this.WorkingMemory.CurrentAddendDigit);
 
                 if (this.WorkingMemory.CurrentAugendDigit == null && this.WorkingMemory.CurrentAddendDigit == null)
                     this.Complete();

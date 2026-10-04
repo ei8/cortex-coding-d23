@@ -90,31 +90,19 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                 return result;
             }
 
-            public bool TryAddCurrent(IList<Neuron> result, int digitIndex)
+            public void AddCurrent(IList<Neuron> result, int digitIndex)
             {
-                var bResult = true;
-
                 if (digitIndex == 0)
                     result.Add(this.PrecedingCarryOverValues.Content.Single(n => n.Value.Tag.EndsWith('0')).Value);
                 else if (this.CarryOver != null)
                     result.Add(this.CarryOver.Content);
 
-                if
-                (
-                    digitIndex > this.Augend.Content.Count() &&
-                    digitIndex > this.Addend.Content.Count()
-                )
-                    bResult = false;
-                else
-                {
-                    WorkingMemoryInfo.AddAddend(digitIndex, result, this.AugendValues, this.Augend);
-                    WorkingMemoryInfo.AddAddend(digitIndex, result, this.AddendValues, this.Addend);
-                }
-
-                return bResult;
+                WorkingMemoryInfo.AddAddend(digitIndex, result, this.AugendValues, this.Augend);
+                WorkingMemoryInfo.AddAddend(digitIndex, result, this.AddendValues, this.Addend);
             }
 
-            private static void AddAddend(int digitIndex, IList<Neuron> addendsResult, EnumerableChunk<NeuronChunk> addendValues, EnumerableChunk<NeuronChunk> addend)
+            // TODO: transfer to extensions
+            internal static void AddAddend(int digitIndex, IList<Neuron> addendsResult, EnumerableChunk<NeuronChunk> addendValues, EnumerableChunk<NeuronChunk> addend)
             {
                 if (digitIndex < addend.Content.Count())
                     addendsResult.Add(addendValues.Content.Single(ad => ad.Value.Tag.EndsWith(addend.Content.ElementAt(digitIndex).Value.Tag.Last())).Value);

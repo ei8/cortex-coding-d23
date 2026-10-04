@@ -101,7 +101,7 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                     (
                         (
                             this.WorkingMemory.CurrentMultiplicandDigit =
-                                this.WorkingMemory.Multiplicand.Content.IncrementReset(this.WorkingMemory.CurrentMultiplicandDigit)
+                                this.WorkingMemory.Multiplicand.Content.GetAdjacentOrDefault(this.WorkingMemory.CurrentMultiplicandDigit)
                         ) == null
                     )
                     {
@@ -109,7 +109,7 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                         (
                             (
                                 this.WorkingMemory.CurrentMultiplierDigit =
-                                    this.WorkingMemory.Multiplier.Content.IncrementReset(this.WorkingMemory.CurrentMultiplierDigit)
+                                    this.WorkingMemory.Multiplier.Content.GetAdjacentOrDefault(this.WorkingMemory.CurrentMultiplierDigit)
                             ) != null
                         )
                         {
@@ -217,7 +217,7 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                         );
 
                     workingMemory.CurrentMultiplierProduct =
-                        workingMemory.MultiplierProducts.Content.IncrementReset(workingMemory.CurrentMultiplierProduct);
+                        workingMemory.MultiplierProducts.Content.GetAdjacentOrDefault(workingMemory.CurrentMultiplierProduct);
 
                     complete();
                 }

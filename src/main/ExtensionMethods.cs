@@ -194,18 +194,33 @@ namespace ei8.Cortex.Coding.d23
         // 1. Store current digit info
         // 2. Retrieve next digit value by looping from first digit to current digit
         // 3. Use Equal (Operation-TBD) as condition in DoUntil  to determine if current Digit Index is equal to current digit info
-        internal static T? IncrementReset<T>(this IEnumerable<T> list, T? currentItem)
+        internal static T? GetAdjacentOrDefault<T>(this IEnumerable<T> list, T? currentItem, bool next = true)
             where T : class
         {
-            T? nextItem = default;
+            T? adjacentItem = default;
 
             if (currentItem != null)
-                nextItem = list
-                    .SkipWhile(li => li != currentItem)
-                    .Skip(1)
-                    .FirstOrDefault();
+            {
+                var itemArray = list.ToArray();
+                var currentIndex = Array.IndexOf(itemArray, currentItem);
 
-            return nextItem;
+                if (next)
+                {
+                    if (currentIndex < itemArray.Length - 1)
+                    {
+                        adjacentItem = itemArray[currentIndex + 1];
+                    }
+                }
+                else
+                {
+                    if (currentIndex > 0)
+                    {
+                        adjacentItem = itemArray[currentIndex - 1];
+                    }
+                }
+            }
+
+            return adjacentItem;
         }
 
         public static IDictionary<Guid, T> ConvertToNeuronValueMap<T>(this IEnumerable<T> values, IEnumerable<MirrorConfig> mirrorConfigs, Network network) where T : Enum

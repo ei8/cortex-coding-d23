@@ -15,14 +15,14 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
         >
     {
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
-        private readonly Func<Neuron, int> digitRetriever;
+        private readonly Func<Neuron, int?> digitRetriever;
         private Neuron? lastSumDigit;
 
         public SequentialAddition
         (
             Addition.WorkingMemoryInfo workingMemory,
             DoUntil.WorkingMemoryInfo doUntilWorkingMemory,
-            Func<Neuron, int> digitRetriever,
+            Func<Neuron, int?> digitRetriever,
             Action<SequentialAddition, IProcess?, IEnumerable<Neuron>> completionCallback
         ) :
             base
@@ -50,7 +50,9 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                 result.AddRange(this.DoUntil.GetCurrent());
 
                 var digitIndex = this.digitRetriever(this.DoUntil.WorkingMemory.CounterVariable.Value);
-                if (!this.WorkingMemory.TryAddCurrent(result, digitIndex))
+                if (digitIndex.HasValue)
+                    this.WorkingMemory.AddCurrent(result, digitIndex.Value);
+                else
                     this.Complete(null);
             }
 

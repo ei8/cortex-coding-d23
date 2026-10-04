@@ -26,7 +26,21 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
         {
             List<Neuron> result = [];
 
-            if (!this.WorkingMemory.TryAddCurrent(result))
+            int? currentComparand1DigitIndex = this.WorkingMemory.CurrentComparand1Digit != null ?
+                this.WorkingMemory.Comparand1.Content.ToList().IndexOf(this.WorkingMemory.CurrentComparand1Digit) :
+                null;
+
+            int? currentComparand2DigitIndex = this.WorkingMemory.CurrentComparand2Digit != null ?
+                this.WorkingMemory.Comparand2.Content.ToList().IndexOf(this.WorkingMemory.CurrentComparand2Digit) :
+                null;
+
+            int? digitIndex = currentComparand1DigitIndex.HasValue && currentComparand2DigitIndex.HasValue ?
+                System.Math.Max(currentComparand1DigitIndex.Value, currentComparand2DigitIndex.Value) :
+                currentComparand1DigitIndex ?? currentComparand2DigitIndex;
+
+            if (digitIndex.HasValue)
+                this.WorkingMemory.AddCurrent(result, digitIndex.Value);
+            else
                 this.Complete();
 
             return result;
@@ -34,13 +48,14 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
 
         public override void HandleFire(Neuron targetNeuron, ReadOnlyNetwork network)
         {
+            // TODO: Refactor with DynamicAddition
             // if one of specified result values, add to results
             if
             (
                 this.WorkingMemory.ResultValues.Content.Any(c => c.Value == targetNeuron) &&
                 (
-                    this.WorkingMemory.PreviousComparand1Digit.NextExists(this.WorkingMemory.CurrentComparand1Digit) ||
-                    this.WorkingMemory.PreviousComparand2Digit.NextExists(this.WorkingMemory.CurrentComparand2Digit)
+                    this.WorkingMemory.PreviousComparand1Digit.HasCurrentChanged(this.WorkingMemory.CurrentComparand1Digit) ||
+                    this.WorkingMemory.PreviousComparand2Digit.HasCurrentChanged(this.WorkingMemory.CurrentComparand2Digit)
                 )
             )
             {
@@ -51,16 +66,17 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
 
                 DynamicLessThan.logger.Info(new LogMessageGenerator(() => $"Added to Result(s): {targetNeuron.Tag}"));
 
+                this.WorkingMemory.CurrentComparand1Digit = this.WorkingMemory.Comparand1.Content.GetAdjacentOrDefault(this.WorkingMemory.CurrentComparand1Digit, false);
+                this.WorkingMemory.CurrentComparand2Digit = this.WorkingMemory.Comparand2.Content.GetAdjacentOrDefault(this.WorkingMemory.CurrentComparand2Digit, false);
+
                 if
                 (
                     (
-                        this.WorkingMemory.CurrentComparand1Digit =
-                            this.WorkingMemory.Comparand1.Content.IncrementReset(this.WorkingMemory.CurrentComparand1Digit)
-                    ) == null &&
-                    (
-                        this.WorkingMemory.CurrentComparand2Digit =
-                            this.WorkingMemory.Comparand2.Content.IncrementReset(this.WorkingMemory.CurrentComparand2Digit)
-                    ) == null
+                        this.WorkingMemory.CurrentComparand1Digit == null &&
+                        this.WorkingMemory.CurrentComparand2Digit == null
+                    ) ||
+                    // TODO: CanShortCircuit predicate
+                    targetNeuron.Tag.EndsWith("1")
                 )
                     this.Complete();
             }
