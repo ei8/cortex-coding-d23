@@ -21,12 +21,12 @@ namespace ei8.Cortex.Coding.d23.Math.TruthTables
         {
         }
 
-        public class Input(BinaryNeuronParameter? input1) : InputCircuitParameterSubset<BinaryNeuronParameter>(input1)
+        public class Input(BinaryNeuronParameter? input1) : InputCircuitParameterSubsetBase<BinaryNeuronParameter>(input1)
         {
             public BinaryNeuronParameter? Input1 => this.Parameter1;
         }
 
-        public class Output(BinaryNeuronParameter? output1) : OutputCircuitParameterSubset<BinaryNeuronParameter>(output1)
+        public class Output(BinaryNeuronParameter? output1) : OutputCircuitParameterSubsetBase<BinaryNeuronParameter>(output1)
         {
             public BinaryNeuronParameter? Output1 => this.Parameter1;
         }

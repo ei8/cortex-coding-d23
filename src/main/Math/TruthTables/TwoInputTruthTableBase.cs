@@ -1,26 +1,39 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Runtime.CompilerServices;
 
 namespace ei8.Cortex.Coding.d23.Math.TruthTables
 {
+    // TODO: Change references to BinaryNeuronParameter to generic TNeuronParam
+    // TODO: Create BinaryTwoInputTruthTableBase and 1) specify BinaryNeuronParameter; 2) Transfer LinkInputNeurons and GetInterneuronTags there
     public abstract partial class TwoInputTruthTableBase
+    <
+        TParam,
+        TInput,
+        TInterneuron
+    >
     (
-        TwoInputTruthTableBase.ParameterInfo parameters,
-        TwoInputTruthTableBase.InterneuronSet interneurons,
+        TParam parameters,
+        TInterneuron interneurons,
         VariableInfo? variableInfo
     ) :
         TruthTableBase
         <
-            TwoInputTruthTableBase.ParameterInfo,
-            TwoInputTruthTableBase.InterneuronSet
+            TParam,
+            TInterneuron
         >
         (
             parameters,
             interneurons,
             variableInfo
         )
+        where TParam : IFunctionalCircuitParameter<TInput>
+        where TInput : 
+            IInputCircuitParameterSubset
+            <
+                BinaryNeuronParameter,
+                BinaryNeuronParameter
+            >
+        where TInterneuron : ICircuitInterneuronSet
     {
         public static IEnumerable<string> GetInterneuronTags
         (
@@ -53,7 +66,7 @@ namespace ei8.Cortex.Coding.d23.Math.TruthTables
 
         public static IEnumerable<ReadOnlyNetwork> LinkInputNeurons
         (
-            TwoInputTruthTableBase.ParameterInfo parameters,
+            TwoInputTruthTableBase.Input inputs,
             IEnumerable<ReadOnlyNetwork> interneuronNetworks,
             NetworkHelper.InputNeuronStrengthMode additionalInputNeuronType = NetworkHelper.InputNeuronStrengthMode.And,
             params Neuron[] additionalInputs
@@ -61,15 +74,15 @@ namespace ei8.Cortex.Coding.d23.Math.TruthTables
         {
             var result = new List<ReadOnlyNetwork>();
 
-            if (parameters.Inputs.Parameter1 != null && parameters.Inputs.Parameter2 != null)
+            if (inputs.Parameter1 != null && inputs.Parameter2 != null)
             {
                 result.AddRange(
                     [
                         NetworkHelper.LinkInputNeuronsToInterneuron(
                         interneuronNetworks.ElementAt(0).GetInterneuron(),
                         [
-                            new(parameters.Inputs.Parameter1.Neuron0),
-                            new(parameters.Inputs.Parameter2.Neuron0)
+                            new(inputs.Parameter1.Neuron0),
+                            new(inputs.Parameter2.Neuron0)
                         ],
                         additionalInputNeuronType,
                         [
@@ -79,8 +92,8 @@ namespace ei8.Cortex.Coding.d23.Math.TruthTables
                     NetworkHelper.LinkInputNeuronsToInterneuron(
                         interneuronNetworks.ElementAt(1).GetInterneuron(),
                         [
-                            new(parameters.Inputs.Parameter1.Neuron0),
-                            new(parameters.Inputs.Parameter2.Neuron1),
+                            new(inputs.Parameter1.Neuron0),
+                            new(inputs.Parameter2.Neuron1),
                         ],
                         additionalInputNeuronType,
                         [
@@ -90,8 +103,8 @@ namespace ei8.Cortex.Coding.d23.Math.TruthTables
                     NetworkHelper.LinkInputNeuronsToInterneuron(
                         interneuronNetworks.ElementAt(2).GetInterneuron(),
                         [
-                            new(parameters.Inputs.Parameter1.Neuron1),
-                            new(parameters.Inputs.Parameter2.Neuron0),
+                            new(inputs.Parameter1.Neuron1),
+                            new(inputs.Parameter2.Neuron0),
                         ],
                         additionalInputNeuronType,
                         [
@@ -101,8 +114,8 @@ namespace ei8.Cortex.Coding.d23.Math.TruthTables
                     NetworkHelper.LinkInputNeuronsToInterneuron(
                         interneuronNetworks.ElementAt(3).GetInterneuron(),
                         [
-                            new(parameters.Inputs.Parameter1.Neuron1),
-                            new(parameters.Inputs.Parameter2.Neuron1),
+                            new(inputs.Parameter1.Neuron1),
+                            new(inputs.Parameter2.Neuron1),
                         ],
                         additionalInputNeuronType,
                         [
@@ -114,67 +127,6 @@ namespace ei8.Cortex.Coding.d23.Math.TruthTables
             }
 
             return result;
-        }
-
-        public static bool TryCreate<T>
-        (
-            [NotNullWhen(true)] out T? result,
-            TwoInputTruthTableBase.ParameterInfo parameters,
-            InterneuronTagInfo? interneuronTagInfo = null,
-            [CallerArgumentExpression(nameof(result))] string parameterExpression = "",
-            NetworkHelper.InputNeuronStrengthMode additionalInputNeuronType = NetworkHelper.InputNeuronStrengthMode.And,
-            params Neuron[] additionalInputs
-        )
-            where T :
-                ITruthTableStatic
-                <
-                    T,
-                    TwoInputTruthTableBase.ParameterInfo,
-                    InterneuronSet
-                >
-        {
-            bool bResult = false;
-            result = default;
-            if (VariableInfo.TryParse(parameterExpression, out var variableInfo))
-            {
-                if
-                (
-                    parameters.Outputs.Output1 != null &&
-                    parameters.Inputs.Input1 != null &&
-                    parameters.Inputs.Input2 != null
-                )
-                {
-                    var interneuronNetworks = NetworkHelper.CreateInterneuronNetworksByOutputNeurons
-                    (
-                        T.GetInterneuronOutputs(parameters.Outputs.Output1),
-                        T.GetInterneuronTags(variableInfo, interneuronTagInfo)
-                    );
-                    var interneurons = new TwoInputTruthTableBase.InterneuronSet
-                    (
-                        interneuronNetworks.ElementAt(0),
-                        interneuronNetworks.ElementAt(1),
-                        interneuronNetworks.ElementAt(2),
-                        interneuronNetworks.ElementAt(3),
-                        T.LinkInputNeurons
-                        (
-                            parameters,
-                            interneuronNetworks,
-                            additionalInputNeuronType,
-                            additionalInputs
-                        ).Combine()
-                    );
-
-                    result = T.Create
-                    (
-                        parameters,
-                        interneurons,
-                        variableInfo
-                    );
-                    bResult = true;
-                }
-            }
-
-            return bResult;
         }
     }
 }

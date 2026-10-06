@@ -108,7 +108,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 
                     // half2 interneurons
                     if (
-                        TwoInputLogicGateBase.TryCreate(
+                        TwoInputOneOutputLogicGateBase.TryCreate(
                             out XorGate? half2_XOR___Borrow__Half1_XOR_Result,
                             new(
                                 new(
@@ -137,7 +137,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                             ),
                             InterneuronTagInfo.CreateByCommonTagPrefix(subtractorName)
                         ) &&
-                        TwoInputLogicGateBase.TryCreate(
+                        TwoInputOneOutputLogicGateBase.TryCreate(
                             out AndGate? half2_AND___Borrow__Half2_OUT___Half2_NOT___Half1_XOR_Result,
                             new(
                                 new(
@@ -155,7 +155,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                             )
                         ) &&
                         // OR Borrows
-                        TwoInputLogicGateBase.TryCreate(
+                        TwoInputOneOutputLogicGateBase.TryCreate(
                             out OrGate? OR___Half1_Borrow__Half2_Borrow,
                             new(
                                 new(
@@ -211,7 +211,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
             var result = new List<IneurUL>();
             // Link half1 interneurons
             if (
-                TwoInputLogicGateBase.TryCreate(
+                TwoInputOneOutputLogicGateBase.TryCreate(
                     out XorGate? half1_XOR___Minuend__Subtrahend,
                     new(
                         new(
@@ -236,7 +236,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                     ),
                     InterneuronTagInfo.CreateByCommonTagPrefix(prefix)
                 ) &&
-                TwoInputLogicGateBase.TryCreate(
+                TwoInputOneOutputLogicGateBase.TryCreate(
                     out AndGate? half1_AND___Subtrahend__Half1_OUT___Half1_NOT___Minuend,
                     new(
                         new(

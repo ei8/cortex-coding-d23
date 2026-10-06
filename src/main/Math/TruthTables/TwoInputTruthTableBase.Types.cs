@@ -4,29 +4,12 @@ namespace ei8.Cortex.Coding.d23.Math.TruthTables
 {
     public abstract partial class TwoInputTruthTableBase
     {
-        public class ParameterInfo
-        (
-            Input inputs,
-            Output outputs
-        ) :
-            FunctionalCircuitParameter
-            <
-                Input,
-                Output
-            >
-            (
-                inputs,
-                outputs
-            )
-        {
-        }
-
         public class Input
         (
             BinaryNeuronParameter? input1,
             BinaryNeuronParameter? input2
         ) :
-            InputCircuitParameterSubset
+            InputCircuitParameterSubsetBase
             <
                 BinaryNeuronParameter,
                 BinaryNeuronParameter
@@ -38,11 +21,6 @@ namespace ei8.Cortex.Coding.d23.Math.TruthTables
         {
             public BinaryNeuronParameter? Input1 => this.Parameter1;
             public BinaryNeuronParameter? Input2 => this.Parameter2;
-        }
-
-        public class Output(BinaryNeuronParameter? output1) : OutputCircuitParameterSubset<BinaryNeuronParameter>(output1)
-        {
-            public BinaryNeuronParameter? Output1 => this.Parameter1;
         }
 
         public class InterneuronSet

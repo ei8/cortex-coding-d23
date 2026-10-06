@@ -5,11 +5,11 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
 {
     public class OrGate
     (
-        TwoInputTruthTableBase.ParameterInfo parameters,
+        TwoInputOneOutputTruthTableBase.ParameterInfo parameters,
         TwoInputTruthTableBase.InterneuronSet interneurons,
         VariableInfo? variableInfo
     ) : 
-        TwoInputLogicGateBase
+        TwoInputOneOutputLogicGateBase
         (
             parameters,
             interneurons,
@@ -17,14 +17,16 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
         ), 
         ITruthTableStatic
         <
-            OrGate, 
-            TwoInputTruthTableBase.ParameterInfo,
+            OrGate,
+            TwoInputOneOutputTruthTableBase.ParameterInfo,
+            TwoInputTruthTableBase.Input,
+            TwoInputOneOutputTruthTableBase.Output,
             TwoInputTruthTableBase.InterneuronSet
         >
     {
         public static OrGate Create
         (
-            TwoInputTruthTableBase.ParameterInfo parameters,
+            TwoInputOneOutputTruthTableBase.ParameterInfo parameters,
             TwoInputTruthTableBase.InterneuronSet interneurons,
             VariableInfo? variableInfo
         ) => 
@@ -35,12 +37,14 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
                 variableInfo
             );
 
-        public static IEnumerable<Neuron> GetInterneuronOutputs(BinaryNeuronParameter output) =>
-        [
-            output.Neuron0,
-            output.Neuron1,
-            output.Neuron1,
-            output.Neuron1
-        ];
+        public static IEnumerable<IEnumerable<Neuron>> GetOutputsPerInterneuron(TwoInputOneOutputTruthTableBase.Output outputs) =>
+            outputs.Output1 != null ?
+                [
+                    [outputs.Output1.Neuron0],
+                    [outputs.Output1.Neuron1],
+                    [outputs.Output1.Neuron1],
+                    [outputs.Output1.Neuron1]
+                ] :
+                [];
     }
 }

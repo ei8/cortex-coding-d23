@@ -2,13 +2,13 @@
 
 namespace ei8.Cortex.Coding.d23.Math.Logic
 {
-    public abstract class TwoInputLogicGateBase
+    public abstract class TwoInputOneOutputLogicGateBase
     (
-        TwoInputTruthTableBase.ParameterInfo parameters,
+        TwoInputOneOutputTruthTableBase.ParameterInfo parameters,
         TwoInputTruthTableBase.InterneuronSet interneurons,
         VariableInfo? variableInfo
     ) :
-        TwoInputTruthTableBase
+        TwoInputOneOutputTruthTableBase
         (
             parameters,
             interneurons,
@@ -16,7 +16,7 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
         ),
         ILogicGate
         <
-            TwoInputTruthTableBase.ParameterInfo,
+            TwoInputOneOutputTruthTableBase.ParameterInfo,
             TwoInputTruthTableBase.InterneuronSet
         >
     {

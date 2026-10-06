@@ -91,20 +91,20 @@ namespace ei8.Cortex.Coding.d23
         }
 
         public static IEnumerable<ReadOnlyNetwork> CreateInterneuronNetworksByOutputNeurons(
-            IEnumerable<Neuron> outputs,
+            IEnumerable<IEnumerable<Neuron>> outputsPerInterneuron,
             IEnumerable<string> outputInterneuronTags,
             NeurotransmitterEffect effect = NeurotransmitterEffect.Excite,
             float strength = 1f
         ) =>
         [
-            ..outputs.Select(o => {
-                var index = outputs.ToList().IndexOf(o);
+            ..outputInterneuronTags.Select(o => {
+                var index = outputInterneuronTags.ToList().IndexOf(o);
                 return NetworkHelper.CreateInterneuronNetworkByOutputNeurons
                 (
                     outputInterneuronTags.ElementAt(index),
                     effect,
                     strength,
-                    outputs.ElementAt(index)
+                    [..outputsPerInterneuron.ElementAt(index)]
                 );
             })
         ];

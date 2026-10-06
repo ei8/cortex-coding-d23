@@ -40,8 +40,17 @@
 	  <Compile Update="Math\Arithmetic\Subtractor.Types.cs">
 		  <DependentUpon>Subtractor.cs</DependentUpon>
 	  </Compile>
+	  <Compile Update="Math\Comparison\Comparator.Types.cs">
+		  <DependentUpon>Comparator.cs</DependentUpon>
+	  </Compile>
 	  <Compile Update="Math\TruthTables\OneInputTruthTableBase.Types.cs">
 		  <DependentUpon>OneInputTruthTableBase.cs</DependentUpon>
+	  </Compile>
+	  <Compile Update="Math\TruthTables\TwoInputThreeOutputTruthTableBase.Types.cs">
+	    <DependentUpon>TwoInputThreeOutputTruthTableBase.cs</DependentUpon>
+	  </Compile>
+	  <Compile Update="Math\TruthTables\TwoInputOneOutputTruthTableBase.Types.cs">
+		  <DependentUpon>TwoInputOneOutputTruthTableBase.cs</DependentUpon>
 	  </Compile>
 	  <Compile Update="Math\TruthTables\TwoInputTruthTableBase.Types.cs">
 		  <DependentUpon>TwoInputTruthTableBase.cs</DependentUpon>

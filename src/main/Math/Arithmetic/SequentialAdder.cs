@@ -71,14 +71,16 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
             bool bResult = false;
             result = default;
             // TODO: use variableInfo
-            if (VariableInfo.TryParse(parameterExpression, out var variableInfo))
-            {
-                ArgumentNullException.ThrowIfNull(adder.Parameters.Inputs.PrecedingCarryOver);
-                ArgumentNullException.ThrowIfNull(adder.Parameters.Inputs.Addend1);
-                ArgumentNullException.ThrowIfNull(adder.Parameters.Inputs.Addend2);
-                ArgumentNullException.ThrowIfNull(adder.Parameters.Outputs.Sum);
-                ArgumentNullException.ThrowIfNull(adder.Parameters.Outputs.CarryOver);
-
+            if
+            (
+                VariableInfo.TryParse(parameterExpression, out var variableInfo) &&
+                adder.Parameters.Inputs.PrecedingCarryOver != null &&
+                adder.Parameters.Inputs.Addend1 != null &&
+                adder.Parameters.Inputs.Addend2 != null &&
+                adder.Parameters.Outputs.Sum != null &&
+                adder.Parameters.Outputs.CarryOver != null
+            )
+            { 
                 result = T.Create
                 (
                     new

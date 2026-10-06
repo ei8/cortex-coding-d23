@@ -12,7 +12,7 @@ namespace ei8.Cortex.Coding.d23
         TOutput outputs
     ) : 
         ProceduralCircuitParameter<TInput>(inputs),
-        IFunctionalCircuitParameter
+        IFunctionalCircuitParameter<TInput, TOutput>
         where TInput : IInputCircuitParameterSubset
         where TOutput : IOutputCircuitParameterSubset
     {

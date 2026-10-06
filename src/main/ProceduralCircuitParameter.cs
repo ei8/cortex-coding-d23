@@ -4,7 +4,7 @@ namespace ei8.Cortex.Coding.d23
 {
     public class ProceduralCircuitParameter<TInput>(TInput inputs) : 
         CircuitParameterBase(),
-        ICircuitParameter
+        ICircuitParameter<TInput>
         where TInput : IInputCircuitParameterSubset
     {
         public TInput Inputs { get; } = inputs;

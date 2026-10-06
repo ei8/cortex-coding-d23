@@ -24,7 +24,7 @@
             BinaryNeuronParameter? multiplicand,
             BinaryNeuronParameter? multiplier
         ) :
-            InputCircuitParameterSubset<BinaryNeuronParameter, BinaryNeuronParameter>(
+            InputCircuitParameterSubsetBase<BinaryNeuronParameter, BinaryNeuronParameter>(
                 multiplicand,
                 multiplier
             )
@@ -37,7 +37,7 @@
         (
             BinaryNeuronParameter? product
         ) :
-            OutputCircuitParameterSubset<BinaryNeuronParameter>(
+            OutputCircuitParameterSubsetBase<BinaryNeuronParameter>(
                 product
             )
         {

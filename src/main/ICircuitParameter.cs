@@ -3,4 +3,10 @@
     public interface ICircuitParameter : IneurUL
     {
     }
+
+    public interface ICircuitParameter<TInput> : ICircuitParameter
+        where TInput : IInputCircuitParameterSubset
+    {
+        TInput Inputs { get; }
+    }
 }

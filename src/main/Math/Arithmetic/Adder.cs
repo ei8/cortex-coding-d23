@@ -122,7 +122,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 
                 // half2
                 if (
-                    TwoInputLogicGateBase.TryCreate(
+                    TwoInputOneOutputLogicGateBase.TryCreate(
                         out XorGate? half2_XOR___CarryOver__Half1_XOR_Result,
                         new(
                             new(
@@ -139,7 +139,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                             adderName
                         )
                     ) &&
-                    TwoInputLogicGateBase.TryCreate(
+                    TwoInputOneOutputLogicGateBase.TryCreate(
                         out AndGate? half2_AND___CarryOver__Half1_XOR_Result,
                         new(
                             new(
@@ -157,7 +157,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                         )
                     ) &&
                     // OR carryOvers
-                    TwoInputLogicGateBase.TryCreate(
+                    TwoInputOneOutputLogicGateBase.TryCreate(
                         out OrGate? OR___Half1_CarryOver__Half2_CarryOver,
                         new(
                             new(
@@ -212,7 +212,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
             var result = new List<IneurUL>();
             // Link half1 interneurons
             if (
-                TwoInputLogicGateBase.TryCreate(
+                TwoInputOneOutputLogicGateBase.TryCreate(
                     out XorGate? half1_XOR___Addend1__Addend2,
                     new(
                         new(
@@ -227,7 +227,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                     additionalInputNeuronType: additionalInputNeuronType,
                     additionalInputs: additionalInputs
                 ) &&
-                TwoInputLogicGateBase.TryCreate(
+                TwoInputOneOutputLogicGateBase.TryCreate(
                     out AndGate? half1_AND___Addend1__Addend2,
                     new(
                         new(

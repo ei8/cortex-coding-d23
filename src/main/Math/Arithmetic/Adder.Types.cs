@@ -25,7 +25,7 @@
             BinaryNeuronParameter? addend2,
             BinaryNeuronParameter? precedingCarryOver
         ) :
-            InputCircuitParameterSubset<BinaryNeuronParameter, BinaryNeuronParameter, BinaryNeuronParameter>(
+            InputCircuitParameterSubsetBase<BinaryNeuronParameter, BinaryNeuronParameter, BinaryNeuronParameter>(
                 addend1,
                 addend2,
                 precedingCarryOver
@@ -41,7 +41,7 @@
             BinaryNeuronParameter? sum,
             BinaryNeuronParameter? carryOver
         ) :
-            OutputCircuitParameterSubset<BinaryNeuronParameter, BinaryNeuronParameter>(
+            OutputCircuitParameterSubsetBase<BinaryNeuronParameter, BinaryNeuronParameter>(
                 sum,
                 carryOver
             )

@@ -26,6 +26,8 @@ namespace ei8.Cortex.Coding.d23.Math.TruthTables
     <
         T, 
         TParam, 
+        TInput,
+        TOutput,
         TInterneuron
     > :
         ITruthTable
@@ -40,9 +42,11 @@ namespace ei8.Cortex.Coding.d23.Math.TruthTables
                 TInterneuron
             >
         where TParam : IFunctionalCircuitParameter
+        where TInput : IInputCircuitParameterSubset
+        where TOutput : IOutputCircuitParameterSubset
         where TInterneuron : ICircuitInterneuronSet
     {
-        static abstract IEnumerable<Neuron> GetInterneuronOutputs(BinaryNeuronParameter output);
+        static abstract IEnumerable<IEnumerable<Neuron>> GetOutputsPerInterneuron(TOutput outputs);
 
         static abstract IEnumerable<string> GetInterneuronTags
         (
@@ -59,7 +63,7 @@ namespace ei8.Cortex.Coding.d23.Math.TruthTables
 
         static abstract IEnumerable<ReadOnlyNetwork> LinkInputNeurons
         (
-            TParam parameters,
+            TInput inputs,
             IEnumerable<ReadOnlyNetwork> interneuronNetworks,
             NetworkHelper.InputNeuronStrengthMode additionalInputNeuronType = NetworkHelper.InputNeuronStrengthMode.And,
             params Neuron[] additionalInputs

@@ -24,7 +24,7 @@
             BinaryNeuronParameter? subtrahend,
             BinaryNeuronParameter? precedingBorrow
         ) :
-            InputCircuitParameterSubset<BinaryNeuronParameter, BinaryNeuronParameter, BinaryNeuronParameter>(
+            InputCircuitParameterSubsetBase<BinaryNeuronParameter, BinaryNeuronParameter, BinaryNeuronParameter>(
                 minuend,
                 subtrahend,
                 precedingBorrow
@@ -39,7 +39,7 @@
             BinaryNeuronParameter? difference,
             BinaryNeuronParameter? borrow
         ) :
-        OutputCircuitParameterSubset<BinaryNeuronParameter, BinaryNeuronParameter>(
+        OutputCircuitParameterSubsetBase<BinaryNeuronParameter, BinaryNeuronParameter>(
             difference,
             borrow
         )

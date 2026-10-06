@@ -24,6 +24,8 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
         <
             NotGate,
             OneInputTruthTableBase.ParameterInfo,
+            OneInputTruthTableBase.Input,
+            OneInputTruthTableBase.Output,
             OneInputTruthTableBase.InterneuronSet
         >
     {
@@ -37,10 +39,12 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
             variableInfo
         );
 
-        public static IEnumerable<Neuron> GetInterneuronOutputs(BinaryNeuronParameter output) =>
-        [
-            output.Neuron1,
-            output.Neuron0
-        ];
+        public static IEnumerable<IEnumerable<Neuron>> GetOutputsPerInterneuron(OneInputTruthTableBase.Output outputs) =>
+            outputs.Output1 != null ?
+                [
+                    [outputs.Output1.Neuron1],
+                    [outputs.Output1.Neuron0]
+                ] :
+                [];
     }
 }
