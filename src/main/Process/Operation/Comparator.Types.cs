@@ -3,13 +3,15 @@ using System.Linq;
 
 namespace ei8.Cortex.Coding.d23.Process.Operation
 {
-    public partial class LessThan
+    public class Comparator
     {
         public class WorkingMemoryValuesInfo
         (
             EnumerableChunk<NeuronChunk> comparand1Values,
             EnumerableChunk<NeuronChunk> comparand2Values,
-            EnumerableChunk<NeuronChunk> resultValues
+            EnumerableChunk<NeuronChunk> areEqualValues,
+            EnumerableChunk<NeuronChunk> isLessThanValues,
+            EnumerableChunk<NeuronChunk> isGreaterThanValues
         ) :
             IWorkingMemory
         {
@@ -17,7 +19,11 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
 
             public EnumerableChunk<NeuronChunk> Comparand2Values => comparand2Values;
 
-            public EnumerableChunk<NeuronChunk> ResultValues => resultValues;
+            public EnumerableChunk<NeuronChunk> AreEqualValues => areEqualValues;
+
+            public EnumerableChunk<NeuronChunk> IsLessThanValues => isLessThanValues;
+
+            public EnumerableChunk<NeuronChunk> IsGreaterThanValues => isGreaterThanValues;
         }
 
         public class WorkingMemoryInfo
@@ -30,14 +36,20 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
             NeuronChunk? currentComparand2Digit,
             NeuronChunk? previousComparand1Digit,
             NeuronChunk? previousComparand2Digit,
-            EnumerableChunk<NeuronChunk> resultValues,
-            ListChunk<NeuronChunk> result
+            EnumerableChunk<NeuronChunk> areEqualValues,
+            EnumerableChunk<NeuronChunk> isLessThanValues,
+            EnumerableChunk<NeuronChunk> isGreaterThanValues,
+            ListChunk<NeuronChunk> areEqual,
+            ListChunk<NeuronChunk> isLessThan,
+            ListChunk<NeuronChunk> isGreaterThan
         ) :
             WorkingMemoryValuesInfo
             (
                 comparand1Values,
                 comparand2Values,
-                resultValues
+                areEqualValues,
+                isLessThanValues,
+                isGreaterThanValues
             )
         {
             public WorkingMemoryInfo
@@ -46,7 +58,9 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                 EnumerableChunk<NeuronChunk> comparand2Values,
                 EnumerableChunk<NeuronChunk> comparand1,
                 EnumerableChunk<NeuronChunk> comparand2,
-                EnumerableChunk<NeuronChunk> resultValues
+                EnumerableChunk<NeuronChunk> areEqualValues,
+                EnumerableChunk<NeuronChunk> isLessThanValues,
+                EnumerableChunk<NeuronChunk> isGreaterThanValues
             ) :
                 this
                 (
@@ -58,7 +72,11 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                     comparand2.Content.Last(),
                     null,
                     null,
-                    resultValues,
+                    areEqualValues,
+                    isLessThanValues,
+                    isGreaterThanValues,
+                    new(),
+                    new(),
                     new()
                 )
             {
@@ -82,7 +100,11 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
 
             public NeuronChunk? PreviousComparand2Digit { get; set; } = previousComparand2Digit;
 
-            public ListChunk<NeuronChunk> Result => result;
+            public ListChunk<NeuronChunk> AreEqual => areEqual;
+
+            public ListChunk<NeuronChunk> IsLessThan => isLessThan;
+
+            public ListChunk<NeuronChunk> IsGreaterThan => isGreaterThan;
         }
     }
 }

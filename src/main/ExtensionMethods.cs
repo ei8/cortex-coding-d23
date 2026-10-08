@@ -2,18 +2,20 @@
 using ei8.Cortex.Coding.Mirrors;
 using ei8.Cortex.Coding.Model.Reflection;
 using ei8.Cortex.Coding.Spiker;
-using ei8.Cortex.Library.Common;
 using NLog;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace ei8.Cortex.Coding.d23
 {
     public static class ExtensionMethods
     {
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+
         public static string LogFire(Neuron n) => $"Fired: {n.ToReadableString()}";
 
         public static void Log(this IProcess process, Logger logger, LogLevel level, LogMessageGenerator logMessageGenerator) =>
@@ -56,7 +58,7 @@ namespace ei8.Cortex.Coding.d23
         }
 
         public static void AddReplaceItems(this Network original, params IneurUL[] neurULs) =>
-            original.AddReplaceItems([..neurULs.Select(no => no.Network)]);
+            original.AddReplaceItems([.. neurULs.Select(no => no.Network)]);
 
         public static void AddReplaceItems(this Network original, params ReadOnlyNetwork[] networks)
         {
@@ -65,9 +67,6 @@ namespace ei8.Cortex.Coding.d23
         }
 
         public static Neuron GetInterneuron(this ReadOnlyNetwork value) => value.GetItems<Neuron>().Single();
-
-
-        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
         public static bool TryParseSensoryNeurons(
             this ISpikable spikable,
@@ -285,6 +284,26 @@ namespace ei8.Cortex.Coding.d23
                     .Tag
                     .Last()
             );
+        }
+
+        public static bool HandleFire
+        (
+            this ResultInfo resultInfo, 
+            Neuron target, 
+            int expectedHandledCount
+        )
+        {
+            if 
+            (
+                resultInfo.Values.Content.Any(c => c.Value == target) && 
+                resultInfo.List.Content.Count < expectedHandledCount
+            )
+            {
+                resultInfo.List.Content.Add(new(target));
+                ExtensionMethods.logger.Info(new LogMessageGenerator(() => $"Added to {resultInfo.Name}: {target.Tag}"));
+            }
+
+            return resultInfo.List.Content.Count == expectedHandledCount;
         }
     }
 }

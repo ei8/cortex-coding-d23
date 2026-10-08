@@ -70,9 +70,6 @@
 	  <Compile Update="Process\Operation\DynamicMultiplication.Types.cs">
 		  <DependentUpon>DynamicMultiplication.cs</DependentUpon>
 	  </Compile>
-	  <Compile Update="Process\Operation\LessThan.Types.cs">
-		  <DependentUpon>LessThan.cs</DependentUpon>
-	  </Compile>
   </ItemGroup>
 
   <ItemGroup>
