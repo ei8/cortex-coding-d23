@@ -49,9 +49,9 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
             {
                 result.AddRange(this.DoUntil.GetCurrent());
 
-                var digitIndex = this.digitRetriever(this.DoUntil.WorkingMemory.CounterVariable.Value);
+                var digitIndex = this.digitRetriever(this.DoUntil.WorkingMemory.CounterVariable.Neuron);
                 if (digitIndex.HasValue)
-                    this.WorkingMemory.AddCurrent(result, digitIndex.Value);
+                    result.AddRange(this.WorkingMemory.GetCurrent(digitIndex.Value).Select(c => c.Neuron));
                 else
                     this.Complete(null);
             }
@@ -68,32 +68,27 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                 // if one of specified sum values, add to sums
                 if
                 (
-                    this.WorkingMemory.SumValues.Content.Any(c => c.Value == targetNeuron) &&
-                    lastSumDigit != this.DoUntil.WorkingMemory.CounterVariable.Value
+                    this.WorkingMemory.Sum.DigitValues.Items.Any(c => c.Neuron == targetNeuron) &&
+                    this.lastSumDigit != this.DoUntil.WorkingMemory.CounterVariable.Neuron
                 )
                 {
                     SequentialAddition.logger.Info(new LogMessageGenerator(() => $"Added to Sum(s): {targetNeuron.Tag}"));
 
-                    this.lastSumDigit = this.DoUntil.WorkingMemory.CounterVariable.Value;
-                    this.WorkingMemory.Sum.Content.Add(new(targetNeuron));
+                    this.lastSumDigit = this.DoUntil.WorkingMemory.CounterVariable.Neuron;
+                    this.WorkingMemory.Sum.Value.Items.Add(new NeuronChunk(targetNeuron));
                 }
             }
 
+            // TODO: Check if possible to update to copy DynamicAddition
             // if one of specified carry over values, update carry over
-            if(this.WorkingMemory.CarryOverValues.Content.Any(c => c.Value == targetNeuron))
-            {
-                this.WorkingMemory.CarryOver = 
-                    this.WorkingMemory.PrecedingCarryOverValues.Content.Single
-                    (
-                        n => n.Value.Tag.EndsWith(targetNeuron.Tag.Last())
-                    );
-            }
+            if(this.WorkingMemory.CarryOver.DigitValues.Items.Any(c => c.Neuron == targetNeuron))
+                this.WorkingMemory.CarryOver.Value.Items.Add(new NeuronChunk(targetNeuron));
         }
 
         private void Complete(IProcess? process)
         {
             this.completionCallback(this, process, [.. this.WorkingMemory.GetSumNeurons()]);
-            this.WorkingMemory.Sum.Content.Clear();
+            this.WorkingMemory.Sum.Value.Items.Clear();
         }
 
         public DoUntil? DoUntil => this.Process1;

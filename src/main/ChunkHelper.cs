@@ -10,18 +10,19 @@ namespace ei8.Cortex.Coding.d23
     {
         public static int? GetOperandCurrentIndex
         (
-            NeuronChunk? currentOperand1Digit,
-            IEnumerableChunk<NeuronChunk> operand1,
-            NeuronChunk? currentOperand2Digit,
-            IEnumerableChunk<NeuronChunk> operand2
+            IOperandChunk operand1,
+            IOperandChunk operand2
         )
         {
-            int? currentOperand1DigitIndex = currentOperand1Digit != null ?
-                operand1.Content.ToList().IndexOf(currentOperand1Digit) :
+            ArgumentNullException.ThrowIfNull(operand1.Value);
+            ArgumentNullException.ThrowIfNull(operand2.Value);
+
+            int? currentOperand1DigitIndex = operand1.CurrentDigit != null ?
+                operand1.Value.Items.ToList().IndexOf(operand1.CurrentDigit) :
                 null;
 
-            int? currentOperand2DigitIndex = currentOperand2Digit != null ?
-                operand2.Content.ToList().IndexOf(currentOperand2Digit) :
+            int? currentOperand2DigitIndex = operand2.CurrentDigit != null ?
+                operand2.Value.Items.ToList().IndexOf(operand2.CurrentDigit) :
                 null;
 
             int? digitIndex = currentOperand1DigitIndex.HasValue && currentOperand2DigitIndex.HasValue ?
@@ -33,35 +34,39 @@ namespace ei8.Cortex.Coding.d23
 
         public static bool TryGetExpectedHandledDigitsCount
         (
-            NeuronChunk? currentOperand1Digit,
-            IEnumerableChunk<NeuronChunk> operand1,
-            NeuronChunk? currentOperand2Digit,
-            IEnumerableChunk<NeuronChunk> operand2,
+            IOperandChunk operand1,
+            IOperandChunk operand2,
+            bool incremental,
             [NotNullWhen(true)]
             out int? result
         )
         {
-            var bResult = false;
+            ArgumentNullException.ThrowIfNull(operand1.Value);
+            ArgumentNullException.ThrowIfNull(operand2.Value);
 
-            var maxDigitCount = System.Math.Max
-            (
-                operand1.Content.Count(),
-                operand2.Content.Count()
-            );
+            var bResult = false;
 
             var currentDigitIndex =
                 ChunkHelper.GetOperandCurrentIndex
                 (
-                    currentOperand1Digit,
                     operand1,
-                    currentOperand2Digit,
                     operand2
                 );
 
             if (currentDigitIndex != null)
             {
                 bResult = true;
-                result = maxDigitCount - currentDigitIndex;
+                if (incremental)
+                    result = currentDigitIndex + 1;
+                else
+                {
+                    var maxDigitCount = System.Math.Max
+                    (
+                        operand1.Value.Items.Count(),
+                        operand2.Value.Items.Count()
+                    );
+                    result = maxDigitCount - currentDigitIndex;
+                }
             }
             else
                 result = null;
@@ -72,33 +77,38 @@ namespace ei8.Cortex.Coding.d23
         public static bool HandleFire
         (
             Neuron target,
-            NeuronChunk? currentOperand1Digit,
-            IEnumerableChunk<NeuronChunk> operand1,
-            NeuronChunk? currentOperand2Digit,
-            IEnumerableChunk<NeuronChunk> operand2,
-            IEnumerable<ResultInfo> resultInfo,
-            out bool allResultsHandled
+            IOperandChunk operand1,
+            IOperandChunk operand2,
+            bool incremental,
+            IEnumerable<IResultChunk> resultInfo,
+            [NotNullWhen(true)]
+            out bool? allResultsHandled
         )
         {
             bool canHandleCurrentDigit = false;
-            allResultsHandled = false;
+            allResultsHandled = null;
+            bool? allResultsHandledTemp = null;
 
             if
             (
                 ChunkHelper.TryGetExpectedHandledDigitsCount
                 (
-                    currentOperand1Digit,
                     operand1,
-                    currentOperand2Digit,
                     operand2,
+                    incremental,
                     out var expectedHandledCount
                 )
             )
             {
                 canHandleCurrentDigit = true;
-                allResultsHandled = true;
                 foreach (var result in resultInfo)
-                    allResultsHandled &= result.HandleFire(target, expectedHandledCount.Value);
+                {
+                    if (allResultsHandled == null)
+                        allResultsHandled = result.HandleFire(target, expectedHandledCount.Value);
+                    else
+                        allResultsHandled &= result.HandleFire(target, expectedHandledCount.Value);
+                }
+                allResultsHandledTemp = allResultsHandled;
             }
 
             return canHandleCurrentDigit;

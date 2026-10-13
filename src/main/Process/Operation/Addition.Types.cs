@@ -5,126 +5,66 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
 {
     public partial class Addition
     {
-        public class WorkingMemoryValuesInfo
-        (
-            EnumerableChunk<NeuronChunk> precedingCarryOverValues,
-            EnumerableChunk<NeuronChunk> augendValues,
-            EnumerableChunk<NeuronChunk> addendValues,
-            EnumerableChunk<NeuronChunk> sumValues,
-            EnumerableChunk<NeuronChunk> carryOverValues
-        ) :
-            IWorkingMemory
-        {
-            public EnumerableChunk<NeuronChunk> PrecedingCarryOverValues => precedingCarryOverValues;
-
-            public EnumerableChunk<NeuronChunk> AugendValues => augendValues;
-
-            public EnumerableChunk<NeuronChunk> AddendValues => addendValues;
-
-            public EnumerableChunk<NeuronChunk> SumValues => sumValues;
-
-            public EnumerableChunk<NeuronChunk> CarryOverValues => carryOverValues;
-        }
-
         public class WorkingMemoryInfo
         (
-            EnumerableChunk<NeuronChunk> precedingCarryOverValues,
-            EnumerableChunk<NeuronChunk> augendValues,
-            EnumerableChunk<NeuronChunk> addendValues,
-            EnumerableChunk<NeuronChunk> augend,
-            EnumerableChunk<NeuronChunk> addend,
-            NeuronChunk? currentAugendDigit,
-            NeuronChunk? currentAddendDigit,
-            NeuronChunk? previousAugendDigit,
-            NeuronChunk? previousAddendDigit,
-            EnumerableChunk<NeuronChunk> sumValues,
-            ListChunk<NeuronChunk> sum,
-            EnumerableChunk<NeuronChunk> carryOverValues,
-            NeuronChunk? carryOver
+            IEnumerableChunk<INeuronChunk> precedingCarryOverValues,
+            IOperandChunk augend,
+            IOperandChunk addend,
+            IResultChunk sum,
+            IResultChunk carryOver
         ) :
-            WorkingMemoryValuesInfo
+            ChunkBase
+            <
+                IEnumerableChunk<INeuronChunk>,
+                IOperandChunk,
+                IOperandChunk,
+                IResultChunk,
+                IResultChunk 
+            >
             (
                 precedingCarryOverValues,
-                augendValues,
-                addendValues, 
-                sumValues,
-                carryOverValues
-            )
+                augend,
+                addend, 
+                sum,
+                carryOver
+            ),
+            IWorkingMemory
         {
-            public WorkingMemoryInfo
-            (
-                EnumerableChunk<NeuronChunk> precedingCarryOverValues,
-                EnumerableChunk<NeuronChunk> augendValues,
-                EnumerableChunk<NeuronChunk> addendValues,
-                EnumerableChunk<NeuronChunk> augend,
-                EnumerableChunk<NeuronChunk> addend,
-                EnumerableChunk<NeuronChunk> sumValues,
-                EnumerableChunk<NeuronChunk> carryOverValues
-            ) :
-                this
-                (
-                    precedingCarryOverValues,
-                    augendValues,
-                    addendValues,
-                    augend,
-                    addend,
-                    augend.Content.First(),
-                    addend.Content.First(),
-                    null,
-                    null,
-                    sumValues,
-                    new(),
-                    carryOverValues,
-                    null
-                )
-            {
-            }
-
             public IEnumerable<Neuron> GetSumNeurons()
             {
-                var result = new List<Neuron>(this.Sum.Content.Select(c => c.Value));
+                var result = new List<Neuron>(this.Sum.Value.Items.Select(c => c.Neuron));
 
-                if (this.CarryOver != null && this.CarryOver.Value.Tag.EndsWith('1'))
-                    result.Add(this.CarryOver.Value);
+                if (this.CarryOver != null && this.CarryOver.Value.Items.Last().Neuron.Tag.EndsWith('1'))
+                    result.Add(this.CarryOver.Value.Items.Last().Neuron);
 
                 return result;
             }
 
-            public void AddCurrent(IList<Neuron> result, int digitIndex)
-            {
-                if (digitIndex == 0)
-                    result.Add(this.PrecedingCarryOverValues.Content.Single(n => n.Value.Tag.EndsWith('0')).Value);
-                else if (this.CarryOver != null)
-                    result.Add(this.CarryOver.Content);
+            public IEnumerable<INeuronChunk> GetCurrent(int digitIndex) =>
+                [
+                    this.PrecedingCarryOverValues.Items.Single
+                    (
+                        n =>
+                            n.Neuron.Tag.EndsWith
+                            (
+                                digitIndex == 0 ?
+                                    '0' :
+                                    this.CarryOver.Value.Items[digitIndex - 1].Neuron.Tag.Last()
+                            )
+                    ),
+                    this.Augend.GetValueByIndex(digitIndex),
+                    this.Addend.GetValueByIndex(digitIndex)
+                ];
 
-                WorkingMemoryInfo.AddAddend(digitIndex, result, this.AugendValues, this.Augend);
-                WorkingMemoryInfo.AddAddend(digitIndex, result, this.AddendValues, this.Addend);
-            }
+            public IEnumerableChunk<INeuronChunk> PrecedingCarryOverValues => this.Content1;
 
-            // TODO: transfer to extensions
-            internal static void AddAddend(int digitIndex, IList<Neuron> addendsResult, EnumerableChunk<NeuronChunk> addendValues, EnumerableChunk<NeuronChunk> addend)
-            {
-                if (digitIndex < addend.Content.Count())
-                    addendsResult.Add(addendValues.Content.Single(ad => ad.Value.Tag.EndsWith(addend.Content.ElementAt(digitIndex).Value.Tag.Last())).Value);
-                else
-                    addendsResult.Add(addendValues.Content.Single(ad => ad.Value.Tag.EndsWith('0')).Value);
-            }
+            public IOperandChunk Augend => this.Content2;
 
-            public EnumerableChunk<NeuronChunk> Augend => augend;
+            public IOperandChunk Addend => this.Content3;
 
-            public EnumerableChunk<NeuronChunk> Addend => addend;
+            public IResultChunk Sum => this.Content4;
 
-            public NeuronChunk? CurrentAugendDigit { get; set; } = currentAugendDigit;
-
-            public NeuronChunk? CurrentAddendDigit { get; set; } = currentAddendDigit;
-
-            public NeuronChunk? PreviousAugendDigit { get; set; } = previousAugendDigit;
-
-            public NeuronChunk? PreviousAddendDigit { get; set; } = previousAddendDigit;
-
-            public ListChunk<NeuronChunk> Sum => sum;
-
-            public NeuronChunk? CarryOver { get; set; } = carryOver;
+            public IResultChunk CarryOver => this.Content5;
         }
     }
 }

@@ -8,7 +8,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Runtime.CompilerServices;
 
 namespace ei8.Cortex.Coding.d23
 {
@@ -251,9 +250,8 @@ namespace ei8.Cortex.Coding.d23
             return enumerable.Where(e => e != null).Select(e => e!);
         }
 
-        public static bool HasCurrentChanged<T>(this T? previousValue, T? currentValue)
-            where T : class =>
-            previousValue != currentValue && currentValue != null;
+        public static bool HasCurrentDigitChanged(this IOperandChunk operand) =>
+            operand.PreviousDigit != operand.CurrentDigit && operand.CurrentDigit != null;
 
         public static T? GetIfUnequal<T>(this T? value, T? otherValue)
             where T : class
@@ -270,17 +268,17 @@ namespace ei8.Cortex.Coding.d23
             return values.Single(ad => comparer(ad));
         }
 
-        public static bool IsMatchingValue(this NeuronChunk value, EnumerableChunk<NeuronChunk> targetList, int targetIndex)
+        public static bool IsMatchingValue(this INeuronChunk value, IEnumerableChunk<NeuronChunk> targetList, int targetIndex)
         {
-            return value.Value.Tag.EndsWith
+            return value.Neuron.Tag.EndsWith
             (
                 targetList
-                    .Content
+                    .Items
                     .ElementAt
                         (
                             targetIndex
                         )
-                    .Value
+                    .Neuron
                     .Tag
                     .Last()
             );
@@ -288,22 +286,39 @@ namespace ei8.Cortex.Coding.d23
 
         public static bool HandleFire
         (
-            this ResultInfo resultInfo, 
+            this IResultChunk resultInfo, 
             Neuron target, 
             int expectedHandledCount
         )
         {
             if 
             (
-                resultInfo.Values.Content.Any(c => c.Value == target) && 
-                resultInfo.List.Content.Count < expectedHandledCount
+                resultInfo.DigitValues.Items.Any(c => c.Neuron == target) && 
+                resultInfo.Value.Items.Count < expectedHandledCount
             )
             {
-                resultInfo.List.Content.Add(new(target));
-                ExtensionMethods.logger.Info(new LogMessageGenerator(() => $"Added to {resultInfo.Name}: {target.Tag}"));
+                resultInfo.Value.Items.Add(new NeuronChunk(target));
+                if (resultInfo is INamedChunk namedChunk)
+                    ExtensionMethods.logger.Info(new LogMessageGenerator(() => $"Added to {namedChunk.Name}: {target.Tag}"));
             }
 
-            return resultInfo.List.Content.Count == expectedHandledCount;
+            return resultInfo.Value.Items.Count == expectedHandledCount;
+        }
+
+        public static INeuronChunk GetValueByIndex
+        (
+            this IOperandChunk operand,
+            int index
+        )
+        {
+            INeuronChunk result;
+            ArgumentNullException.ThrowIfNull(operand.Value);
+
+            if (index < operand.Value.Items.Count())
+                result = operand.DigitValues.Items.Single(ad => ad.Neuron.Tag.EndsWith(operand.Value.Items.ElementAt(index).Neuron.Tag.Last()));
+            else
+                result = operand.DigitValues.Items.Single(ad => ad.Neuron.Tag.EndsWith('0'));
+            return result;
         }
     }
 }

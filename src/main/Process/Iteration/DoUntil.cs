@@ -27,8 +27,8 @@ namespace ei8.Cortex.Coding.d23.Process.Iteration
 
         public override IEnumerable<Neuron> GetCurrent() => 
             [
-                this.WorkingMemory.Action.Value,
-                this.WorkingMemory.CounterVariable.Value
+                this.WorkingMemory.Action.Neuron,
+                this.WorkingMemory.CounterVariable.Neuron
             ];
 
         public override void HandleFire(Neuron targetNeuron, ReadOnlyNetwork network)
@@ -38,7 +38,7 @@ namespace ei8.Cortex.Coding.d23.Process.Iteration
                 NeuronChunk? targetChunk = null;
                 if 
                 (
-                    (targetChunk = this.WorkingMemory.CounterVariableValues.Content.SingleOrDefault(nc => nc.Value == targetNeuron)) != null &&
+                    (targetChunk = this.WorkingMemory.CounterVariableValues.Items.SingleOrDefault(nc => nc.Neuron == targetNeuron)) != null &&
                     this.WorkingMemory.CounterVariable != targetChunk
                 )
                 {
@@ -53,7 +53,7 @@ namespace ei8.Cortex.Coding.d23.Process.Iteration
                     );
                 }
 
-                if (targetNeuron == this.WorkingMemory.Condition.Content)
+                if (targetNeuron == this.WorkingMemory.Condition.Neuron)
                     this.completionCallback(this);
             }
         }

@@ -1,5 +1,4 @@
-﻿using NLog;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -20,8 +19,6 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
             completionCallback
         )
     {
-        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
-
         public override IEnumerable<Neuron> GetCurrent()
         {
             List<Neuron> result = [];
@@ -29,14 +26,14 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
             int? digitIndex = 
                 ChunkHelper.GetOperandCurrentIndex
                 (
-                    this.WorkingMemory.CurrentComparand1Digit,
                     this.WorkingMemory.Comparand1,
-                    this.WorkingMemory.CurrentComparand2Digit,
                     this.WorkingMemory.Comparand2
                 );
 
             if (digitIndex.HasValue)
-                this.WorkingMemory.AddCurrent(result, digitIndex.Value);
+            {
+                result.AddRange(this.WorkingMemory.GetCurrent(digitIndex.Value).Select(c => c.Neuron));
+            }
             else
                 this.Complete();
 
@@ -49,54 +46,37 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
             if
             (
                 (
-                    this.WorkingMemory.PreviousComparand1Digit.HasCurrentChanged(this.WorkingMemory.CurrentComparand1Digit) ||
-                    this.WorkingMemory.PreviousComparand2Digit.HasCurrentChanged(this.WorkingMemory.CurrentComparand2Digit)
+                    this.WorkingMemory.Comparand1.HasCurrentDigitChanged() ||
+                    this.WorkingMemory.Comparand2.HasCurrentDigitChanged()
                 ) &&
                 (
                     !ChunkHelper.HandleFire
                     (
                         targetNeuron,
-                        this.WorkingMemory.CurrentComparand1Digit,
                         this.WorkingMemory.Comparand1,
-                        this.WorkingMemory.CurrentComparand2Digit,
                         this.WorkingMemory.Comparand2,
+                        false,
                         [
-                            new
-                            (
-                                this.WorkingMemory.AreEqualValues,
-                                this.WorkingMemory.AreEqual
-                            ),
-                            new
-                            (
-                                this.WorkingMemory.IsLessThanValues,
-                                this.WorkingMemory.IsLessThan
-                            ),
-                            new
-                            (
-                                this.WorkingMemory.IsGreaterThanValues,
-                                this.WorkingMemory.IsGreaterThan
-                            )
+                            this.WorkingMemory.AreEqual,
+                            this.WorkingMemory.IsLessThan,
+                            this.WorkingMemory.IsGreaterThan
                         ],
                         out var allResultsHandled
-                    )
-                    ||
-                    allResultsHandled
+                    ) ||
+                    allResultsHandled.GetValueOrDefault(false)
                 )
             )
-            {
-                this.WorkingMemory.PreviousComparand1Digit = this.WorkingMemory.PreviousComparand1Digit.GetIfUnequal(this.WorkingMemory.CurrentComparand1Digit);
-                this.WorkingMemory.PreviousComparand2Digit = this.WorkingMemory.PreviousComparand2Digit.GetIfUnequal(this.WorkingMemory.CurrentComparand2Digit);
-                this.WorkingMemory.CurrentComparand1Digit = this.WorkingMemory.Comparand1.Content.GetAdjacentOrDefault(this.WorkingMemory.CurrentComparand1Digit, false);
-                this.WorkingMemory.CurrentComparand2Digit = this.WorkingMemory.Comparand2.Content.GetAdjacentOrDefault(this.WorkingMemory.CurrentComparand2Digit, false);
-
+            { 
+                this.WorkingMemory.Comparand1.UpdateTracking(false);
+                this.WorkingMemory.Comparand2.UpdateTracking(false);
                 if
                 (
                     (
-                        this.WorkingMemory.CurrentComparand1Digit == null &&
-                        this.WorkingMemory.CurrentComparand2Digit == null
+                        this.WorkingMemory.Comparand1.CurrentDigit == null &&
+                        this.WorkingMemory.Comparand2.CurrentDigit == null
                     ) ||
-                    this.WorkingMemory.IsLessThan.Content.Last().Value.Tag.EndsWith("1") || 
-                    this.WorkingMemory.IsGreaterThan.Content.Last().Value.Tag.EndsWith("1")
+                    this.WorkingMemory.IsLessThan.Value.Items.Last().Neuron.Tag.EndsWith('1') || 
+                    this.WorkingMemory.IsGreaterThan.Value.Items.Last().Neuron.Tag.EndsWith('1')
                 )
                     this.Complete();
             }
@@ -104,10 +84,10 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
 
         private void Complete()
         {
-            this.completionCallback(this, this.WorkingMemory.IsLessThan.Content.Select(c => c.Value));
-            this.WorkingMemory.AreEqual.Content.Clear();
-            this.WorkingMemory.IsLessThan.Content.Clear();
-            this.WorkingMemory.IsGreaterThan.Content.Clear();
+            this.completionCallback(this, this.WorkingMemory.IsLessThan.Value.Items.Select(c => c.Neuron));
+            this.WorkingMemory.AreEqual.Value.Items.Clear();
+            this.WorkingMemory.IsLessThan.Value.Items.Clear();
+            this.WorkingMemory.IsGreaterThan.Value.Items.Clear();
         }
     }
 }

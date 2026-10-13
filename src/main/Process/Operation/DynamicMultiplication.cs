@@ -16,12 +16,12 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
         private readonly IList<NeuronChunk> multiplier;
-        private readonly Addition.WorkingMemoryValuesInfo additionWorkingMemory;
+        private readonly Addition.WorkingMemoryInfo additionWorkingMemory;
 
         public DynamicMultiplication
         (
             DynamicMultiplication.WorkingMemoryInfo workingMemory,
-            Addition.WorkingMemoryValuesInfo additionWorkingMemory,
+            Addition.WorkingMemoryInfo additionWorkingMemory,
             Action<DynamicMultiplication, IEnumerable<Neuron>> completionCallback
         ) :
             base
@@ -30,7 +30,7 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                 completionCallback
             )
         {
-            this.multiplier = [.. this.WorkingMemory.Multiplier.Content];
+            this.multiplier = [.. this.WorkingMemory.Multiplier.Items];
             this.additionWorkingMemory = additionWorkingMemory;
         }
 
@@ -48,8 +48,8 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                     result.AddRange
                     (
                         [
-                            this.WorkingMemory.MultiplicandValues.Content.Single(mv => mv.Value.Tag.EndsWith(this.WorkingMemory.CurrentMultiplicandDigit.Content.Tag.Last())).Value,
-                            this.WorkingMemory.MultiplierValues.Content.Single(mv => mv.Value.Tag.EndsWith(this.WorkingMemory.CurrentMultiplierDigit.Content.Tag.Last())).Value
+                            this.WorkingMemory.MultiplicandValues.Items.Single(mv => mv.Neuron.Tag.EndsWith(this.WorkingMemory.CurrentMultiplicandDigit.Neuron.Tag.Last())).Neuron,
+                            this.WorkingMemory.MultiplierValues.Items.Single(mv => mv.Neuron.Tag.EndsWith(this.WorkingMemory.CurrentMultiplierDigit.Neuron.Tag.Last())).Neuron
                         ]
                     );
             }
@@ -67,7 +67,7 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
 
                 if
                 (
-                    this.WorkingMemory.ProductValues.Content.Any(c => c.Value == targetNeuron) &&
+                    this.WorkingMemory.ProductValues.Items.Any(c => c.Neuron == targetNeuron) &&
                     this.WorkingMemory.LastMultiplicandDigit != this.WorkingMemory.CurrentMultiplicandDigit &&
                     this.WorkingMemory.CurrentMultiplierDigit != null &&
                     (currentMultiplierDigitIndex = this.multiplier.IndexOf(this.WorkingMemory.CurrentMultiplierDigit)) >= 0
@@ -75,10 +75,10 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                 {
                     this.WorkingMemory.LastMultiplicandDigit = this.WorkingMemory.CurrentMultiplicandDigit;
                     
-                    if (this.WorkingMemory.MultiplierProducts.Content.Count < currentMultiplierDigitIndex + 1)
-                        this.WorkingMemory.MultiplierProducts.Content.Add(new ListChunk<NeuronChunk>());
+                    if (this.WorkingMemory.MultiplierProducts.Lists.Count < currentMultiplierDigitIndex + 1)
+                        this.WorkingMemory.MultiplierProducts.Lists.Add(new ListChunk<NeuronChunk>());
 
-                    this.WorkingMemory.MultiplierProducts.Content[currentMultiplierDigitIndex].Content.Add(new(targetNeuron));
+                    this.WorkingMemory.MultiplierProducts.Lists[currentMultiplierDigitIndex].Items.Add(new(targetNeuron));
 
                     DynamicMultiplication.logger.Info
                     (
@@ -90,8 +90,8 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                                     (
                                         string.Empty, 
                                         this.WorkingMemory.MultiplierProducts
-                                            .Content[currentMultiplierDigitIndex]
-                                            .Content.Reverse().Select(d => d.Value.Tag.Last())
+                                            .Lists[currentMultiplierDigitIndex]
+                                            .Items.Reverse().Select(d => d.Neuron.Tag.Last())
                                     )
                                 }"
                         )
@@ -101,7 +101,7 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                     (
                         (
                             this.WorkingMemory.CurrentMultiplicandDigit =
-                                this.WorkingMemory.Multiplicand.Content.GetAdjacentOrDefault(this.WorkingMemory.CurrentMultiplicandDigit)
+                                this.WorkingMemory.Multiplicand.Items.GetAdjacentOrDefault(this.WorkingMemory.CurrentMultiplicandDigit)
                         ) == null
                     )
                     {
@@ -109,18 +109,18 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                         (
                             (
                                 this.WorkingMemory.CurrentMultiplierDigit =
-                                    this.WorkingMemory.Multiplier.Content.GetAdjacentOrDefault(this.WorkingMemory.CurrentMultiplierDigit)
+                                    this.WorkingMemory.Multiplier.Items.GetAdjacentOrDefault(this.WorkingMemory.CurrentMultiplierDigit)
                             ) != null
                         )
                         {
-                            this.WorkingMemory.CurrentMultiplicandDigit = this.WorkingMemory.Multiplicand.Content.First();
+                            this.WorkingMemory.CurrentMultiplicandDigit = this.WorkingMemory.Multiplicand.Items.First();
                         }
-                        else if (this.WorkingMemory.MultiplierProducts.Content.Count > 0)
+                        else if (this.WorkingMemory.MultiplierProducts.Lists.Count > 0)
                         {
-                            if (this.WorkingMemory.MultiplierProducts.Content.Count == 1)
+                            if (this.WorkingMemory.MultiplierProducts.Lists.Count == 1)
                             {
-                                foreach (var mp in this.WorkingMemory.MultiplierProducts.Content[0].Content)
-                                    this.WorkingMemory.Product.Content.Add(mp);
+                                foreach (var mp in this.WorkingMemory.MultiplierProducts.Lists[0].Items)
+                                    this.WorkingMemory.Product.Items.Add(mp);
                                 this.Complete();
                             }
                             else
@@ -141,13 +141,13 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                                                 string.Join
                                                 (
                                                     ',',
-                                                    this.WorkingMemory.MultiplierProducts.Content.Select
+                                                    this.WorkingMemory.MultiplierProducts.Lists.Select
                                                     (
                                                         mp =>
                                                             string.Join
                                                             (
                                                                 string.Empty,
-                                                                mp.Content.Reverse().Select(d => d.Value.Tag.Last())
+                                                                mp.Items.Reverse().Select(d => d.Neuron.Tag.Last())
                                                             )
                                                     )
                                                 )
@@ -166,7 +166,7 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
         private static DynamicAddition? CreateDynamicAddition
         (
             WorkingMemoryInfo workingMemory, 
-            Addition.WorkingMemoryValuesInfo additionWorkingMemoryValuesInfo,
+            Addition.WorkingMemoryInfo additionWorkingMemoryInfo,
             Action complete
         )
         {
@@ -178,28 +178,37 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
             }
             else
             {
-                augend = workingMemory.MultiplierProducts.Content[0];
-                workingMemory.CurrentMultiplierProduct = workingMemory.MultiplierProducts.Content[1];
+                augend = workingMemory.MultiplierProducts.Lists[0];
+                workingMemory.CurrentMultiplierProduct = workingMemory.MultiplierProducts.Lists[1];
             }
 
             if 
             (
-                workingMemory.MultiplierProducts.Content.IndexOf(workingMemory.CurrentMultiplierProduct) > 
-                workingMemory.Product.Content.Count
+                workingMemory.MultiplierProducts.Lists.IndexOf(workingMemory.CurrentMultiplierProduct) > 
+                workingMemory.Product.Items.Count
             )
-                workingMemory.Product.Content.Add(augend.Content[0]);
+                workingMemory.Product.Items.Add(augend.Items[0]);
 
             return new
             (
                 new
                 (
-                    additionWorkingMemoryValuesInfo.PrecedingCarryOverValues,
-                    additionWorkingMemoryValuesInfo.AugendValues,
-                    additionWorkingMemoryValuesInfo.AddendValues,
-                    new([.. augend.Content.Skip(1).Select(ad => new NeuronChunk(ad.Value))]),
-                    new([.. workingMemory.CurrentMultiplierProduct.Content.Select(c => new NeuronChunk(c.Value))]),
-                    additionWorkingMemoryValuesInfo.SumValues,
-                    additionWorkingMemoryValuesInfo.CarryOverValues
+                    additionWorkingMemoryInfo.PrecedingCarryOverValues,
+                    new OperandChunk
+                    (
+                        additionWorkingMemoryInfo.Augend.DigitValues,
+                        new EnumerableChunk<INeuronChunk>([.. augend.Items.Skip(1).Select(ad => new NeuronChunk(ad.Neuron))])
+                    ),
+                    new OperandChunk
+                    (
+                        additionWorkingMemoryInfo.Addend.DigitValues,
+                        new EnumerableChunk<INeuronChunk>([.. workingMemory.CurrentMultiplierProduct.Items.Select(c => new NeuronChunk(c.Neuron))])
+                    ),
+                    // Clone without value to ensure IResultChunk.Value is cleared for each DynamicAddition
+                    // Otherwise, DynamicAddition will be unable to add to ResultChunk.Value since it is already filled 
+                    // in a previously instantiated DynamicAddition
+                    ResultChunk.CloneWithoutValue((ResultChunk)additionWorkingMemoryInfo.Sum),
+                    ResultChunk.CloneWithoutValue((ResultChunk)additionWorkingMemoryInfo.CarryOver)
                 ),
                 (a, s) =>
                 {
@@ -212,12 +221,12 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                             new LogMessageGenerator
                             (
                                 () => 
-                                    $"Sum [{workingMemory.MultiplierProducts.Content.IndexOf(workingMemory.CurrentMultiplierProduct)}]: " +
+                                    $"Sum [{workingMemory.MultiplierProducts.Lists.IndexOf(workingMemory.CurrentMultiplierProduct)}]: " +
                                     $"{string.Join(string.Empty, s.Reverse().Select(s => s.Tag.Last()))}")
                         );
 
                     workingMemory.CurrentMultiplierProduct =
-                        workingMemory.MultiplierProducts.Content.GetAdjacentOrDefault(workingMemory.CurrentMultiplierProduct);
+                        workingMemory.MultiplierProducts.Lists.GetAdjacentOrDefault(workingMemory.CurrentMultiplierProduct);
 
                     complete();
                 }
@@ -246,11 +255,11 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
         {
             if (this.WorkingMemory.LastAdditionSum != null)
             {
-                foreach (var n in this.WorkingMemory.LastAdditionSum.Content)
-                    this.WorkingMemory.Product.Content.Add(n);
+                foreach (var n in this.WorkingMemory.LastAdditionSum.Items)
+                    this.WorkingMemory.Product.Items.Add(n);
 
-                this.completionCallback(this, [.. this.WorkingMemory.Product.Content.Select(c => c.Value)]);
-                this.WorkingMemory.Product.Content.Clear();
+                this.completionCallback(this, [.. this.WorkingMemory.Product.Items.Select(c => c.Neuron)]);
+                this.WorkingMemory.Product.Items.Clear();
             }
         }
 

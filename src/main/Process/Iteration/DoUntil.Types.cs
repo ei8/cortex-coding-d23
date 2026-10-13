@@ -24,7 +24,7 @@ namespace ei8.Cortex.Coding.d23.Process.Iteration
                     action,
                     counterVariableValues,
                     counterVariable,
-                    counterVariableValues.Content.Last()
+                    counterVariableValues.Items.Last()
                 )
             {
             }

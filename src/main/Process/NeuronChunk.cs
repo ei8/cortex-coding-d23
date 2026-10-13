@@ -1,10 +1,7 @@
-﻿using System;
-
-namespace ei8.Cortex.Coding.d23.Process
+﻿namespace ei8.Cortex.Coding.d23.Process
 {
-    public class NeuronChunk(Neuron value) :
-        ChunkBase<Neuron>(value)
+    public class NeuronChunk(Neuron value) : INeuronChunk
     {
-        public Neuron Value => this.Content;
+        public Neuron Neuron { get; } = value;
     }
 }
