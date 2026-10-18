@@ -59,8 +59,10 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
             return result;
         }
 
-        public override void HandleFire(Neuron targetNeuron, ReadOnlyNetwork network)
+        public override bool HandleFire(Neuron targetNeuron)
         {
+            var result = false;
+
             if(this.DynamicAddition == null)
             {
                 int currentMultiplierDigitIndex = -1;
@@ -73,6 +75,8 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                     (currentMultiplierDigitIndex = this.multiplier.IndexOf(this.WorkingMemory.CurrentMultiplierDigit)) >= 0
                 )
                 {
+                    result = true;
+
                     this.WorkingMemory.LastMultiplicandDigit = this.WorkingMemory.CurrentMultiplicandDigit;
                     
                     if (this.WorkingMemory.MultiplierProducts.Lists.Count < currentMultiplierDigitIndex + 1)
@@ -160,7 +164,9 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                 }
             }
             else
-                this.DynamicAddition.HandleFire(targetNeuron, network);
+                result = this.DynamicAddition.HandleFire(targetNeuron);
+
+            return result;
         }
 
         private static DynamicAddition? CreateDynamicAddition

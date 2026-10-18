@@ -31,11 +31,12 @@ namespace ei8.Cortex.Coding.d23.Process.Iteration
                 this.WorkingMemory.CounterVariable.Neuron
             ];
 
-        public override void HandleFire(Neuron targetNeuron, ReadOnlyNetwork network)
+        public override bool HandleFire(Neuron targetNeuron)
         {
+            bool result = false;
             if (this.WorkingMemory != null)
             {
-                NeuronChunk? targetChunk = null;
+                INeuronChunk? targetChunk = null;
                 if 
                 (
                     (targetChunk = this.WorkingMemory.CounterVariableValues.Items.SingleOrDefault(nc => nc.Neuron == targetNeuron)) != null &&
@@ -43,19 +44,21 @@ namespace ei8.Cortex.Coding.d23.Process.Iteration
                 )
                 {
                     this.WorkingMemory.CounterVariable = targetChunk;
-                    if (this.counterChangedCallback != null)
-                        this.counterChangedCallback(this);
+                    this.counterChangedCallback?.Invoke(this);
 
                     DoUntil.logger.Info(
                         new LogMessageGenerator(
                             () => $"Updated variable to: {targetNeuron.ToReadableString()}"
                         )
                     );
+
+                    result = true;
                 }
 
                 if (targetNeuron == this.WorkingMemory.Condition.Neuron)
                     this.completionCallback(this);
             }
+            return result;
         }
     }
 }

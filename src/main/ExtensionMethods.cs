@@ -320,5 +320,66 @@ namespace ei8.Cortex.Coding.d23
                 result = operand.DigitValues.Items.Single(ad => ad.Neuron.Tag.EndsWith('0'));
             return result;
         }
+
+        public static bool TryHandleAllResults
+        (
+            this IWorkingMemory workingMemory,
+            Neuron target,
+            IOperandChunk operand1,
+            IOperandChunk operand2,
+            bool incremental,
+            out bool targetHandled
+        )
+        {
+            var result = false;
+            targetHandled = false;
+
+            if
+            (
+                ChunkHelper.TryGetExpectedHandledDigitsCount
+                (
+                    operand1,
+                    operand2,
+                    incremental,
+                    out var expectedHandledCount
+                )
+            )
+            {
+                result =
+                    workingMemory.TryHandleAllResults
+                    (
+                        target,
+                        expectedHandledCount.Value,
+                        out targetHandled
+                    );
+            }
+
+            return result;
+        }
+
+        public static bool TryHandleAllResults
+        (
+            this IWorkingMemory workingMemory,
+            Neuron target,
+            int expectedHandledCount,
+            out bool targetHandled
+        )
+        {
+            var result = false;
+            targetHandled = false;
+
+            var expectedResults = workingMemory.Chunks.OfType<IResultChunk>();
+            foreach (var expectedResult in expectedResults)
+            {
+                if (expectedResults.First() == expectedResult)
+                    result = expectedResult.HandleFire(target, expectedHandledCount);
+                else
+                    result &= expectedResult.HandleFire(target, expectedHandledCount);
+
+                if (!targetHandled && result)
+                    targetHandled = true;
+            }
+            return result;
+        }
     }
 }

@@ -13,7 +13,7 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
             IResultChunk sum,
             IResultChunk carryOver
         ) :
-            ChunkBase
+            WorkingMemoryBase
             <
                 IEnumerableChunk<INeuronChunk>,
                 IOperandChunk,
@@ -27,8 +27,7 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                 addend, 
                 sum,
                 carryOver
-            ),
-            IWorkingMemory
+            )
         {
             public IEnumerable<Neuron> GetSumNeurons()
             {

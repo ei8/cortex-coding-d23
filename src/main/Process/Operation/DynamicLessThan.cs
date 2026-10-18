@@ -40,31 +40,24 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
             return result;
         }
 
-        public override void HandleFire(Neuron targetNeuron, ReadOnlyNetwork network)
+        public override bool HandleFire(Neuron targetNeuron)
         {
             // TODO: Refactor with DynamicAddition
+            var result = false;
             if
             (
                 (
                     this.WorkingMemory.Comparand1.HasCurrentDigitChanged() ||
                     this.WorkingMemory.Comparand2.HasCurrentDigitChanged()
                 ) &&
+                this.WorkingMemory.TryHandleAllResults
                 (
-                    !ChunkHelper.HandleFire
-                    (
-                        targetNeuron,
-                        this.WorkingMemory.Comparand1,
-                        this.WorkingMemory.Comparand2,
-                        false,
-                        [
-                            this.WorkingMemory.AreEqual,
-                            this.WorkingMemory.IsLessThan,
-                            this.WorkingMemory.IsGreaterThan
-                        ],
-                        out var allResultsHandled
-                    ) ||
-                    allResultsHandled.GetValueOrDefault(false)
-                )
+                    targetNeuron,
+                    this.WorkingMemory.Comparand1,
+                    this.WorkingMemory.Comparand2,
+                    false,
+                    out result
+                ) 
             )
             { 
                 this.WorkingMemory.Comparand1.UpdateTracking(false);
@@ -80,6 +73,7 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                 )
                     this.Complete();
             }
+            return result;
         }
 
         private void Complete()

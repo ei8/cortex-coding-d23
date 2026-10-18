@@ -8,7 +8,7 @@ namespace ei8.Cortex.Coding.d23.Process
         IListChunk<INeuronChunk> value,
         [CallerArgumentExpression(nameof(value))] string name = ""
     ) :
-        ChunkBase
+        AggregateChunkBase
         <
             IEnumerableChunk<INeuronChunk>,
             IListChunk<INeuronChunk>

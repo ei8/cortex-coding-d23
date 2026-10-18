@@ -7,7 +7,7 @@ namespace ei8.Cortex.Coding.d23.Process
     {
         IEnumerable<Neuron> GetCurrent();
 
-        void HandleFire(Neuron targetNeuron, ReadOnlyNetwork network);
+        bool HandleFire(Neuron targetNeuron);
     }
 
     public interface IProcess<T> : IProcess

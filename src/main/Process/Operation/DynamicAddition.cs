@@ -42,8 +42,9 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
             return result;
         }
 
-        public override void HandleFire(Neuron targetNeuron, ReadOnlyNetwork network)
+        public override bool HandleFire(Neuron targetNeuron)
         {
+            bool targetHandled = false;
             // if one of specified sum values, add to sums
             if
             (
@@ -51,20 +52,13 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                     this.WorkingMemory.Augend.HasCurrentDigitChanged() ||
                     this.WorkingMemory.Addend.HasCurrentDigitChanged()
                 ) &&
+                this.WorkingMemory.TryHandleAllResults
                 (
-                    !ChunkHelper.HandleFire
-                    (
-                        targetNeuron,
-                        this.WorkingMemory.Augend,
-                        this.WorkingMemory.Addend,
-                        true,
-                        [
-                            this.WorkingMemory.Sum,
-                            this.WorkingMemory.CarryOver
-                        ],
-                        out var allResultsHandled
-                    ) ||
-                    allResultsHandled.GetValueOrDefault(false)
+                    targetNeuron,
+                    this.WorkingMemory.Augend,
+                    this.WorkingMemory.Addend,
+                    true,
+                    out targetHandled
                 )
             )
             {
@@ -78,6 +72,8 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                 )
                     this.Complete();
             }
+
+            return targetHandled;
         }
 
         private void Complete()

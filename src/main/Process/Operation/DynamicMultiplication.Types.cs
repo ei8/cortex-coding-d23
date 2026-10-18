@@ -1,9 +1,11 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace ei8.Cortex.Coding.d23.Process.Operation
 {
     public partial class DynamicMultiplication
     {
+        // TODO:1 Convert to WorkingMemoryBase
         public class WorkingMemoryInfo
         (
             EnumerableChunk<NeuronChunk> multiplicandValues,
@@ -70,6 +72,9 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
             public IListChunk<NeuronChunk>? LastAdditionSum { get; set; } = lastAdditionSum;
 
             public ListChunk<NeuronChunk> Product => product;
+
+            // DEL: remove once WorkingMemoryBase has been implemented
+            public IEnumerable<IChunk?> Chunks => throw new System.NotImplementedException();
         }
     }
 }

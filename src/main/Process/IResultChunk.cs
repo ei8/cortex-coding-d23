@@ -1,7 +1,7 @@
 ﻿namespace ei8.Cortex.Coding.d23.Process
 {
     public interface IResultChunk :
-        IChunk
+        IAggregateChunk
         <
             IEnumerableChunk<INeuronChunk>,
             IListChunk<INeuronChunk>

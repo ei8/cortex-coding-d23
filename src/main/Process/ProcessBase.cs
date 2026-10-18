@@ -11,7 +11,7 @@ namespace ei8.Cortex.Coding.d23.Process
     {
         public abstract IEnumerable<Neuron> GetCurrent();
 
-        public abstract void HandleFire(Neuron targetNeuron, ReadOnlyNetwork network);
+        public abstract bool HandleFire(Neuron targetNeuron);
 
         public T WorkingMemory { get; } = workingMemory;
     }

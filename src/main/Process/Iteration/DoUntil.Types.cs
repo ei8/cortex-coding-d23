@@ -6,18 +6,30 @@ namespace ei8.Cortex.Coding.d23.Process.Iteration
     {
         public class WorkingMemoryInfo
         (
-            NeuronChunk action,
-            EnumerableChunk<NeuronChunk> counterVariableValues,
-            NeuronChunk counterVariable,
-            NeuronChunk condition
+            INeuronChunk action,
+            IEnumerableChunk<INeuronChunk> counterVariableValues,
+            INeuronChunk counterVariable,
+            INeuronChunk condition
         ) :
-            IWorkingMemory
+            WorkingMemoryBase
+            <
+                INeuronChunk,
+                IEnumerableChunk<INeuronChunk>,
+                INeuronChunk,
+                INeuronChunk
+            >
+            (
+                action,
+                counterVariableValues,
+                counterVariable,
+                condition
+            )
         {
             public WorkingMemoryInfo
             (
-                NeuronChunk action,
-                EnumerableChunk<NeuronChunk> counterVariableValues,
-                NeuronChunk counterVariable
+                INeuronChunk action,
+                IEnumerableChunk<INeuronChunk> counterVariableValues,
+                INeuronChunk counterVariable
             ) : 
                 this
                 (
@@ -29,10 +41,17 @@ namespace ei8.Cortex.Coding.d23.Process.Iteration
             {
             }
 
-            public NeuronChunk Action => action;
-            public EnumerableChunk<NeuronChunk> CounterVariableValues => counterVariableValues;
-            public NeuronChunk CounterVariable { get; set; } = counterVariable;
-            public NeuronChunk Condition => condition;
+            public INeuronChunk Action => this.Content1;
+            
+            public IEnumerableChunk<INeuronChunk> CounterVariableValues => this.Content2;
+            
+            public INeuronChunk CounterVariable
+            {
+                get => this.Content3;
+                set => this.Content3 = value;
+            }
+
+            public INeuronChunk Condition => this.Content4;
         }
     }
 }

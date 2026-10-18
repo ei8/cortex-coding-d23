@@ -73,45 +73,5 @@ namespace ei8.Cortex.Coding.d23
 
             return bResult;
         }
-
-        public static bool HandleFire
-        (
-            Neuron target,
-            IOperandChunk operand1,
-            IOperandChunk operand2,
-            bool incremental,
-            IEnumerable<IResultChunk> resultInfo,
-            [NotNullWhen(true)]
-            out bool? allResultsHandled
-        )
-        {
-            bool canHandleCurrentDigit = false;
-            allResultsHandled = null;
-            bool? allResultsHandledTemp = null;
-
-            if
-            (
-                ChunkHelper.TryGetExpectedHandledDigitsCount
-                (
-                    operand1,
-                    operand2,
-                    incremental,
-                    out var expectedHandledCount
-                )
-            )
-            {
-                canHandleCurrentDigit = true;
-                foreach (var result in resultInfo)
-                {
-                    if (allResultsHandled == null)
-                        allResultsHandled = result.HandleFire(target, expectedHandledCount.Value);
-                    else
-                        allResultsHandled &= result.HandleFire(target, expectedHandledCount.Value);
-                }
-                allResultsHandledTemp = allResultsHandled;
-            }
-
-            return canHandleCurrentDigit;
-        }
     }
 }

@@ -12,7 +12,7 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
             IResultChunk isLessThan,
             IResultChunk isGreaterThan
         ) : 
-            ChunkBase
+            WorkingMemoryBase
             <
                 IOperandChunk,
                 IOperandChunk,
@@ -26,8 +26,7 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                 areEqual,
                 isLessThan,
                 isGreaterThan
-            ),
-            IWorkingMemory
+            )
         {
             public IEnumerable<INeuronChunk> GetCurrent(int digitIndex) =>
                 [

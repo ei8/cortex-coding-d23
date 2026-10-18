@@ -10,7 +10,7 @@ namespace ei8.Cortex.Coding.d23.Process
         INeuronChunk? previousDigit,
         INeuronChunk? currentDigit
     ) :
-        ChunkBase
+        AggregateChunkBase
         <
             IEnumerableChunk<INeuronChunk>,
             IEnumerableChunk<INeuronChunk>?,

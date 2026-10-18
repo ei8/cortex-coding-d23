@@ -1,7 +1,7 @@
 ﻿namespace ei8.Cortex.Coding.d23.Process
 {
     public  interface IOperandChunk :
-        IChunk
+        IAggregateChunk
         <
             IEnumerableChunk<INeuronChunk>,
             IEnumerableChunk<INeuronChunk>?,
@@ -13,8 +13,6 @@
         public IEnumerableChunk<INeuronChunk>? Value { get; }
         public INeuronChunk? PreviousDigit { get; }
         public INeuronChunk? CurrentDigit { get; }
-
-        // TODO: Transfer to extension methods or IOperandChunkStatic?
         public void UpdateTracking(bool next = true);
     }
 }
