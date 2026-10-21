@@ -141,4 +141,48 @@
         where T5 : IChunk?
     {
     }
+
+    public class WorkingMemoryBase
+    <
+        T1,
+        T2,
+        T3,
+        T4,
+        T5,
+        T6
+    >
+    (
+        T1 content1,
+        T2 content2,
+        T3 content3,
+        T4 content4,
+        T5 content5,
+        T6 content6
+    ) :
+        AggregateChunkBase
+        <
+            T1,
+            T2,
+            T3,
+            T4,
+            T5,
+            T6
+        >
+        (
+            content1,
+            content2,
+            content3,
+            content4,
+            content5,
+            content6
+        ),
+        IWorkingMemory
+        where T1 : IChunk?
+        where T2 : IChunk?
+        where T3 : IChunk?
+        where T4 : IChunk?
+        where T5 : IChunk?
+        where T6 : IChunk?
+    {
+    }
 }

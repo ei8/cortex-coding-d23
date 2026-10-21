@@ -27,7 +27,8 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                 addend, 
                 sum,
                 carryOver
-            )
+            ),
+            ISyncOperationWorkingMemory
         {
             public IEnumerable<Neuron> GetSumNeurons()
             {

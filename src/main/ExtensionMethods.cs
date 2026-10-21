@@ -287,22 +287,19 @@ namespace ei8.Cortex.Coding.d23
         public static bool HandleFire
         (
             this IResultChunk resultInfo, 
-            Neuron target, 
-            int expectedHandledCount
+            Neuron target
         )
         {
-            if 
-            (
-                resultInfo.DigitValues.Items.Any(c => c.Neuron == target) && 
-                resultInfo.Value.Items.Count < expectedHandledCount
-            )
+            bool result = false;
+            if (resultInfo.DigitValues.Items.Any(c => c.Neuron == target))
             {
                 resultInfo.Value.Items.Add(new NeuronChunk(target));
                 if (resultInfo is INamedChunk namedChunk)
                     ExtensionMethods.logger.Info(new LogMessageGenerator(() => $"Added to {namedChunk.Name}: {target.Tag}"));
+                result = true;
             }
 
-            return resultInfo.Value.Items.Count == expectedHandledCount;
+            return result;
         }
 
         public static INeuronChunk GetValueByIndex
@@ -372,13 +369,26 @@ namespace ei8.Cortex.Coding.d23
             foreach (var expectedResult in expectedResults)
             {
                 if (expectedResults.First() == expectedResult)
-                    result = expectedResult.HandleFire(target, expectedHandledCount);
+                    result = expectedResult.HandleFireOrAlreadyHandled(target, expectedHandledCount, ref targetHandled);
                 else
-                    result &= expectedResult.HandleFire(target, expectedHandledCount);
+                    result &= expectedResult.HandleFireOrAlreadyHandled(target, expectedHandledCount, ref targetHandled);
+            }
+            return result;
+        }
 
-                if (!targetHandled && result)
+        private static bool HandleFireOrAlreadyHandled(this IResultChunk expectedResult, Neuron target, int expectedHandledCount, ref bool targetHandled)
+        {
+            bool result = false;
+            
+            if (expectedResult.Value.Items.Count < expectedHandledCount)
+            {
+                result = expectedResult.HandleFire(target);
+                if (result)
                     targetHandled = true;
             }
+            else if (expectedResult.Value.Items.Count == expectedHandledCount)
+                result = true;
+
             return result;
         }
     }

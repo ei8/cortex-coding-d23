@@ -20,51 +20,6 @@ namespace ei8.Cortex.Coding.d23.Process
         string Name { get; }
     }
 
-    public interface IAggregateChunk : IChunk
-    {
-        IEnumerable<IChunk?> Chunks { get; }
-    }
-
-    public interface IAggregateChunk<T1> : IChunk
-        where T1 : IChunk?
-    {
-        T1 Content1 { get; }
-    }
-
-    public interface IAggregateChunk<T1, T2> : IAggregateChunk<T1>
-        where T1 : IChunk?
-        where T2 : IChunk?
-    {
-        T2 Content2 { get; }
-    }
-
-    public interface IAggregateChunk<T1, T2, T3> : IAggregateChunk<T1, T2>
-        where T1 : IChunk?
-        where T2 : IChunk?
-        where T3 : IChunk?
-    {
-        T3 Content3 { get; }
-    }
-
-    public interface IAggregateChunk<T1, T2, T3, T4> : IAggregateChunk<T1, T2, T3>
-        where T1 : IChunk?
-        where T2 : IChunk?
-        where T3 : IChunk?
-        where T4 : IChunk?
-    {
-        T4 Content4 { get; }
-    }
-
-    public interface IAggregateChunk<T1, T2, T3, T4, T5> : IAggregateChunk<T1, T2, T3, T4>
-        where T1 : IChunk?
-        where T2 : IChunk?
-        where T3 : IChunk?
-        where T4 : IChunk?
-        where T5 : IChunk?
-    {
-        T5 Content5 { get; }
-    }
-
     public interface IEnumerableChunkCore<T, TItem> : IChunk
         where T : IEnumerable<TItem>
         where TItem : IChunk
@@ -82,10 +37,15 @@ namespace ei8.Cortex.Coding.d23.Process
     {
     }
 
-    public interface INestedListChunk<TList, T> : IChunk
-        where TList : IListChunk<T>
-        where T : IChunk
+    public interface INestedListChunk<TList, TChunk> : IChunk
+        where TList : IListChunk<TChunk>
+        where TChunk : IChunk
     {
         IList<TList> Lists { get; }
+    }
+
+    public interface INestedNeuronListChunk<TList> : INestedListChunk<TList, INeuronChunk>
+        where TList : IListChunk<INeuronChunk>
+    {
     }
 }

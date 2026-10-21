@@ -92,6 +92,14 @@ namespace ei8.Cortex.Coding.d23.Process
             }
         }
 
+        public void ResetTracking()
+        {
+            ArgumentNullException.ThrowIfNull(this.Value);
+
+            this.PreviousDigit = null;
+            this.CurrentDigit = this.Value.Items.First();
+        }
+
         public void UpdateTracking(bool next)
         {
             ArgumentNullException.ThrowIfNull(this.Value);

@@ -26,7 +26,8 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                 areEqual,
                 isLessThan,
                 isGreaterThan
-            )
+            ),
+            ISyncOperationWorkingMemory
         {
             public IEnumerable<INeuronChunk> GetCurrent(int digitIndex) =>
                 [

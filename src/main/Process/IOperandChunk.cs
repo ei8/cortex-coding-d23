@@ -14,5 +14,6 @@
         public INeuronChunk? PreviousDigit { get; }
         public INeuronChunk? CurrentDigit { get; }
         public void UpdateTracking(bool next = true);
+        public void ResetTracking();
     }
 }

@@ -1,5 +1,4 @@
-﻿using NLog;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -20,8 +19,6 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
             completionCallback
         )
     {
-        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
-
         public override IEnumerable<Neuron> GetCurrent()
         {
             List<Neuron> result = [];

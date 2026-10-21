@@ -5,76 +5,64 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
 {
     public partial class DynamicMultiplication
     {
-        // TODO:1 Convert to WorkingMemoryBase
         public class WorkingMemoryInfo
         (
-            EnumerableChunk<NeuronChunk> multiplicandValues,
-            EnumerableChunk<NeuronChunk> multiplierValues,
-            EnumerableChunk<NeuronChunk> multiplicand,
-            EnumerableChunk<NeuronChunk> multiplier,
-            NeuronChunk? currentMultiplicandDigit,
-            NeuronChunk? currentMultiplierDigit,
-            NeuronChunk? lastMultiplicandDigit,
-            EnumerableChunk<NeuronChunk> productValues,
-            NestedListChunk<NeuronChunk> multiplierProducts,
-            IListChunk<NeuronChunk>? currentMultiplierProduct,
-            IListChunk<NeuronChunk>? lastAdditionSum,
-            ListChunk<NeuronChunk> product
+            IOperandChunk multiplicand,
+            IOperandChunk multiplier,
+            INestedNeuronListChunk<IListChunk<INeuronChunk>> multiplierProducts,
+            IListChunk<INeuronChunk>? currentMultiplierProduct,
+            IListChunk<INeuronChunk>? lastAdditionSum,
+            IResultChunk product
         ) :
-            IWorkingMemory
-        {
-            public WorkingMemoryInfo
+            WorkingMemoryBase
+            <
+                IOperandChunk,
+                IOperandChunk,
+                INestedNeuronListChunk<IListChunk<INeuronChunk>>,
+                IListChunk<INeuronChunk>?,
+                IListChunk<INeuronChunk>?,
+                IResultChunk
+            >
             (
-                EnumerableChunk<NeuronChunk> multiplicandValues,
-                EnumerableChunk<NeuronChunk> multiplierValues,
-                EnumerableChunk<NeuronChunk> multiplicand,
-                EnumerableChunk<NeuronChunk> multiplier,
-                EnumerableChunk<NeuronChunk> productValues
-            ) :
-                this
-                (
-                    multiplicandValues,
-                    multiplierValues,
-                    multiplicand,
-                    multiplier,
-                    multiplicand.Items.First(),
-                    multiplier.Items.First(),
-                    null,
-                    productValues,
-                    new(),
-                    null,
-                    null,
-                    new()
-                )
+                multiplicand,
+                multiplier,
+                multiplierProducts,
+                currentMultiplierProduct,
+                lastAdditionSum,
+                product
+            ),
+            IAsyncOperationWorkingMemory
+        {
+            public IEnumerable<INeuronChunk> GetCurrent()
             {
+                var result = new List<INeuronChunk>();
+                if
+                (
+                    this.Multiplicand.CurrentDigit != null &&
+                    this.Multiplier.CurrentDigit != null
+                )
+                    result.AddRange
+                    (
+                        [
+                            this.Multiplicand.DigitValues.Items.Single(mv => mv.Neuron.Tag.EndsWith(this.Multiplicand.CurrentDigit.Neuron.Tag.Last())),
+                            this.Multiplier.DigitValues.Items.Single(mv => mv.Neuron.Tag.EndsWith(this.Multiplier.CurrentDigit.Neuron.Tag.Last()))
+                        ]
+                    );
+
+                return result;
             }
 
-            public EnumerableChunk<NeuronChunk> MultiplicandValues => multiplicandValues;
+            public IOperandChunk Multiplicand => this.Content1;
 
-            public EnumerableChunk<NeuronChunk> MultiplierValues => multiplierValues;
+            public IOperandChunk Multiplier => this.Content2;
 
-            public EnumerableChunk<NeuronChunk> Multiplicand => multiplicand;
+            public INestedNeuronListChunk<IListChunk<INeuronChunk>> MultiplierProducts => this.Content3;
 
-            public EnumerableChunk<NeuronChunk> Multiplier => multiplier;
+            public IListChunk<INeuronChunk>? CurrentMultiplierProduct { get => this.Content4; set => this.Content4 = value; }
 
-            public NeuronChunk? CurrentMultiplicandDigit { get; set; } = currentMultiplicandDigit;
+            public IListChunk<INeuronChunk>? LastAdditionSum { get => this.Content5; set => this.Content5 = value; }
 
-            public NeuronChunk? CurrentMultiplierDigit { get; set; } = currentMultiplierDigit;
-
-            public NeuronChunk? LastMultiplicandDigit { get; set; } = lastMultiplicandDigit;
-
-            public EnumerableChunk<NeuronChunk> ProductValues => productValues;
-
-            public NestedListChunk<NeuronChunk> MultiplierProducts => multiplierProducts;
-
-            public IListChunk<NeuronChunk>? CurrentMultiplierProduct { get; set; } = currentMultiplierProduct;
-            
-            public IListChunk<NeuronChunk>? LastAdditionSum { get; set; } = lastAdditionSum;
-
-            public ListChunk<NeuronChunk> Product => product;
-
-            // DEL: remove once WorkingMemoryBase has been implemented
-            public IEnumerable<IChunk?> Chunks => throw new System.NotImplementedException();
+            public IResultChunk Product => this.Content6;
         }
     }
 }
