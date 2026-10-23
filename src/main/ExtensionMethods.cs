@@ -1,4 +1,5 @@
 ﻿using ei8.Cortex.Coding.d23.Process;
+using ei8.Cortex.Coding.d23.Process.Operation;
 using ei8.Cortex.Coding.Mirrors;
 using ei8.Cortex.Coding.Model.Reflection;
 using ei8.Cortex.Coding.Spiker;
@@ -253,15 +254,6 @@ namespace ei8.Cortex.Coding.d23
         public static bool HasCurrentDigitChanged(this IOperandChunk operand) =>
             operand.PreviousDigit != operand.CurrentDigit && operand.CurrentDigit != null;
 
-        public static T? GetIfUnequal<T>(this T? value, T? otherValue)
-            where T : class
-        {
-            if (value != otherValue)
-                return otherValue;
-            else
-                return value;
-        }
-
         public static T GetByComparer<T>(this IEnumerable<T> values, Predicate<T> comparer)
             where T : class
         {
@@ -293,7 +285,7 @@ namespace ei8.Cortex.Coding.d23
             bool result = false;
             if (resultInfo.DigitValues.Items.Any(c => c.Neuron == target))
             {
-                resultInfo.Value.Items.Add(new NeuronChunk(target));
+                resultInfo.Value.Add(new NeuronChunk(target));
                 if (resultInfo is INamedChunk namedChunk)
                     ExtensionMethods.logger.Info(new LogMessageGenerator(() => $"Added to {namedChunk.Name}: {target.Tag}"));
                 result = true;
@@ -320,10 +312,8 @@ namespace ei8.Cortex.Coding.d23
 
         public static bool TryHandleAllResults
         (
-            this IWorkingMemory workingMemory,
+            this ISyncOperationWorkingMemory workingMemory,
             Neuron target,
-            IOperandChunk operand1,
-            IOperandChunk operand2,
             bool incremental,
             out bool targetHandled
         )
@@ -333,10 +323,8 @@ namespace ei8.Cortex.Coding.d23
 
             if
             (
-                ChunkHelper.TryGetExpectedHandledDigitsCount
+                workingMemory.TryGetExpectedHandledDigitsCount
                 (
-                    operand1,
-                    operand2,
                     incremental,
                     out var expectedHandledCount
                 )
@@ -380,16 +368,72 @@ namespace ei8.Cortex.Coding.d23
         {
             bool result = false;
             
-            if (expectedResult.Value.Items.Count < expectedHandledCount)
+            if (expectedResult.Value.Count < expectedHandledCount)
             {
                 result = expectedResult.HandleFire(target);
                 if (result)
                     targetHandled = true;
             }
-            else if (expectedResult.Value.Items.Count == expectedHandledCount)
+            else if (expectedResult.Value.Count == expectedHandledCount)
                 result = true;
 
             return result;
+        }
+
+        public static int? GetOperandsCurrentIndex(this ISyncOperationWorkingMemory workingMemory)
+        {
+            int? result = null;
+
+            foreach (var operand in workingMemory.Chunks.OfType<IOperandChunk>())
+            {
+                ArgumentNullException.ThrowIfNull(operand.Value);
+
+                int? currentOperandDigitIndex = operand.CurrentDigit != null ?
+                    operand.Value.Items.ToList().IndexOf(operand.CurrentDigit) :
+                    null;
+
+                if (currentOperandDigitIndex.HasValue)
+                {
+                    if (!result.HasValue)
+                        result = currentOperandDigitIndex;
+                    else if (currentOperandDigitIndex.Value > result.Value)
+                        result = currentOperandDigitIndex;
+                }
+            }
+            return result;
+        }
+
+        public static bool TryGetExpectedHandledDigitsCount
+        (
+            this ISyncOperationWorkingMemory workingMemory,
+            bool incremental,
+            [NotNullWhen(true)]
+            out int? result
+        )
+        {
+            var bResult = false;
+            var currentDigitIndex = workingMemory.GetOperandsCurrentIndex();
+
+            if (currentDigitIndex != null)
+            {
+                bResult = true;
+                if (incremental)
+                    result = currentDigitIndex + 1;
+                else
+                {
+                    var maxDigitCount =
+                        workingMemory.Chunks
+                            .OfType<IOperandChunk>()
+                            .Select(o => o.Value)
+                            .WhereNotNull()
+                            .Max(v => v.Items.Count());
+                    result = maxDigitCount - currentDigitIndex;
+                }
+            }
+            else
+                result = null;
+
+            return bResult;
         }
     }
 }

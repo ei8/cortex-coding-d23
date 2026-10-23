@@ -81,7 +81,7 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
         private void Complete(IProcess? process)
         {
             this.completionCallback(this, process, [.. this.WorkingMemory.GetSumNeurons()]);
-            this.WorkingMemory.Sum.Value.Items.Clear();
+            this.WorkingMemory.Sum.Value.Clear();
         }
 
         public DoUntil? DoUntil => this.Process1;

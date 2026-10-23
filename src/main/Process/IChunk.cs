@@ -32,6 +32,18 @@ namespace ei8.Cortex.Coding.d23.Process
     {
     }
 
+    public interface IConcurrentListChunk<T> : IEnumerableChunkCore<IEnumerable<T>, T>
+        where T : IChunk
+    {
+        void Add(T item);
+
+        void Clear();
+
+        T ItemAt(int index);
+
+        int Count { get; }
+    }
+
     public interface IListChunk<T> : IEnumerableChunkCore<IList<T>, T>
         where T : IChunk
     {

@@ -49,7 +49,7 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                             (
                                 digitIndex == 0 ?
                                     '0' :
-                                    this.CarryOver.Value.Items[digitIndex - 1].Neuron.Tag.Last()
+                                    this.CarryOver.Value.ItemAt(digitIndex - 1).Neuron.Tag.Last()
                             )
                     ),
                     this.Augend.GetValueByIndex(digitIndex),

@@ -11,6 +11,7 @@ namespace ei8.Cortex.Coding.d23.Process
     }
 
     public interface IProcess<T> : IProcess
+        where T : IWorkingMemory
     {
         T WorkingMemory { get; }
     }

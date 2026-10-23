@@ -4,11 +4,11 @@
         IAggregateChunk
         <
             IEnumerableChunk<INeuronChunk>,
-            IListChunk<INeuronChunk>
+            IConcurrentListChunk<INeuronChunk>
         >
     {
         public IEnumerableChunk<INeuronChunk> DigitValues { get; }
-        public IListChunk<INeuronChunk> Value { get; }
+        public IConcurrentListChunk<INeuronChunk> Value { get; }
     }
 
     public interface IResultChunkStatic<T> :

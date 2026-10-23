@@ -104,7 +104,7 @@ namespace ei8.Cortex.Coding.d23.Process
         {
             ArgumentNullException.ThrowIfNull(this.Value);
 
-            this.PreviousDigit = this.PreviousDigit.GetIfUnequal(this.CurrentDigit);
+            this.PreviousDigit = this.CurrentDigit;
             this.CurrentDigit = this.Value.Items.GetAdjacentOrDefault(this.CurrentDigit, next);
         }
     }

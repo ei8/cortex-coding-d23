@@ -100,7 +100,7 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                             if (this.WorkingMemory.MultiplierProducts.Lists.Count == 1)
                             {
                                 foreach (var mp in this.WorkingMemory.MultiplierProducts.Lists[0].Items)
-                                    this.WorkingMemory.Product.Value.Items.Add(mp);
+                                    this.WorkingMemory.Product.Value.Add(mp);
                                 this.Complete();
                             }
                             else
@@ -167,9 +167,9 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
             if 
             (
                 workingMemory.MultiplierProducts.Lists.IndexOf(workingMemory.CurrentMultiplierProduct) > 
-                workingMemory.Product.Value.Items.Count
+                workingMemory.Product.Value.Count
             )
-                workingMemory.Product.Value.Items.Add(augend.Items[0]);
+                workingMemory.Product.Value.Add(augend.Items[0]);
 
             return new
             (
@@ -238,10 +238,10 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
             if (this.WorkingMemory.LastAdditionSum != null)
             {
                 foreach (var n in this.WorkingMemory.LastAdditionSum.Items)
-                    this.WorkingMemory.Product.Value.Items.Add(n);
+                    this.WorkingMemory.Product.Value.Add(n);
 
                 this.completionCallback(this, [.. this.WorkingMemory.Product.Value.Items.Select(c => c.Neuron)]);
-                this.WorkingMemory.Product.Value.Items.Clear();
+                this.WorkingMemory.Product.Value.Clear();
             }
         }
 
