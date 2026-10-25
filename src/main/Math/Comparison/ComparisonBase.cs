@@ -4,15 +4,15 @@ namespace ei8.Cortex.Coding.d23.Math.Comparison
 {
     public abstract class ComparisonBase
     (
-        TwoInputOneOutputTruthTableBase.ParameterInfo parameters,
-        TwoInputTruthTableBase.InterneuronSet interneurons,
+        In2Out1TruthTableBase.ParameterInfo parameters,
+        In2TruthTableBase.InterneuronSet interneurons,
         VariableInfo? variableInfo
     ) :
-        TwoInputTruthTableBase
+        In2TruthTableBase
         <
-            TwoInputOneOutputTruthTableBase.ParameterInfo,
-            TwoInputTruthTableBase.Input,
-            TwoInputTruthTableBase.InterneuronSet
+            In2Out1TruthTableBase.ParameterInfo,
+            In2TruthTableBase.Input,
+            In2TruthTableBase.InterneuronSet
         >
         (
             parameters,
@@ -21,8 +21,8 @@ namespace ei8.Cortex.Coding.d23.Math.Comparison
         ),
         IComparison
         <
-            TwoInputOneOutputTruthTableBase.ParameterInfo,
-            TwoInputTruthTableBase.InterneuronSet
+            In2Out1TruthTableBase.ParameterInfo,
+            In2TruthTableBase.InterneuronSet
         >
     {
     }

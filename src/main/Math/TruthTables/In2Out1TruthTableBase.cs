@@ -4,17 +4,17 @@ using System.Runtime.CompilerServices;
 
 namespace ei8.Cortex.Coding.d23.Math.TruthTables
 {
-    public abstract partial class TwoInputOneOutputTruthTableBase
+    public abstract partial class In2Out1TruthTableBase
     (
-        TwoInputOneOutputTruthTableBase.ParameterInfo parameters,
-        TwoInputTruthTableBase.InterneuronSet interneurons,
+        In2Out1TruthTableBase.ParameterInfo parameters,
+        In2TruthTableBase.InterneuronSet interneurons,
         VariableInfo? variableInfo
     ) :
-        TwoInputTruthTableBase
+        In2TruthTableBase
         <
-            TwoInputOneOutputTruthTableBase.ParameterInfo,
-            TwoInputTruthTableBase.Input,
-            TwoInputTruthTableBase.InterneuronSet
+            In2Out1TruthTableBase.ParameterInfo,
+            In2TruthTableBase.Input,
+            In2TruthTableBase.InterneuronSet
         >
         (
             parameters,
@@ -25,7 +25,7 @@ namespace ei8.Cortex.Coding.d23.Math.TruthTables
         public static bool TryCreate<T>
         (
             [NotNullWhen(true)] out T? result,
-            TwoInputOneOutputTruthTableBase.ParameterInfo parameters,
+            In2Out1TruthTableBase.ParameterInfo parameters,
             InterneuronTagInfo? interneuronTagInfo = null,
             [CallerArgumentExpression(nameof(result))] string parameterExpression = "",
             NetworkHelper.InputNeuronStrengthMode additionalInputNeuronType = NetworkHelper.InputNeuronStrengthMode.And,
@@ -35,10 +35,10 @@ namespace ei8.Cortex.Coding.d23.Math.TruthTables
                 ITruthTableStatic
                 <
                     T,
-                    TwoInputOneOutputTruthTableBase.ParameterInfo,
-                    TwoInputTruthTableBase.Input,
-                    TwoInputOneOutputTruthTableBase.Output,
-                    TwoInputTruthTableBase.InterneuronSet
+                    In2Out1TruthTableBase.ParameterInfo,
+                    In2TruthTableBase.Input,
+                    In2Out1TruthTableBase.Output,
+                    In2TruthTableBase.InterneuronSet
                 >
         {
             bool bResult = false;
@@ -57,7 +57,7 @@ namespace ei8.Cortex.Coding.d23.Math.TruthTables
                     T.GetInterneuronTags(variableInfo, interneuronTagInfo)
                 );
 
-                var interneurons = new TwoInputTruthTableBase.InterneuronSet
+                var interneurons = new In2TruthTableBase.InterneuronSet
                 (
                     interneuronNetworks.ElementAt(0),
                     interneuronNetworks.ElementAt(1),

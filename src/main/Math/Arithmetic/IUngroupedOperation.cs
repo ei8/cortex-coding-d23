@@ -35,9 +35,7 @@
         where TParam : IFunctionalCircuitParameter
         where TInterneuron : ICircuitInterneuronSet
     {
-        static abstract TParam GetDefaultParameters(
-            int exponent
-        );
+        static abstract TParam GetDefaultParameters();
 
         static abstract TInterneuron CreateInterneurons(
             TParam parameters,

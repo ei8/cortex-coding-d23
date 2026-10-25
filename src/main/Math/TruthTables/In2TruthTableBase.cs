@@ -5,7 +5,7 @@ namespace ei8.Cortex.Coding.d23.Math.TruthTables
 {
     // TODO: Change references to BinaryNeuronParameter to generic TNeuronParam
     // TODO: Create BinaryTwoInputTruthTableBase and 1) specify BinaryNeuronParameter; 2) Transfer LinkInputNeurons and GetInterneuronTags there
-    public abstract partial class TwoInputTruthTableBase
+    public abstract partial class In2TruthTableBase
     <
         TParam,
         TInput,
@@ -66,7 +66,7 @@ namespace ei8.Cortex.Coding.d23.Math.TruthTables
 
         public static IEnumerable<ReadOnlyNetwork> LinkInputNeurons
         (
-            TwoInputTruthTableBase.Input inputs,
+            In2TruthTableBase.Input inputs,
             IEnumerable<ReadOnlyNetwork> interneuronNetworks,
             NetworkHelper.InputNeuronStrengthMode additionalInputNeuronType = NetworkHelper.InputNeuronStrengthMode.And,
             params Neuron[] additionalInputs

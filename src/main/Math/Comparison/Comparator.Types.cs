@@ -6,12 +6,12 @@ namespace ei8.Cortex.Coding.d23.Math.Comparison
     {
         public class ParameterInfo
         (
-            TwoInputTruthTableBase.Input inputs,
+            In2TruthTableBase.Input inputs,
             Output outputs
         ) :
             FunctionalCircuitParameter
             <
-                TwoInputTruthTableBase.Input,
+                In2TruthTableBase.Input,
                 Output
             >
             (

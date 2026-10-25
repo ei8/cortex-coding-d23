@@ -9,7 +9,7 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
         NotGate.InterneuronSet interneurons,
         VariableInfo? variableInfo
     ) :
-        OneInputTruthTableBase
+        In1Out1TruthTableBase
         (
             parameters,
             interneurons,
@@ -17,21 +17,21 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
         ),
         ILogicGate
         <
-            OneInputTruthTableBase.ParameterInfo,
-            OneInputTruthTableBase.InterneuronSet
+            In1Out1TruthTableBase.ParameterInfo,
+            In1Out1TruthTableBase.InterneuronSet
         >,
         ITruthTableStatic
         <
             NotGate,
-            OneInputTruthTableBase.ParameterInfo,
-            OneInputTruthTableBase.Input,
-            OneInputTruthTableBase.Output,
-            OneInputTruthTableBase.InterneuronSet
+            In1Out1TruthTableBase.ParameterInfo,
+            In1Out1TruthTableBase.Input,
+            In1Out1TruthTableBase.Output,
+            In1Out1TruthTableBase.InterneuronSet
         >
     {
         public static NotGate Create(
-            OneInputTruthTableBase.ParameterInfo parameters,
-            OneInputTruthTableBase.InterneuronSet interneurons,
+            In1Out1TruthTableBase.ParameterInfo parameters,
+            In1Out1TruthTableBase.InterneuronSet interneurons,
             VariableInfo? variableInfo
         ) => new(
             parameters,
@@ -39,7 +39,7 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
             variableInfo
         );
 
-        public static IEnumerable<IEnumerable<Neuron>> GetOutputsPerInterneuron(OneInputTruthTableBase.Output outputs) =>
+        public static IEnumerable<IEnumerable<Neuron>> GetOutputsPerInterneuron(In1Out1TruthTableBase.Output outputs) =>
             outputs.Output1 != null ?
                 [
                     [outputs.Output1.Neuron1],

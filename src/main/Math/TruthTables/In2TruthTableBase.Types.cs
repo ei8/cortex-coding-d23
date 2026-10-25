@@ -2,39 +2,33 @@
 
 namespace ei8.Cortex.Coding.d23.Math.TruthTables
 {
-    public abstract partial class OneInputTruthTableBase
+    public abstract partial class In2TruthTableBase
     {
-        public class ParameterInfo
+        public class Input
         (
-            Input inputs,
-            Output outputs
+            BinaryNeuronParameter? input1,
+            BinaryNeuronParameter? input2
         ) :
-            FunctionalCircuitParameter
+            InputCircuitParameterSubsetBase
             <
-                Input,
-                Output
+                BinaryNeuronParameter,
+                BinaryNeuronParameter
             >
-            (
-                inputs,
-                outputs
-            )
-        {
-        }
-
-        public class Input(BinaryNeuronParameter? input1) : InputCircuitParameterSubsetBase<BinaryNeuronParameter>(input1)
+        (
+            input1,
+            input2
+        )
         {
             public BinaryNeuronParameter? Input1 => this.Parameter1;
-        }
-
-        public class Output(BinaryNeuronParameter? output1) : OutputCircuitParameterSubsetBase<BinaryNeuronParameter>(output1)
-        {
-            public BinaryNeuronParameter? Output1 => this.Parameter1;
+            public BinaryNeuronParameter? Input2 => this.Parameter2;
         }
 
         public class InterneuronSet
         (
             ReadOnlyNetwork interneuron1,
             ReadOnlyNetwork interneuron2,
+            ReadOnlyNetwork interneuron3,
+            ReadOnlyNetwork interneuron4,
             ReadOnlyNetwork linkedInputNeurons
         ) :
             CircuitInterneuronSetBase,
@@ -44,11 +38,15 @@ namespace ei8.Cortex.Coding.d23.Math.TruthTables
             [
                 this.Interneuron1,
                 this.Interneuron2,
+                this.Interneuron3,
+                this.Interneuron4,
                 this.LinkedInputNeurons
             ];
 
             public ReadOnlyNetwork Interneuron1 = interneuron1;
             public ReadOnlyNetwork Interneuron2 = interneuron2;
+            public ReadOnlyNetwork Interneuron3 = interneuron3;
+            public ReadOnlyNetwork Interneuron4 = interneuron4;
             public ReadOnlyNetwork LinkedInputNeurons = linkedInputNeurons;
         }
     }

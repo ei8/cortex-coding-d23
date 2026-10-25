@@ -31,6 +31,9 @@
 	  <Compile Update="Math\Arithmetic\Multiplier.Types.cs">
 	    <DependentUpon>Multiplier.cs</DependentUpon>
 	  </Compile>
+	  <Compile Update="Math\Arithmetic\Divider.Types.cs">
+	    <DependentUpon>Divider.cs</DependentUpon>
+	  </Compile>
 	  <Compile Update="Math\Arithmetic\Adder.Types.cs">
 		  <DependentUpon>Adder.cs</DependentUpon>
 	  </Compile>
@@ -43,17 +46,17 @@
 	  <Compile Update="Math\Comparison\Comparator.Types.cs">
 		  <DependentUpon>Comparator.cs</DependentUpon>
 	  </Compile>
-	  <Compile Update="Math\TruthTables\OneInputTruthTableBase.Types.cs">
-		  <DependentUpon>OneInputTruthTableBase.cs</DependentUpon>
+	  <Compile Update="Math\TruthTables\In1Out1TruthTableBase.Types.cs">
+		  <DependentUpon>In1Out1TruthTableBase.cs</DependentUpon>
 	  </Compile>
-	  <Compile Update="Math\TruthTables\TwoInputThreeOutputTruthTableBase.Types.cs">
-	    <DependentUpon>TwoInputThreeOutputTruthTableBase.cs</DependentUpon>
+	  <Compile Update="Math\TruthTables\In2Out3TruthTableBase.Types.cs">
+	    <DependentUpon>In2Out3TruthTableBase.cs</DependentUpon>
 	  </Compile>
-	  <Compile Update="Math\TruthTables\TwoInputOneOutputTruthTableBase.Types.cs">
-		  <DependentUpon>TwoInputOneOutputTruthTableBase.cs</DependentUpon>
+	  <Compile Update="Math\TruthTables\In2Out1TruthTableBase.Types.cs">
+		  <DependentUpon>In2Out1TruthTableBase.cs</DependentUpon>
 	  </Compile>
-	  <Compile Update="Math\TruthTables\TwoInputTruthTableBase.Types.cs">
-		  <DependentUpon>TwoInputTruthTableBase.cs</DependentUpon>
+	  <Compile Update="Math\TruthTables\In2TruthTableBase.Types.cs">
+		  <DependentUpon>In2TruthTableBase.cs</DependentUpon>
 	  </Compile>
 	  <Compile Update="Sequences\BiphasicNext.Types.cs">
 		  <DependentUpon>BiphasicNext.cs</DependentUpon>

@@ -51,7 +51,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
             result = default;
             if (VariableInfo.TryParse(parameterExpression, out var variableInfo))
             {
-                var parameters = T.GetDefaultParameters(exponent);
+                var parameters = T.GetDefaultParameters();
                 result = T.Create(
                     parameters,
                     T.CreateInterneurons(

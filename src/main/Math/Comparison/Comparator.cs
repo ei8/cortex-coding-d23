@@ -6,13 +6,13 @@ namespace ei8.Cortex.Coding.d23.Math.Comparison
     public partial class Comparator
     (
         Comparator.ParameterInfo parameters,
-        TwoInputTruthTableBase.InterneuronSet interneurons,
+        In2TruthTableBase.InterneuronSet interneurons,
         VariableInfo? variableInfo
     ) :
-        TwoInputThreeOutputTruthTableBase
+        In2Out3TruthTableBase
         <
             Comparator.ParameterInfo,
-            TwoInputTruthTableBase.Input,
+            In2TruthTableBase.Input,
             Comparator.Output
         >
         (
@@ -23,24 +23,24 @@ namespace ei8.Cortex.Coding.d23.Math.Comparison
         IComparison
         <
             Comparator.ParameterInfo,
-            TwoInputTruthTableBase.InterneuronSet
+            In2TruthTableBase.InterneuronSet
         >,
         ITruthTableStatic
         <
             Comparator,
             Comparator.ParameterInfo,
-            TwoInputTruthTableBase.Input,
+            In2TruthTableBase.Input,
             Comparator.Output,
-            TwoInputTruthTableBase.InterneuronSet
+            In2TruthTableBase.InterneuronSet
         >
     {
         public static Comparator Create
         (
             ParameterInfo parameters, 
-            TwoInputTruthTableBase.InterneuronSet interneurons, 
+            In2TruthTableBase.InterneuronSet interneurons, 
             VariableInfo? variableInfo
         ) =>
-        new
+            new
             (
                 parameters,
                 interneurons,

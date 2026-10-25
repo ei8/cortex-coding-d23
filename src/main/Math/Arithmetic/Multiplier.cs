@@ -47,17 +47,17 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                 variableInfo
             );
 
-        public static Multiplier.ParameterInfo GetDefaultParameters(int exponent) => 
+        public static Multiplier.ParameterInfo GetDefaultParameters() => 
             new
             (
                 new
                 (
-                    BinaryNeuronParameter.Create($"{nameof(Multiplier)}{exponent + 1}.{nameof(Input.Multiplicand)}"),
-                    BinaryNeuronParameter.Create($"{nameof(Multiplier)}{exponent + 1}.{nameof(Input.Multiplier)}")
+                    BinaryNeuronParameter.Create($"{nameof(Multiplier)}.{nameof(Input.Multiplicand)}"),
+                    BinaryNeuronParameter.Create($"{nameof(Multiplier)}.{nameof(Input.Multiplier)}")
                 ),
                 new
                 (
-                    BinaryNeuronParameter.Create($"{nameof(Multiplier)}{exponent + 1}.{nameof(Output.Product)}")
+                    BinaryNeuronParameter.Create($"{nameof(Multiplier)}.{nameof(Output.Product)}")
                 )
             );
 
@@ -71,7 +71,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 
             if
             (
-                TwoInputOneOutputLogicGateBase.TryCreate
+                In2Out1LogicGateBase.TryCreate
                 (
                     out AndGate? AND___Multiplicand__Multiplier,
                     new(

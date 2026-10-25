@@ -1,15 +1,15 @@
 ﻿namespace ei8.Cortex.Coding.d23.Math.TruthTables
 {
-    public abstract partial class TwoInputThreeOutputTruthTableBase
+    public abstract partial class In2Out3TruthTableBase
     {
         public class ParameterInfo
         (
-            TwoInputTruthTableBase.Input inputs,
+            In2TruthTableBase.Input inputs,
             Output outputs
         ) :
             FunctionalCircuitParameter
             <
-                TwoInputTruthTableBase.Input,
+                In2TruthTableBase.Input,
                 Output
             >
             (

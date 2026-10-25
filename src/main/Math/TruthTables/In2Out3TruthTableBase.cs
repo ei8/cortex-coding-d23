@@ -4,17 +4,17 @@ using System.Runtime.CompilerServices;
 
 namespace ei8.Cortex.Coding.d23.Math.TruthTables
 {
-    public abstract partial class TwoInputThreeOutputTruthTableBase
+    public abstract partial class In2Out3TruthTableBase
     (
-        TwoInputThreeOutputTruthTableBase.ParameterInfo parameters,
-        TwoInputTruthTableBase.InterneuronSet interneurons,
+        In2Out3TruthTableBase.ParameterInfo parameters,
+        In2TruthTableBase.InterneuronSet interneurons,
         VariableInfo? variableInfo
     ) :
-        TwoInputThreeOutputTruthTableBase
+        In2Out3TruthTableBase
         <
-            TwoInputThreeOutputTruthTableBase.ParameterInfo,
-            TwoInputTruthTableBase.Input,
-            TwoInputThreeOutputTruthTableBase.Output
+            In2Out3TruthTableBase.ParameterInfo,
+            In2TruthTableBase.Input,
+            In2Out3TruthTableBase.Output
         >
         (
             parameters,
@@ -24,7 +24,7 @@ namespace ei8.Cortex.Coding.d23.Math.TruthTables
     {
     }
 
-    public abstract partial class TwoInputThreeOutputTruthTableBase
+    public abstract partial class In2Out3TruthTableBase
     <
         TParam,
         TInput,
@@ -32,14 +32,14 @@ namespace ei8.Cortex.Coding.d23.Math.TruthTables
     >
     (
         TParam parameters,
-        TwoInputTruthTableBase.InterneuronSet interneurons,
+        In2TruthTableBase.InterneuronSet interneurons,
         VariableInfo? variableInfo
     ) :
-        TwoInputTruthTableBase
+        In2TruthTableBase
         <
             TParam,
             TInput,
-            TwoInputTruthTableBase.InterneuronSet
+            In2TruthTableBase.InterneuronSet
         >
         (
             parameters,
@@ -77,7 +77,7 @@ namespace ei8.Cortex.Coding.d23.Math.TruthTables
                     TParam,
                     TInput,
                     TOutput,
-                    TwoInputTruthTableBase.InterneuronSet
+                    In2TruthTableBase.InterneuronSet
                 >
         {
             bool bResult = false;
@@ -98,7 +98,7 @@ namespace ei8.Cortex.Coding.d23.Math.TruthTables
                     T.GetInterneuronTags(variableInfo, interneuronTagInfo)
                 );
 
-                var interneurons = new TwoInputTruthTableBase.InterneuronSet
+                var interneurons = new In2TruthTableBase.InterneuronSet
                 (
                     interneuronNetworks.ElementAt(0),
                     interneuronNetworks.ElementAt(1),
