@@ -70,7 +70,6 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
         {
             bool bResult = false;
             result = default;
-            // TODO: use variableInfo
             if
             (
                 VariableInfo.TryParse(parameterExpression, out var variableInfo) &&
