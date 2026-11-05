@@ -71,9 +71,9 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 
             if
             (
-                In2Out1LogicGateBase.TryCreate
+                AndGate.TryCreate
                 (
-                    out AndGate? AND___Multiplicand__Multiplier,
+                    out var AND___Multiplicand__Multiplier,
                     new(
                         new(
                             parameters.Inputs.Multiplicand,

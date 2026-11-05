@@ -70,7 +70,8 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
             parameters.Inputs.Addend1,
             parameters.Inputs.Addend2,
             parameters.Outputs.Sum,
-            parameters.Outputs.CarryOver
+            parameters.Outputs.CarryOver,
+            new AdditionalInputNeuronInfo()
         );
 
         internal static InterneuronSet CreateInterneuronNetworksCore(
@@ -81,8 +82,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
             BinaryNeuronParameter? addend2,
             BinaryNeuronParameter? sum,
             BinaryNeuronParameter? carryOver,
-            NetworkHelper.InputNeuronStrengthMode additionalInputNeuronType = NetworkHelper.InputNeuronStrengthMode.And,
-            params Neuron[] additionalInputs
+            AdditionalInputNeuronInfo? additionalInputNeurons
         )
         {
             var result = new List<IneurUL>();
@@ -115,15 +115,14 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                         half1_XOR_Result,
                         half1_CarryOver,
                         adderName,
-                        additionalInputNeuronType,
-                        additionalInputs
+                        additionalInputNeurons
                     )
                 );
 
                 // half2
                 if (
-                    In2Out1LogicGateBase.TryCreate(
-                        out XorGate? half2_XOR___CarryOver__Half1_XOR_Result,
+                    XorGate.TryCreate(
+                        out var half2_XOR___CarryOver__Half1_XOR_Result,
                         new(
                             new(
                                 precedingCarryOver,
@@ -139,8 +138,8 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                             adderName
                         )
                     ) &&
-                    In2Out1LogicGateBase.TryCreate(
-                        out AndGate? half2_AND___CarryOver__Half1_XOR_Result,
+                    AndGate.TryCreate(
+                        out var half2_AND___CarryOver__Half1_XOR_Result,
                         new(
                             new(
                                 precedingCarryOver,
@@ -157,8 +156,8 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                         )
                     ) &&
                     // OR carryOvers
-                    In2Out1LogicGateBase.TryCreate(
-                        out OrGate? OR___Half1_CarryOver__Half2_CarryOver,
+                    OrGate.TryCreate(
+                        out var OR___Half1_CarryOver__Half2_CarryOver,
                         new(
                             new(
                                 half1_CarryOver,
@@ -190,8 +189,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                         sum,
                         carryOver,
                         adderName,
-                        additionalInputNeuronType,
-                        additionalInputs
+                        additionalInputNeurons
                     )
                 );
             }
@@ -205,15 +203,14 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
             BinaryNeuronParameter? xorOutput,
             BinaryNeuronParameter? andOutput,
             string prefix,
-            NetworkHelper.InputNeuronStrengthMode additionalInputNeuronType = NetworkHelper.InputNeuronStrengthMode.And,
-            params Neuron[] additionalInputs
+            AdditionalInputNeuronInfo? additionalInputNeurons
         )
         {
             var result = new List<IneurUL>();
             // Link half1 interneurons
             if (
-                In2Out1LogicGateBase.TryCreate(
-                    out XorGate? half1_XOR___Addend1__Addend2,
+                XorGate.TryCreate(
+                    out var half1_XOR___Addend1__Addend2,
                     new(
                         new(
                             addend1,
@@ -224,11 +221,10 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                         )
                     ),
                     InterneuronTagInfo.CreateByCommonTagPrefix(prefix, 2),
-                    additionalInputNeuronType: additionalInputNeuronType,
-                    additionalInputs: additionalInputs
+                    additionalInputNeurons
                 ) &&
-                In2Out1LogicGateBase.TryCreate(
-                    out AndGate? half1_AND___Addend1__Addend2,
+                AndGate.TryCreate(
+                    out var half1_AND___Addend1__Addend2,
                     new(
                         new(
                             addend1,
@@ -239,8 +235,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                         )
                     ),
                     InterneuronTagInfo.CreateByCommonTagPrefix(prefix, 2),
-                    additionalInputNeuronType: additionalInputNeuronType,
-                    additionalInputs: additionalInputs
+                    additionalInputNeurons
                 )
             )
             {

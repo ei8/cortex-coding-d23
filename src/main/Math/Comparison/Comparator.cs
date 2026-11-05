@@ -1,5 +1,6 @@
 ﻿using ei8.Cortex.Coding.d23.Math.TruthTables;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ei8.Cortex.Coding.d23.Math.Comparison
 {
@@ -9,11 +10,12 @@ namespace ei8.Cortex.Coding.d23.Math.Comparison
         In2TruthTableBase.InterneuronSet interneurons,
         VariableInfo? variableInfo
     ) :
-        In2Out3TruthTableBase
+        In2TruthTableBase
         <
+            Comparator,
             Comparator.ParameterInfo,
             In2TruthTableBase.Input,
-            Comparator.Output
+            In2TruthTableBase.InterneuronSet
         >
         (
             parameters,
@@ -29,8 +31,6 @@ namespace ei8.Cortex.Coding.d23.Math.Comparison
         <
             Comparator,
             Comparator.ParameterInfo,
-            In2TruthTableBase.Input,
-            Comparator.Output,
             In2TruthTableBase.InterneuronSet
         >
     {
@@ -46,6 +46,35 @@ namespace ei8.Cortex.Coding.d23.Math.Comparison
                 interneurons,
                 variableInfo
             );
+        // TODO: Unify with In2Out1LogicGateBase.CreateInterneurons
+        public static In2TruthTableBase.InterneuronSet CreateInterneurons
+        (
+            ParameterInfo parameters, 
+            VariableInfo variableInfo, 
+            InterneuronTagInfo? interneuronTagInfo = null, 
+            AdditionalInputNeuronInfo? additionalInputNeurons = null
+        )
+        {
+            var interneuronNetworks = NetworkHelper.CreateInterneuronNetworksByOutputNeurons
+                (
+                    Comparator.GetOutputsPerInterneuron(parameters.Outputs),
+                    Comparator.GetInterneuronTags(variableInfo, interneuronTagInfo)
+                );
+
+            return new In2TruthTableBase.InterneuronSet
+            (
+                interneuronNetworks.ElementAt(0),
+                interneuronNetworks.ElementAt(1),
+                interneuronNetworks.ElementAt(2),
+                interneuronNetworks.ElementAt(3),
+                Comparator.LinkInputNeurons
+                (
+                    parameters.Inputs,
+                    interneuronNetworks,
+                    additionalInputNeurons
+                ).Combine()
+            );
+        }
 
         public static IEnumerable<IEnumerable<Neuron>> GetOutputsPerInterneuron(Comparator.Output outputs) =>
             outputs.AreEqual != null &&

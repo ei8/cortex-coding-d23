@@ -1,0 +1,32 @@
+﻿using System.Collections.Generic;
+
+namespace ei8.Cortex.Coding.d23.Math.TruthTables
+{
+    public abstract partial class In1TruthTableBase
+    {
+        public class Input(BinaryNeuronParameter? input1) : InputCircuitParameterSubsetBase<BinaryNeuronParameter>(input1)
+        {
+            public BinaryNeuronParameter? Input1 => this.Parameter1;
+        }
+
+        public class InterneuronSet
+        (
+            ReadOnlyNetwork interneuron1,
+            ReadOnlyNetwork interneuron2,
+            ReadOnlyNetwork linkedInputNeurons
+        ) :
+            CircuitInterneuronSetBase
+        {
+            protected override IEnumerable<ReadOnlyNetwork> GetNetworks() =>
+            [
+                this.Interneuron1,
+                this.Interneuron2,
+                this.LinkedInputNeurons
+            ];
+
+            public ReadOnlyNetwork Interneuron1 = interneuron1;
+            public ReadOnlyNetwork Interneuron2 = interneuron2;
+            public ReadOnlyNetwork LinkedInputNeurons = linkedInputNeurons;
+        }
+    }
+}

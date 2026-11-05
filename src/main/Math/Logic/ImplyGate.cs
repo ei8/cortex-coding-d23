@@ -9,18 +9,18 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
         In2TruthTableBase.InterneuronSet interneurons,
         VariableInfo? variableInfo
     ) : 
-        In2Out1LogicGateBase
+        In2Out1LogicGateBase<ImplyGate>
         (
             parameters,
             interneurons,
             variableInfo
         ), 
-        ITruthTableStatic
+        ILogicGateStatic
         <
             ImplyGate, 
             In2Out1TruthTableBase.ParameterInfo,
             In2TruthTableBase.Input,
-            In2Out1LogicGateBase.Output,
+            In2Out1TruthTableBase.Output,
             In2TruthTableBase.InterneuronSet
         >
     {

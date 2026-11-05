@@ -108,8 +108,8 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 
                     // half2 interneurons
                     if (
-                        In2Out1LogicGateBase.TryCreate(
-                            out XorGate? half2_XOR___Borrow__Half1_XOR_Result,
+                        XorGate.TryCreate(
+                            out var half2_XOR___Borrow__Half1_XOR_Result,
                             new(
                                 new(
                                     precedingBorrow,
@@ -126,7 +126,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                             )
                         ) &&
                         NotGate.TryCreate(
-                            out NotGate? half2_NOT___Half1_XOR_Result,
+                            out var half2_NOT___Half1_XOR_Result,
                             new(
                                 new(
                                     half1_XOR_Result
@@ -137,8 +137,8 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                             ),
                             InterneuronTagInfo.CreateByCommonTagPrefix(subtractorName)
                         ) &&
-                        In2Out1LogicGateBase.TryCreate(
-                            out AndGate? half2_AND___Borrow__Half2_OUT___Half2_NOT___Half1_XOR_Result,
+                        AndGate.TryCreate(
+                            out var half2_AND___Borrow__Half2_OUT___Half2_NOT___Half1_XOR_Result,
                             new(
                                 new(
                                     precedingBorrow,
@@ -155,8 +155,8 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                             )
                         ) &&
                         // OR Borrows
-                        In2Out1LogicGateBase.TryCreate(
-                            out OrGate? OR___Half1_Borrow__Half2_Borrow,
+                        OrGate.TryCreate(
+                            out var OR___Half1_Borrow__Half2_Borrow,
                             new(
                                 new(
                                     half1_Borrow,
@@ -211,8 +211,8 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
             var result = new List<IneurUL>();
             // Link half1 interneurons
             if (
-                In2Out1LogicGateBase.TryCreate(
-                    out XorGate? half1_XOR___Minuend__Subtrahend,
+                XorGate.TryCreate(
+                    out var half1_XOR___Minuend__Subtrahend,
                     new(
                         new(
                             minuend,
@@ -225,7 +225,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                     InterneuronTagInfo.CreateByCommonTagPrefix(prefix, 2)
                 ) &&
                 NotGate.TryCreate(
-                    out NotGate? half1_NOT___Minuend,
+                    out var half1_NOT___Minuend,
                     new(
                         new(
                             minuend
@@ -236,8 +236,8 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                     ),
                     InterneuronTagInfo.CreateByCommonTagPrefix(prefix)
                 ) &&
-                In2Out1LogicGateBase.TryCreate(
-                    out AndGate? half1_AND___Subtrahend__Half1_OUT___Half1_NOT___Minuend,
+                AndGate.TryCreate(
+                    out var half1_AND___Subtrahend__Half1_OUT___Half1_NOT___Minuend,
                     new(
                         new(
                             notOutput,

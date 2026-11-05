@@ -107,8 +107,7 @@ namespace ei8.Cortex.Coding.d23.Sequences
             return NetworkHelper.LinkInputNeuronsToInterneuron(
                 interneuronToNext.GetInterneuron(),
                 [.. inputNeurons],
-                NetworkHelper.InputNeuronStrengthMode.Manual,
-                additionalInputNeuronInfos
+                new Math.TruthTables.AdditionalInputNeuronInfo(Math.TruthTables.AdditionalInputNeuronInfo.TypeValue.Manual)
             );
         }
     }

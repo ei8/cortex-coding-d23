@@ -49,8 +49,7 @@ namespace ei8.Cortex.Coding.d23.Sequences
         (
             ReadOnlyNetwork interneuron
         ) :
-            CircuitInterneuronSetBase,
-            ICircuitInterneuronSet
+            CircuitInterneuronSetBase
         {
             protected override IEnumerable<ReadOnlyNetwork> GetNetworks() =>
             [

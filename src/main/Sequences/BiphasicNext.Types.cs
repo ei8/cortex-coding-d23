@@ -9,8 +9,7 @@ namespace ei8.Cortex.Coding.d23.Sequences
             ReadOnlyNetwork initiator,
             ReadOnlyNetwork completer
         ) :
-            CircuitInterneuronSetBase,
-            ICircuitInterneuronSet
+            CircuitInterneuronSetBase
         {
             protected override IEnumerable<ReadOnlyNetwork> GetNetworks() =>
             [

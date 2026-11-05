@@ -94,7 +94,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                                     adder.Parameters.Outputs.CarryOver
                                 ]
                             ).Combine().GetItems<Neuron>().Select(n => new NeuronInfo(n, NeurotransmitterEffect.Excite, inputStrength)),
-                            NetworkHelper.InputNeuronStrengthMode.Manual
+                            new TruthTables.AdditionalInputNeuronInfo(TruthTables.AdditionalInputNeuronInfo.TypeValue.Manual)
                         )
                     ),
                     next,

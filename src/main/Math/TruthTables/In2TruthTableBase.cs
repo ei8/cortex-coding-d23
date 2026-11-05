@@ -7,6 +7,7 @@ namespace ei8.Cortex.Coding.d23.Math.TruthTables
     // TODO: Create BinaryTwoInputTruthTableBase and 1) specify BinaryNeuronParameter; 2) Transfer LinkInputNeurons and GetInterneuronTags there
     public abstract partial class In2TruthTableBase
     <
+        T,
         TParam,
         TInput,
         TInterneuron
@@ -18,6 +19,7 @@ namespace ei8.Cortex.Coding.d23.Math.TruthTables
     ) :
         TruthTableBase
         <
+            T,
             TParam,
             TInterneuron
         >
@@ -26,6 +28,12 @@ namespace ei8.Cortex.Coding.d23.Math.TruthTables
             interneurons,
             variableInfo
         )
+        where T : ITruthTableStatic
+            <
+                T,
+                TParam,
+                TInterneuron
+            >
         where TParam : IFunctionalCircuitParameter<TInput>
         where TInput : 
             IInputCircuitParameterSubset
@@ -66,10 +74,9 @@ namespace ei8.Cortex.Coding.d23.Math.TruthTables
 
         public static IEnumerable<ReadOnlyNetwork> LinkInputNeurons
         (
-            In2TruthTableBase.Input inputs,
+            TInput inputs,
             IEnumerable<ReadOnlyNetwork> interneuronNetworks,
-            NetworkHelper.InputNeuronStrengthMode additionalInputNeuronType = NetworkHelper.InputNeuronStrengthMode.And,
-            params Neuron[] additionalInputs
+            AdditionalInputNeuronInfo? additionalInputNeurons
         )
         {
             var result = new List<ReadOnlyNetwork>();
@@ -79,49 +86,37 @@ namespace ei8.Cortex.Coding.d23.Math.TruthTables
                 result.AddRange(
                     [
                         NetworkHelper.LinkInputNeuronsToInterneuron(
-                        interneuronNetworks.ElementAt(0).GetInterneuron(),
-                        [
-                            new(inputs.Parameter1.Neuron0),
-                            new(inputs.Parameter2.Neuron0)
-                        ],
-                        additionalInputNeuronType,
-                        [
-                            ..additionalInputs.Select(n => new NeuronInfo(n))
-                        ]
-                    ),
-                    NetworkHelper.LinkInputNeuronsToInterneuron(
-                        interneuronNetworks.ElementAt(1).GetInterneuron(),
-                        [
-                            new(inputs.Parameter1.Neuron0),
-                            new(inputs.Parameter2.Neuron1),
-                        ],
-                        additionalInputNeuronType,
-                        [
-                            ..additionalInputs.Select(n => new NeuronInfo(n))
-                        ]
-                    ),
-                    NetworkHelper.LinkInputNeuronsToInterneuron(
-                        interneuronNetworks.ElementAt(2).GetInterneuron(),
-                        [
-                            new(inputs.Parameter1.Neuron1),
-                            new(inputs.Parameter2.Neuron0),
-                        ],
-                        additionalInputNeuronType,
-                        [
-                            ..additionalInputs.Select(n => new NeuronInfo(n))
-                        ]
-                    ),
-                    NetworkHelper.LinkInputNeuronsToInterneuron(
-                        interneuronNetworks.ElementAt(3).GetInterneuron(),
-                        [
-                            new(inputs.Parameter1.Neuron1),
-                            new(inputs.Parameter2.Neuron1),
-                        ],
-                        additionalInputNeuronType,
-                        [
-                            ..additionalInputs.Select(n => new NeuronInfo(n))
-                        ]
-                    )
+                            interneuronNetworks.ElementAt(0).GetInterneuron(),
+                            [
+                                new(inputs.Parameter1.Neuron0),
+                                new(inputs.Parameter2.Neuron0)
+                            ],
+                            additionalInputNeurons
+                        ),
+                        NetworkHelper.LinkInputNeuronsToInterneuron(
+                            interneuronNetworks.ElementAt(1).GetInterneuron(),
+                            [
+                                new(inputs.Parameter1.Neuron0),
+                                new(inputs.Parameter2.Neuron1),
+                            ],
+                            additionalInputNeurons
+                        ),
+                        NetworkHelper.LinkInputNeuronsToInterneuron(
+                            interneuronNetworks.ElementAt(2).GetInterneuron(),
+                            [
+                                new(inputs.Parameter1.Neuron1),
+                                new(inputs.Parameter2.Neuron0),
+                            ],
+                            additionalInputNeurons
+                        ),
+                        NetworkHelper.LinkInputNeuronsToInterneuron(
+                            interneuronNetworks.ElementAt(3).GetInterneuron(),
+                            [
+                                new(inputs.Parameter1.Neuron1),
+                                new(inputs.Parameter2.Neuron1),
+                            ],
+                            additionalInputNeurons
+                        )
                     ]
                 );
             }

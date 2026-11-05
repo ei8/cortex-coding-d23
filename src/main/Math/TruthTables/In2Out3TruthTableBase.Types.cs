@@ -1,6 +1,7 @@
 ﻿namespace ei8.Cortex.Coding.d23.Math.TruthTables
 {
-    public abstract partial class In2Out3TruthTableBase
+    // TODO: Remove Base from filename and class name
+    public class In2Out3TruthTableBase
     {
         public class ParameterInfo
         (

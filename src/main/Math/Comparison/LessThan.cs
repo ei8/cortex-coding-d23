@@ -10,13 +10,13 @@ namespace ei8.Cortex.Coding.d23.Math.Comparison
         In2TruthTableBase.InterneuronSet interneurons,
         VariableInfo? variableInfo
     ) :
-        In2Out1LogicGateBase
+        In2Out1LogicGateBase<LessThan>
         (
             parameters,
             interneurons,
             variableInfo
         ),
-        ITruthTableStatic
+        ILogicGateStatic
         <
             LessThan,
             In2Out1TruthTableBase.ParameterInfo,

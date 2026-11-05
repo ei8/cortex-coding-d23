@@ -6,8 +6,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
     (
         IEnumerable<ReadOnlyNetwork> interneurons
     ) :
-        CircuitInterneuronSetBase,
-        ICircuitInterneuronSet
+        CircuitInterneuronSetBase
     {
         protected override IEnumerable<ReadOnlyNetwork> GetNetworks() => this.Interneurons;
 

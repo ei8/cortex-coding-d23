@@ -113,8 +113,7 @@ namespace ei8.Cortex.Coding.d23.Sequences
             var interneuronFromInputsToInitiator = NetworkHelper.LinkInputNeuronsToInterneuron(
                 initiator.GetInterneuron(),
                 [.. inputNeurons],
-                NetworkHelper.InputNeuronStrengthMode.Manual,
-                additionalInputs
+                new Math.TruthTables.AdditionalInputNeuronInfo(Math.TruthTables.AdditionalInputNeuronInfo.TypeValue.Manual)
             );
             
             initiator = ((IEnumerable<ReadOnlyNetwork>) [initiator, interneuronFromInputsToInitiator]).Combine();

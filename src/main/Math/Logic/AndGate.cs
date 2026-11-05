@@ -9,13 +9,13 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
         In2TruthTableBase.InterneuronSet interneurons,
         VariableInfo? variableInfo
     ) : 
-        In2Out1LogicGateBase
+        In2Out1LogicGateBase<AndGate>
         (
             parameters,
             interneurons,
             variableInfo
-        ), 
-        ITruthTableStatic
+        ),
+        ILogicGateStatic
         <
             AndGate,
             In2Out1TruthTableBase.ParameterInfo,
@@ -36,13 +36,13 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
                 interneurons,
                 variableInfo
             );
-        
+
         public static IEnumerable<IEnumerable<Neuron>> GetOutputsPerInterneuron(In2Out1TruthTableBase.Output outputs) =>
             outputs.Output1 != null ?
                 [
                     [outputs.Output1.Neuron0], 
                     [outputs.Output1.Neuron0], 
-                    [outputs.Output1.Neuron0], 
+                    [outputs.Output1.Neuron0],
                     [outputs.Output1.Neuron1]
                 ] :
                 [];

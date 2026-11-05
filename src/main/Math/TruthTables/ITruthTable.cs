@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 
 namespace ei8.Cortex.Coding.d23.Math.TruthTables
 {
@@ -26,8 +27,6 @@ namespace ei8.Cortex.Coding.d23.Math.TruthTables
     <
         T, 
         TParam, 
-        TInput,
-        TOutput,
         TInterneuron
     > :
         ITruthTable
@@ -42,16 +41,23 @@ namespace ei8.Cortex.Coding.d23.Math.TruthTables
                 TInterneuron
             >
         where TParam : IFunctionalCircuitParameter
-        where TInput : IInputCircuitParameterSubset
-        where TOutput : IOutputCircuitParameterSubset
         where TInterneuron : ICircuitInterneuronSet
     {
-        static abstract IEnumerable<IEnumerable<Neuron>> GetOutputsPerInterneuron(TOutput outputs);
-
-        static abstract IEnumerable<string> GetInterneuronTags
+        static abstract bool TryCreate
         (
+            [NotNullWhen(true)] out T? result,
+            TParam parameters,
+            InterneuronTagInfo? interneuronTagInfo = null,
+            AdditionalInputNeuronInfo? additionalInputNeurons = null,
+            [CallerArgumentExpression(nameof(result))] string parameterExpression = ""
+        );
+
+        static abstract TInterneuron CreateInterneurons
+        (
+            TParam parameters,
             VariableInfo variableInfo,
-            InterneuronTagInfo? interneuronTagInfo = null
+            InterneuronTagInfo? interneuronTagInfo = null,
+            AdditionalInputNeuronInfo? additionalInputNeurons = null
         );
 
         static abstract T Create
@@ -59,14 +65,6 @@ namespace ei8.Cortex.Coding.d23.Math.TruthTables
             TParam parameters,
             TInterneuron interneurons,
             VariableInfo? variableInfo
-        );
-
-        static abstract IEnumerable<ReadOnlyNetwork> LinkInputNeurons
-        (
-            TInput inputs,
-            IEnumerable<ReadOnlyNetwork> interneuronNetworks,
-            NetworkHelper.InputNeuronStrengthMode additionalInputNeuronType = NetworkHelper.InputNeuronStrengthMode.And,
-            params Neuron[] additionalInputs
         );
     }
 }

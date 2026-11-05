@@ -1,4 +1,5 @@
-﻿using ei8.Cortex.Coding.Mirrors;
+﻿using ei8.Cortex.Coding.d23.Math.TruthTables;
+using ei8.Cortex.Coding.Mirrors;
 using neurUL.Common.Domain.Model;
 using System;
 using System.Collections.Generic;
@@ -11,13 +12,6 @@ namespace ei8.Cortex.Coding.d23
     // TODO: Use C# 14+ Extension Members and attach to Neuron and Terminal classes
     public static class NetworkHelper
     {
-        public enum InputNeuronStrengthMode
-        {
-            Or,
-            And,
-            Manual
-        }
-
         public static IEnumerable<ReadOnlyNetwork> ConvertToNetworks(params IneurUL?[] neurULs) =>
             neurULs.WhereNotNull().Select(n => n.Network);
 
@@ -113,8 +107,7 @@ namespace ei8.Cortex.Coding.d23
         (
             Neuron interneuron,
             IEnumerable<NeuronInfo> inputNeuronInfos,
-            InputNeuronStrengthMode additionalInputNeuronStrengthMode = InputNeuronStrengthMode.And,
-            params NeuronInfo[] additionalInputNeuronInfos
+            AdditionalInputNeuronInfo? additionalInputNeurons
         )
         {
             var network = new Network();
@@ -124,8 +117,7 @@ namespace ei8.Cortex.Coding.d23
                 inputNeuronInfos,
                 network,
                 NeurotransmitterEffect.Excite,
-                additionalInputNeuronStrengthMode,
-                additionalInputNeuronInfos
+                additionalInputNeurons
             );
             NetworkHelper.LinkInputNeuronsToInterneuronByEffect
             (
@@ -133,8 +125,7 @@ namespace ei8.Cortex.Coding.d23
                 inputNeuronInfos,
                 network,
                 NeurotransmitterEffect.Inhibit,
-                additionalInputNeuronStrengthMode,
-                additionalInputNeuronInfos
+                additionalInputNeurons
             );
             return network;
         }
@@ -145,10 +136,13 @@ namespace ei8.Cortex.Coding.d23
             IEnumerable<NeuronInfo> inputNeuronInfos,
             Network network,
             NeurotransmitterEffect effect,
-            InputNeuronStrengthMode additionalInputNeuronStrengthMode,
-            NeuronInfo[] additionalInputNeuronInfos
+            AdditionalInputNeuronInfo? additionalInputNeurons
         )
         {
+            NeuronInfo[] additionalInputNeuronInfos = 
+                additionalInputNeurons != null ?
+                    [.. additionalInputNeurons.Neurons.Select(n => new NeuronInfo(n))] :
+                    [];
             var inputNeurons = inputNeuronInfos
                 .Concat(additionalInputNeuronInfos)
                 .Where(i => i.Effect == effect);
@@ -157,13 +151,18 @@ namespace ei8.Cortex.Coding.d23
             {
                 float strength = input.Strength;
 
-                if (additionalInputNeuronStrengthMode != InputNeuronStrengthMode.Manual)
+                if 
+                (
+                    additionalInputNeurons == null ||
+                    additionalInputNeurons.Type != AdditionalInputNeuronInfo.TypeValue.Manual
+                )
                 {
-                    var strengthDivisor = 
-                        additionalInputNeuronStrengthMode == InputNeuronStrengthMode.And ?
+                    var strengthDivisor =
+                        additionalInputNeurons == null || 
+                        additionalInputNeurons.Type == AdditionalInputNeuronInfo.TypeValue.And ?
                             inputNeurons.Count() :
                             inputNeuronInfos.Count() + (additionalInputNeuronInfos.Length > 0 ? 1 : 0);
-                    strength =  input.Strength / strengthDivisor;
+                    strength = input.Strength / strengthDivisor;
                 }
 
                 network.AddReplace(
@@ -195,9 +194,7 @@ namespace ei8.Cortex.Coding.d23
             return result;
         }
 
-        public static Neuron CreateNeuron(
-            MirrorConfig mirrorConfig
-        )
+        public static Neuron CreateNeuron(MirrorConfig mirrorConfig)
         {
             AssertionConcern.AssertArgumentNotNull(mirrorConfig, nameof(mirrorConfig));
 

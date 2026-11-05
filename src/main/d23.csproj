@@ -46,15 +46,9 @@
 	  <Compile Update="Math\Comparison\Comparator.Types.cs">
 		  <DependentUpon>Comparator.cs</DependentUpon>
 	  </Compile>
-	  <Compile Update="Math\TruthTables\In1Out1TruthTableBase.Types.cs">
-		  <DependentUpon>In1Out1TruthTableBase.cs</DependentUpon>
-	  </Compile>
-	  <Compile Update="Math\TruthTables\In2Out3TruthTableBase.Types.cs">
-	    <DependentUpon>In2Out3TruthTableBase.cs</DependentUpon>
-	  </Compile>
-	  <Compile Update="Math\TruthTables\In2Out1TruthTableBase.Types.cs">
-		  <DependentUpon>In2Out1TruthTableBase.cs</DependentUpon>
-	  </Compile>
+	  <Compile Update="Math\TruthTables\In1TruthTableBase.Types.cs">
+		  <DependentUpon>In1TruthTableBase.cs</DependentUpon>
+	  </Compile>	  
 	  <Compile Update="Math\TruthTables\In2TruthTableBase.Types.cs">
 		  <DependentUpon>In2TruthTableBase.cs</DependentUpon>
 	  </Compile>

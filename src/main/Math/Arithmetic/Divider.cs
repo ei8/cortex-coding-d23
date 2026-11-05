@@ -72,9 +72,9 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 
             if
             (
-                In2Out1LogicGateBase.TryCreate
+                AndGate.TryCreate
                 (
-                    out AndGate? AND___Dividend__Divisor,
+                    out var AND___Dividend__Divisor,
                     new(
                         new(
                             parameters.Inputs.Dividend,

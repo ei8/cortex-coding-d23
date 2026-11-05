@@ -31,8 +31,7 @@ namespace ei8.Cortex.Coding.d23.Math.TruthTables
             ReadOnlyNetwork interneuron4,
             ReadOnlyNetwork linkedInputNeurons
         ) :
-            CircuitInterneuronSetBase,
-            ICircuitInterneuronSet
+            CircuitInterneuronSetBase
         {
             protected override IEnumerable<ReadOnlyNetwork> GetNetworks() =>
             [
