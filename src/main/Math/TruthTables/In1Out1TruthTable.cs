@@ -1,7 +1,6 @@
 ﻿namespace ei8.Cortex.Coding.d23.Math.TruthTables
 {
-    // TODO: Remove Base from filename and class name
-    public class In1Out1TruthTableBase
+    public class In1Out1TruthTable
     {
         public class ParameterInfo
         (
