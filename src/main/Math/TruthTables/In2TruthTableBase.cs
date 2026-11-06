@@ -10,18 +10,20 @@ namespace ei8.Cortex.Coding.d23.Math.TruthTables
         T,
         TParam,
         TInput,
-        TInterneuron
+        TOutput
     >
     (
         TParam parameters,
-        TInterneuron interneurons,
+        In2TruthTableBase.InterneuronSet interneurons,
         VariableInfo? variableInfo
     ) :
         TruthTableBase
         <
             T,
             TParam,
-            TInterneuron
+            TInput,
+            TOutput,
+            In2TruthTableBase.InterneuronSet
         >
         (
             parameters,
@@ -32,17 +34,48 @@ namespace ei8.Cortex.Coding.d23.Math.TruthTables
             <
                 T,
                 TParam,
-                TInterneuron
+                TInput,
+                TOutput,
+                In2TruthTableBase.InterneuronSet
             >
-        where TParam : IFunctionalCircuitParameter<TInput>
+        where TParam : IFunctionalCircuitParameter<TInput, TOutput>
         where TInput : 
             IInputCircuitParameterSubset
             <
                 BinaryNeuronParameter,
                 BinaryNeuronParameter
             >
-        where TInterneuron : ICircuitInterneuronSet
+        where TOutput : IOutputCircuitParameterSubset
     {
+        public static In2TruthTableBase.InterneuronSet CreateInterneurons
+        (
+            TParam parameters,
+            VariableInfo variableInfo,
+            InterneuronTagInfo? interneuronTagInfo = null,
+            AdditionalInputNeuronInfo? additionalInputNeurons = null
+        )
+        {
+            var interneuronNetworks = NetworkHelper.CreateInterneuronNetworksByOutputNeurons
+                (
+                    T.GetOutputsPerInterneuron(parameters.Outputs),
+                    T.GetInterneuronTags(variableInfo, interneuronTagInfo)
+                );
+
+            return new In2TruthTableBase.InterneuronSet
+            (
+                interneuronNetworks.ElementAt(0),
+                interneuronNetworks.ElementAt(1),
+                interneuronNetworks.ElementAt(2),
+                interneuronNetworks.ElementAt(3),
+                T.LinkInputNeurons
+                (
+                    parameters.Inputs,
+                    interneuronNetworks,
+                    additionalInputNeurons
+                ).Combine()
+            );
+        }
+
         public static IEnumerable<string> GetInterneuronTags
         (
             VariableInfo variableInfo, 

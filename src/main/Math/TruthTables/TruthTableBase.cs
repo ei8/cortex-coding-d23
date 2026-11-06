@@ -7,6 +7,8 @@ namespace ei8.Cortex.Coding.d23.Math.TruthTables
     <
         T,
         TParam,
+        TInput,
+        TOutput,
         TInterneuron
     >
     (
@@ -29,9 +31,13 @@ namespace ei8.Cortex.Coding.d23.Math.TruthTables
             <
                 T,
                 TParam,
+                TInput,
+                TOutput,
                 TInterneuron
             >
         where TParam : IFunctionalCircuitParameter
+        where TInput : IInputCircuitParameterSubset
+        where TOutput : IOutputCircuitParameterSubset
         where TInterneuron : ICircuitInterneuronSet
     {
         public static bool TryCreate

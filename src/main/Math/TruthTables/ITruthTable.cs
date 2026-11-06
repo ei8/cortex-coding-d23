@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
 namespace ei8.Cortex.Coding.d23.Math.TruthTables
@@ -26,7 +27,9 @@ namespace ei8.Cortex.Coding.d23.Math.TruthTables
     public interface ITruthTableStatic
     <
         T, 
-        TParam, 
+        TParam,
+        TInput,
+        TOutput,
         TInterneuron
     > :
         ITruthTable
@@ -41,6 +44,8 @@ namespace ei8.Cortex.Coding.d23.Math.TruthTables
                 TInterneuron
             >
         where TParam : IFunctionalCircuitParameter
+        where TInput : IInputCircuitParameterSubset
+        where TOutput : IOutputCircuitParameterSubset
         where TInterneuron : ICircuitInterneuronSet
     {
         static abstract bool TryCreate
@@ -65,6 +70,21 @@ namespace ei8.Cortex.Coding.d23.Math.TruthTables
             TParam parameters,
             TInterneuron interneurons,
             VariableInfo? variableInfo
+        );
+
+        static abstract IEnumerable<IEnumerable<Neuron>> GetOutputsPerInterneuron(TOutput outputs);
+
+        static abstract IEnumerable<string> GetInterneuronTags
+        (
+            VariableInfo variableInfo,
+            InterneuronTagInfo? interneuronTagInfo = null
+        );
+
+        static abstract IEnumerable<ReadOnlyNetwork> LinkInputNeurons
+        (
+            TInput inputs,
+            IEnumerable<ReadOnlyNetwork> interneuronNetworks,
+            AdditionalInputNeuronInfo? additionalInputNeurons
         );
     }
 }
