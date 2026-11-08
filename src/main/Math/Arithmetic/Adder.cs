@@ -1,6 +1,7 @@
 ﻿using ei8.Cortex.Coding.d23.Math.Logic;
 using ei8.Cortex.Coding.d23.Math.TruthTables;
-using System.Collections.Generic;
+using neurUL.Common.Domain.Model;
+using System;
 using System.Linq;
 
 namespace ei8.Cortex.Coding.d23.Math.Arithmetic
@@ -8,30 +9,37 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
     public partial class Adder
     (
         Adder.ParameterInfo parameters,
-        InterneuronSet interneurons,
+        Adder.InterneuronSet interneurons,
         VariableInfo? variableInfo
     ) :
         GroupedOperationBase
         <
+            Adder,
             Adder.ParameterInfo,
-            InterneuronSet
+            Adder.Input,
+            Adder.Output,
+            Adder.InterneuronSet,
+            Adder.KeyedInterneuronTagger
         >
         (
             parameters,
             interneurons,
             variableInfo
         ),
+        ITruthTableStatic
+        <
+            Adder,
+            Adder.ParameterInfo,
+            Adder.Input,
+            Adder.Output,
+            Adder.InterneuronSet,
+            Adder.KeyedInterneuronTagger
+        >,
         IGroupedOperationStatic
         <
             Adder,
             Adder.ParameterInfo,
-            InterneuronSet
-        >,
-        IOperationStatic
-        <
-            Adder,
-            Adder.ParameterInfo,
-            InterneuronSet
+            Adder.InterneuronSet
         >
     {
         public static Adder Create(
@@ -44,7 +52,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
             variableInfo
         );
 
-        public static Adder.ParameterInfo GetDefaultParameters(
+        public static Adder.ParameterInfo CreateDefaultParameters(
             BinaryNeuronParameter? precedingValue,
             int exponent
         ) => new(
@@ -59,194 +67,196 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
             )
         );
 
-        public static InterneuronSet CreateInterneurons(
-            Adder.ParameterInfo parameters,
-            VariableInfo variableInfo,
-            VariableInfo? precedingVariableInfo = null
-        ) => Adder.CreateInterneuronNetworksCore(
-            variableInfo,
-            precedingVariableInfo,
-            parameters.Inputs.PrecedingCarryOver,
-            parameters.Inputs.Addend1,
-            parameters.Inputs.Addend2,
-            parameters.Outputs.Sum,
-            parameters.Outputs.CarryOver,
-            new AdditionalInputNeuronInfo()
-        );
-
-        internal static InterneuronSet CreateInterneuronNetworksCore(
-            VariableInfo variableInfo,
-            VariableInfo? precedingVariableInfo,
-            BinaryNeuronParameter? precedingCarryOver,
-            BinaryNeuronParameter? addend1,
-            BinaryNeuronParameter? addend2,
-            BinaryNeuronParameter? sum,
-            BinaryNeuronParameter? carryOver,
-            AdditionalInputNeuronInfo? additionalInputNeurons
+        public static InterneuronSet CreateInterneurons
+        (
+            ParameterInfo parameters, 
+            VariableInfo variableInfo, 
+            KeyedInterneuronTagger? interneuronTagger = null, 
+            AdditionalInputNeuronInfo? additionalInputNeurons = null
         )
         {
-            var result = new List<IneurUL>();
+            ArgumentNullException.ThrowIfNull(interneuronTagger);
+
+            var result = new InterneuronSet();
             string adderName = variableInfo.Inputs.First();
 
             if (
                 // is not least significant bit
-                precedingCarryOver != null &&
+                parameters.Inputs.PrecedingCarryOver != null &&
                 BinaryNeuronParameter.TryCreate(out var half1_XOR_Result, adderName) &&
                 BinaryNeuronParameter.TryCreate(out var half1_CarryOver, adderName) &&
                 BinaryNeuronParameter.TryCreate(out var half2_CarryOver, adderName)
             )
             {
-                result.AddRange(
-                    [
-                        half1_XOR_Result,
-                        half1_CarryOver,
-                        half2_CarryOver
-                    ]
-                );
-
-                string precedingAdderName = precedingVariableInfo != null ?
-                    precedingVariableInfo.Inputs.First() : 
-                    string.Empty;
-
-                result.AddRange(
-                    Adder.CreateAdderHalf1Interneurons(
-                        addend1,
-                        addend2,
-                        half1_XOR_Result,
-                        half1_CarryOver,
-                        adderName,
-                        additionalInputNeurons
-                    )
+                Adder.CreateAdderHalf1Interneurons(
+                    result,
+                    variableInfo,
+                    parameters.Inputs.Addend1,
+                    parameters.Inputs.Addend2,
+                    half1_XOR_Result,
+                    half1_CarryOver,
+                    additionalInputNeurons,
+                    interneuronTagger
                 );
 
                 // half2
-                if (
-                    XorGate.TryCreate(
+                if 
+                (
+                    XorGate.TryCreate
+                    (
                         out var half2_XOR___CarryOver__Half1_XOR_Result,
-                        new(
-                            new(
-                                precedingCarryOver,
+                        new
+                        (
+                            new
+                            (
+                                parameters.Inputs.PrecedingCarryOver,
                                 half1_XOR_Result
                             ),
-                            new(
-                                sum
-                            )
+                            new(parameters.Outputs.Sum)
                         ),
-                        new(
-                            adderName,
-                            precedingAdderName,
-                            adderName
+                        new
+                        (
+                            interneuronTagger.CreateByKey
+                            (
+                                nameof(InterneuronSet.Half2_XOR___CarryOver__Half1_XOR_Result),
+                                variableInfo
+                            )
                         )
                     ) &&
-                    AndGate.TryCreate(
+                    AndGate.TryCreate
+                    (
                         out var half2_AND___CarryOver__Half1_XOR_Result,
-                        new(
-                            new(
-                                precedingCarryOver,
+                        new
+                        (
+                            new
+                            (
+                                parameters.Inputs.PrecedingCarryOver,
                                 half1_XOR_Result
                             ),
-                            new(
-                                half2_CarryOver
-                            )
+                            new(half2_CarryOver)
                         ),
-                        new(
-                            adderName,
-                            precedingAdderName,
-                            adderName
+                        new
+                        (
+                            interneuronTagger.CreateByKey
+                            (
+                                nameof(InterneuronSet.Half2_AND___CarryOver__Half1_XOR_Result),
+                                variableInfo
+                            )
                         )
                     ) &&
                     // OR carryOvers
-                    OrGate.TryCreate(
+                    OrGate.TryCreate
+                    (
                         out var OR___Half1_CarryOver__Half2_CarryOver,
-                        new(
-                            new(
+                        new
+                        (
+                            new
+                            (
                                 half1_CarryOver,
                                 half2_CarryOver
                             ),
-                            new(
-                                carryOver
-                            )
+                            new(parameters.Outputs.CarryOver)
                         ),
-                        InterneuronTagInfo.CreateByCommonTagPrefix(adderName, 2)
+                        new
+                        (
+                            interneuronTagger.CreateByKey
+                            (
+                                nameof(InterneuronSet.OR___Half1_CarryOver__Half2_CarryOver),
+                                variableInfo
+                            )
+                        )
                     )
                 )
                 {
-                    result.AddRange(
-                        [
-                            half2_XOR___CarryOver__Half1_XOR_Result,
-                            half2_AND___CarryOver__Half1_XOR_Result,
-                            OR___Half1_CarryOver__Half2_CarryOver
-                        ]
-                    );
+                    result.Half2_XOR___CarryOver__Half1_XOR_Result = half2_XOR___CarryOver__Half1_XOR_Result;
+                    result.Half2_AND___CarryOver__Half1_XOR_Result = half2_AND___CarryOver__Half1_XOR_Result;
+                    result.OR___Half1_CarryOver__Half2_CarryOver = OR___Half1_CarryOver__Half2_CarryOver;
                 }
             }
             else
             {
-                result.AddRange(
-                    Adder.CreateAdderHalf1Interneurons(
-                        addend1,
-                        addend2,
-                        sum,
-                        carryOver,
-                        adderName,
-                        additionalInputNeurons
-                    )
+                Adder.CreateAdderHalf1Interneurons
+                (
+                    result,
+                    variableInfo,
+                    parameters.Inputs.Addend1,
+                    parameters.Inputs.Addend2,
+                    parameters.Outputs.Sum,
+                    parameters.Outputs.CarryOver,
+                    additionalInputNeurons,
+                    interneuronTagger
                 );
             }
 
-            return new InterneuronSet(result.Select(n => n.Network));
+            return result;
         }
 
-        private static IEnumerable<IneurUL> CreateAdderHalf1Interneurons(
+        private static void CreateAdderHalf1Interneurons
+        (
+            InterneuronSet result,
+            VariableInfo variableInfo,
             BinaryNeuronParameter? addend1,
             BinaryNeuronParameter? addend2,
             BinaryNeuronParameter? xorOutput,
             BinaryNeuronParameter? andOutput,
-            string prefix,
-            AdditionalInputNeuronInfo? additionalInputNeurons
+            AdditionalInputNeuronInfo? additionalInputNeurons,
+            KeyedInterneuronTagger? interneuronTagger = null
         )
         {
-            var result = new List<IneurUL>();
+            ArgumentNullException.ThrowIfNull(interneuronTagger);
+
             // Link half1 interneurons
-            if (
-                XorGate.TryCreate(
+            if 
+            (
+                XorGate.TryCreate
+                (
                     out var half1_XOR___Addend1__Addend2,
-                    new(
-                        new(
+                    new
+                    (
+                        new
+                        (
                             addend1,
                             addend2
                         ),
-                        new(
-                            xorOutput
+                        new(xorOutput)
+                    ),
+                    new
+                    (
+                        interneuronTagger.CreateByKey
+                        (
+                            nameof(InterneuronSet.Half1_XOR___Addend1__Addend2),
+                            variableInfo
                         )
                     ),
-                    InterneuronTagInfo.CreateByCommonTagPrefix(prefix, 2),
                     additionalInputNeurons
                 ) &&
-                AndGate.TryCreate(
+                AndGate.TryCreate
+                (
                     out var half1_AND___Addend1__Addend2,
-                    new(
-                        new(
+                    new
+                    (
+                        new
+                        (
                             addend1,
                             addend2
                         ),
-                        new(
-                            andOutput
+                        new(andOutput)
+                    ),
+                    new
+                    (
+                        interneuronTagger.CreateByKey
+                        (
+                            nameof(InterneuronSet.Half1_AND___Addend1__Addend2),
+                            variableInfo
                         )
                     ),
-                    InterneuronTagInfo.CreateByCommonTagPrefix(prefix, 2),
                     additionalInputNeurons
                 )
             )
             {
-                result.AddRange(
-                    [
-                        half1_XOR___Addend1__Addend2,
-                        half1_AND___Addend1__Addend2
-                    ]
-                );
+                result.Half1_XOR___Addend1__Addend2 = half1_XOR___Addend1__Addend2;
+                result.Half1_AND___Addend1__Addend2 = half1_AND___Addend1__Addend2;
             }
-            return result;
         }
     }
 }

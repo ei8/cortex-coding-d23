@@ -1,37 +1,44 @@
 ﻿using ei8.Cortex.Coding.d23.Math.Logic;
 using ei8.Cortex.Coding.d23.Math.TruthTables;
-using System.Collections.Generic;
-using System.Linq;
+using neurUL.Common.Domain.Model;
+using System;
 
 namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 {
     public partial class Multiplier
     (
         Multiplier.ParameterInfo parameters,
-        InterneuronSet interneurons,
+        Multiplier.InterneuronSet interneurons,
         VariableInfo? variableInfo
     ) :
         UngroupedOperationBase
         <
+            Multiplier,
             Multiplier.ParameterInfo,
-            InterneuronSet
+            Multiplier.Input,
+            Multiplier.Output,
+            Multiplier.InterneuronSet,
+            TwoInputInterneuronTagger
         >
         (
             parameters,
             interneurons,
             variableInfo
-        ), 
+        ),
+        ITruthTableStatic
+        <
+            Multiplier,
+            Multiplier.ParameterInfo,
+            Multiplier.Input,
+            Multiplier.Output,
+            Multiplier.InterneuronSet,
+            TwoInputInterneuronTagger
+        >,
         IUngroupedOperationStatic
         <
             Multiplier,
             Multiplier.ParameterInfo,
-            InterneuronSet
-        >,
-        IOperationStatic
-        <
-            Multiplier,
-            Multiplier.ParameterInfo,
-            InterneuronSet
+            Multiplier.InterneuronSet
         >
     {
         public static Multiplier Create
@@ -47,7 +54,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                 variableInfo
             );
 
-        public static Multiplier.ParameterInfo GetDefaultParameters() => 
+        public static Multiplier.ParameterInfo CreateDefaultParameters() => 
             new
             (
                 new
@@ -63,36 +70,42 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 
         public static InterneuronSet CreateInterneurons
         (
-            Multiplier.ParameterInfo parameters,
-            VariableInfo variableInfo
+            ParameterInfo parameters, 
+            VariableInfo variableInfo, 
+            TwoInputInterneuronTagger? interneuronTagger = null, 
+            AdditionalInputNeuronInfo? additionalInputNeurons = null
         )
         {
-            var result = new List<ReadOnlyNetwork>();
+            ArgumentNullException.ThrowIfNull(interneuronTagger);
+
+            var result = new InterneuronSet();
 
             if
             (
                 AndGate.TryCreate
                 (
                     out var AND___Multiplicand__Multiplier,
-                    new(
-                        new(
+                    new
+                    (
+                        new
+                        (
                             parameters.Inputs.Multiplicand,
                             parameters.Inputs.Multiplier
                         ),
-                        new(
+                        new
+                        (
                             parameters.Outputs.Product
                         )
                     ),
-                    InterneuronTagInfo.CreateByCommonTagPrefix
+                    new
                     (
-                        variableInfo.Inputs.First(),
-                        2
+                        interneuronTagger.CreateByVariable(variableInfo)
                     )
                 )
             )
-                result.Add(AND___Multiplicand__Multiplier.Network);
+                result.AND___Multiplicand__Multiplier = AND___Multiplicand__Multiplier;
 
-            return new(result);
+            return result;
         }
     }
 }

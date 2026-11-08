@@ -1,15 +1,31 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Runtime.CompilerServices;
+﻿using ei8.Cortex.Coding.d23.Math.TruthTables;
 
 namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 {
-    public abstract class GroupedOperationBase<TParam, TInterneuron>
+    // DEL:
+    public abstract class GroupedOperationBase
+    <
+        T,
+        TParam, 
+        TInput,
+        TOutput,
+        TInterneuron,
+        TInterneuronTagger
+    >
     (
         TParam parameters,
         TInterneuron interneurons,
         VariableInfo? variableInfo
     ) : 
-        FunctionalCircuitBase<TParam, TInterneuron>
+        TruthTableBase
+        <
+            T,
+            TParam,
+            TInput,
+            TOutput,
+            TInterneuron,
+            TInterneuronTagger
+        >
         (
             parameters,
             interneurons,
@@ -20,52 +36,21 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
             TParam,
             TInterneuron
         >
-        where TParam : IFunctionalCircuitParameter
+        where T :
+            ITruthTableStatic
+            <
+                T,
+                TParam,
+                TInput,
+                TOutput,
+                TInterneuron,
+                TInterneuronTagger
+            >
+        where TParam : IFunctionalCircuitParameter<TInput, TOutput>
+        where TInput : IInputCircuitParameterSubset
+        where TOutput : IOutputCircuitParameterSubset
         where TInterneuron : ICircuitInterneuronSet
+        where TInterneuronTagger : IKeyedInterneuronTagger
     {
-        public static bool TryCreate<T>
-        (
-            [NotNullWhen(true)] out T? result,
-            int exponent = 0,
-            BinaryNeuronParameter? precedingValue = null,
-            VariableInfo? precedingVariableInfo = null,
-            [CallerArgumentExpression(nameof(result))] string parameterExpression = ""
-        )
-            where T : 
-                IGroupedOperationStatic
-                <
-                    T, 
-                    TParam, 
-                    TInterneuron
-                >, 
-                IOperationStatic
-                <
-                    T, 
-                    TParam, 
-                    TInterneuron
-                >
-        {
-            bool bResult = false;
-            result = default;
-            if (VariableInfo.TryParse(parameterExpression, out var variableInfo))
-            {
-                var parameters = T.GetDefaultParameters(
-                    precedingValue,
-                    exponent
-                );
-                result = T.Create(
-                    parameters,
-                    T.CreateInterneurons(
-                        parameters,
-                        variableInfo,
-                        precedingVariableInfo
-                    ),
-                    variableInfo
-                );
-                bResult = true;
-            }
-
-            return bResult;
-        }
     }
 }

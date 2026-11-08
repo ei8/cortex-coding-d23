@@ -1,4 +1,9 @@
-﻿namespace ei8.Cortex.Coding.d23.Math.Arithmetic
+﻿using ei8.Cortex.Coding.d23.Math.Logic;
+using ei8.Cortex.Coding.d23.Math.TruthTables;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 {
     public partial class Subtractor
     {
@@ -46,6 +51,69 @@
         {
             public BinaryNeuronParameter? Difference => this.Parameter1;
             public BinaryNeuronParameter? Borrow => this.Parameter2;
+        }
+
+        public class InterneuronSet : CircuitInterneuronSetBase
+        {
+            protected override IEnumerable<ReadOnlyNetwork> GetNetworks()
+            {
+                IEnumerable<ReadOnlyNetwork?> nets = 
+                    [
+                        this.Half1_AND___Subtrahend__Half1_OUT___Half1_NOT___Minuend?.Network,
+                        this.Half1_NOT___Minuend?.Network,
+                        this.Half1_XOR___Minuend__Subtrahend?.Network,
+                        this.OR___Half1_Borrow__Half2_Borrow?.Network,
+                        this.Half2_AND___Borrow__Half2_OUT___Half2_NOT___Half1_XOR_Result?.Network,
+                        this.Half2_NOT___Half1_XOR_Result?.Network,
+                        this.Half2_XOR___Borrow__Half1_XOR_Result?.Network
+                    ];
+
+                return nets.WhereNotNull();
+            }
+
+            public AndGate? Half1_AND___Subtrahend__Half1_OUT___Half1_NOT___Minuend { get; internal set; }
+            public NotGate? Half1_NOT___Minuend { get; internal set; }
+            public XorGate? Half1_XOR___Minuend__Subtrahend { get; internal set; }
+            public OrGate? OR___Half1_Borrow__Half2_Borrow { get; internal set; }
+            public AndGate? Half2_AND___Borrow__Half2_OUT___Half2_NOT___Half1_XOR_Result { get; internal set; }
+            public NotGate? Half2_NOT___Half1_XOR_Result { get; internal set; }
+            public XorGate? Half2_XOR___Borrow__Half1_XOR_Result { get; internal set; }
+        }
+
+        public class KeyedInterneuronTagger(string precedingCircuitName) : IKeyedInterneuronTagger
+        {
+            private readonly string precedingCircuitName = precedingCircuitName;
+
+            public InterneuronTagInfo? CreateByKey(string key, VariableInfo variableInfo)
+            {
+                InterneuronTagInfo? result = null;
+                var circuitName = variableInfo.Inputs.First();
+
+                switch (key)
+                {
+                    case nameof(InterneuronSet.Half2_XOR___Borrow__Half1_XOR_Result):
+                    case nameof(InterneuronSet.Half2_AND___Borrow__Half2_OUT___Half2_NOT___Half1_XOR_Result):
+                        result =
+                            new
+                            (
+                                circuitName,
+                                this.precedingCircuitName,
+                                circuitName
+                            );
+                        break;
+                    case nameof(InterneuronSet.Half2_NOT___Half1_XOR_Result):
+                    case nameof(InterneuronSet.Half1_NOT___Minuend):
+                        result = InterneuronTagInfo.CreateByCommonTagPrefix(circuitName);
+                        break;
+                    case nameof(InterneuronSet.OR___Half1_Borrow__Half2_Borrow):
+                    case nameof(InterneuronSet.Half1_XOR___Minuend__Subtrahend):
+                    case nameof(InterneuronSet.Half1_AND___Subtrahend__Half1_OUT___Half1_NOT___Minuend):
+                        result = InterneuronTagInfo.CreateByCommonTagPrefix(circuitName, 2);
+                        break;
+                }
+
+                return result;
+            }
         }
     }
 }

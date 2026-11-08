@@ -21,13 +21,14 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
             interneurons,
             variableInfo
         ),
-        ITruthTableStatic
+        IInTruthTableStatic
         <
             XorGate,
             In2Out1TruthTable.ParameterInfo,
             In2TruthTableBase.Input,
             In2Out1TruthTable.Output,
-            In2TruthTableBase.InterneuronSet
+            In2TruthTableBase.InterneuronSet,
+            StaticInterneuronTagger
         >
     {
         public static XorGate Create

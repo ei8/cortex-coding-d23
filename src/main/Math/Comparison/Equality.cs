@@ -1,5 +1,4 @@
-﻿using ei8.Cortex.Coding.d23.Math.Logic;
-using ei8.Cortex.Coding.d23.Math.TruthTables;
+﻿using ei8.Cortex.Coding.d23.Math.TruthTables;
 using System.Collections.Generic;
 
 namespace ei8.Cortex.Coding.d23.Math.Comparison
@@ -22,13 +21,14 @@ namespace ei8.Cortex.Coding.d23.Math.Comparison
             interneurons,
             variableInfo
         ),
-        ITruthTableStatic
+        IInTruthTableStatic
         <
             Equality,
             In2Out1TruthTable.ParameterInfo,
             In2TruthTableBase.Input,
             In2Out1TruthTable.Output,
-            In2TruthTableBase.InterneuronSet
+            In2TruthTableBase.InterneuronSet,
+            StaticInterneuronTagger
         >
     {
         public static Equality Create

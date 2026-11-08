@@ -21,7 +21,8 @@ namespace ei8.Cortex.Coding.d23.Math.TruthTables
             TParam,
             TInput,
             TOutput,
-            In1TruthTableBase.InterneuronSet
+            In1TruthTableBase.InterneuronSet,
+            StaticInterneuronTagger
         >
         (
             parameters,
@@ -29,13 +30,14 @@ namespace ei8.Cortex.Coding.d23.Math.TruthTables
             variableInfo
         )
         where T :
-            ITruthTableStatic
+            IInTruthTableStatic
             <
                 T,
                 TParam,
                 TInput,
                 TOutput,
-                In1TruthTableBase.InterneuronSet
+                In1TruthTableBase.InterneuronSet,
+                StaticInterneuronTagger
             >
         where TParam : IFunctionalCircuitParameter<TInput, TOutput>
         where TInput : IInputCircuitParameterSubset<BinaryNeuronParameter>
@@ -45,14 +47,14 @@ namespace ei8.Cortex.Coding.d23.Math.TruthTables
         (
             TParam parameters,
             VariableInfo variableInfo,
-            InterneuronTagInfo? interneuronTagInfo = null,
+            StaticInterneuronTagger? interneuronTagger = null,
             AdditionalInputNeuronInfo? additionalInputNeurons = null
         )
         {
             var interneuronNetworks = NetworkHelper.CreateInterneuronNetworksByOutputNeurons
                 (
                     T.GetOutputsPerInterneuron(parameters.Outputs),
-                    T.GetInterneuronTags(variableInfo, interneuronTagInfo)
+                    T.GetInterneuronTags(variableInfo, interneuronTagger)
                 );
 
             return new In1TruthTableBase.InterneuronSet
@@ -70,18 +72,18 @@ namespace ei8.Cortex.Coding.d23.Math.TruthTables
         public static IEnumerable<string> GetInterneuronTags
         (
             VariableInfo variableInfo,
-            InterneuronTagInfo? interneuronTagInfo = null
+            StaticInterneuronTagger? interneuronTagger = null
         )
         {
             string coreOperatorPrefix = string.Empty,
                 coreInputTagPrefix = string.Empty;
 
-            if (interneuronTagInfo != null)
+            if (interneuronTagger?.Value != null)
             {
-                if (!string.IsNullOrEmpty(interneuronTagInfo.TypeTagPrefix))
-                    coreOperatorPrefix = $"{interneuronTagInfo.TypeTagPrefix}.";
-                if (interneuronTagInfo.InputTagPrefixes?.Count() > 0)
-                    coreInputTagPrefix = $"{interneuronTagInfo.InputTagPrefixes.ElementAt(0)}.";
+                if (!string.IsNullOrEmpty(interneuronTagger.Value.TypeTagPrefix))
+                    coreOperatorPrefix = $"{interneuronTagger.Value.TypeTagPrefix}.";
+                if (interneuronTagger.Value.InputTagPrefixes?.Count() > 0)
+                    coreInputTagPrefix = $"{interneuronTagger.Value.InputTagPrefixes.ElementAt(0)}.";
             }
 
             return [

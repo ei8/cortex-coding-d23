@@ -1,37 +1,43 @@
 ﻿using ei8.Cortex.Coding.d23.Math.Logic;
 using ei8.Cortex.Coding.d23.Math.TruthTables;
-using System.Collections.Generic;
-using System.Linq;
+using System;
 
 namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 {
     public partial class Divider
     (
         Divider.ParameterInfo parameters,
-        InterneuronSet interneurons,
+        Divider.InterneuronSet interneurons,
         VariableInfo? variableInfo
     ) :
         UngroupedOperationBase
         <
+            Divider,
             Divider.ParameterInfo,
-            InterneuronSet
+            Divider.Input,
+            Divider.Output,
+            Divider.InterneuronSet,
+            TwoInputInterneuronTagger
         >
         (
             parameters,
             interneurons,
             variableInfo
         ),
+        ITruthTableStatic
+        <
+            Divider,
+            Divider.ParameterInfo,
+            Divider.Input,
+            Divider.Output,
+            Divider.InterneuronSet,
+            TwoInputInterneuronTagger
+        >,
         IUngroupedOperationStatic
         <
             Divider,
             Divider.ParameterInfo,
-            InterneuronSet
-        >,
-        IOperationStatic
-        <
-            Divider,
-            Divider.ParameterInfo,
-            InterneuronSet
+            Divider.InterneuronSet
         >
     {
         public static Divider Create
@@ -47,7 +53,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                 variableInfo
             );
 
-        public static Divider.ParameterInfo GetDefaultParameters() =>
+        public static Divider.ParameterInfo CreateDefaultParameters() =>
             new
             (
                 new
@@ -64,36 +70,42 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 
         public static InterneuronSet CreateInterneurons
         (
-            Divider.ParameterInfo parameters,
-            VariableInfo variableInfo
+            ParameterInfo parameters, 
+            VariableInfo variableInfo,
+            TwoInputInterneuronTagger? interneuronTagger = null,
+            AdditionalInputNeuronInfo? additionalInputNeurons = null
         )
         {
-            var result = new List<ReadOnlyNetwork>();
+            ArgumentNullException.ThrowIfNull(interneuronTagger);
+
+            var result = new InterneuronSet();
 
             if
             (
                 AndGate.TryCreate
                 (
                     out var AND___Dividend__Divisor,
-                    new(
-                        new(
+                    new
+                    (
+                        new
+                        (
                             parameters.Inputs.Dividend,
                             parameters.Inputs.Divisor
                         ),
-                        new(
+                        new
+                        (
                             parameters.Outputs.Quotient
                         )
                     ),
-                    InterneuronTagInfo.CreateByCommonTagPrefix
+                    new
                     (
-                        variableInfo.Inputs.First(),
-                        2
+                        interneuronTagger.CreateByVariable(variableInfo)
                     )
                 )
             )
-                result.Add(AND___Dividend__Divisor.Network);
+                result.AND___Dividend__Divisor = AND___Dividend__Divisor;
 
-            return new(result);
+            return result;
         }
     }
 }

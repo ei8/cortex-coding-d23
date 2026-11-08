@@ -30,7 +30,8 @@ namespace ei8.Cortex.Coding.d23.Math.TruthTables
         TParam,
         TInput,
         TOutput,
-        TInterneuron
+        TInterneuron,
+        TInterneuronTagger
     > :
         ITruthTable
         <
@@ -47,12 +48,13 @@ namespace ei8.Cortex.Coding.d23.Math.TruthTables
         where TInput : IInputCircuitParameterSubset
         where TOutput : IOutputCircuitParameterSubset
         where TInterneuron : ICircuitInterneuronSet
+        where TInterneuronTagger : IInterneuronTagger
     {
         static abstract bool TryCreate
         (
             [NotNullWhen(true)] out T? result,
             TParam parameters,
-            InterneuronTagInfo? interneuronTagInfo = null,
+            TInterneuronTagger? interneuronTagger = default,
             AdditionalInputNeuronInfo? additionalInputNeurons = null,
             [CallerArgumentExpression(nameof(result))] string parameterExpression = ""
         );
@@ -61,7 +63,7 @@ namespace ei8.Cortex.Coding.d23.Math.TruthTables
         (
             TParam parameters,
             VariableInfo variableInfo,
-            InterneuronTagInfo? interneuronTagInfo = null,
+            TInterneuronTagger? interneuronTagger = default,
             AdditionalInputNeuronInfo? additionalInputNeurons = null
         );
 
@@ -71,13 +73,44 @@ namespace ei8.Cortex.Coding.d23.Math.TruthTables
             TInterneuron interneurons,
             VariableInfo? variableInfo
         );
+    }
 
+    public interface IInTruthTableStatic
+    <
+        T,
+        TParam,
+        TInput,
+        TOutput,
+        TInterneuron,
+        TInterneuronTagger
+    > :
+        ITruthTableStatic
+        <
+            T,
+            TParam,
+            TInput,
+            TOutput,
+            TInterneuron,
+            TInterneuronTagger
+        >
+        where T :
+            ITruthTable
+            <
+                TParam,
+                TInterneuron
+            >
+        where TParam : IFunctionalCircuitParameter
+        where TInput : IInputCircuitParameterSubset
+        where TOutput : IOutputCircuitParameterSubset
+        where TInterneuron : ICircuitInterneuronSet
+        where TInterneuronTagger : IInterneuronTagger
+    {
         static abstract IEnumerable<IEnumerable<Neuron>> GetOutputsPerInterneuron(TOutput outputs);
 
         static abstract IEnumerable<string> GetInterneuronTags
         (
             VariableInfo variableInfo,
-            InterneuronTagInfo? interneuronTagInfo = null
+            TInterneuronTagger? tagger = default
         );
 
         static abstract IEnumerable<ReadOnlyNetwork> LinkInputNeurons

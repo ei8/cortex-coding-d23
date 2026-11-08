@@ -21,13 +21,14 @@ namespace ei8.Cortex.Coding.d23.Math.Comparison
             interneurons,
             variableInfo
         ),
-        ITruthTableStatic
+        IInTruthTableStatic
         <
             Comparator,
             Comparator.ParameterInfo,
             In2TruthTableBase.Input,
             Comparator.Output,
-            In2TruthTableBase.InterneuronSet
+            In2TruthTableBase.InterneuronSet,
+            StaticInterneuronTagger
         >
     {
         public static Comparator Create

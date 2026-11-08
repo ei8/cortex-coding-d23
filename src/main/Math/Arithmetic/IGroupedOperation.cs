@@ -35,15 +35,9 @@
         where TParam : IFunctionalCircuitParameter
         where TInterneuron : ICircuitInterneuronSet
     {
-        static abstract TParam GetDefaultParameters(
+        static abstract TParam CreateDefaultParameters(
             BinaryNeuronParameter? precedingValue,
             int exponent
-        );
-
-        static abstract TInterneuron CreateInterneurons(
-            TParam parameters,
-            VariableInfo variableInfo,
-            VariableInfo? precedingVariableInfo = null
         );
     }
 }

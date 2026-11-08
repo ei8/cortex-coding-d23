@@ -9,7 +9,8 @@ namespace ei8.Cortex.Coding.d23.Math.TruthTables
         TParam,
         TInput,
         TOutput,
-        TInterneuron
+        TInterneuron,
+        TInterneuronTagger
     >
     (
         TParam parameters,
@@ -33,18 +34,20 @@ namespace ei8.Cortex.Coding.d23.Math.TruthTables
                 TParam,
                 TInput,
                 TOutput,
-                TInterneuron
+                TInterneuron,
+                TInterneuronTagger
             >
         where TParam : IFunctionalCircuitParameter
         where TInput : IInputCircuitParameterSubset
         where TOutput : IOutputCircuitParameterSubset
         where TInterneuron : ICircuitInterneuronSet
+        where TInterneuronTagger : IInterneuronTagger
     {
         public static bool TryCreate
         (
             [NotNullWhen(true)] out T? result,
             TParam parameters,
-            InterneuronTagInfo? interneuronTagInfo = null,
+            TInterneuronTagger? interneuronTagger = default,
             AdditionalInputNeuronInfo? additionalInputNeurons = null,
             [CallerArgumentExpression(nameof(result))] string parameterExpression = ""
         )
@@ -57,7 +60,7 @@ namespace ei8.Cortex.Coding.d23.Math.TruthTables
                 (
                     parameters,
                     variableInfo,
-                    interneuronTagInfo,
+                    interneuronTagger,
                     additionalInputNeurons
                 );
 

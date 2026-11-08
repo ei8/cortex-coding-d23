@@ -21,13 +21,14 @@ namespace ei8.Cortex.Coding.d23.Math.Logic
             interneurons,
             variableInfo
         ),
-        ITruthTableStatic
+        IInTruthTableStatic
         <
             NotGate,
             In1Out1TruthTable.ParameterInfo,
             In1TruthTableBase.Input,
             In1Out1TruthTable.Output,
-            In1TruthTableBase.InterneuronSet
+            In1TruthTableBase.InterneuronSet,
+            StaticInterneuronTagger
         >
     {
         public static NotGate Create(

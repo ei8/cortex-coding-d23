@@ -1,4 +1,7 @@
-﻿namespace ei8.Cortex.Coding.d23.Math.Arithmetic
+﻿using ei8.Cortex.Coding.d23.Math.Logic;
+using System.Collections.Generic;
+
+namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 {
     public partial class Multiplier
     {
@@ -42,6 +45,16 @@
             )
         {
             public BinaryNeuronParameter? Product => this.Parameter1;
+        }
+
+        public class InterneuronSet : CircuitInterneuronSetBase
+        {
+            protected override IEnumerable<ReadOnlyNetwork> GetNetworks() =>
+                this.AND___Multiplicand__Multiplier != null ?
+                    [this.AND___Multiplicand__Multiplier.Network] :
+                    [];
+
+            public AndGate? AND___Multiplicand__Multiplier { get; internal set; }
         }
     }
 }

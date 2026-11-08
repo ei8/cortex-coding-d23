@@ -1,4 +1,7 @@
-﻿namespace ei8.Cortex.Coding.d23.Math.Arithmetic
+﻿using ei8.Cortex.Coding.d23.Math.Logic;
+using System.Collections.Generic;
+
+namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 {
     public partial class Divider
     {
@@ -55,6 +58,16 @@
         {
             public BinaryNeuronParameter? Quotient => this.Parameter1;
             public BinaryNeuronParameter? Undefined => this.Parameter2;
+        }
+
+        public class InterneuronSet : CircuitInterneuronSetBase
+        {
+            protected override IEnumerable<ReadOnlyNetwork> GetNetworks() =>
+                this.AND___Dividend__Divisor != null ?
+                    [this.AND___Dividend__Divisor.Network] :
+                    [];
+
+            public AndGate? AND___Dividend__Divisor { get; internal set; }
         }
     }
 }
