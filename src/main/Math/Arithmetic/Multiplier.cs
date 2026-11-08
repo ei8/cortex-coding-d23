@@ -1,6 +1,5 @@
 ﻿using ei8.Cortex.Coding.d23.Math.Logic;
 using ei8.Cortex.Coding.d23.Math.TruthTables;
-using neurUL.Common.Domain.Model;
 using System;
 
 namespace ei8.Cortex.Coding.d23.Math.Arithmetic
@@ -11,7 +10,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
         Multiplier.InterneuronSet interneurons,
         VariableInfo? variableInfo
     ) :
-        UngroupedOperationBase
+        TruthTableBase
         <
             Multiplier,
             Multiplier.ParameterInfo,

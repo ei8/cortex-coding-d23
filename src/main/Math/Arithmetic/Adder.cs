@@ -1,6 +1,5 @@
 ﻿using ei8.Cortex.Coding.d23.Math.Logic;
 using ei8.Cortex.Coding.d23.Math.TruthTables;
-using neurUL.Common.Domain.Model;
 using System;
 using System.Linq;
 
@@ -12,7 +11,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
         Adder.InterneuronSet interneurons,
         VariableInfo? variableInfo
     ) :
-        GroupedOperationBase
+        TruthTableBase
         <
             Adder,
             Adder.ParameterInfo,

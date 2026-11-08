@@ -10,7 +10,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
         Divider.InterneuronSet interneurons,
         VariableInfo? variableInfo
     ) :
-        UngroupedOperationBase
+        TruthTableBase
         <
             Divider,
             Divider.ParameterInfo,

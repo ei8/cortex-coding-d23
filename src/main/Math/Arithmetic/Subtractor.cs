@@ -1,7 +1,6 @@
 ﻿using ei8.Cortex.Coding.d23.Math.Logic;
 using ei8.Cortex.Coding.d23.Math.TruthTables;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace ei8.Cortex.Coding.d23.Math.Arithmetic
@@ -12,7 +11,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
         Subtractor.InterneuronSet interneurons,
         VariableInfo? variableInfo
     ) : 
-        GroupedOperationBase
+        TruthTableBase
         <
             Subtractor,
             Subtractor.ParameterInfo,
