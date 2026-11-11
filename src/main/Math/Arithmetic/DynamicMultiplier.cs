@@ -21,12 +21,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
             multiplier,
             adder,
             variableInfo
-        ),
-        ICompositeCircuit
-        <
-            Multiplier,
-            Adder
-        >
+        )
     {
         protected override IEnumerable<ReadOnlyNetwork> GetNetworks() => [.. base.GetNetworks()];
 
