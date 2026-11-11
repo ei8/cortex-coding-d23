@@ -165,7 +165,8 @@ namespace ei8.Cortex.Coding.d23
                     strength = input.Strength / strengthDivisor;
                 }
 
-                network.AddReplace(
+                network.AddReplace
+                (
                     NetworkHelper.CreateTerminal
                     (
                         input.Neuron,

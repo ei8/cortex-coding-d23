@@ -83,7 +83,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
         {
             ArgumentNullException.ThrowIfNull(interneuronTagger);
 
-            var result = new InterneuronSet();
+            InterneuronSet? result = null;
             string subtractorName = variableInfo.Inputs.First();
            
             // Declare Outputs
@@ -101,14 +101,16 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                 {
                     // half1 interneurons
                     Subtractor.CreateSubtractorHalf1Interneurons(
-                        result,
                         variableInfo,
                         parameters.Inputs.Minuend,
                         parameters.Inputs.Subtrahend,
                         half1_XOR_Result,
                         half1_OUT___Half1_NOT___Minuend,
                         half1_Borrow,
-                        interneuronTagger
+                        interneuronTagger,
+                        out var half1_XOR___Minuend__Subtrahend,
+                        out var half1_NOT___Minuend,
+                        out var half1_AND___Subtrahend__Half1_OUT___Half1_NOT___Minuend
                     );
 
                     // half2 interneurons
@@ -195,10 +197,16 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                         )
                     )
                     {
-                        result.Half2_XOR___Borrow__Half1_XOR_Result = half2_XOR___Borrow__Half1_XOR_Result;
-                        result.Half2_NOT___Half1_XOR_Result = half2_NOT___Half1_XOR_Result;
-                        result.Half2_AND___Borrow__Half2_OUT___Half2_NOT___Half1_XOR_Result = half2_AND___Borrow__Half2_OUT___Half2_NOT___Half1_XOR_Result;
-                        result.OR___Half1_Borrow__Half2_Borrow = OR___Half1_Borrow__Half2_Borrow;
+                        result = new InterneuronSet()
+                        {
+                            Half1_AND___Subtrahend__Half1_OUT___Half1_NOT___Minuend = half1_AND___Subtrahend__Half1_OUT___Half1_NOT___Minuend,
+                            Half1_NOT___Minuend = half1_NOT___Minuend,
+                            Half1_XOR___Minuend__Subtrahend = half1_XOR___Minuend__Subtrahend,
+                            Half2_XOR___Borrow__Half1_XOR_Result = half2_XOR___Borrow__Half1_XOR_Result,
+                            Half2_NOT___Half1_XOR_Result = half2_NOT___Half1_XOR_Result,
+                            Half2_AND___Borrow__Half2_OUT___Half2_NOT___Half1_XOR_Result = half2_AND___Borrow__Half2_OUT___Half2_NOT___Half1_XOR_Result,
+                            OR___Half1_Borrow__Half2_Borrow = OR___Half1_Borrow__Half2_Borrow
+                        };                        
                     }
                 }
                 else
@@ -206,100 +214,115 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                     // half1
                     Subtractor.CreateSubtractorHalf1Interneurons
                     (
-                        result,
                         variableInfo,
                         parameters.Inputs.Minuend,
                         parameters.Inputs.Subtrahend,
                         parameters.Outputs.Difference,
                         half1_OUT___Half1_NOT___Minuend,
                         parameters.Outputs.Borrow,
-                        interneuronTagger
+                        interneuronTagger,
+                        out var half1_XOR___Minuend__Subtrahend,
+                        out var half1_NOT___Minuend,
+                        out var half1_AND___Subtrahend__Half1_OUT___Half1_NOT___Minuend
                     );
+
+                    result = new InterneuronSet()
+                    {
+                        Half1_AND___Subtrahend__Half1_OUT___Half1_NOT___Minuend = half1_AND___Subtrahend__Half1_OUT___Half1_NOT___Minuend,
+                        Half1_NOT___Minuend = half1_NOT___Minuend,
+                        Half1_XOR___Minuend__Subtrahend = half1_XOR___Minuend__Subtrahend
+                    };
                 }
             }
+
+            ArgumentNullException.ThrowIfNull(result);
 
             return result;
         }
 
         private static void CreateSubtractorHalf1Interneurons
         (
-            InterneuronSet result,
             VariableInfo variableInfo,
             BinaryNeuronParameter? minuend,
             BinaryNeuronParameter? subtrahend,
             BinaryNeuronParameter? xorOutput,
             BinaryNeuronParameter? notOutput,
             BinaryNeuronParameter? andOutput,
-            KeyedInterneuronTagger interneuronTagger
+            KeyedInterneuronTagger interneuronTagger,
+            out XorGate half1_XOR___Minuend__Subtrahend,
+            out NotGate half1_NOT___Minuend,
+            out AndGate half1_AND___Subtrahend__Half1_OUT___Half1_NOT___Minuend
         )
         {
             // Link half1 interneurons
-            if (
-                XorGate.TryCreate(
-                    out var half1_XOR___Minuend__Subtrahend,
-                    new(
-                        new(
-                            minuend,
-                            subtrahend
-                        ),
-                        new(
-                            xorOutput
-                        )
-                    ),
-                    new
+            if
+            (
+                !(
+                    XorGate.TryCreate
                     (
-                        interneuronTagger.CreateByKey
-                        (
-                            nameof(InterneuronSet.Half1_XOR___Minuend__Subtrahend),
-                            variableInfo
-                        )
-                    )
-                ) &&
-                NotGate.TryCreate(
-                    out var half1_NOT___Minuend,
-                    new(
+                        out half1_XOR___Minuend__Subtrahend!,
                         new(
-                            minuend
+                            new(
+                                minuend,
+                                subtrahend
+                            ),
+                            new(
+                                xorOutput
+                            )
                         ),
-                        new(
-                            notOutput
-                        )
-                    ),
-                    new
-                    (
-                        interneuronTagger.CreateByKey
+                        new
                         (
-                            nameof(InterneuronSet.Half1_NOT___Minuend),
-                            variableInfo
+                            interneuronTagger.CreateByKey
+                            (
+                                nameof(InterneuronSet.Half1_XOR___Minuend__Subtrahend),
+                                variableInfo
+                            )
                         )
-                    )
-                ) &&
-                AndGate.TryCreate(
-                    out var half1_AND___Subtrahend__Half1_OUT___Half1_NOT___Minuend,
-                    new(
+                    ) &&
+                    NotGate.TryCreate
+                    (
+                        out half1_NOT___Minuend!,
                         new(
-                            notOutput,
-                            subtrahend
+                            new(
+                                minuend
+                            ),
+                            new(
+                                notOutput
+                            )
                         ),
-                        new(
-                            andOutput
-                        )
-                    ),
-                    new
-                    (
-                        interneuronTagger.CreateByKey
+                        new
                         (
-                            nameof(InterneuronSet.Half1_AND___Subtrahend__Half1_OUT___Half1_NOT___Minuend),
-                            variableInfo
+                            interneuronTagger.CreateByKey
+                            (
+                                nameof(InterneuronSet.Half1_NOT___Minuend),
+                                variableInfo
+                            )
+                        )
+                    ) &&
+                    AndGate.TryCreate
+                    (
+                        out half1_AND___Subtrahend__Half1_OUT___Half1_NOT___Minuend!,
+                        new(
+                            new(
+                                notOutput,
+                                subtrahend
+                            ),
+                            new(
+                                andOutput
+                            )
+                        ),
+                        new
+                        (
+                            interneuronTagger.CreateByKey
+                            (
+                                nameof(InterneuronSet.Half1_AND___Subtrahend__Half1_OUT___Half1_NOT___Minuend),
+                                variableInfo
+                            )
                         )
                     )
                 )
             )
-            {
-                result.Half1_XOR___Minuend__Subtrahend = half1_XOR___Minuend__Subtrahend;
-                result.Half1_NOT___Minuend = half1_NOT___Minuend;
-                result.Half1_AND___Subtrahend__Half1_OUT___Half1_NOT___Minuend = half1_AND___Subtrahend__Half1_OUT___Half1_NOT___Minuend;
-            }
+                throw new InvalidOperationException();
         }
     }
 }

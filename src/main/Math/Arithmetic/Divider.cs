@@ -77,8 +77,9 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
         )
         {
             ArgumentNullException.ThrowIfNull(interneuronTagger);
+            ArgumentNullException.ThrowIfNull(parameters.Outputs.Undefined);
 
-            var result = new InterneuronSet();
+            InterneuronSet? result = null;
 
             if
             (
@@ -103,7 +104,41 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                     )
                 )
             )
-                result.AND___Dividend__Divisor = AND___Dividend__Divisor;
+            {
+                var interneuronsToUndefined = new Network();
+                interneuronsToUndefined.AddReplaceItems(
+                    [
+                        NetworkHelper.CreateTerminal
+                        (
+                            AND___Dividend__Divisor.Interneurons.Interneuron1.GetInterneuron(),
+                            parameters.Outputs.Undefined.Neuron1
+                        ),
+                        NetworkHelper.CreateTerminal
+                        (
+                            AND___Dividend__Divisor.Interneurons.Interneuron2.GetInterneuron(),
+                            parameters.Outputs.Undefined.Neuron0
+                        ),
+                        NetworkHelper.CreateTerminal
+                        (
+                            AND___Dividend__Divisor.Interneurons.Interneuron3.GetInterneuron(),
+                            parameters.Outputs.Undefined.Neuron1
+                        ),
+                        NetworkHelper.CreateTerminal
+                        (
+                            AND___Dividend__Divisor.Interneurons.Interneuron4.GetInterneuron(),
+                            parameters.Outputs.Undefined.Neuron0
+                        )
+                    ]
+                );
+
+                result = new InterneuronSet()
+                {
+                    AND___Dividend__Divisor = AND___Dividend__Divisor,
+                    InterneuronsToUndefined = interneuronsToUndefined
+                };
+            }
+
+            ArgumentNullException.ThrowIfNull(result);
 
             return result;
         }

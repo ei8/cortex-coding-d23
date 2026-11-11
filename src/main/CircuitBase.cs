@@ -25,10 +25,10 @@ namespace ei8.Cortex.Coding.d23
         where TInterneuron : ICircuitInterneuronSet
     {
         protected override IEnumerable<ReadOnlyNetwork> GetNetworks() =>
-        [
-            this.Parameters.Network,
-            this.Interneurons.Network
-        ];
+            [
+                this.Parameters.Network,
+                this.Interneurons.Network
+            ];
 
         public TParam Parameters { get; } = parameters;
 

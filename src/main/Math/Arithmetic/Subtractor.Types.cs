@@ -55,29 +55,25 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 
         public class InterneuronSet : CircuitInterneuronSetBase
         {
-            protected override IEnumerable<ReadOnlyNetwork> GetNetworks()
-            {
-                IEnumerable<ReadOnlyNetwork?> nets = 
-                    [
-                        this.Half1_AND___Subtrahend__Half1_OUT___Half1_NOT___Minuend?.Network,
-                        this.Half1_NOT___Minuend?.Network,
-                        this.Half1_XOR___Minuend__Subtrahend?.Network,
-                        this.OR___Half1_Borrow__Half2_Borrow?.Network,
-                        this.Half2_AND___Borrow__Half2_OUT___Half2_NOT___Half1_XOR_Result?.Network,
-                        this.Half2_NOT___Half1_XOR_Result?.Network,
-                        this.Half2_XOR___Borrow__Half1_XOR_Result?.Network
-                    ];
+            protected override IEnumerable<ReadOnlyNetwork> GetNetworks() =>
+                NetworkHelper.ConvertToNetworks
+                (
+                    this.Half1_AND___Subtrahend__Half1_OUT___Half1_NOT___Minuend,
+                    this.Half1_NOT___Minuend,
+                    this.Half1_XOR___Minuend__Subtrahend,
+                    this.OR___Half1_Borrow__Half2_Borrow,
+                    this.Half2_AND___Borrow__Half2_OUT___Half2_NOT___Half1_XOR_Result,
+                    this.Half2_NOT___Half1_XOR_Result,
+                    this.Half2_XOR___Borrow__Half1_XOR_Result
+                );
 
-                return nets.WhereNotNull();
-            }
-
-            public AndGate? Half1_AND___Subtrahend__Half1_OUT___Half1_NOT___Minuend { get; internal set; }
-            public NotGate? Half1_NOT___Minuend { get; internal set; }
-            public XorGate? Half1_XOR___Minuend__Subtrahend { get; internal set; }
-            public OrGate? OR___Half1_Borrow__Half2_Borrow { get; internal set; }
-            public AndGate? Half2_AND___Borrow__Half2_OUT___Half2_NOT___Half1_XOR_Result { get; internal set; }
-            public NotGate? Half2_NOT___Half1_XOR_Result { get; internal set; }
-            public XorGate? Half2_XOR___Borrow__Half1_XOR_Result { get; internal set; }
+            public required AndGate Half1_AND___Subtrahend__Half1_OUT___Half1_NOT___Minuend { get; set; }
+            public required NotGate Half1_NOT___Minuend { get; set; }
+            public required XorGate Half1_XOR___Minuend__Subtrahend { get; set; }
+            public OrGate? OR___Half1_Borrow__Half2_Borrow { get; set; }
+            public AndGate? Half2_AND___Borrow__Half2_OUT___Half2_NOT___Half1_XOR_Result { get; set; }
+            public NotGate? Half2_NOT___Half1_XOR_Result { get; set; }
+            public XorGate? Half2_XOR___Borrow__Half1_XOR_Result { get; set; }
         }
 
         public class KeyedInterneuronTagger(string precedingCircuitName) : IKeyedInterneuronTagger

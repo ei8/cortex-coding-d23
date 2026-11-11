@@ -12,6 +12,7 @@ namespace ei8.Cortex.Coding.d23.Sequences
     ) :
         BiphasicAdjacentBase
         <
+            BiphasicNext,
             Next.ParameterInfo,
             BiphasicNext.InterneuronSet
         >

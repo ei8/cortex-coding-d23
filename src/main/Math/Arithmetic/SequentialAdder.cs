@@ -1,5 +1,4 @@
 ﻿using ei8.Cortex.Coding.d23.Sequences;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -50,23 +49,15 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                 variableInfo
             );
 
-        public static bool TryCreate<T>
+        public static bool TryCreate
         (
-            [NotNullWhen(true)] out T? result,
+            [NotNullWhen(true)] out SequentialAdder? result,
             Next next,
             Adder adder,
             float inputStrength,
             VariableInfo? precedingVariableInfo = null,
             [CallerArgumentExpression(nameof(result))] string parameterExpression = ""
         )
-            where T :
-                IAugmentedCompositeCircuitStatic
-                <
-                    T,
-                    SequentialAdder.AugmentationInfo,
-                    Next,
-                    Adder
-                >
         {
             bool bResult = false;
             result = default;
@@ -80,7 +71,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                 adder.Parameters.Outputs.CarryOver != null
             )
             { 
-                result = T.Create
+                result = SequentialAdder.Create
                 (
                     new
                     (

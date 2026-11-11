@@ -63,11 +63,17 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
         public class InterneuronSet : CircuitInterneuronSetBase
         {
             protected override IEnumerable<ReadOnlyNetwork> GetNetworks() =>
-                this.AND___Dividend__Divisor != null ?
-                    [this.AND___Dividend__Divisor.Network] :
-                    [];
+                [
+                    ..NetworkHelper.ConvertToNetworks
+                    (
+                        this.AND___Dividend__Divisor
+                    ),
+                    this.InterneuronsToUndefined
+                ];
+                
+            public required AndGate AND___Dividend__Divisor { get; set; }
 
-            public AndGate? AND___Dividend__Divisor { get; internal set; }
+            public required ReadOnlyNetwork InterneuronsToUndefined { get; set; }
         }
     }
 }

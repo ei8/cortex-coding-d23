@@ -5,6 +5,7 @@ namespace ei8.Cortex.Coding.d23.Sequences
 {
     public abstract class BiphasicAdjacentBase
     <
+        T,
         TParam, 
         TInterneuron
     >
@@ -28,10 +29,23 @@ namespace ei8.Cortex.Coding.d23.Sequences
             TParam,
             TInterneuron
         >
+        where T :
+            IBiphasicAdjacentStatic
+            <
+                T,
+                TParam,
+                TInterneuron
+            >,
+            IAdjacentStatic
+            <
+                T,
+                TParam,
+                TInterneuron
+            >
         where TParam : IFunctionalCircuitParameter
         where TInterneuron : ICircuitInterneuronSet
     {
-        public static bool TryCreate<T>
+        public static bool TryCreate
         (
             [NotNullWhen(true)] out T? result,
             TParam parameters,
@@ -41,19 +55,6 @@ namespace ei8.Cortex.Coding.d23.Sequences
             [CallerArgumentExpression(nameof(result))] string parameterExpression = "",
             params NeuronInfo[] additionalInputs
         )
-            where T : 
-                IBiphasicAdjacentStatic
-                <
-                    T, 
-                    TParam, 
-                    TInterneuron
-                >,
-                IAdjacentStatic
-                <
-                    T,
-                    TParam,
-                    TInterneuron
-                >
         {
             bool bResult = false;
             result = default;

@@ -50,11 +50,9 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
         public class InterneuronSet : CircuitInterneuronSetBase
         {
             protected override IEnumerable<ReadOnlyNetwork> GetNetworks() =>
-                this.AND___Multiplicand__Multiplier != null ?
-                    [this.AND___Multiplicand__Multiplier.Network] :
-                    [];
+                [this.AND___Multiplicand__Multiplier.Network];
 
-            public AndGate? AND___Multiplicand__Multiplier { get; internal set; }
+            public required AndGate AND___Multiplicand__Multiplier { get; set; }
         }
     }
 }

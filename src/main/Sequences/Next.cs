@@ -12,6 +12,7 @@ namespace ei8.Cortex.Coding.d23.Sequences
     ) : 
         AdjacentBase
         <
+            Next,
             Next.ParameterInfo,
             Next.InterneuronSet
         >

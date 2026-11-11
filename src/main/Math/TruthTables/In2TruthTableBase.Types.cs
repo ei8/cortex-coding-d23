@@ -34,19 +34,19 @@ namespace ei8.Cortex.Coding.d23.Math.TruthTables
             CircuitInterneuronSetBase
         {
             protected override IEnumerable<ReadOnlyNetwork> GetNetworks() =>
-            [
-                this.Interneuron1,
-                this.Interneuron2,
-                this.Interneuron3,
-                this.Interneuron4,
-                this.LinkedInputNeurons
-            ];
+                [
+                    this.Interneuron1,
+                    this.Interneuron2,
+                    this.Interneuron3,
+                    this.Interneuron4,
+                    this.LinkedInputNeurons
+                ];
 
-            public ReadOnlyNetwork Interneuron1 = interneuron1;
-            public ReadOnlyNetwork Interneuron2 = interneuron2;
-            public ReadOnlyNetwork Interneuron3 = interneuron3;
-            public ReadOnlyNetwork Interneuron4 = interneuron4;
-            public ReadOnlyNetwork LinkedInputNeurons = linkedInputNeurons;
+            public ReadOnlyNetwork Interneuron1 => interneuron1;
+            public ReadOnlyNetwork Interneuron2 => interneuron2;
+            public ReadOnlyNetwork Interneuron3 => interneuron3;
+            public ReadOnlyNetwork Interneuron4 => interneuron4;
+            public ReadOnlyNetwork LinkedInputNeurons => linkedInputNeurons;
         }
     }
 }

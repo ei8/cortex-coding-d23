@@ -12,13 +12,13 @@ namespace ei8.Cortex.Coding.d23.Sequences
             CircuitInterneuronSetBase
         {
             protected override IEnumerable<ReadOnlyNetwork> GetNetworks() =>
-            [
-                this.Initiator,
-                this.Completer
-            ];
+                [
+                    this.Initiator,
+                    this.Completer
+                ];
 
-            public ReadOnlyNetwork Initiator { get; } = initiator;
-            public ReadOnlyNetwork Completer { get; } = completer;
+            public ReadOnlyNetwork Initiator => initiator;
+            public ReadOnlyNetwork Completer => completer;
         }
     }
 }

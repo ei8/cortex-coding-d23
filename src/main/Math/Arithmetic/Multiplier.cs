@@ -77,7 +77,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
         {
             ArgumentNullException.ThrowIfNull(interneuronTagger);
 
-            var result = new InterneuronSet();
+            InterneuronSet? result = null;
 
             if
             (
@@ -102,7 +102,12 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                     )
                 )
             )
-                result.AND___Multiplicand__Multiplier = AND___Multiplicand__Multiplier;
+                result = new InterneuronSet()
+                {
+                    AND___Multiplicand__Multiplier = AND___Multiplicand__Multiplier
+                };
+
+            ArgumentNullException.ThrowIfNull(result);
 
             return result;
         }
