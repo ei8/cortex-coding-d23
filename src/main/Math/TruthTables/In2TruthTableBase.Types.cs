@@ -6,8 +6,8 @@ namespace ei8.Cortex.Coding.d23.Math.TruthTables
     {
         public class Input
         (
-            BinaryNeuronParameter? input1,
-            BinaryNeuronParameter? input2
+            BinaryNeuronParameter input1,
+            BinaryNeuronParameter input2
         ) :
             InputCircuitParameterSubsetBase
             <
@@ -19,8 +19,8 @@ namespace ei8.Cortex.Coding.d23.Math.TruthTables
             input2
         )
         {
-            public BinaryNeuronParameter? Input1 => this.Parameter1;
-            public BinaryNeuronParameter? Input2 => this.Parameter2;
+            public BinaryNeuronParameter Input1 => this.Parameter1;
+            public BinaryNeuronParameter Input2 => this.Parameter2;
         }
 
         public class InterneuronSet

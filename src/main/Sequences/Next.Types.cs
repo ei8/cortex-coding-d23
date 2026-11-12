@@ -23,8 +23,8 @@ namespace ei8.Cortex.Coding.d23.Sequences
 
         public class Input
         (
-            UnaryNeuronParameter? function,
-            UnaryNeuronParameter? current
+            UnaryNeuronParameter function,
+            UnaryNeuronParameter current
         ) :
             InputCircuitParameterSubsetBase
             <
@@ -36,13 +36,13 @@ namespace ei8.Cortex.Coding.d23.Sequences
                 current
             )
         {
-            public UnaryNeuronParameter? Function => this.Parameter1;
-            public UnaryNeuronParameter? Current => this.Parameter2;
+            public UnaryNeuronParameter Function => this.Parameter1;
+            public UnaryNeuronParameter Current => this.Parameter2;
         }
 
-        public class Output(UnaryNeuronParameter? subsequent) : OutputCircuitParameterSubsetBase<UnaryNeuronParameter>(subsequent)
+        public class Output(UnaryNeuronParameter subsequent) : OutputCircuitParameterSubsetBase<UnaryNeuronParameter>(subsequent)
         {
-            public UnaryNeuronParameter? Next => this.Parameter1;
+            public UnaryNeuronParameter Next => this.Parameter1;
         }
 
         public class InterneuronSet

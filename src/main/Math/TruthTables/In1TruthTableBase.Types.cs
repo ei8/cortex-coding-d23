@@ -4,9 +4,9 @@ namespace ei8.Cortex.Coding.d23.Math.TruthTables
 {
     public abstract partial class In1TruthTableBase
     {
-        public class Input(BinaryNeuronParameter? input1) : InputCircuitParameterSubsetBase<BinaryNeuronParameter>(input1)
+        public class Input(BinaryNeuronParameter input1) : InputCircuitParameterSubsetBase<BinaryNeuronParameter>(input1)
         {
-            public BinaryNeuronParameter? Input1 => this.Parameter1;
+            public BinaryNeuronParameter Input1 => this.Parameter1;
         }
 
         public class InterneuronSet

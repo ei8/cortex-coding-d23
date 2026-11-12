@@ -243,11 +243,11 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
         private static void CreateSubtractorHalf1Interneurons
         (
             VariableInfo variableInfo,
-            BinaryNeuronParameter? minuend,
-            BinaryNeuronParameter? subtrahend,
-            BinaryNeuronParameter? xorOutput,
-            BinaryNeuronParameter? notOutput,
-            BinaryNeuronParameter? andOutput,
+            BinaryNeuronParameter minuend,
+            BinaryNeuronParameter subtrahend,
+            BinaryNeuronParameter xorOutput,
+            BinaryNeuronParameter notOutput,
+            BinaryNeuronParameter andOutput,
             KeyedInterneuronTagger interneuronTagger,
             out XorGate half1_XOR___Minuend__Subtrahend,
             out NotGate half1_NOT___Minuend,

@@ -23,9 +23,9 @@ namespace ei8.Cortex.Coding.d23.Math.Comparison
 
         public class Output
         (
-            BinaryNeuronParameter? areEqual,
-            BinaryNeuronParameter? isLessThan,
-            BinaryNeuronParameter? isGreaterThan
+            BinaryNeuronParameter areEqual,
+            BinaryNeuronParameter isLessThan,
+            BinaryNeuronParameter isGreaterThan
         ) :
             OutputCircuitParameterSubsetBase
             <
@@ -39,11 +39,11 @@ namespace ei8.Cortex.Coding.d23.Math.Comparison
                 isGreaterThan
             )
         {
-            public BinaryNeuronParameter? AreEqual => this.Parameter1;
+            public BinaryNeuronParameter AreEqual => this.Parameter1;
 
-            public BinaryNeuronParameter? IsLessThan => this.Parameter2;
+            public BinaryNeuronParameter IsLessThan => this.Parameter2;
 
-            public BinaryNeuronParameter? IsGreaterThan => this.Parameter3;
+            public BinaryNeuronParameter IsGreaterThan => this.Parameter3;
         }
     }
 }

@@ -36,7 +36,7 @@
         where TInterneuron : ICircuitInterneuronSet
     {
         static abstract TParam CreateDefaultParameters(
-            BinaryNeuronParameter? precedingValue,
+            BinaryNeuronParameter precedingValue,
             int exponent
         );
     }

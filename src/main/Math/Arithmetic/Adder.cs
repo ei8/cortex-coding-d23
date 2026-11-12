@@ -45,11 +45,13 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
             Adder.ParameterInfo parameters,
             InterneuronSet interneurons,
             VariableInfo? variableInfo
-        ) => new (
-            parameters,
-            interneurons,
-            variableInfo
-        );
+        ) => 
+            new 
+            (
+                parameters,
+                interneurons,
+                variableInfo
+            );
 
         public static Adder.ParameterInfo CreateDefaultParameters(
             BinaryNeuronParameter? precedingValue,
@@ -208,10 +210,10 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
         private static void CreateAdderHalf1Interneurons
         (
             VariableInfo variableInfo,
-            BinaryNeuronParameter? addend1,
-            BinaryNeuronParameter? addend2,
-            BinaryNeuronParameter? xorOutput,
-            BinaryNeuronParameter? andOutput,
+            BinaryNeuronParameter addend1,
+            BinaryNeuronParameter addend2,
+            BinaryNeuronParameter xorOutput,
+            BinaryNeuronParameter andOutput,
             AdditionalInputNeuronInfo? additionalInputNeurons,
             KeyedInterneuronTagger interneuronTagger,
             out XorGate half1_XOR___Addend1__Addend2,

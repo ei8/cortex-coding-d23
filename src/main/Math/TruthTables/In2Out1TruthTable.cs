@@ -18,9 +18,9 @@
             )
         {
         }
-        public class Output(BinaryNeuronParameter? output1) : OutputCircuitParameterSubsetBase<BinaryNeuronParameter>(output1)
+        public class Output(BinaryNeuronParameter output1) : OutputCircuitParameterSubsetBase<BinaryNeuronParameter>(output1)
         {
-            public BinaryNeuronParameter? Output1 => this.Parameter1;
+            public BinaryNeuronParameter Output1 => this.Parameter1;
         }
     }
 }

@@ -24,27 +24,27 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 
         public class Input
         (
-            BinaryNeuronParameter? multiplicand,
-            BinaryNeuronParameter? multiplier
+            BinaryNeuronParameter multiplicand,
+            BinaryNeuronParameter multiplier
         ) :
             InputCircuitParameterSubsetBase<BinaryNeuronParameter, BinaryNeuronParameter>(
                 multiplicand,
                 multiplier
             )
         {
-            public BinaryNeuronParameter? Multiplicand => this.Parameter1;
-            public BinaryNeuronParameter? Multiplier => this.Parameter2;
+            public BinaryNeuronParameter Multiplicand => this.Parameter1;
+            public BinaryNeuronParameter Multiplier => this.Parameter2;
         }
 
         public class Output
         (
-            BinaryNeuronParameter? product
+            BinaryNeuronParameter product
         ) :
             OutputCircuitParameterSubsetBase<BinaryNeuronParameter>(
                 product
             )
         {
-            public BinaryNeuronParameter? Product => this.Parameter1;
+            public BinaryNeuronParameter Product => this.Parameter1;
         }
 
         public class InterneuronSet : CircuitInterneuronSetBase

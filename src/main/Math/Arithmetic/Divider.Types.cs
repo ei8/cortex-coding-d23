@@ -24,8 +24,8 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
 
         public class Input
         (
-            BinaryNeuronParameter? dividend,
-            BinaryNeuronParameter? divisor
+            BinaryNeuronParameter dividend,
+            BinaryNeuronParameter divisor
         ) :
             InputCircuitParameterSubsetBase
             <
@@ -37,14 +37,14 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                 divisor
             )
         {
-            public BinaryNeuronParameter? Dividend => this.Parameter1;
-            public BinaryNeuronParameter? Divisor => this.Parameter2;
+            public BinaryNeuronParameter Dividend => this.Parameter1;
+            public BinaryNeuronParameter Divisor => this.Parameter2;
         }
 
         public class Output
         (
-            BinaryNeuronParameter? quotient,
-            BinaryNeuronParameter? undefined
+            BinaryNeuronParameter quotient,
+            BinaryNeuronParameter undefined
         ) :
             OutputCircuitParameterSubsetBase
             <
@@ -56,8 +56,8 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
                 undefined
             )
         {
-            public BinaryNeuronParameter? Quotient => this.Parameter1;
-            public BinaryNeuronParameter? Undefined => this.Parameter2;
+            public BinaryNeuronParameter Quotient => this.Parameter1;
+            public BinaryNeuronParameter Undefined => this.Parameter2;
         }
 
         public class InterneuronSet : CircuitInterneuronSetBase
