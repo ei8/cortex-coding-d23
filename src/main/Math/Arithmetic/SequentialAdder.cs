@@ -61,15 +61,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
         {
             bool bResult = false;
             result = default;
-            if
-            (
-                VariableInfo.TryParse(parameterExpression, out var variableInfo) &&
-                adder.Parameters.Inputs.PrecedingCarryOver != null &&
-                adder.Parameters.Inputs.Addend1 != null &&
-                adder.Parameters.Inputs.Addend2 != null &&
-                adder.Parameters.Outputs.Sum != null &&
-                adder.Parameters.Outputs.CarryOver != null
-            )
+            if (VariableInfo.TryParse(parameterExpression, out var variableInfo))
             { 
                 result = SequentialAdder.Create
                 (
