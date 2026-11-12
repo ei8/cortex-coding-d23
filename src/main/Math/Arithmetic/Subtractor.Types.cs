@@ -86,6 +86,10 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
         {
             private readonly string precedingCircuitName = precedingCircuitName;
 
+            public KeyedInterneuronTagger() : this(string.Empty)
+            {
+            }
+
             public InterneuronTagInfo? CreateByKey(string key, VariableInfo variableInfo)
             {
                 InterneuronTagInfo? result = null;
