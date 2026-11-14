@@ -64,7 +64,8 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
             if 
             (
                 ((expectedHandledCount = this.digitIndexRetriever(this.DoUntil.WorkingMemory.CounterVariable.Neuron) + 1) != null) &&
-                this.WorkingMemory.TryHandleAllResults(
+                this.WorkingMemory.TryHandleAllResults
+                (
                     targetNeuron,
                     expectedHandledCount.Value,
                     out _
@@ -80,7 +81,12 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
 
         private void Complete(IProcess? process)
         {
-            this.completionCallback(this, process, [.. this.WorkingMemory.GetSumNeurons()]);
+            this.completionCallback
+            (
+                this, 
+                process,
+                Addition.WorkingMemoryInfo.GetResultNeuronns(this.WorkingMemory)
+            );
             this.WorkingMemory.Sum.Value.Clear();
         }
 

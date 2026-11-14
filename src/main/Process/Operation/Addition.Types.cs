@@ -30,12 +30,16 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
             ),
             ISyncOperationWorkingMemory
         {
-            public IEnumerable<Neuron> GetSumNeurons()
+            public static IEnumerable<Neuron> GetResultNeuronns(Addition.WorkingMemoryInfo workingMemory)
             {
-                var result = new List<Neuron>(this.Sum.Value.Items.Select(c => c.Neuron));
+                var result = new List<Neuron>(workingMemory.Sum.Value.Items.Select(c => c.Neuron));
 
-                if (this.CarryOver != null && this.CarryOver.Value.Items.Last().Neuron.Tag.EndsWith('1'))
-                    result.Add(this.CarryOver.Value.Items.Last().Neuron);
+                if
+                (
+                    workingMemory.CarryOver != null &&
+                    workingMemory.CarryOver.Value.Items.Last().Neuron.Tag.EndsWith('1')
+                )
+                    result.Add(workingMemory.CarryOver.Value.Items.Last().Neuron);
 
                 return result;
             }

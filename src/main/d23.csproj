@@ -64,6 +64,9 @@
 	  <Compile Update="Process\Operation\Addition.Types.cs">
 		  <DependentUpon>Addition.cs</DependentUpon>
 	  </Compile>
+	  <Compile Update="Process\Operation\Subtraction.Types.cs">
+		  <DependentUpon>Subtraction.cs</DependentUpon>
+	  </Compile>
 	  <Compile Update="Process\Operation\DynamicMultiplication.Types.cs">
 		  <DependentUpon>DynamicMultiplication.cs</DependentUpon>
 	  </Compile>
