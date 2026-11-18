@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace ei8.Cortex.Coding.d23.Process.Operation
 {
@@ -49,19 +51,36 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
         {
             bool result = false;
 
+            int? currentDigitIndex = null;
             if
             (
-                this.operands.Any(o => o.HasCurrentDigitChanged()) &&
                 this.WorkingMemory.TryHandleAllResults
                 (
                     targetNeuron,
-                    this.IsDigitProgressionIncremental,
-                    out result
-                )
+                    (wm) =>
+                    {
+                        int? result = null;
+                        currentDigitIndex = this.WorkingMemory.GetOperandsCurrentIndex();
+                        if (currentDigitIndex != null)
+                        {
+                            result =
+                                wm.GetExpectedHandledDigitsCount
+                                (
+                                    currentDigitIndex.Value,
+                                    this.IsDigitProgressionIncremental
+                                );
+                        }
+                        return result;
+                    },
+                    out var targetHandled
+                ) &&
+                targetHandled
             )
             {
-                foreach (var operand in this.operands)
-                    operand.UpdateTracking(this.IsTrackingDirectionNext);
+                result = true;
+                if (this.WorkingMemory.GetOperandsCurrentIndex() == currentDigitIndex)
+                    foreach (var operand in this.operands)
+                        operand.UpdateTracking(this.IsTrackingDirectionNext);
 
                 if(this.IsComplete())
                     this.Complete();

@@ -74,15 +74,6 @@ namespace ei8.Cortex.Coding.d23.Process
 
         public IEnumerableChunk<INeuronChunk>? Value => this.Content2;
 
-        public INeuronChunk? PreviousDigit
-        {
-            get => this.Content3;
-            private set
-            {
-                this.Content3 = value;
-            }
-        }
-
         public INeuronChunk? CurrentDigit
         {
             get => this.Content4;
@@ -96,7 +87,6 @@ namespace ei8.Cortex.Coding.d23.Process
         {
             ArgumentNullException.ThrowIfNull(this.Value);
 
-            this.PreviousDigit = null;
             this.CurrentDigit = this.Value.Items.First();
         }
 
@@ -104,7 +94,6 @@ namespace ei8.Cortex.Coding.d23.Process
         {
             ArgumentNullException.ThrowIfNull(this.Value);
 
-            this.PreviousDigit = this.CurrentDigit;
             this.CurrentDigit = this.Value.Items.GetAdjacentOrDefault(this.CurrentDigit, next);
         }
     }

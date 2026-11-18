@@ -36,10 +36,11 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
         {
             List<Neuron> result = [];
 
-            if(this.DynamicAddition == null)
-                result.AddRange(this.WorkingMemory.GetCurrent().Select(c => c.Neuron));
-            else
+            // TODO: Use Next to determine current operation
+            if(this.DynamicAddition != null)
                 result.AddRange(this.DynamicAddition.GetCurrent());
+            else
+                result.AddRange(this.WorkingMemory.GetCurrent().Select(c => c.Neuron));
 
             return result;
         }
@@ -50,22 +51,22 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
 
             var result = false;
 
-            if(this.DynamicAddition == null)
+            if (this.DynamicAddition != null)
+                result = this.DynamicAddition.HandleFire(targetNeuron);
+            else
             {
-                int currentMultiplierDigitIndex = -1;
-
-                if
+                var currentMultiplierDigitIndex = -1;
+                if 
                 (
                     this.WorkingMemory.Product.DigitValues.Items.Any(c => c.Neuron == targetNeuron) &&
-                    this.WorkingMemory.Multiplicand.HasCurrentDigitChanged() &&
                     this.WorkingMemory.Multiplier.CurrentDigit != null &&
                     (currentMultiplierDigitIndex = this.WorkingMemory.Multiplier.Value.Items.ToList().IndexOf(this.WorkingMemory.Multiplier.CurrentDigit)) >= 0
                 )
                 {
-                    result = true;
+                    result = true; 
 
                     this.WorkingMemory.Multiplicand.UpdateTracking();
-                    
+
                     if (this.WorkingMemory.MultiplierProducts.Lists.Count < currentMultiplierDigitIndex + 1)
                         this.WorkingMemory.MultiplierProducts.Lists.Add(new ListChunk<INeuronChunk>());
 
@@ -75,11 +76,12 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                     (
                         new LogMessageGenerator
                         (
-                            () => $"Added to MultiplierProduct(s): {targetNeuron.Tag}, " +
-                                $"{ 
+                            () =>
+                                $"Added to MultiplierProduct(s): {targetNeuron.Tag}, " +
+                                $"{
                                     string.Join
                                     (
-                                        string.Empty, 
+                                        string.Empty,
                                         this.WorkingMemory.MultiplierProducts
                                             .Lists[currentMultiplierDigitIndex]
                                             .Items.Reverse().Select(d => d.Neuron.Tag.Last())
@@ -88,10 +90,10 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                         )
                     );
 
-                    if(this.WorkingMemory.Multiplicand.CurrentDigit == null)
+                    if (this.WorkingMemory.Multiplicand.CurrentDigit == null)
                     {
                         this.WorkingMemory.Multiplier.UpdateTracking();
-                        if(this.WorkingMemory.Multiplier.CurrentDigit != null)
+                        if (this.WorkingMemory.Multiplier.CurrentDigit != null)
                         {
                             this.WorkingMemory.Multiplicand.ResetTracking();
                         }
@@ -107,7 +109,7 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                             {
                                 this.Process1 = DynamicMultiplication.CreateDynamicAddition
                                 (
-                                    this.WorkingMemory, 
+                                    this.WorkingMemory,
                                     this.additionWorkingMemory,
                                     this.AdditionCompleteHandler
                                 );
@@ -116,9 +118,8 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                                 (
                                     new LogMessageGenerator
                                     (
-                                        () => 
-                                            $"Addition started: [{
-                                                string.Join
+                                        () =>
+                                            $"Addition started: [{string.Join
                                                 (
                                                     ',',
                                                     this.WorkingMemory.MultiplierProducts.Lists.Select
@@ -130,8 +131,7 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                                                                 mp.Items.Reverse().Select(d => d.Neuron.Tag.Last())
                                                             )
                                                     )
-                                                )
-                                            }]"
+                                                )}]"
                                     )
                                 );
                             }
@@ -139,8 +139,6 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                     }
                 }
             }
-            else
-                result = this.DynamicAddition.HandleFire(targetNeuron);
 
             return result;
         }

@@ -11,7 +11,6 @@
     {
         public IEnumerableChunk<INeuronChunk> DigitValues { get; }
         public IEnumerableChunk<INeuronChunk>? Value { get; }
-        public INeuronChunk? PreviousDigit { get; }
         public INeuronChunk? CurrentDigit { get; }
         public void UpdateTracking(bool next = true);
         public void ResetTracking();

@@ -24,7 +24,8 @@ namespace ei8.Cortex.Coding.d23.Process
 
         public void Add(T item)
         {
-            this.innerDictionary.TryAdd(this.innerDictionary.Count, item);
+            if (!this.innerDictionary.TryAdd(this.innerDictionary.Count, item))
+                throw new InvalidOperationException("Item already exists.");
         }
 
         public void Clear()

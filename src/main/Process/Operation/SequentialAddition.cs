@@ -60,15 +60,21 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
             ArgumentNullException.ThrowIfNull(this.DoUntil);
 
             var result = false;
-            int? expectedHandledCount = 0;
             if 
             (
-                ((expectedHandledCount = this.digitIndexRetriever(this.DoUntil.WorkingMemory.CounterVariable.Neuron) + 1) != null) &&
                 this.WorkingMemory.TryHandleAllResults
                 (
                     targetNeuron,
-                    expectedHandledCount.Value,
-                    out _
+                    (wm) =>
+                    {
+                        var result = this.digitIndexRetriever(this.DoUntil.WorkingMemory.CounterVariable.Neuron);
+
+                        if (result != null)
+                            result++;
+
+                        return result;
+                    },
+                    out var targetHandled
                 ) &&
                 this.DoUntil.HandleFire(targetNeuron)
             )
