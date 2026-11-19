@@ -25,6 +25,8 @@ namespace ei8.Cortex.Coding.d23.Process
         ),
         IOperandChunk
     {
+        private INeuronChunk[]? valueArray;
+
         public OperandChunk
         (
             IEnumerableChunk<INeuronChunk> digitValues
@@ -81,6 +83,19 @@ namespace ei8.Cortex.Coding.d23.Process
             {
                 this.Content4 = value;
             }
+        }
+
+        public int? GetCurrentDigitIndex()
+        {
+            int? result = null;
+
+            if (this.Value != null)
+                this.valueArray ??= [.. this.Value.Items];
+
+            if (this.valueArray != null)
+                result = Array.IndexOf(this.valueArray, this.CurrentDigit);
+
+            return result;
         }
 
         public void ResetTracking()

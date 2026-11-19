@@ -274,24 +274,24 @@ namespace ei8.Cortex.Coding.d23
             );
         }
 
-        public static bool HandleFire
+        public static bool CanHandle
         (
-            this IResultChunk resultInfo, 
+            this IResultChunk resultInfo,
+            Neuron target
+        ) =>
+            resultInfo.DigitValues.Items.Any(c => c.Neuron == target);
+
+        public static void HandleFire
+        (
+            this IResultChunk resultInfo,
             Neuron target
         )
         {
-            bool result = false;
-            if (resultInfo.DigitValues.Items.Any(c => c.Neuron == target))
+            resultInfo.Value.Add(new NeuronChunk(target));
+            if (resultInfo is INamedChunk namedChunk)
             {
-                resultInfo.Value.Add(new NeuronChunk(target));
-                if (resultInfo is INamedChunk namedChunk)
-                {
-                    ExtensionMethods.logger.Info(new LogMessageGenerator(() => $"Added to {namedChunk.Name}: {target.Tag}"));
-                }
-                result = true;
+                ExtensionMethods.logger.Info(new LogMessageGenerator(() => $"Added to {namedChunk.Name}: {target.Tag}"));
             }
-
-            return result;
         }
 
         public static INeuronChunk GetValueByIndex
@@ -318,68 +318,37 @@ namespace ei8.Cortex.Coding.d23
             out bool targetHandled
         )
         {
-            var handledResultsCount = 0;
-            int? expectedHandledCount = null;
+            int? expectedHandledCount = expectedHandledCountRetriever(workingMemory);
             targetHandled = false;
 
             var expectedResults = workingMemory.Chunks.OfType<IResultChunk>();
-            foreach (var expectedResult in expectedResults)
+            var expectedResultTargetHandler = expectedResults.SingleOrDefault(er => er.CanHandle(target));
+
+            if 
+            (
+                expectedResultTargetHandler != null &&
+                expectedHandledCount != null &&
+                expectedResultTargetHandler.Value.Count < expectedHandledCount
+            )
             {
-                if (expectedHandledCount == null)
-                    expectedHandledCount = expectedHandledCountRetriever(workingMemory);
-                
-                if 
-                (
-                    expectedHandledCount != null && 
-                    expectedResult.HandleFireOrAlreadyHandled(target, expectedHandledCount.Value, out targetHandled)
-                )
-                    handledResultsCount++;
+                expectedResultTargetHandler.HandleFire(target);
+                targetHandled = true;
             }
+
+            var handledResultsCount = 0;
+            foreach (var expectedResult in expectedResults)
+                if (expectedResult.Value.Count == expectedHandledCount)
+                    handledResultsCount++;
 
             return handledResultsCount == expectedResults.Count();
         }
 
-        private static bool HandleFireOrAlreadyHandled(this IResultChunk expectedResult, Neuron target, int expectedHandledCount, out bool targetHandled)
-        {
-            bool result = false;
-            targetHandled = false;
-
-            if (expectedResult.Value.Count < expectedHandledCount)
-            {
-                result = expectedResult.HandleFire(target);
-                if (result)
-                    targetHandled = true;
-            }
-            else if (expectedResult.Value.Count == expectedHandledCount)
-            {
-                result = true;
-            }
-
-            return result;
-        }
-
-        public static int? GetOperandsCurrentIndex(this IWorkingMemory workingMemory)
-        {
-            int? result = null;
-
-            foreach (var operand in workingMemory.Chunks.OfType<IOperandChunk>())
-            {
-                ArgumentNullException.ThrowIfNull(operand.Value);
-
-                int? currentOperandDigitIndex = operand.CurrentDigit != null ?
-                    operand.Value.Items.ToList().IndexOf(operand.CurrentDigit) :
-                    null;
-
-                if (currentOperandDigitIndex.HasValue)
-                {
-                    if (!result.HasValue)
-                        result = currentOperandDigitIndex;
-                    else if (currentOperandDigitIndex.Value > result.Value)
-                        result = currentOperandDigitIndex;
-                }
-            }
-            return result;
-        }
+        public static int? GetOperandsCurrentIndex(this IWorkingMemory workingMemory) =>
+            // TODO: specify IEnumerable<IOperandChunk>
+            workingMemory.Chunks
+                .OfType<IOperandChunk>()
+                .Select(oc => oc.GetCurrentDigitIndex())
+                .Max();
 
         public static int GetExpectedHandledDigitsCount
         (

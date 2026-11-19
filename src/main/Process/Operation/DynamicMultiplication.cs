@@ -58,18 +58,24 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                 var currentMultiplierDigitIndex = -1;
                 if 
                 (
+                    // if target is a product digit
                     this.WorkingMemory.Product.DigitValues.Items.Any(c => c.Neuron == targetNeuron) &&
+                    // and current multiplier index exists
                     this.WorkingMemory.Multiplier.CurrentDigit != null &&
                     (currentMultiplierDigitIndex = this.WorkingMemory.Multiplier.Value.Items.ToList().IndexOf(this.WorkingMemory.Multiplier.CurrentDigit)) >= 0
                 )
                 {
                     result = true; 
 
+                    // update multiplicand current digit
                     this.WorkingMemory.Multiplicand.UpdateTracking();
 
+                    // if multiplier product does not yet exist for current multiplier digit
                     if (this.WorkingMemory.MultiplierProducts.Lists.Count < currentMultiplierDigitIndex + 1)
+                        // create and new multiplier product
                         this.WorkingMemory.MultiplierProducts.Lists.Add(new ListChunk<INeuronChunk>());
 
+                    // add product to current multiplier product
                     this.WorkingMemory.MultiplierProducts.Lists[currentMultiplierDigitIndex].Items.Add(new NeuronChunk(targetNeuron));
 
                     DynamicMultiplication.logger.Info
@@ -77,7 +83,7 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                         new LogMessageGenerator
                         (
                             () =>
-                                $"Added to MultiplierProduct(s): {targetNeuron.Tag}, " +
+                                $"Added to MultiplierProduct(s) [Index:{currentMultiplierDigitIndex}]: {targetNeuron.Tag}, " +
                                 $"{
                                     string.Join
                                     (
@@ -90,21 +96,28 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                         )
                     );
 
+                    // if multiplicand is past left-most digit
                     if (this.WorkingMemory.Multiplicand.CurrentDigit == null)
                     {
+                        // update multiplier current digit
                         this.WorkingMemory.Multiplier.UpdateTracking();
+                        // if multiplier is not left-most digit
                         if (this.WorkingMemory.Multiplier.CurrentDigit != null)
                         {
+                            // reset multiplicand digit to right-most digit
                             this.WorkingMemory.Multiplicand.ResetTracking();
                         }
+                        // ... otherwise if multiplier products have accumulated
                         else if (this.WorkingMemory.MultiplierProducts.Lists.Count > 0)
                         {
+                            // if it's just one mulitplier product
                             if (this.WorkingMemory.MultiplierProducts.Lists.Count == 1)
                             {
                                 foreach (var mp in this.WorkingMemory.MultiplierProducts.Lists[0].Items)
                                     this.WorkingMemory.Product.Value.Add(mp);
                                 this.Complete();
                             }
+                            // otherwise, if more
                             else
                             {
                                 this.Process1 = DynamicMultiplication.CreateDynamicAddition
