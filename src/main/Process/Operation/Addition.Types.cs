@@ -60,6 +60,18 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                     this.Addend.GetValueByIndex(digitIndex)
                 ];
 
+            public IOperandChunk[] GetOperands() =>
+                [
+                    this.Augend,
+                    this.Addend
+                ];
+
+            public IResultChunk[] GetResults() =>
+                [
+                    this.Sum,
+                    this.CarryOver
+                ];
+
             public IEnumerableChunk<INeuronChunk> PrecedingCarryOverValues => this.Content1;
 
             public IOperandChunk Augend => this.Content2;

@@ -35,6 +35,19 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                     this.Comparand2.GetValueByIndex(digitIndex)
                 ];
 
+            public IOperandChunk[] GetOperands() =>
+                [
+                    this.Comparand1,
+                    this.Comparand2
+                ];
+
+            public IResultChunk[] GetResults() =>
+                [
+                    this.AreEqual,
+                    this.IsLessThan,
+                    this.IsGreaterThan
+                ];
+
             public IOperandChunk Comparand1 => this.Content1;
 
             public IOperandChunk Comparand2 => this.Content2;

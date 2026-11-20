@@ -194,14 +194,13 @@ namespace ei8.Cortex.Coding.d23
         // 1. Store current digit info
         // 2. Retrieve next digit value by looping from first digit to current digit
         // 3. Use Equal (Operation-TBD) as condition in DoUntil  to determine if current Digit Index is equal to current digit info
-        internal static T? GetAdjacentOrDefault<T>(this IEnumerable<T> list, T? currentItem, bool next = true)
+        internal static T? GetAdjacentOrDefault<T>(this T[] itemArray, T? currentItem, bool next = true)
             where T : class
         {
             T? adjacentItem = default;
 
             if (currentItem != null)
             {
-                var itemArray = list.ToArray();
                 var currentIndex = Array.IndexOf(itemArray, currentItem);
 
                 if (next)
@@ -278,8 +277,13 @@ namespace ei8.Cortex.Coding.d23
         (
             this IResultChunk resultInfo,
             Neuron target
-        ) =>
-            resultInfo.DigitValues.Items.Any(c => c.Neuron == target);
+        )
+        {
+            foreach(var neuronChunk in resultInfo.DigitValues.Items)
+                if (neuronChunk.Neuron == target)
+                    return true;
+            return false;
+        }
 
         public static void HandleFire
         (
@@ -303,8 +307,9 @@ namespace ei8.Cortex.Coding.d23
             INeuronChunk result;
             ArgumentNullException.ThrowIfNull(operand.Value);
 
-            if (index < operand.Value.Items.Count())
-                result = operand.DigitValues.Items.Single(ad => ad.Neuron.Tag.EndsWith(operand.Value.Items.ElementAt(index).Neuron.Tag.Last()));
+            if (operand.ValueArray != null && index < operand.ValueArray.Length)
+                // TODO: remove LINQ
+                result = operand.DigitValues.Items.Single(ad => ad.Neuron.Tag.EndsWith(operand.ValueArray[index].Neuron.Tag.Last()));
             else
                 result = operand.DigitValues.Items.Single(ad => ad.Neuron.Tag.EndsWith('0'));
             return result;
@@ -312,17 +317,23 @@ namespace ei8.Cortex.Coding.d23
 
         public static bool TryHandleAllResults
         (
-            this IWorkingMemory workingMemory,
+            this ISyncOperationWorkingMemory workingMemory,
             Neuron target,
-            Func<IWorkingMemory, int?> expectedHandledCountRetriever,
+            Func<ISyncOperationWorkingMemory, int?> expectedHandledCountRetriever,
             out bool targetHandled
         )
         {
             int? expectedHandledCount = expectedHandledCountRetriever(workingMemory);
             targetHandled = false;
 
-            var expectedResults = workingMemory.Chunks.OfType<IResultChunk>();
-            var expectedResultTargetHandler = expectedResults.SingleOrDefault(er => er.CanHandle(target));
+            var expectedResults = workingMemory.GetResults();
+            IResultChunk? expectedResultTargetHandler = null;
+            foreach (var expectedResult in expectedResults)
+                if (expectedResult.CanHandle(target))
+                {
+                    expectedResultTargetHandler = expectedResult;
+                    break;
+                }
 
             if 
             (
@@ -340,19 +351,25 @@ namespace ei8.Cortex.Coding.d23
                 if (expectedResult.Value.Count == expectedHandledCount)
                     handledResultsCount++;
 
-            return handledResultsCount == expectedResults.Count();
+            return handledResultsCount == expectedResults.Length;
         }
 
-        public static int? GetOperandsCurrentIndex(this IWorkingMemory workingMemory) =>
-            // TODO: specify IEnumerable<IOperandChunk>
-            workingMemory.Chunks
-                .OfType<IOperandChunk>()
-                .Select(oc => oc.GetCurrentDigitIndex())
-                .Max();
+        public static int? GetCurrentDigitIndex(this IOperandChunk[] operands)
+        {
+            int? result = null;
+
+            foreach(var operand in operands)
+            {
+                var index = operand.GetCurrentDigitIndex();
+                if (index.HasValue && (result == null || index > result))
+                    result = index;
+            }
+            return result;
+        }
 
         public static int GetExpectedHandledDigitsCount
         (
-            this IWorkingMemory workingMemory,
+            this IOperandChunk[] operands,
             int operandsCurrentIndex,
             bool incremental
         )
@@ -363,12 +380,12 @@ namespace ei8.Cortex.Coding.d23
                 result = operandsCurrentIndex + 1;
             else
             {
-                var maxDigitCount =
-                    workingMemory.Chunks
-                        .OfType<IOperandChunk>()
-                        .Select(o => o.Value)
-                        .WhereNotNull()
-                        .Max(v => v.Items.Count());
+                var maxDigitCount = int.MinValue;
+
+                foreach (var operand in operands)
+                    if (operand.ValueArray != null && operand.ValueArray.Length > maxDigitCount)
+                        maxDigitCount = operand.ValueArray.Length;
+
                 result = maxDigitCount - operandsCurrentIndex;
             }
             

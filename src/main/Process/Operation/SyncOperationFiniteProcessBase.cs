@@ -35,7 +35,7 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
         public override IEnumerable<Neuron> GetCurrent()
         {
             List<Neuron> result = [];
-            int? digitIndex = this.WorkingMemory.GetOperandsCurrentIndex();
+            int? digitIndex = this.WorkingMemory.GetOperands().GetCurrentDigitIndex();
 
             if (digitIndex.HasValue)
                 result.AddRange(this.WorkingMemory.GetCurrent(digitIndex.Value).Select(c => c.Neuron));
@@ -50,6 +50,7 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
             bool result = false;
 
             int? currentDigitIndex = null;
+            var operandChunks = this.WorkingMemory.GetOperands();
             if
             (
                 this.WorkingMemory.TryHandleAllResults
@@ -58,11 +59,11 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                     (wm) =>
                     {
                         int? result = null;
-                        currentDigitIndex = this.WorkingMemory.GetOperandsCurrentIndex();
+                        currentDigitIndex = operandChunks.GetCurrentDigitIndex();
                         if (currentDigitIndex != null)
                         {
                             result =
-                                wm.GetExpectedHandledDigitsCount
+                                operandChunks.GetExpectedHandledDigitsCount
                                 (
                                     currentDigitIndex.Value,
                                     this.IsDigitProgressionIncremental
@@ -76,7 +77,7 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
             )
             {
                 result = true;
-                if (this.WorkingMemory.GetOperandsCurrentIndex() == currentDigitIndex)
+                if (operandChunks.GetCurrentDigitIndex() == currentDigitIndex)
                     foreach (var operand in this.operands)
                         operand.UpdateTracking(this.IsTrackingDirectionNext);
 

@@ -219,7 +219,7 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                         );
 
                     workingMemory.CurrentMultiplierProduct =
-                        workingMemory.MultiplierProducts.Lists.GetAdjacentOrDefault(workingMemory.CurrentMultiplierProduct);
+                        workingMemory.MultiplierProducts.Lists.ToArray().GetAdjacentOrDefault(workingMemory.CurrentMultiplierProduct);
 
                     complete();
                 }

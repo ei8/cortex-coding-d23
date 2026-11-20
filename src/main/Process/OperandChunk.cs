@@ -85,15 +85,24 @@ namespace ei8.Cortex.Coding.d23.Process
             }
         }
 
+        public INeuronChunk[]? ValueArray
+        {
+            get
+            {
+                if (this.Value != null && this.valueArray == null)
+                    this.valueArray = [.. this.Value.Items];
+
+                return this.valueArray;
+            }
+        }
+
         public int? GetCurrentDigitIndex()
         {
             int? result = null;
 
-            if (this.Value != null)
-                this.valueArray ??= [.. this.Value.Items];
-
-            if (this.valueArray != null)
-                result = Array.IndexOf(this.valueArray, this.CurrentDigit);
+            var va = this.ValueArray;
+            if (va != null)
+                result = Array.IndexOf(va, this.CurrentDigit);
 
             return result;
         }
@@ -109,7 +118,9 @@ namespace ei8.Cortex.Coding.d23.Process
         {
             ArgumentNullException.ThrowIfNull(this.Value);
 
-            this.CurrentDigit = this.Value.Items.GetAdjacentOrDefault(this.CurrentDigit, next);
+            var va = this.ValueArray;
+            if (va != null)
+                this.CurrentDigit = va.GetAdjacentOrDefault(this.CurrentDigit, next);
         }
     }
 }

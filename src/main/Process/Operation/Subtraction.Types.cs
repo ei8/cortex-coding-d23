@@ -46,6 +46,18 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                     this.Subtrahend.GetValueByIndex(digitIndex)
                 ];
 
+            public IOperandChunk[] GetOperands() =>
+                [
+                    this.Minuend,
+                    this.Subtrahend
+                ];
+
+            public IResultChunk[] GetResults() =>
+                [
+                    this.Difference,
+                    this.Borrow
+                ];
+
             public IEnumerableChunk<INeuronChunk> PrecedingBorrowValues => this.Content1;
 
             public IOperandChunk Minuend => this.Content2;
