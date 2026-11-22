@@ -69,7 +69,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
         public class InterneuronSet : CircuitInterneuronSetBase
         {
             protected override IEnumerable<ReadOnlyNetwork> GetNetworks() =>
-                NetworkHelper.ConvertToNetworks
+                PerfNetworkHelper.ConvertToNetworks
                 (
                     this.Half1_AND___Addend1__Addend2,
                     this.Half1_XOR___Addend1__Addend2,

@@ -25,6 +25,8 @@ namespace ei8.Cortex.Coding.d23.Process
         ),
         IOperandChunk
     {
+        private INeuronChunk[]? digitValuesArray;
+
         private INeuronChunk[]? valueArray;
 
         public OperandChunk
@@ -73,6 +75,16 @@ namespace ei8.Cortex.Coding.d23.Process
         }
 
         public IEnumerableChunk<INeuronChunk> DigitValues => this.Content1;
+
+        public INeuronChunk[] DigitValuesArray
+        {
+            get
+            {
+                this.digitValuesArray ??= [.. this.DigitValues.Items];
+
+                return this.digitValuesArray;
+            }
+        }
 
         public IEnumerableChunk<INeuronChunk>? Value => this.Content2;
 

@@ -64,7 +64,7 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
         {
             protected override IEnumerable<ReadOnlyNetwork> GetNetworks() =>
                 [
-                    ..NetworkHelper.ConvertToNetworks
+                    .. PerfNetworkHelper.ConvertToNetworks
                     (
                         this.AND___Dividend__Divisor
                     ),

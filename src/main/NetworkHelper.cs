@@ -12,9 +12,6 @@ namespace ei8.Cortex.Coding.d23
     // TODO: Use C# 14+ Extension Members and attach to Neuron and Terminal classes
     public static class NetworkHelper
     {
-        public static IEnumerable<ReadOnlyNetwork> ConvertToNetworks(params IneurUL?[] neurULs) =>
-            neurULs.WhereNotNull().Select(n => n.Network);
-
         public static bool TryCreateNeuron(
             [NotNullWhen(true)] out Neuron? result,
             [CallerArgumentExpression(nameof(result))] string parameterExpression = ""
@@ -239,6 +236,19 @@ namespace ei8.Cortex.Coding.d23
                     result.Add(NetworkHelper.CreateTerminal(presynapticNeuron, postsynapticNeuron, effect, strength));
 
             return result;
+        }
+    }
+
+    public static class PerfNetworkHelper
+    {
+        public static ReadOnlyNetwork[] ConvertToNetworks(params IneurUL?[] neurULs)
+        {
+            var result = new List<ReadOnlyNetwork>();
+
+            foreach (var neurUL in neurULs.WhereNotNull())
+                result.Add(neurUL.Network);
+
+            return [..result];
         }
     }
 }

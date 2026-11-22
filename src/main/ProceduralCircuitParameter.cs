@@ -9,6 +9,6 @@ namespace ei8.Cortex.Coding.d23
     {
         public TInput Inputs { get; } = inputs;
 
-        protected override IEnumerable<ReadOnlyNetwork> GetNetworks() => NetworkHelper.ConvertToNetworks(this.Inputs);
+        protected override IEnumerable<ReadOnlyNetwork> GetNetworks() => PerfNetworkHelper.ConvertToNetworks(this.Inputs);
     }
 }

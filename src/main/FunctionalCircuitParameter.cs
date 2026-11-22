@@ -16,7 +16,7 @@ namespace ei8.Cortex.Coding.d23
         where TInput : IInputCircuitParameterSubset
         where TOutput : IOutputCircuitParameterSubset
     {
-        protected override IEnumerable<ReadOnlyNetwork> GetNetworks() => [..base.GetNetworks(), ..NetworkHelper.ConvertToNetworks(this.Outputs)];
+        protected override IEnumerable<ReadOnlyNetwork> GetNetworks() => [..base.GetNetworks(), .. PerfNetworkHelper.ConvertToNetworks(this.Outputs)];
 
         public TOutput Outputs { get; } = outputs;
     }

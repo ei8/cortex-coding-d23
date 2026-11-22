@@ -20,7 +20,7 @@ namespace ei8.Cortex.Coding.d23
         where T2 : ICircuit
     {
         protected override IEnumerable<ReadOnlyNetwork> GetNetworks() =>
-            NetworkHelper.ConvertToNetworks(this.Circuit1, Circuit2);
+            PerfNetworkHelper.ConvertToNetworks(this.Circuit1, Circuit2);
 
         public T1 Circuit1 { get; } = circuit1;
 

@@ -10,6 +10,7 @@
         >
     {
         public IEnumerableChunk<INeuronChunk> DigitValues { get; }
+        public INeuronChunk[] DigitValuesArray { get; }
         public IEnumerableChunk<INeuronChunk>? Value { get; }
         public INeuronChunk[]? ValueArray { get; }
         public INeuronChunk? CurrentDigit { get; }
