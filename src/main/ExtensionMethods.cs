@@ -13,7 +13,7 @@ namespace ei8.Cortex.Coding.d23
 {
     using System.Linq;
 
-    public static class LinqExtensionMethods
+    public static class ExtensionMethods
     {
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
@@ -107,7 +107,7 @@ namespace ei8.Cortex.Coding.d23
             result = null;
             var tempResults = new List<ParseMotorResult>();
 
-            lock (LinqExtensionMethods.parseLock)
+            lock (ExtensionMethods.parseLock)
             {
                 var fireHistory = (ConcurrentDictionary<DateTime, FireInfo>)spikable.FireHistory;
                 fireHistory.Clean(currentFire.Timestamp.Subtract(spikable.RelatedSpikesPeriod));
@@ -119,12 +119,12 @@ namespace ei8.Cortex.Coding.d23
                 foreach (var rp in responseParsers)
                     if (currentFire.Target.Id == rp.ActionNeuronId || rp.Evaluator(currentFire))
                     {
-                        if (fireHistory.Count >= LinqExtensionMethods.GetExpectedResultCount(rp))
+                        if (fireHistory.Count >= ExtensionMethods.GetExpectedResultCount(rp))
                         {
                             var matchedActionNeurons = fireHistory.Select(fh => fh.Value).Where(n => n.Target.Id == rp.ActionNeuronId);
 
                             if (matchedActionNeurons.Count() > 1)
-                                LinqExtensionMethods.logger.Warn(
+                                ExtensionMethods.logger.Warn(
                                     new LogMessageGenerator(
                                         () =>
                                             $"{matchedActionNeurons.First().Target.ToReadableString()} fired more than once within related spikes period ({spikable.RelatedSpikesPeriod.TotalMilliseconds} ms): " +
@@ -145,7 +145,7 @@ namespace ei8.Cortex.Coding.d23
                                         {
                                             tempResults.Add(new(fi.Target, fi, objectResult));
 
-                                            if (tempResults.Count == LinqExtensionMethods.GetExpectedResultCount(rp))
+                                            if (tempResults.Count == ExtensionMethods.GetExpectedResultCount(rp))
                                             {
                                                 fireHistory.Clear();
                                                 bResult = true;
@@ -174,7 +174,7 @@ namespace ei8.Cortex.Coding.d23
 
 namespace ei8.Cortex.Coding.d23
 {
-    public static class ExtensionMethods
+    public static class PerfExtensionMethods
     {
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
@@ -282,51 +282,66 @@ namespace ei8.Cortex.Coding.d23
             resultInfo.Value.Add(new NeuronChunk(target));
             if (resultInfo is INamedChunk namedChunk)
             {
-                ExtensionMethods.logger.Info(new LogMessageGenerator(() => $"Added to {namedChunk.Name}: {target.Tag}"));
+                PerfExtensionMethods.logger.Info(new LogMessageGenerator(() => $"Added to {namedChunk.Name}: {target.Tag}"));
             }
         }
 
-        public static INeuronChunk GetValueByIndex
+        public static INeuronChunk GetDigitValueByValueIndex
         (
             this IOperandChunk operand,
             int index
         )
         {
+            ArgumentNullException.ThrowIfNull(operand.Value);
             ArgumentNullException.ThrowIfNull(operand.ValueArray);
 
-            return operand.GetValueByIndex
+            return operand.DigitValuesArray.GetDigitValueByValueIndex
             (
+                operand.ValueArray.Length,
                 index,
-                (n, i) =>
-                {
-                    var operandTag = operand.ValueArray[index].Neuron.Tag;
-                    return n.Tag.EndsWith(operandTag[operandTag.Length - 1]);
-                },
-                (n) => n.Tag.EndsWith('0')
+                (digitNeuron, valueNeuron) => 
+                    digitNeuron.Tag.EndsWith(valueNeuron.Tag[valueNeuron.Tag.Length - 1]),
+                digitNeuron => digitNeuron.Tag.EndsWith('0'),
+                i => operand.ValueArray[i]
             );
         }
 
-        public static INeuronChunk GetValueByIndex
+        public static INeuronChunk GetDigitValueByValueIndex
         (
-            this IOperandChunk operand,
+            this INeuronChunk[] digitValues,
+            int valueLength,
             int index,
-            Func<Neuron, int, bool> matchComparer,
-            Predicate<Neuron> noMatchComparer
+            Func<Neuron, Neuron, bool> matchComparer,
+            Predicate<Neuron> noMatchComparer,
+            Func<int, INeuronChunk> valueRetriever
         )
         {
             INeuronChunk result;
-            ArgumentNullException.ThrowIfNull(operand.Value);
 
-            if (operand.ValueArray != null && index < operand.ValueArray.Length)
-                result = operand.DigitValuesArray.GetByComparer(neuron => matchComparer(neuron, index));
+            if (index < valueLength)
+                result = 
+                    digitValues.GetValueByComparer
+                    (
+                        digitNeuron => 
+                            matchComparer
+                            (
+                                digitNeuron, 
+                                valueRetriever(index).Neuron
+                            )
+                    );
             else
-                result = operand.DigitValuesArray.GetByComparer(neuron => noMatchComparer(neuron));
+                result = digitValues.GetValueByComparer(neuron => noMatchComparer(neuron));
+
             return result;
         }
 
-        public static INeuronChunk GetByComparer(this INeuronChunk[] chunks, Predicate<Neuron> comparer)
+        public static INeuronChunk GetValueByComparer
+        (
+            this INeuronChunk[] valueChunks, 
+            Predicate<Neuron> comparer
+        )
         {
-            foreach (var chunk in chunks)
+            foreach (var chunk in valueChunks)
                 if (comparer(chunk.Neuron))
                     return chunk;
 

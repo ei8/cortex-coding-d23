@@ -31,8 +31,8 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
         {
             public IEnumerable<INeuronChunk> GetCurrent(int digitIndex) =>
                 [
-                    this.Comparand1.GetValueByIndex(digitIndex),
-                    this.Comparand2.GetValueByIndex(digitIndex)
+                    this.Comparand1.GetDigitValueByValueIndex(digitIndex),
+                    this.Comparand2.GetDigitValueByValueIndex(digitIndex)
                 ];
 
             public IOperandChunk[] GetOperands() =>

@@ -42,8 +42,8 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                                     this.Borrow.Value.ItemAt(digitIndex - 1).Neuron.Tag.Last()
                             )
                     ),
-                    this.Minuend.GetValueByIndex(digitIndex),
-                    this.Subtrahend.GetValueByIndex(digitIndex)
+                    this.Minuend.GetDigitValueByValueIndex(digitIndex),
+                    this.Subtrahend.GetDigitValueByValueIndex(digitIndex)
                 ];
 
             public IOperandChunk[] GetOperands() =>

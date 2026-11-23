@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace ei8.Cortex.Coding.d23.Process.Operation
@@ -30,6 +31,9 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
             ),
             ISyncOperationWorkingMemory
         {
+
+            private INeuronChunk[]? precedingCarryOverValuesArray = null;
+
             public static IEnumerable<Neuron> GetResultNeuronns(Addition.WorkingMemoryInfo workingMemory)
             {
                 var result = new List<Neuron>(workingMemory.Sum.Value.Items.Select(c => c.Neuron));
@@ -44,21 +48,37 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                 return result;
             }
 
-            public IEnumerable<INeuronChunk> GetCurrent(int digitIndex) =>
-                [
-                    this.PrecedingCarryOverValues.Items.Single
+            public IEnumerable<INeuronChunk> GetCurrent(int digitIndex)
+            {
+                var result = new List<INeuronChunk>();
+
+                result.AddRange
+                (
+                    [
+                        this.Augend.GetDigitValueByValueIndex(digitIndex),
+                        this.Addend.GetDigitValueByValueIndex(digitIndex)
+                    ]
+                );
+
+                var noMatchComparer = new Predicate<Neuron>(n => n.Tag.EndsWith('0'));
+                if (digitIndex == 0)
+                    result.Add(this.PrecedingCarryOverValuesArray.GetValueByComparer(noMatchComparer));
+                else if (digitIndex - 1 < this.CarryOver.Value.Count)
+                    result.Add
                     (
-                        n =>
-                            n.Neuron.Tag.EndsWith
-                            (
-                                digitIndex == 0 ?
-                                    '0' :
-                                    this.CarryOver.Value.ItemAt(digitIndex - 1).Neuron.Tag.Last()
-                            )
-                    ),
-                    this.Augend.GetValueByIndex(digitIndex),
-                    this.Addend.GetValueByIndex(digitIndex)
-                ];
+                        this.PrecedingCarryOverValuesArray.GetDigitValueByValueIndex
+                        (
+                            this.CarryOver.Value.Count,
+                            digitIndex - 1,
+                            (digitNeuron, valueNeuron) =>
+                                digitNeuron.Tag.EndsWith(valueNeuron.Tag[^1]),
+                            noMatchComparer,
+                            this.CarryOver.Value.ItemAt
+                        )
+                    );
+
+                return result;
+            }
 
             public IOperandChunk[] GetOperands() =>
                 [
@@ -73,6 +93,16 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                 ];
 
             public IEnumerableChunk<INeuronChunk> PrecedingCarryOverValues => this.Content1;
+
+            private INeuronChunk[] PrecedingCarryOverValuesArray
+            {
+                get
+                {
+                    this.precedingCarryOverValuesArray ??= this.PrecedingCarryOverValues.Items.ToArray();
+
+                    return this.precedingCarryOverValuesArray;
+                }
+            }
 
             public IOperandChunk Augend => this.Content2;
 
