@@ -55,14 +55,16 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                 result = this.DynamicAddition.HandleFire(targetNeuron);
             else
             {
-                var currentMultiplierDigitIndex = -1;
                 if 
                 (
                     // if target is a product digit
                     this.WorkingMemory.Product.DigitValues.Items.Any(c => c.Neuron == targetNeuron) &&
                     // and current multiplier index exists
-                    this.WorkingMemory.Multiplier.CurrentDigit != null &&
-                    (currentMultiplierDigitIndex = this.WorkingMemory.Multiplier.Value.Items.ToList().IndexOf(this.WorkingMemory.Multiplier.CurrentDigit)) >= 0
+                    this.WorkingMemory.Multiplier.ValueArray.TryGetIndexOf
+                    (
+                        this.WorkingMemory.Multiplier.CurrentDigit,
+                        out var currentMultiplierDigitIndex
+                    )
                 )
                 {
                     result = true; 
@@ -76,7 +78,7 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                         this.WorkingMemory.MultiplierProducts.Lists.Add(new ListChunk<INeuronChunk>());
 
                     // add product to current multiplier product
-                    this.WorkingMemory.MultiplierProducts.Lists[currentMultiplierDigitIndex].Items.Add(new NeuronChunk(targetNeuron));
+                    this.WorkingMemory.MultiplierProducts.Lists[currentMultiplierDigitIndex.Value].Items.Add(new NeuronChunk(targetNeuron));
 
                     DynamicMultiplication.logger.Info
                     (
@@ -89,7 +91,7 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                                     (
                                         string.Empty,
                                         this.WorkingMemory.MultiplierProducts
-                                            .Lists[currentMultiplierDigitIndex]
+                                            .Lists[currentMultiplierDigitIndex.Value]
                                             .Items.Reverse().Select(d => d.Neuron.Tag.Last())
                                     )
                                 }"

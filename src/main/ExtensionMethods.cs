@@ -347,56 +347,69 @@ namespace ei8.Cortex.Coding.d23
 
             throw new KeyNotFoundException();
         }
+
         public static bool TryHandleAllResults
         (
             this ISyncOperationWorkingMemory workingMemory,
             Neuron target,
-            Func<ISyncOperationWorkingMemory, int?> expectedHandledCountRetriever,
+            TryFunc<int?> expectedHandledCountRetriever,
             out bool targetHandled
         )
         {
-            int? expectedHandledCount = expectedHandledCountRetriever(workingMemory);
+            var result = false;
             targetHandled = false;
 
-            var expectedResults = workingMemory.GetResults();
-            IResultChunk? expectedResultTargetHandler = null;
-            foreach (var expectedResult in expectedResults)
-                if (expectedResult.CanHandle(target))
+            if (expectedHandledCountRetriever(out var expectedHandledCount))
+            {
+                var expectedResults = workingMemory.GetResults();
+                IResultChunk? expectedResultTargetHandler = null;
+                foreach (var expectedResult in expectedResults)
+                    if (expectedResult.CanHandle(target))
+                    {
+                        expectedResultTargetHandler = expectedResult;
+                        break;
+                    }
+                if
+                (
+                    expectedResultTargetHandler != null &&
+                    expectedResultTargetHandler.Value.Count < expectedHandledCount
+                )
                 {
-                    expectedResultTargetHandler = expectedResult;
-                    break;
+                    expectedResultTargetHandler.HandleFire(target);
+                    targetHandled = true;
                 }
 
-            if
-            (
-                expectedResultTargetHandler != null &&
-                expectedHandledCount != null &&
-                expectedResultTargetHandler.Value.Count < expectedHandledCount
-            )
-            {
-                expectedResultTargetHandler.HandleFire(target);
-                targetHandled = true;
+                var handledResultsCount = 0;
+                foreach (var expectedResult in expectedResults)
+                    if (expectedResult.Value.Count == expectedHandledCount)
+                        handledResultsCount++;
+
+                result = handledResultsCount == expectedResults.Length;
             }
 
-            var handledResultsCount = 0;
-            foreach (var expectedResult in expectedResults)
-                if (expectedResult.Value.Count == expectedHandledCount)
-                    handledResultsCount++;
-
-            return handledResultsCount == expectedResults.Length;
+            return result;
         }
 
-        public static int? GetCurrentDigitIndex(this IOperandChunk[] operands)
+        public static bool TryGetCurrentDigitIndex
+        (
+            this IOperandChunk[] operands,
+            [NotNullWhen(true)]
+            out int? result
+        )
         {
-            int? result = null;
+            result = null;
 
             foreach (var operand in operands)
             {
-                var index = operand.GetCurrentDigitIndex();
-                if (index.HasValue && (result == null || index > result))
+                if 
+                (
+                    operand.TryGetCurrentDigitIndex(out var index) && 
+                    (result == null || index > result)
+                )
                     result = index;
             }
-            return result;
+
+            return result.HasValue;
         }
 
         public static int GetExpectedHandledDigitsCount
@@ -422,6 +435,26 @@ namespace ei8.Cortex.Coding.d23
             }
 
             return result;
+        }
+
+        public static bool TryGetIndexOf<T>
+        (
+            this T[]? array,
+            T? value,
+            [NotNullWhen(true)]
+            out int? index
+        )
+        {
+            index = null;
+            if (array != null)
+                index =
+                    Array.IndexOf
+                    (
+                        array,
+                        value
+                    );
+
+            return index != null;
         }
     }
 }

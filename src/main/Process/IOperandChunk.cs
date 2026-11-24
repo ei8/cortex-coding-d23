@@ -14,7 +14,7 @@
         public IEnumerableChunk<INeuronChunk>? Value { get; }
         public INeuronChunk[]? ValueArray { get; }
         public INeuronChunk? CurrentDigit { get; }
-        public int? GetCurrentDigitIndex();
+        public bool TryGetCurrentDigitIndex(out int? index);
         public void UpdateTracking(bool next = true);
         public void ResetTracking();
     }

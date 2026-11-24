@@ -13,13 +13,13 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
             Action<SequentialAddition, IProcess?, IEnumerable<Neuron>>
         >
     {
-        private readonly Func<Neuron, int?> digitIndexRetriever;
+        private readonly TryFunc<Neuron, int?> digitIndexRetriever;
 
         public SequentialAddition
         (
             Addition.WorkingMemoryInfo workingMemory,
             DoUntil.WorkingMemoryInfo doUntilWorkingMemory,
-            Func<Neuron, int?> digitIndexRetriever,
+            TryFunc<Neuron, int?> digitIndexRetriever,
             Action<SequentialAddition, IProcess?, IEnumerable<Neuron>> completionCallback
         ) :
             base
@@ -46,8 +46,7 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
 
             result.AddRange(this.DoUntil.GetCurrent());
 
-            var counterIndex = this.digitIndexRetriever(this.DoUntil.WorkingMemory.CounterVariable.Neuron);
-            if (counterIndex.HasValue)
+            if (this.digitIndexRetriever(this.DoUntil.WorkingMemory.CounterVariable.Neuron, out var counterIndex))
                 result.AddRange(this.WorkingMemory.GetCurrent(counterIndex.Value).Select(c => c.Neuron));
             else
                 this.Complete(null);
@@ -65,14 +64,14 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                 this.WorkingMemory.TryHandleAllResults
                 (
                     targetNeuron,
-                    (wm) =>
+                    (out count) =>
                     {
-                        var result = this.digitIndexRetriever(this.DoUntil.WorkingMemory.CounterVariable.Neuron);
+                        count = null;
 
-                        if (result != null)
-                            result++;
+                        if (this.digitIndexRetriever(this.DoUntil.WorkingMemory.CounterVariable.Neuron, out int? index))
+                            count = index + 1;
 
-                        return result;
+                        return count.HasValue;
                     },
                     out var targetHandled
                 ) &&

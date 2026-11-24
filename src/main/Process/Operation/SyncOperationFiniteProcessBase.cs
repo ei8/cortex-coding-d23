@@ -35,9 +35,8 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
         public override IEnumerable<Neuron> GetCurrent()
         {
             List<Neuron> result = [];
-            int? digitIndex = this.WorkingMemory.GetOperands().GetCurrentDigitIndex();
 
-            if (digitIndex.HasValue)
+            if (this.WorkingMemory.GetOperands().TryGetCurrentDigitIndex(out var digitIndex))
                 result.AddRange(this.WorkingMemory.GetCurrent(digitIndex.Value).Select(c => c.Neuron));
             else
                 this.Complete();
@@ -56,20 +55,19 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                 this.WorkingMemory.TryHandleAllResults
                 (
                     targetNeuron,
-                    (wm) =>
+                    (out count) =>
                     {
-                        int? result = null;
-                        currentDigitIndex = operandChunks.GetCurrentDigitIndex();
-                        if (currentDigitIndex != null)
+                        count = null;
+                        if (operandChunks.TryGetCurrentDigitIndex(out currentDigitIndex))
                         {
-                            result =
+                            count =
                                 operandChunks.GetExpectedHandledDigitsCount
                                 (
                                     currentDigitIndex.Value,
                                     this.IsDigitProgressionIncremental
                                 );
                         }
-                        return result;
+                        return count.HasValue;
                     },
                     out var targetHandled
                 ) &&
@@ -77,7 +75,11 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
             )
             {
                 result = true;
-                if (operandChunks.GetCurrentDigitIndex() == currentDigitIndex)
+                if 
+                (
+                    operandChunks.TryGetCurrentDigitIndex(out var innerCurrentDigitIndex) &&
+                    innerCurrentDigitIndex == currentDigitIndex
+                )
                     foreach (var operand in this.operands)
                         operand.UpdateTracking(this.IsTrackingDirectionNext);
 

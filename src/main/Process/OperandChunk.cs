@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace ei8.Cortex.Coding.d23.Process
@@ -108,15 +109,15 @@ namespace ei8.Cortex.Coding.d23.Process
             }
         }
 
-        public int? GetCurrentDigitIndex()
+        public bool TryGetCurrentDigitIndex([NotNullWhen(true)] out int? index)
         {
-            int? result = null;
+            index = null;
 
             var va = this.ValueArray;
             if (va != null)
-                result = Array.IndexOf(va, this.CurrentDigit);
+                index = Array.IndexOf(va, this.CurrentDigit);
 
-            return result;
+            return index.HasValue;
         }
 
         public void ResetTracking()
