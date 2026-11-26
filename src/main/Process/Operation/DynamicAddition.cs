@@ -23,6 +23,6 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
         protected override bool IsDigitProgressionIncremental => true;
 
         protected override IEnumerable<Neuron> BuildResults() =>
-            Addition.WorkingMemoryInfo.GetResultNeuronns(this.WorkingMemory);
+            Addition.WorkingMemoryInfo.GetResultNeurons(this.WorkingMemory);
     }
 }

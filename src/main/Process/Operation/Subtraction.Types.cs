@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System;
+using System.Collections.Generic;
 
 namespace ei8.Cortex.Coding.d23.Process.Operation
 {
@@ -30,21 +30,34 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
             ),
             ISyncOperationWorkingMemory
         {
-            public IEnumerable<INeuronChunk> GetCurrent(int digitIndex) =>
-                [
-                    this.PrecedingBorrowValues.Items.Single
+            private INeuronChunk[]? precedingBorrowValuesArray = null;
+
+            public IEnumerable<INeuronChunk> GetCurrent(int digitIndex)
+            {
+                IEnumerable<INeuronChunk> result;
+
+                if
+                (
+                    this.PrecedingBorrowValuesArray.TryGetDigitValueByGroupedValueIndex
                     (
-                        n =>
-                            n.Neuron.Tag.EndsWith
-                            (
-                                digitIndex == 0 ?
-                                    '0' :
-                                    this.Borrow.Value.ItemAt(digitIndex - 1).Neuron.Tag.Last()
-                            )
-                    ),
-                    this.Minuend.GetDigitValueByValueIndex(digitIndex),
-                    this.Subtrahend.GetDigitValueByValueIndex(digitIndex)
-                ];
+                        this.Borrow.Value,
+                        digitIndex,
+                        out var precedingBorrow
+                    ) &&
+                    this.Minuend.TryGetDigitValueByValueIndex(digitIndex, out var minuend) &&
+                    this.Subtrahend.TryGetDigitValueByValueIndex(digitIndex, out var subtrahend)
+                )
+                    result = 
+                        [
+                            precedingBorrow,
+                            minuend, 
+                            subtrahend
+                        ];
+                else
+                    throw new ArgumentOutOfRangeException(nameof(digitIndex));
+
+                return result;
+            }
 
             public IOperandChunk[] GetOperands() =>
                 [
@@ -59,6 +72,16 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                 ];
 
             public IEnumerableChunk<INeuronChunk> PrecedingBorrowValues => this.Content1;
+
+            private INeuronChunk[] PrecedingBorrowValuesArray
+            {
+                get
+                {
+                    this.precedingBorrowValuesArray ??= [.. this.PrecedingBorrowValues.Items];
+
+                    return this.precedingBorrowValuesArray;
+                }
+            }
 
             public IOperandChunk Minuend => this.Content2;
 

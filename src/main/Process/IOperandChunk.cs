@@ -7,15 +7,19 @@
             IEnumerableChunk<INeuronChunk>?,
             INeuronChunk?,
             INeuronChunk?
-        >
+        >,
+        IDigitValueArray
     {
         public IEnumerableChunk<INeuronChunk> DigitValues { get; }
-        public INeuronChunk[] DigitValuesArray { get; }
         public IEnumerableChunk<INeuronChunk>? Value { get; }
-        public INeuronChunk[]? ValueArray { get; }
         public INeuronChunk? CurrentDigit { get; }
         public bool TryGetCurrentDigitIndex(out int? index);
-        public void UpdateTracking(bool next = true);
+
+        /// <summary>
+        /// Updates current digit to an adjacent digit or null if one does not exist.
+        /// </summary>
+        /// <param name="ascending">A value indicating whether retrieval direction is ascending (lower to higher index) or otherwise.</param>
+        public void UpdateTracking(bool ascending = true);
         public void ResetTracking();
     }
 }

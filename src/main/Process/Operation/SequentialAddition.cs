@@ -90,7 +90,7 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
             (
                 this, 
                 process,
-                Addition.WorkingMemoryInfo.GetResultNeuronns(this.WorkingMemory)
+                Addition.WorkingMemoryInfo.GetResultNeurons(this.WorkingMemory)
             );
             this.WorkingMemory.Sum.Value.Clear();
         }

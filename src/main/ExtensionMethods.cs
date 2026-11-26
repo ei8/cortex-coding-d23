@@ -212,29 +212,40 @@ namespace ei8.Cortex.Coding.d23
         // 1. Store current digit info
         // 2. Retrieve next digit value by looping from first digit to current digit
         // 3. Use Equal (Operation-TBD) as condition in DoUntil  to determine if current Digit Index is equal to current digit info
-        internal static T? GetAdjacentOrDefault<T>(this T[] itemArray, T? currentItem, bool next = true)
+        /// <summary>
+        /// Gets adjacent item in an array.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="itemArray"></param>
+        /// <param name="currentItem"></param>
+        /// <param name="ascending">A value indicating whether retrieval direction is ascending (lower to higher index) or otherwise.</param>
+        /// <returns></returns>
+        internal static T? GetAdjacentOrDefault<T>(this T[] itemArray, T? currentItem, bool ascending = true)
             where T : class
         {
             T? adjacentItem = default;
 
             if (currentItem != null)
             {
-                var currentIndex = Array.IndexOf(itemArray, currentItem);
-
-                if (next)
+                if (itemArray.TryGetIndexOf(currentItem, out var currentIndex))
                 {
-                    if (currentIndex < itemArray.Length - 1)
+                    if (ascending)
                     {
-                        adjacentItem = itemArray[currentIndex + 1];
+                        if (currentIndex < itemArray.Length - 1)
+                        {
+                            adjacentItem = itemArray[currentIndex.Value + 1];
+                        }
+                    }
+                    else
+                    {
+                        if (currentIndex > 0)
+                        {
+                            adjacentItem = itemArray[currentIndex.Value - 1];
+                        }
                     }
                 }
                 else
-                {
-                    if (currentIndex > 0)
-                    {
-                        adjacentItem = itemArray[currentIndex - 1];
-                    }
-                }
+                    throw new ArgumentOutOfRangeException(nameof(currentItem));
             }
 
             return adjacentItem;
@@ -286,66 +297,134 @@ namespace ei8.Cortex.Coding.d23
             }
         }
 
-        public static INeuronChunk GetDigitValueByValueIndex
+        public static bool TryGetDigitValueByValueIndex
         (
-            this IOperandChunk operand,
-            int index
+            this IDigitValueArray digitValueArray,
+            int index,
+            [NotNullWhen(true)]
+            out INeuronChunk? result
         )
         {
-            ArgumentNullException.ThrowIfNull(operand.Value);
-            ArgumentNullException.ThrowIfNull(operand.ValueArray);
+            ArgumentNullException.ThrowIfNull(digitValueArray.ValueArray);
 
-            return operand.DigitValuesArray.GetDigitValueByValueIndex
+            result = null;
+
+            return digitValueArray.DigitValuesArray.TryGetDigitValueByValueIndex
             (
-                operand.ValueArray.Length,
+                digitValueArray.ValueArray.Length,
                 index,
-                (digitNeuron, valueNeuron) => 
-                    digitNeuron.Tag.EndsWith(valueNeuron.Tag[valueNeuron.Tag.Length - 1]),
+                (digitNeuron, valueNeuron) =>
+                    digitNeuron.Tag.EndsWith(valueNeuron.Tag[^1]),
                 digitNeuron => digitNeuron.Tag.EndsWith('0'),
-                i => operand.ValueArray[i]
+                i => digitValueArray.ValueArray[i],
+                out result
             );
         }
 
-        public static INeuronChunk GetDigitValueByValueIndex
+        public static bool TryGetDigitValueByValueIndex
         (
             this INeuronChunk[] digitValues,
             int valueLength,
             int index,
             Func<Neuron, Neuron, bool> matchComparer,
             Predicate<Neuron> noMatchComparer,
-            Func<int, INeuronChunk> valueRetriever
+            Func<int, INeuronChunk> valueRetriever,
+            [NotNullWhen(true)]
+            out INeuronChunk? result
         )
         {
-            INeuronChunk result;
+            result = null;
 
             if (index < valueLength)
-                result = 
-                    digitValues.GetValueByComparer
-                    (
-                        digitNeuron => 
-                            matchComparer
-                            (
-                                digitNeuron, 
-                                valueRetriever(index).Neuron
-                            )
-                    );
+                digitValues.TryGetValueByComparer
+                (
+                    digitNeuron =>
+                        matchComparer
+                        (
+                            digitNeuron,
+                            valueRetriever(index).Neuron
+                        ),
+                    out result
+                );
             else
-                result = digitValues.GetValueByComparer(neuron => noMatchComparer(neuron));
+                digitValues.TryGetValueByComparer
+                (
+                    neuron => noMatchComparer(neuron),
+                    out result
+                );
 
-            return result;
+            return result != null;
         }
 
-        public static INeuronChunk GetValueByComparer
+        public static bool TryGetDigitValueByGroupedValueIndex
         (
-            this INeuronChunk[] valueChunks, 
-            Predicate<Neuron> comparer
+            this INeuronChunk[] digitValues,
+            IConcurrentListChunk<INeuronChunk> value,
+            int index,
+            [NotNullWhen(true)]
+            out INeuronChunk? result
         )
         {
+            result = null;
+
+            return 
+                (
+                    index == 0 &&
+                    digitValues.TryGetValueByComparer
+                    (
+                        n => n.Tag.EndsWith('0'),
+                        out result
+                    )
+                ) ||
+                (
+                    index - 1 < value.Count &&
+                    digitValues.TryGetDigitValueByValueIndex
+                    (
+                        value,
+                        index - 1,
+                        out result
+                    )
+                );
+        }
+
+        public static bool TryGetDigitValueByValueIndex
+        (
+            this INeuronChunk[] digitValues,
+            IConcurrentListChunk<INeuronChunk> value,
+            int index,
+            [NotNullWhen(true)]
+            out INeuronChunk? result
+        )
+        {
+            return digitValues.TryGetDigitValueByValueIndex
+                (
+                    value.Count,
+                    index,
+                    (digitNeuron, valueNeuron) =>
+                        digitNeuron.Tag.EndsWith(valueNeuron.Tag[^1]),
+                    n => n.Tag.EndsWith('0'),
+                    value.ItemAt,
+                    out result
+                );
+        }
+
+        public static bool TryGetValueByComparer
+        (
+            this INeuronChunk[] valueChunks,
+            Predicate<Neuron> comparer,
+            [NotNullWhen(true)]
+            out INeuronChunk? result
+        )
+        {
+            result = null;
             foreach (var chunk in valueChunks)
                 if (comparer(chunk.Neuron))
-                    return chunk;
+                {
+                    result = chunk;
+                    break;
+                }
 
-            throw new KeyNotFoundException();
+            return result != null;
         }
 
         public static bool TryHandleAllResults
@@ -401,9 +480,9 @@ namespace ei8.Cortex.Coding.d23
 
             foreach (var operand in operands)
             {
-                if 
+                if
                 (
-                    operand.TryGetCurrentDigitIndex(out var index) && 
+                    operand.TryGetCurrentDigitIndex(out var index) &&
                     (result == null || index > result)
                 )
                     result = index;
@@ -455,6 +534,20 @@ namespace ei8.Cortex.Coding.d23
                     );
 
             return index != null;
+        }
+
+        public static TResult[] Select<T, TResult>
+        (
+            this T[] array,
+            Func<T, TResult> selector
+        )
+        {
+            var result = new List<TResult>();
+
+            foreach (var item in array)
+                result.Add(selector(item));
+
+            return [.. result];
         }
     }
 }

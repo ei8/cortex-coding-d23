@@ -53,8 +53,25 @@ namespace ei8.Cortex.Coding.d23.Process
             (
                 digitValues,
                 value,
+                true
+            )
+        { 
+        }
+
+        public OperandChunk
+        (
+            IEnumerableChunk<INeuronChunk> digitValues,
+            IEnumerableChunk<INeuronChunk> value,
+            bool ascending
+        ) :
+            this
+            (
+                digitValues,
+                value,
                 null,
-                value.Items.First()
+                ascending ?
+                    value.Items.First() :
+                    value.Items.Last()
             )
         {
         }
@@ -98,14 +115,14 @@ namespace ei8.Cortex.Coding.d23.Process
             }
         }
 
-        public INeuronChunk[]? ValueArray
+        public INeuronChunk[] ValueArray
         {
             get
             {
                 if (this.Value != null && this.valueArray == null)
                     this.valueArray = [.. this.Value.Items];
 
-                return this.valueArray;
+                return this.valueArray ?? [];
             }
         }
 
@@ -127,13 +144,13 @@ namespace ei8.Cortex.Coding.d23.Process
             this.CurrentDigit = this.Value.Items.First();
         }
 
-        public void UpdateTracking(bool next)
+        public void UpdateTracking(bool ascending)
         {
             ArgumentNullException.ThrowIfNull(this.Value);
 
             var va = this.ValueArray;
             if (va != null)
-                this.CurrentDigit = va.GetAdjacentOrDefault(this.CurrentDigit, next);
+                this.CurrentDigit = va.GetAdjacentOrDefault(this.CurrentDigit, ascending);
         }
     }
 }

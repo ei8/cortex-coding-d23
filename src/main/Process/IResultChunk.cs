@@ -5,7 +5,8 @@
         <
             IEnumerableChunk<INeuronChunk>,
             IConcurrentListChunk<INeuronChunk>
-        >
+        >,
+        IDigitValueArray
     {
         public IEnumerableChunk<INeuronChunk> DigitValues { get; }
         public IConcurrentListChunk<INeuronChunk> Value { get; }

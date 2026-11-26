@@ -122,7 +122,7 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                             // otherwise, if more
                             else
                             {
-                                this.Process1 = DynamicMultiplication.CreateDynamicAddition
+                                this.DynamicAddition = DynamicMultiplication.CreateDynamicAddition
                                 (
                                     this.WorkingMemory,
                                     this.additionWorkingMemory,
@@ -166,22 +166,30 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
         )
         {
             IListChunk<INeuronChunk> augend;
+            // if multiplier products were previously added
             if (workingMemory.LastAdditionSum != null)
             {
+                // use last sum as augend
                 augend = workingMemory.LastAdditionSum;
+                // ensure current multiplier product is set
                 ArgumentNullException.ThrowIfNull(workingMemory.CurrentMultiplierProduct);
             }
+            // otherwise
             else
             {
+                // use first multiplier product as augend
                 augend = workingMemory.MultiplierProducts.Lists[0];
+                // use second multiplier product as current multiplier product
                 workingMemory.CurrentMultiplierProduct = workingMemory.MultiplierProducts.Lists[1];
             }
 
+            // if current multiplier product is already past count of product digits
             if 
             (
                 workingMemory.MultiplierProducts.Lists.IndexOf(workingMemory.CurrentMultiplierProduct) > 
                 workingMemory.Product.Value.Count
             )
+                // add least digit of augend to product
                 workingMemory.Product.Value.Add(augend.Items[0]);
 
             return new
@@ -189,19 +197,18 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                 new
                 (
                     additionWorkingMemoryInfo.PrecedingCarryOverValues,
+                    // use remaining (skipping least digit) digits of augend as augend
                     new OperandChunk
                     (
                         additionWorkingMemoryInfo.Augend.DigitValues,
                         new EnumerableChunk<INeuronChunk>([.. augend.Items.Skip(1).Select(ad => new NeuronChunk(ad.Neuron))])
                     ),
+                    // use current multiplier product as addend
                     new OperandChunk
                     (
                         additionWorkingMemoryInfo.Addend.DigitValues,
                         new EnumerableChunk<INeuronChunk>([.. workingMemory.CurrentMultiplierProduct.Items.Select(c => new NeuronChunk(c.Neuron))])
                     ),
-                    // Clone without value to ensure IResultChunk.Value is cleared for each DynamicAddition
-                    // Otherwise, DynamicAddition will be unable to add to ResultChunk.Value since it is already filled 
-                    // in a previously instantiated DynamicAddition
                     ResultChunk.CloneWithoutValue((ResultChunk)additionWorkingMemoryInfo.Sum),
                     ResultChunk.CloneWithoutValue((ResultChunk)additionWorkingMemoryInfo.CarryOver)
                 ),
@@ -232,7 +239,7 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
         {
             if (this.WorkingMemory.CurrentMultiplierProduct != null)
             {
-                this.Process1 = DynamicMultiplication.CreateDynamicAddition
+                this.DynamicAddition = DynamicMultiplication.CreateDynamicAddition
                     (
                         this.WorkingMemory,
                         this.additionWorkingMemory,
@@ -241,7 +248,7 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
             }
             else
             {
-                this.Process1 = null;
+                this.DynamicAddition = null;
                 this.Complete();
             }
         }
@@ -258,6 +265,10 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
             }
         }
 
-        public DynamicAddition? DynamicAddition => this.Process1;
+        public DynamicAddition? DynamicAddition 
+        {
+            get => this.Process1; 
+            private set { this.Process1 = value; }
+        }
     }
 }

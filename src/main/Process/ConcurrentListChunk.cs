@@ -7,7 +7,7 @@ namespace ei8.Cortex.Coding.d23.Process
     public class ConcurrentListChunk<T> : IConcurrentListChunk<T>
         where T : IChunk
     {
-        private ConcurrentDictionary<int, T> innerDictionary;
+        private readonly ConcurrentDictionary<int, T> innerDictionary;
 
         public ConcurrentListChunk(IEnumerable<T> items)
         {

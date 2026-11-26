@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace ei8.Cortex.Coding.d23.Process.Operation
 {
@@ -29,11 +30,21 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
             ),
             ISyncOperationWorkingMemory
         {
-            public IEnumerable<INeuronChunk> GetCurrent(int digitIndex) =>
-                [
-                    this.Comparand1.GetDigitValueByValueIndex(digitIndex),
-                    this.Comparand2.GetDigitValueByValueIndex(digitIndex)
-                ];
+            public IEnumerable<INeuronChunk> GetCurrent(int digitIndex)
+            {
+                IEnumerable<INeuronChunk> result;
+
+                if
+                (
+                    this.Comparand1.TryGetDigitValueByValueIndex(digitIndex, out var comparand1) &&
+                    this.Comparand2.TryGetDigitValueByValueIndex(digitIndex, out var comparand2)
+                )
+                    result = [comparand1, comparand2];
+                else
+                    throw new ArgumentOutOfRangeException(nameof(digitIndex));
+
+                return result;
+            }
 
             public IOperandChunk[] GetOperands() =>
                 [
