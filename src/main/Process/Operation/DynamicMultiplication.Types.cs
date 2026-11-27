@@ -33,6 +33,24 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
             ),
             IAsyncOperationWorkingMemory
         {
+            public WorkingMemoryInfo
+            (
+                IOperandChunk multiplicand,
+                IOperandChunk multiplier,
+                IResultChunk product
+            ) : 
+                this
+                (
+                    multiplicand,
+                    multiplier,
+                    new NestedNeuronListChunk(),
+                    null,
+                    null,
+                    product
+                )
+            {
+                
+            }
             public IEnumerable<INeuronChunk> GetCurrent()
             {
                 var result = new List<INeuronChunk>();

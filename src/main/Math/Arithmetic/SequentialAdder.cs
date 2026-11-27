@@ -13,8 +13,10 @@ namespace ei8.Cortex.Coding.d23.Math.Arithmetic
         Adder adder,
         VariableInfo? variableInfo
     ) : 
-        CompositeCircuitBase
+        AugmentedCompositeCircuitBase
         <
+            SequentialAdder,
+            SequentialAdder.AugmentationInfo,
             Next, 
             Adder
         >

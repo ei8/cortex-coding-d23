@@ -15,12 +15,26 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
     {
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
-        private readonly Addition.WorkingMemoryInfo additionWorkingMemory;
+        private readonly Addition.WorkingMemoryInfo? additionWorkingMemory;
 
         public DynamicMultiplication
         (
             DynamicMultiplication.WorkingMemoryInfo workingMemory,
-            Addition.WorkingMemoryInfo additionWorkingMemory,
+            Action<DynamicMultiplication, IEnumerable<Neuron>> completionCallback
+        ) :
+            this
+            (
+                workingMemory,
+                null,
+                completionCallback
+            )
+        {
+        }
+
+        public DynamicMultiplication
+        (
+            DynamicMultiplication.WorkingMemoryInfo workingMemory,
+            Addition.WorkingMemoryInfo? additionWorkingMemory,
             Action<DynamicMultiplication, IEnumerable<Neuron>> completionCallback
         ) :
             base
@@ -112,8 +126,13 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
                         // ... otherwise if multiplier products have accumulated
                         else if (this.WorkingMemory.MultiplierProducts.Lists.Count > 0)
                         {
-                            // if it's just one mulitplier product
-                            if (this.WorkingMemory.MultiplierProducts.Lists.Count == 1)
+                            // if it's just one multiplier product or
+                            // additionWorkingMemory was not specified
+                            if 
+                            (
+                                this.WorkingMemory.MultiplierProducts.Lists.Count == 1 ||
+                                this.additionWorkingMemory == null
+                            )
                             {
                                 foreach (var mp in this.WorkingMemory.MultiplierProducts.Lists[0].Items)
                                     this.WorkingMemory.Product.Value.Add(mp);
@@ -237,7 +256,11 @@ namespace ei8.Cortex.Coding.d23.Process.Operation
 
         private void AdditionCompleteHandler()
         {
-            if (this.WorkingMemory.CurrentMultiplierProduct != null)
+            if 
+            (
+                this.WorkingMemory.CurrentMultiplierProduct != null && 
+                this.additionWorkingMemory != null
+            )
             {
                 this.DynamicAddition = DynamicMultiplication.CreateDynamicAddition
                     (
